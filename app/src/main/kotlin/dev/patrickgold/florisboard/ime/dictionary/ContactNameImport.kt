@@ -116,32 +116,11 @@ object ContactNameImport {
     /**
      * Writes [tokens] to [dao] and returns those that were actually new, in order.
      *
-     * `locale = null` is what the dictionary calls "all languages" — right for a name, which belongs to
-     * a person rather than to the language the keyboard happens to be set to. The comparison is
-     * case-insensitive because "Bondur" and "bondur" are the same word to everything downstream, and a
-     * second row would only clutter the list.
+     * The writing itself moved to [PersonalDictionaryWriter] when issue #389 gave the custom-words
+     * importer the same job; the rule it applies is unchanged.
      */
-    fun addToDictionary(dao: UserDictionaryDao, tokens: List<String>): List<String> {
-        val added = mutableListOf<String>()
-        for (token in tokens) {
-            val known = runCatching {
-                dao.query(token).any { it.word.equals(token, ignoreCase = true) }
-            }.getOrDefault(true)
-            if (known) continue
-            runCatching {
-                dao.insert(
-                    UserDictionaryEntry(
-                        id = 0,
-                        word = token,
-                        freq = FREQUENCY_MAX,
-                        locale = null,
-                        shortcut = null,
-                    ),
-                )
-            }.onSuccess { added.add(token) }
-        }
-        return added
-    }
+    fun addToDictionary(dao: UserDictionaryDao, tokens: List<String>): List<String> =
+        PersonalDictionaryWriter.addWords(dao, tokens)
 
     /**
      * The name parts of [fields], de-duplicated case-insensitively and capped.

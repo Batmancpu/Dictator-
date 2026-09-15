@@ -188,6 +188,9 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.dictate__style_prompt_title, R.string.dictate__formatting_title, Routes.Settings.DictateFormatting, parentRes = R.string.dictate__title),
         SettingsSearchEntry(R.string.dictate__style_prompt_custom_title, R.string.dictate__formatting_title, Routes.Settings.DictateFormatting, parentRes = R.string.dictate__title),
         SettingsSearchEntry(R.string.dictate__custom_words_title, R.string.dictate__formatting_title, Routes.Settings.DictateFormatting, parentRes = R.string.dictate__title),
+        // Hand-added (issue #389); the generator is lossy, so a rerun of it must be diffed before keeping.
+        SettingsSearchEntry(R.string.dictate__custom_words_import, R.string.dictate__formatting_title, Routes.Settings.DictateFormatting, parentRes = R.string.dictate__title, anchor = "dictate__custom_words_import"),
+        SettingsSearchEntry(R.string.dictate__custom_words_export, R.string.dictate__formatting_title, Routes.Settings.DictateFormatting, parentRes = R.string.dictate__title, anchor = "dictate__custom_words_export"),
         SettingsSearchEntry(R.string.dictate__mappings_title, R.string.dictate__formatting_title, Routes.Settings.DictateFormatting, parentRes = R.string.dictate__title, anchor = "dictate__mappings_title"),
         SettingsSearchEntry(R.string.dictate__push_to_talk_title, R.string.dictate__recording_group, Routes.Settings.DictateRecording, parentRes = R.string.dictate__title, anchor = "dictate__push_to_talk_title"),
         SettingsSearchEntry(R.string.dictate__realtime_title, R.string.dictate__recording_group, Routes.Settings.DictateRecording, parentRes = R.string.dictate__title, anchor = "dictate__realtime_title"),
