@@ -72,6 +72,7 @@ import dev.patrickgold.florisboard.dictate.ui.LegacyLayoutState
 import dev.patrickgold.florisboard.dictate.ui.legacySwipeToggle
 import dev.patrickgold.florisboard.ime.ImeUiMode
 import dev.patrickgold.florisboard.ime.clipboard.ClipboardInputLayout
+import dev.patrickgold.florisboard.ime.editor.EditingPanel
 import dev.patrickgold.florisboard.ime.input.LocalInputFeedbackController
 import dev.patrickgold.florisboard.ime.keyboard.ProvideKeyboardRowBaseHeight
 import dev.patrickgold.florisboard.ime.media.MediaInputLayout
@@ -292,6 +293,10 @@ private fun ImeInnerWindow() {
                 ImeUiMode.HISTORY -> ProvideActualLayoutDirection { DictateHistoryLayout() }
                 ImeUiMode.GIF -> ProvideActualLayoutDirection { GifPanel() }
                 ImeUiMode.STICKER -> ProvideActualLayoutDirection { StickerPanel() }
+                // The cursor pad keeps the *actual* layout direction like every other panel: its arrows
+                // are auto-mirrored icons, so a right-to-left script gets a pad that points the way its
+                // text runs (issue #386).
+                ImeUiMode.EDITING -> ProvideActualLayoutDirection { EditingPanel() }
             }
             ImeSystemUiFloating()
         }

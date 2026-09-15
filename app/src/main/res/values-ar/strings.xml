@@ -72,6 +72,7 @@
     <string name="quick_action__clipboard_cut__tooltip">تنفيذ قص للحافظة</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">لصق</string>
     <string name="quick_action__clipboard_paste__tooltip">تنفيذ لصق للحافظة</string>
+    <string name="quick_action__clipboard_select">تحديد</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">تحديد الكل</string>
     <string name="quick_action__clipboard_select_all__tooltip">تنفيذ تحديد الكل للحافظة</string>
     <string name="quick_action__ime_ui_mode_clipboard" comment="Please mind the limited available space for the quick action strings">الحافظة</string>
@@ -570,6 +571,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">يبدو أن Dictate يوقف عن العمل بشكل متكرر…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">تم العودة إلى لوحة المفاتيح السابقة لإيقاف التعطل المتكرر الغير منتهي. انقر لعرض تفاصيل الخطأ</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">العودة إلى لوحة المفاتيح</string>
     <string name="clipboard__header_title">الحافظة</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">البحث في الحافظة</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">لا يوجد عنصر يحتوي على ذلك</string>
@@ -911,6 +913,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">حرك المؤشر إلى بداية الصفحة</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">حرك المؤشر إلى نهاية الصفحة</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">فتح مدير الحافظة /السجل</string>
+    <string name="enum__swipe_action__switch_to_editing_context">فتح لوحة تحرير النص</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">مفتاح التحويل shift</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">إعادة</string>
     <string name="enum__swipe_action__undo" comment="Enum value label">تراجع</string>
@@ -988,6 +991,8 @@
         <item quantity="other">{v} مرشحون</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">تحرير النص</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">تحريك المؤشر وتحديد النص وتحريره</string>
     <string name="quick_action__ime_ui_mode_dictate">الإملاء</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">انقر للإملاء، وانقر مرة أخرى للتفريغ النصي</string>
     <string name="quick_action__dictate_live_prompt">أمر صوتي</string>

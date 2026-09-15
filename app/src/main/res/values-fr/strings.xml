@@ -72,6 +72,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Coupe vers le presse-papier</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Coller</string>
     <string name="quick_action__clipboard_paste__tooltip">Coller depuis le presse-papier</string>
+    <string name="quick_action__clipboard_select">Sélectionner</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Tout sélect.</string>
     <string name="quick_action__clipboard_select_all__tooltip">Tout sélectionner dans le presse-papiers</string>
     <string name="quick_action__ime_ui_mode_clipboard" comment="Please mind the limited available space for the quick action strings">Pressepapier</string>
@@ -618,6 +619,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Dictate semble cesser de fonctionner de façon répétitive…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Retour au clavier précédent pour arrêter la boucle de plantage infinie. Appuyez pour afficher les détails de l\'erreur</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">Retour au clavier</string>
     <string name="clipboard__header_title">Presse-papier</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Rechercher dans le presse-papiers</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">Aucun élément ne contient cela</string>
@@ -959,6 +961,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">Déplacer le curseur au début de la page</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">Déplacer le curseur à la fin de la page</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Ouvrir l\'historique du presse-papier</string>
+    <string name="enum__swipe_action__switch_to_editing_context">Ouvrir le panneau d\'édition de texte</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Maj</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Recommencer</string>
     <string name="enum__swipe_action__undo" comment="Enum value label">Annuler</string>
@@ -1008,6 +1011,8 @@
         <item quantity="other">{v} candidats</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">Édition de texte</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">Déplacer le curseur, sélectionner et modifier le texte</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Touchez pour dicter, touchez à nouveau pour transcrire</string>
     <string name="quick_action__dictate_live_prompt">Instruction en direct</string>

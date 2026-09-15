@@ -74,6 +74,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Execute o corte da área de transferência</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Colar</string>
     <string name="quick_action__clipboard_paste__tooltip">Execute colar da área de transferência</string>
+    <string name="quick_action__clipboard_select">Selecionar</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Selec. tudo</string>
     <string name="quick_action__clipboard_select_all__tooltip">Executar seleção de tudo da área de transferência</string>
     <string name="quick_action__forward_delete" comment="Please mind the limited available space for the quick action strings">Suprimir</string>
@@ -683,6 +684,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Parece que Dictate não está a funcionar muito bem…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">A ativar o teclado usado anteriormente para parar este ciclo. Toque para ver os detalhes do erro.</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">Voltar ao teclado</string>
     <string name="clipboard__header_title">Área de transferência</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Pesquisar na área de transferência</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">Nenhum item contém isso</string>
@@ -1060,6 +1062,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">Mover cursor para o início da página</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">Mover cursor para o fim da página</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Abrir gestor da área de transferência</string>
+    <string name="enum__swipe_action__switch_to_editing_context">Abrir o painel de edição de texto</string>
     <string name="enum__swipe_action__switch_to_media_context" comment="Enum value label">Abrir painel de emojis</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Deslocar</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Refazer</string>
@@ -1110,6 +1113,8 @@
         <item quantity="other">{v} candidatos</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">Edição de texto</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">Mover o cursor, selecionar e editar texto</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Toque para ditar, toque novamente para transcrever</string>
     <string name="quick_action__dictate_live_prompt">Instrução em direto</string>

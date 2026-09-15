@@ -149,6 +149,7 @@ Dictate nothing and are not going anywhere.
   - Full theme customization with day/night presets and automatic switching, plus bundled themes of our own: **Glass** and **Glass Clear** (translucent, so the app you are in tints the keyboard), **Sand**, **Deep** and a high-contrast **E-Ink** pair for e-readers
   - Emoji keyboard with search in **51 languages** — look for "heart", "心" or "قلب" and land on the same emoji — plus **emoji suggestions while you type** in about fifty languages and an optional row of your pinned and recent emojis
   - A searchable clipboard that offers what you just copied, tracking parameters stripped from pasted links, an inline calculator, a selection counter, jumps to the start and end of the field, and an incognito mode that remembers nothing
+  - A **text editing panel** — a cursor pad that repeats when held, a *Select* key that turns the arrows into a selection, and cut/copy/paste next to them, so fixing a typo in the middle of a paragraph does not mean aiming at it with a fingertip
   - One-handed / compact mode, a **split keyboard** for two thumbs on a tablet or an unfolded foldable, gesture actions, customizable key sound & haptic feedback
 - **Privacy-respecting by design** — no tracking, and your audio goes only to the provider you configure. Choose a key, a server of your own or an on-device model and Dictate never talks to us at all; choose Dictate Cloud and nothing you say or write is stored on the way through.
 

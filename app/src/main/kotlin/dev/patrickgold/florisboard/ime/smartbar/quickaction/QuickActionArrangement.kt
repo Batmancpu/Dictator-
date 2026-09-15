@@ -73,6 +73,10 @@ data class QuickActionArrangement(
                 // button – it lives as a chip inside the prompt panel/row – so only the panel opener
                 // (DICTATE_PROMPTS) remains here.
                 QuickAction.InsertKey(TextKeyData.DICTATE_PROMPTS),
+                // The text editing panel (issue #386) — cursor pad, select, clipboard — high in the
+                // default order because it is the one surface that replaces a dozen of the actions
+                // further down this list, and because a panel nobody finds is a panel nobody has.
+                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_EDITING),
                 QuickAction.InsertKey(TextKeyData.CLIPBOARD_SELECT_ALL),
                 QuickAction.InsertKey(TextKeyData.UNDO),
                 QuickAction.InsertKey(TextKeyData.REDO),

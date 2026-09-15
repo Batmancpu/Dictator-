@@ -376,6 +376,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             SwipeAction.SHOW_INPUT_METHOD_PICKER -> TextKeyData.SYSTEM_INPUT_METHOD_PICKER
             SwipeAction.SHOW_SUBTYPE_PICKER -> TextKeyData.SHOW_SUBTYPE_PICKER
             SwipeAction.SWITCH_TO_CLIPBOARD_CONTEXT -> TextKeyData.IME_UI_MODE_CLIPBOARD
+            SwipeAction.SWITCH_TO_EDITING_CONTEXT -> TextKeyData.IME_UI_MODE_EDITING
             SwipeAction.SWITCH_TO_MEDIA_CONTEXT -> TextKeyData.IME_UI_MODE_MEDIA
             SwipeAction.SWITCH_TO_PREV_SUBTYPE -> TextKeyData.IME_PREV_SUBTYPE
             SwipeAction.SWITCH_TO_NEXT_SUBTYPE -> TextKeyData.IME_NEXT_SUBTYPE
@@ -1520,6 +1521,12 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             KeyCode.IME_UI_MODE_STICKER -> {
                 closeEmojiSearch(returnToMedia = false)
                 activeState.imeUiMode = ImeUiMode.STICKER
+            }
+            // Opens the text editing panel (issue #386). The keys on it send the very codes handled in
+            // this `when`, so the panel adds a surface and no second implementation of anything.
+            KeyCode.IME_UI_MODE_EDITING -> {
+                closeEmojiSearch(returnToMedia = false)
+                activeState.imeUiMode = ImeUiMode.EDITING
             }
             KeyCode.IME_UI_MODE_DICTATE -> dev.patrickgold.florisboard.dictate.DictateController.onMicClick(appContext)
             KeyCode.DICTATE_LIVE_PROMPT -> dev.patrickgold.florisboard.dictate.DictateController.startLivePrompt(appContext)

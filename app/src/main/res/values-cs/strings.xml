@@ -73,6 +73,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Vykonat vyjmutí do schránky</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Vložit</string>
     <string name="quick_action__clipboard_paste__tooltip">Vykonat vložení schránky</string>
+    <string name="quick_action__clipboard_select">Vybrat</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Vybrat vše</string>
     <string name="quick_action__clipboard_select_all__tooltip">Vykonat vybrání všeho do schránky</string>
     <string name="quick_action__forward_delete" comment="Please mind the limited available space for the quick action strings">Smazat za</string>
@@ -694,6 +695,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Zdá se, že Dictate přestal opakovaně pracovat…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Vrácení zpět na předchozí klávesnici pro zastavení nekonečného crash loopu. Klepnutím zobrazíte podrobnosti o chybě</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">Zpět na klávesnici</string>
     <string name="clipboard__header_title">Schránka</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Hledat ve schránce</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">Žádná položka to neobsahuje</string>
@@ -1082,6 +1084,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">Přesunout kurzor na začátek stránky</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">Přesunout kurzor na konec stránky</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Otevřít správce schránky / historii</string>
+    <string name="enum__swipe_action__switch_to_editing_context">Otevřít panel úprav textu</string>
     <string name="enum__swipe_action__switch_to_media_context" comment="Enum value label">Otevřít panel emotikonů</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Přepnout shift</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Vpřed</string>
@@ -1146,6 +1149,8 @@
         <item quantity="other">{v} návrhů</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">Úpravy textu</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">Přesouvání kurzoru, výběr a úpravy textu</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Klepnutím diktujte, dalším klepnutím přepište</string>
     <string name="quick_action__dictate_live_prompt">Pokyn naživo</string>

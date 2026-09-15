@@ -74,6 +74,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Изрязва в междинната памет</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Поставяне</string>
     <string name="quick_action__clipboard_paste__tooltip">Поставя от междинната памет</string>
+    <string name="quick_action__clipboard_select">Избор</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Избор всички</string>
     <string name="quick_action__clipboard_select_all__tooltip">Избира всичко</string>
     <string name="quick_action__forward_delete" comment="Please mind the limited available space for the quick action strings">Премахване →</string>
@@ -692,6 +693,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Dictate изглежда спира да работи многократно…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Връщане към предишна клавиатура, за да се спре безкрайния цикъл от сривове. Докоснете, за да видите подробности за грешката</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">Обратно към клавиатурата</string>
     <string name="clipboard__header_title">Междинна памет</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Търсене в клипборда</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">Няма запис, който да съдържа това</string>
@@ -1080,6 +1082,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">Курсорът се премества в началото на страницата</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">Курсорът се премества в края на страницата</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Управление на междинната памет</string>
+    <string name="enum__swipe_action__switch_to_editing_context">Отваряне на панела за редактиране на текст</string>
     <string name="enum__swipe_action__switch_to_media_context" comment="Enum value label">Отваря панела с емоции</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Shift</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Възстановяване</string>
@@ -1130,6 +1133,8 @@
         <item quantity="other">{v} кандидата</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">Редактиране</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">Преместване на курсора, избор и редактиране на текст</string>
     <string name="quick_action__ime_ui_mode_dictate">Диктовка</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Докоснете, за да диктувате, докоснете отново за транскрибиране</string>
     <string name="quick_action__dictate_live_prompt">Гласова инструкция</string>

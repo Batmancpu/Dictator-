@@ -35,6 +35,8 @@ import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.ContentPasteGo
 import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.HighlightAlt
 import androidx.compose.material.icons.filled.FontDownload
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -244,6 +246,12 @@ fun ComputingEvaluator.computeImageVector(data: KeyData): ImageVector? {
         KeyCode.CLIPBOARD_SELECT_ALL -> {
             Icons.Default.SelectAll
         }
+        // The "Select" toggle of the editing panel (issue #386): after it, the arrows drag a selection
+        // instead of moving the cursor. A marquee with a pointer, because that is the gesture it stands
+        // in for — deliberately not the filled SelectAll square next to it, which means *everything*.
+        KeyCode.CLIPBOARD_SELECT -> {
+            Icons.Default.HighlightAlt
+        }
         KeyCode.CLIPBOARD_CLEAR_PRIMARY_CLIP -> {
             Icons.Default.DeleteSweep
         }
@@ -316,6 +324,9 @@ fun ComputingEvaluator.computeImageVector(data: KeyData): ImageVector? {
         }
         KeyCode.IME_UI_MODE_STICKER -> {
             Icons.Outlined.Sticker
+        }
+        KeyCode.IME_UI_MODE_EDITING -> {
+            Icons.Default.EditNote
         }
         KeyCode.IME_UI_MODE_DICTATE -> {
             when (dev.patrickgold.florisboard.dictate.DictateController.state.value) {

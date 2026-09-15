@@ -73,6 +73,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Klembord knippen uitvoeren</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Plakken</string>
     <string name="quick_action__clipboard_paste__tooltip">Plakken van klembord uitvoeren</string>
+    <string name="quick_action__clipboard_select">Selecteren</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Alles selec.</string>
     <string name="quick_action__clipboard_select_all__tooltip">Alles selecteren op klembord</string>
     <string name="quick_action__ime_ui_mode_clipboard" comment="Please mind the limited available space for the quick action strings">Klembord</string>
@@ -614,6 +615,7 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Dictate lijkt herhaaldelijk te stoppen met werken…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Terugvallen op het vorige toetsenbord om oneindige crash-loop te stoppen. Tik om foutdetails te bekijken</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">Terug naar het toetsenbord</string>
     <string name="clipboard__header_title">Klembord</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Zoeken in klembord</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">Geen fragment bevat dat</string>
@@ -980,6 +982,7 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">Cursor aan het begin van de pagina plaatsen</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">Cursor aan het einde van de pagina plaatsen</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Open klembordbeheer/geschiedenis</string>
+    <string name="enum__swipe_action__switch_to_editing_context">Tekstbewerkingspaneel openen</string>
     <string name="enum__swipe_action__switch_to_media_context" comment="Enum value label">Emoji-paneel openen</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Verschuiving</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Opnieuw</string>
@@ -1030,6 +1033,8 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
         <item quantity="other">{v} kandidaten</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">Tekst bewerken</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">Cursor verplaatsen, tekst selecteren en bewerken</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Tik om te dicteren, tik nogmaals om te transcriberen</string>
     <string name="quick_action__dictate_live_prompt">Live-instructie</string>

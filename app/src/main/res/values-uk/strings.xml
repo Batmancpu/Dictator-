@@ -72,6 +72,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Вирізати</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Вставити</string>
     <string name="quick_action__clipboard_paste__tooltip">Вставити</string>
+    <string name="quick_action__clipboard_select">Виділити</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Обрати все</string>
     <string name="quick_action__clipboard_select_all__tooltip">Виділити все</string>
     <string name="quick_action__ime_ui_mode_clipboard" comment="Please mind the limited available space for the quick action strings">Буфер обміну</string>
@@ -571,6 +572,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Здається, Dictate постійно перестає працювати…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Повернення до попередньої клавіатури, щоб зупинити нескінченний цикл збою. Натисніть, щоб переглянути деталі про помилку</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">Назад до клавіатури</string>
     <string name="clipboard__header_title">Буфер обміну</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Пошук у буфері обміну</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">Жоден запис цього не містить</string>
@@ -912,6 +914,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">Перемістити курсор на початок тексту</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">Перемістити курсор в кінець тексту</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Відкрити буфер обміну/історію</string>
+    <string name="enum__swipe_action__switch_to_editing_context">Відкрити панель редагування тексту</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Shift</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Повторити</string>
     <string name="enum__swipe_action__undo" comment="Enum value label">Відмінити</string>
@@ -975,6 +978,8 @@
         <item quantity="other">{v} пропозицій</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">Редагування тексту</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">Переміщення курсора, виділення та редагування тексту</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Торкніться, щоб диктувати, торкніться ще раз для транскрибування</string>
     <string name="quick_action__dictate_live_prompt">Голосова інструкція</string>

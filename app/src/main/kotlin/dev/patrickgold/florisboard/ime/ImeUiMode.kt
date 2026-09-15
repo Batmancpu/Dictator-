@@ -23,7 +23,14 @@ enum class ImeUiMode(val value: Int) {
     DICTATE(3),
     HISTORY(4),
     GIF(5),
-    STICKER(6);
+    STICKER(6),
+
+    /**
+     * The text editing panel (issue #386): cursor pad, select toggle and the clipboard actions on one
+     * surface. The values are packed into [dev.patrickgold.florisboard.ime.keyboard.KeyboardState], so
+     * adding a mode past the region's width silently truncates it — see the note there.
+     */
+    EDITING(7);
 
     companion object {
         fun fromInt(int: Int) = entries.firstOrNull { it.value == int } ?: TEXT

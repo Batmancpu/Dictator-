@@ -136,6 +136,7 @@ data class TextKeyData(
                 IME_UI_MODE_CLIPBOARD,
                 IME_UI_MODE_GIF,
                 IME_UI_MODE_STICKER,
+                IME_UI_MODE_EDITING,
                 IME_UI_MODE_DICTATE,
                 DICTATE_LIVE_PROMPT,
                 DICTATE_PROMPTS,
@@ -452,6 +453,12 @@ data class TextKeyData(
             type = KeyType.SYSTEM_GUI,
             code = KeyCode.IME_UI_MODE_STICKER,
             label = "ime_ui_mode_sticker",
+        )
+        /** Predefined key data for [KeyCode.IME_UI_MODE_EDITING] (opens the text editing panel) */
+        val IME_UI_MODE_EDITING = TextKeyData(
+            type = KeyType.SYSTEM_GUI,
+            code = KeyCode.IME_UI_MODE_EDITING,
+            label = "ime_ui_mode_editing",
         )
         /** Predefined key data for [KeyCode.IME_UI_MODE_DICTATE] (Dictate AI voice panel) */
         val IME_UI_MODE_DICTATE = TextKeyData(

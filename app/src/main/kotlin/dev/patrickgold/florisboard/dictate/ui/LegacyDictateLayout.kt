@@ -502,6 +502,11 @@ private fun LegacyActionKey(
         LegacyEditAction.END -> ThemedIconKey(KeyCode.MOVE_END_OF_PAGE, action.icon, label, modifier) {
             keyboardManager.tapKey(KeyCode.MOVE_END_OF_PAGE)
         }
+        // The editing panel (#386) — set directly like the other panel openers above, rather than
+        // through the key code, because this layout never shows a Smartbar for the key to come from.
+        LegacyEditAction.EDITING -> ThemedIconKey(KeyCode.NOOP, action.icon, label, modifier) {
+            keyboardManager.activeState.imeUiMode = ImeUiMode.EDITING
+        }
     }
 }
 

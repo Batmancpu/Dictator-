@@ -74,6 +74,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Lakukan potongan papan klip</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Tempelkan</string>
     <string name="quick_action__clipboard_paste__tooltip">Lakukan penempelan papan klip</string>
+    <string name="quick_action__clipboard_select">Pilih</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Pilih semua</string>
     <string name="quick_action__clipboard_select_all__tooltip">Lakukan pemilihan semua papan klip</string>
     <string name="quick_action__ime_ui_mode_clipboard" comment="Please mind the limited available space for the quick action strings">Papan klip</string>
@@ -679,6 +680,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Dictate kelihatannya berhenti bekerja berulang kali…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Mengembalikan ke papan ketik sebelumnya untuk menghentikan pengulangan kesalahan tidak terbatas. Ketuk untuk melihat detail kesalahan</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">Kembali ke papan ketik</string>
     <string name="clipboard__header_title">Papan klip</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Cari di papan klip</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">Tidak ada klip yang memuat itu</string>
@@ -1043,6 +1045,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">Pindahkan kursor ke awal halaman</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">Pindahkan kursor ke akhir halaman</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Buka manager/histori papan klip</string>
+    <string name="enum__swipe_action__switch_to_editing_context">Buka panel edit teks</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Shift</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Ulangi</string>
     <string name="enum__swipe_action__undo" comment="Enum value label">Urungkan</string>
@@ -1085,6 +1088,8 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
         <item quantity="other">Kandidat {v}</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">Edit teks</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">Pindahkan kursor, pilih, dan edit teks</string>
     <string name="quick_action__ime_ui_mode_dictate">Dikte</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Ketuk untuk mendikte, ketuk lagi untuk mentranskripsi</string>
     <string name="quick_action__dictate_live_prompt">Perintah suara</string>

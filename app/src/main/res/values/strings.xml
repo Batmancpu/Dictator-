@@ -192,6 +192,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Perform clipboard cut</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Paste</string>
     <string name="quick_action__clipboard_paste__tooltip">Perform clipboard paste</string>
+    <string name="quick_action__clipboard_select" comment="Toggle in the text editing panel: while it is on, the arrow keys extend the selection instead of moving the cursor. Mind the limited space.">Select</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Select all</string>
     <string name="quick_action__clipboard_select_all__tooltip">Perform clipboard select all</string>
     <string name="quick_action__forward_delete" comment="Please mind the limited available space for the quick action strings">Forward delete</string>
@@ -203,6 +204,8 @@
     <string name="quick_action__ime_ui_mode_gif__tooltip">Search GIFs</string>
     <string name="quick_action__ime_ui_mode_sticker" comment="Please mind the limited available space for the quick action strings">Sticker</string>
     <string name="quick_action__ime_ui_mode_sticker__tooltip">Insert your own stickers</string>
+    <string name="quick_action__ime_ui_mode_editing" comment="Opens the text editing panel: cursor pad, select, cut/copy/paste. Mind the limited space.">Text editing</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">Move the cursor, select and edit text</string>
     <string name="quick_action__ime_ui_mode_dictate" comment="Please mind the limited available space for the quick action strings">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Tap to dictate, tap again to transcribe</string>
     <string name="quick_action__dictate_live_prompt" comment="Please mind the limited available space for the quick action strings">Live prompt</string>
@@ -1228,6 +1231,9 @@
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Falling back to previous keyboard to stop infinite crash loop. Tap to view error details</string>
 
 
+    <!-- Text editing panel strings -->
+    <string name="editing__back_to_keyboard" comment="Content description of the ABC key in the text editing panel">Back to the keyboard</string>
+
     <!-- Clipboard strings -->
     <string name="clipboard__header_title">Clipboard</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Search your clips</string>
@@ -1657,6 +1663,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">Move cursor to start of page</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">Move cursor to end of page</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Open clipboard manager/history</string>
+    <string name="enum__swipe_action__switch_to_editing_context" comment="Enum value label">Open text editing panel</string>
     <string name="enum__swipe_action__switch_to_media_context" comment="Enum value label">Open emoji panel</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Shift</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Redo</string>

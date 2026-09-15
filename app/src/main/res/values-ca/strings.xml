@@ -72,6 +72,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Retalla i desa al porta-retalls</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Enganxa</string>
     <string name="quick_action__clipboard_paste__tooltip">Enganxa del porta-retalls</string>
+    <string name="quick_action__clipboard_select">Selecciona</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Escull tot</string>
     <string name="quick_action__clipboard_select_all__tooltip">Selecciona-ho tot i desa-ho al porta-retalls</string>
     <string name="quick_action__ime_ui_mode_clipboard" comment="Please mind the limited available space for the quick action strings">Porta-retall</string>
@@ -587,6 +588,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Sembla que Dictate ha deixat de funcionar repetidament…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Tornant al teclat anterior per aturar el bucle de fallada infinit. Toca per veure els detalls de l\'error</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">Torna al teclat</string>
     <string name="clipboard__header_title">Porta-retalls</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Cerca al porta-retalls</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">Cap element no conté això</string>
@@ -951,6 +953,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">Mou el cursor al principi de la pàgina</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">Mou el cursor al final de la pàgina</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Obre l\'historial/administrador del porta-retalls</string>
+    <string name="enum__swipe_action__switch_to_editing_context">Obre el tauler d\'edició de text</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Majúscules</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Refés</string>
     <string name="enum__swipe_action__undo" comment="Enum value label">Desfés</string>
@@ -1000,6 +1003,8 @@
         <item quantity="other">{v} suggeriments</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">Edició de text</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">Mou el cursor, selecciona i edita el text</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Toca per dictar, torna a tocar per transcriure</string>
     <string name="quick_action__dictate_live_prompt">Instrucció en directe</string>

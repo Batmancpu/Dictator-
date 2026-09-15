@@ -74,6 +74,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Vágólapra kivágás végrehajtása</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Beillesztés</string>
     <string name="quick_action__clipboard_paste__tooltip">Vágólapról beillesztés végrehajtása</string>
+    <string name="quick_action__clipboard_select">Kijelölés</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Mind kijelöl</string>
     <string name="quick_action__clipboard_select_all__tooltip">Összes kijelölése vágólapra végrehajtása</string>
     <string name="quick_action__forward_delete" comment="Please mind the limited available space for the quick action strings">Törlés előre</string>
@@ -695,6 +696,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Úgy tűnik, hogy a Dictate többször leállt…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Visszalépés az előző billentyűzetre, a végtelen összeomlás megakadályozásához. Érintse meg a hiba részleteinek megtekintéséhez</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">Vissza a billentyűzethez</string>
     <string name="clipboard__header_title">Vágólap</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Keresés a vágólapon</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">Egyik elem sem tartalmazza ezt</string>
@@ -1079,6 +1081,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">Kurzor mozgatása a lap elejére</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">Kurzor mozgatása a lap végére</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Vágólapkezelő/vágólapelőzmények megnyitása</string>
+    <string name="enum__swipe_action__switch_to_editing_context">Szövegszerkesztő panel megnyitása</string>
     <string name="enum__swipe_action__switch_to_media_context" comment="Enum value label">Emodzsi panel megnyitása</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Shift</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Újra</string>
@@ -1129,6 +1132,8 @@
         <item quantity="other">{v} jelölt</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">Szövegszerkesztés</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">Kurzormozgatás, kijelölés és szövegszerkesztés</string>
     <string name="quick_action__ime_ui_mode_dictate">Diktálás</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Koppintson a diktáláshoz, majd újra az átíráshoz</string>
     <string name="quick_action__dictate_live_prompt">Élő utasítás</string>

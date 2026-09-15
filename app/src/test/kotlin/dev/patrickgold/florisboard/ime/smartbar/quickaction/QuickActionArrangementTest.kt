@@ -165,4 +165,35 @@ class QuickActionArrangementTest : FunSpec({
             beforeDistinct.distinct() shouldBe afterDistinct
         }
     }
+
+    // How a newly shipped action reaches someone who already has a stored arrangement — the editing
+    // panel (issue #386) is only discoverable because of this, and a panel nobody can open is no panel.
+    context("a stored arrangement gains actions that were added after it was saved") {
+        test("a brand new action is appended to the visible actions") {
+            val stored = QuickActionArrangement(
+                stickyAction = QuickAction.InsertKey(TextKeyData.IME_UI_MODE_DICTATE),
+                dynamicActions = listOf(QuickAction.InsertKey(TextKeyData.CLIPBOARD_SELECT_ALL)),
+                hiddenActions = listOf(),
+            )
+            val restored = QuickActionArrangement.Serializer.deserialize(
+                QuickActionArrangement.Serializer.serialize(stored)
+            )
+            restored.dynamicActions.first() shouldBe QuickAction.InsertKey(TextKeyData.CLIPBOARD_SELECT_ALL)
+            restored.contains(QuickAction.InsertKey(TextKeyData.IME_UI_MODE_EDITING)) shouldBe true
+        }
+
+        test("an action already in the arrangement is not added a second time") {
+            val stored = QuickActionArrangement(
+                stickyAction = null,
+                dynamicActions = listOf(),
+                hiddenActions = listOf(QuickAction.InsertKey(TextKeyData.IME_UI_MODE_EDITING)),
+            )
+            val restored = QuickActionArrangement.Serializer.deserialize(
+                QuickActionArrangement.Serializer.serialize(stored)
+            )
+            restored.dynamicActions.count {
+                it == QuickAction.InsertKey(TextKeyData.IME_UI_MODE_EDITING)
+            } shouldBe 0
+        }
+    }
 })

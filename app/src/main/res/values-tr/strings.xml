@@ -73,6 +73,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Panoya kes eylemini gerçekleştir</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Yapıştır</string>
     <string name="quick_action__clipboard_paste__tooltip">Panoyu yapıştır</string>
+    <string name="quick_action__clipboard_select">Seç</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Tümünü seç</string>
     <string name="quick_action__clipboard_select_all__tooltip">Tümünü seç eylemini gerçekleştir</string>
     <string name="quick_action__forward_delete" comment="Please mind the limited available space for the quick action strings">İletiyi sil</string>
@@ -683,6 +684,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Dictate tekrar tekrar çalışmayı durduruyor gibi görünüyor…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Sonsuz çökme döngüsünü durdurmak için önceki klavyeye geri dönülüyor. Hata ayrıntılarını görüntülemek için dokunun</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">Klavyeye dön</string>
     <string name="clipboard__header_title">Pano</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Panoda ara</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">Bunu içeren bir öge yok</string>
@@ -1059,6 +1061,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">İmleci sayfa başına taşı</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">İmleci sayfa sonuna taşı</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Pano yöneticisini/geçmişini aç</string>
+    <string name="enum__swipe_action__switch_to_editing_context">Metin düzenleme panelini aç</string>
     <string name="enum__swipe_action__switch_to_media_context" comment="Enum value label">Emoji panelini aç</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Shift</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Yinele</string>
@@ -1109,6 +1112,8 @@
         <item quantity="other">{v} aday</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">Metin düzenleme</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">İmleci taşıyın, metni seçin ve düzenleyin</string>
     <string name="quick_action__ime_ui_mode_dictate">Dikte</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Dikte etmek için dokunun, yazıya dökmek için tekrar dokunun</string>
     <string name="quick_action__dictate_live_prompt">Canlı komut</string>
