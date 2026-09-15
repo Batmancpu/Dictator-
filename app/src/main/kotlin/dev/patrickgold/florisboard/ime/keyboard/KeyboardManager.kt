@@ -1867,6 +1867,16 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
                     // feature itself is turned off, since the panel is otherwise always available.
                     dev.patrickgold.florisboard.dictate.DictateController.isHistoryEnabled()
                 }
+                KeyCode.VIEW_NUMERIC_ADVANCED -> {
+                    // The number-pad action (issue #388) is for digits in an ordinary text field. In a
+                    // number or phone field the pad is already what opens, so the action can only take
+                    // something away: those layouts deliberately have no ABC key, while the advanced pad
+                    // has one, and it leads to letters with no route back to the digits short of leaving
+                    // the field and coming back. Greyed out rather than hidden, like the split-layout
+                    // action, so a button the user placed in the bar does not disappear from under them.
+                    editorInfo.inputAttributes.type != InputAttributes.Type.NUMBER &&
+                        editorInfo.inputAttributes.type != InputAttributes.Type.PHONE
+                }
                 else -> true
             }
         }

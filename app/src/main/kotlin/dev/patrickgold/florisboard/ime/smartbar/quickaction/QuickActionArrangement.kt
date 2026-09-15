@@ -125,6 +125,12 @@ data class QuickActionArrangement(
                 // end for the same reason: worth having in the list, not worth a Smartbar slot for
                 // everyone who never turned the row on in the first place.
                 QuickAction.InsertKey(TextKeyData.TOGGLE_NUMBER_ROW),
+                // The number pad (issue #388). It has always been built and styled, but the only ways to
+                // ask for it were a numeric field deciding for you and a keyboard-mode cycle nobody binds
+                // to a gesture. Next to the number-row toggle because that is the other digit answer, and
+                // at the end for the same reason as the GIF and sticker panels: an IBAN or a serial number
+                // is a real errand, but not one often enough to spend a Smartbar slot on for everyone.
+                QuickAction.InsertKey(TextKeyData.VIEW_NUMERIC_ADVANCED),
             ),
             hiddenActions = listOf(
             ),

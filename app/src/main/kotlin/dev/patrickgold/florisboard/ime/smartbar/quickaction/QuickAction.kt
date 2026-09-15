@@ -114,6 +114,7 @@ fun QuickAction.computeDisplayName(evaluator: ComputingEvaluator): String {
             KeyCode.SPLIT_LAYOUT -> R.string.quick_action__split_layout
             KeyCode.TOGGLE_RESIZE_MODE -> R.string.quick_action__resize_mode
             KeyCode.TOGGLE_NUMBER_ROW -> R.string.quick_action__toggle_number_row
+            KeyCode.VIEW_NUMERIC_ADVANCED -> R.string.quick_action__view_numeric_advanced
             KeyCode.DRAG_MARKER -> if (evaluator.state.debugShowDragAndDropHelpers) {
                 R.string.quick_action__drag_marker
             } else {
@@ -165,6 +166,7 @@ fun QuickAction.computeTooltip(evaluator: ComputingEvaluator): String {
             KeyCode.SPLIT_LAYOUT -> R.string.quick_action__split_layout__tooltip
             KeyCode.TOGGLE_RESIZE_MODE -> R.string.quick_action__resize_mode__tooltip
             KeyCode.TOGGLE_NUMBER_ROW -> R.string.quick_action__toggle_number_row__tooltip
+            KeyCode.VIEW_NUMERIC_ADVANCED -> R.string.quick_action__view_numeric_advanced__tooltip
             KeyCode.DRAG_MARKER -> if (evaluator.state.debugShowDragAndDropHelpers) {
                 R.string.quick_action__drag_marker__tooltip
             } else {

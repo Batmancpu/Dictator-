@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.ContentPasteGo
 import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.Dialpad
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.HighlightAlt
@@ -270,6 +271,15 @@ fun ComputingEvaluator.computeImageVector(data: KeyData): ImageVector? {
         // available and an icon that also flips would only say it twice.
         KeyCode.TOGGLE_NUMBER_ROW -> {
             Icons.Default.Numbers
+        }
+        // The number pad, reachable from the Smartbar since issue #388. Only there: on the keyboard this
+        // key has always worn a 2×2 block of digits as its label — "1 2 / 3 4", which is what the symbol
+        // layer shows and what people recognise — and that label is two lines of tiny text inside a round
+        // Smartbar button. A dial pad rather than the "#" of the number-row toggle right above, because
+        // the two are easy to confuse and do very different things: one folds a row away, the other
+        // replaces the whole keyboard.
+        KeyCode.VIEW_NUMERIC_ADVANCED -> {
+            Icons.Default.Dialpad.takeIf { evaluator.keyboard.mode == KeyboardMode.SMARTBAR_QUICK_ACTIONS }
         }
         KeyCode.TOGGLE_FLOATING_WINDOW -> {
             val enabledIcon = context()?.vectorResource(id = R.drawable.ic_floating_keyboard)
