@@ -77,14 +77,28 @@ import org.florisboard.lib.snygg.ui.rememberSnyggThemeQuery
 /**
  * How much of the body the labelled action tiles take, against [PadWeight] for the cursor pad.
  *
- * Not a taste decision: a tile is a 24 sp icon, the 8 dp the theme puts under it and a line of text, so
- * about 58 dp before its own margin. Any less and the label is clipped on a short keyboard, and a tile
- * whose caption is half a word is worse than a tile with no caption at all.
+ * Bounded from below rather than chosen: a tile is [TileIconSize], [TileIconGap] and a line of text —
+ * about 47 dp with the tile's own padding, 55 dp with its margin — and anything under that clips the
+ * caption on a short keyboard, where a tile captioned with half a word is worse than one with no
+ * caption. Everything above that floor belongs to the pad, so this sits just clear of it.
  */
-private const val ActionRowWeight = 1.7f
+private const val ActionRowWeight = 1.25f
 
 /** The cursor pad is the thing this panel is for, so it gets the room. */
 private const val PadWeight = 3f
+
+/**
+ * The tile icons, sized here rather than by `smartbar-action-tile-icon`'s 24 sp.
+ *
+ * That element is written for the Smartbar's overflow grid, where a tile is a square about 88 dp
+ * across; in a row a fifth of the screen wide the same icon plus the 8 dp gap the theme puts under it
+ * made the row taller than the pad it sits above. The element name is kept, so the colour and the
+ * greyed-out state are still the theme's — only the measurement is ours.
+ */
+private val TileIconSize = 20.dp
+
+/** Between a tile's icon and its caption. Tight, because the two are one label. */
+private val TileIconGap = 3.dp
 
 /** The pad's card against the quiet columns beside it — wide enough that the cross is the focal point. */
 private const val PadCardWeight = 3.2f
@@ -309,15 +323,14 @@ private fun ActionTile(
             verticalArrangement = Arrangement.Center,
         ) {
             if (imageVector != null) {
-                // Box around the icon, not a styled icon: `smartbar-action-tile-icon` carries a margin
-                // as well as the size, and this is the shape the Smartbar's own tiles are built in.
-                SnyggBox(
+                SnyggIcon(
                     elementName = FlorisImeUi.SmartbarActionTileIcon.elementName,
                     attributes = attributes,
                     selector = selector,
-                ) {
-                    SnyggIcon(imageVector = imageVector)
-                }
+                    modifier = Modifier.size(TileIconSize),
+                    imageVector = imageVector,
+                )
+                Spacer(modifier = Modifier.height(TileIconGap))
             }
             SnyggText(
                 elementName = FlorisImeUi.SmartbarActionTileText.elementName,
