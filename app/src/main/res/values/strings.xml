@@ -1026,6 +1026,47 @@
     <string name="apptour61__outro_eyebrow">That is 6.1</string>
     <string name="apptour61__outro_title">Same keyboard, fewer edges</string>
     <string name="apptour61__outro_body">Nothing about how you already dictate has changed — your own key, your own server, or a model on the device. You can revisit any tour under Settings › About.</string>
+    <string name="apptour62__cta_try" comment="Button on a what\'s-new page that opens the settings screen for the feature just described">Try it</string>
+    <string name="apptour62__cta_manage" comment="Button on a what\'s-new page for a feature this release switches ON for everyone; it opens the screen holding the switch, so the label must offer the way out, not the way in">Where to switch it off</string>
+    <string name="apptour62__art_word" comment="A word shown being learned in the illustration. Pick a first name or term that no dictionary in your language would know — short, at most about eight letters.">Zoya</string>
+    <string name="apptour62__art_emoji_word" comment="A word shown being typed in the illustration, for which an emoji is then suggested. Must be an everyday word in your language whose emoji is obvious — keep it short.">cake</string>
+    <string name="apptour62__art_emoji" comment="The emoji suggested for apptour62__art_emoji_word in the illustration. Change it only if your word needs a different one.">🍰</string>
+    <string name="apptour62__intro_eyebrow">Dictate 6.2</string>
+    <string name="apptour62__intro_title">It learns your words, and it has five new looks</string>
+    <string name="apptour62__intro_body">The keyboard can remember the words you type that no dictionary knows, the keys can let the app show through, and both thumbs can have a half of their own. Plus a handful of small helpers for the things you do every day.</string>
+    <string name="apptour62__learning_eyebrow">New: it learns as you type</string>
+    <string name="apptour62__learning_title">The words no dictionary knows</string>
+    <string name="apptour62__learning_body">Type a name or a term often enough and the keyboard keeps it, so it stops marking it as a mistake and starts suggesting it. This update switches that on for everyone, including anyone who had it off. Nothing is learned in incognito mode, in password fields or from anything you did not type key by key; it all stays on this device, and the button below opens the list — and the switch.</string>
+    <string name="apptour62__themes_eyebrow">Five new designs</string>
+    <string name="apptour62__themes_title">Glass, Sand, Deep and a dark E-Ink</string>
+    <string name="apptour62__themes_body">Dictate Glass lets the app show through the gaps between the keys, while the keys themselves stay solid enough to read on; Glass Clear goes further and looks better, at the price of text showing through in apps that draw behind the keyboard. Sand is a warm light theme, Deep a quiet dark one, and E-Ink finally has a night version — so automatic switching no longer hands you a white keyboard after dark.</string>
+    <string name="apptour62__split_eyebrow">New: split keyboard</string>
+    <string name="apptour62__split_title">Both thumbs, without the stretch</string>
+    <string name="apptour62__split_body">A new quick action, next to one-handed and floating, pulls the rows apart so each thumb keeps to its own half. Every layout splits, not just QWERTY, because the seam is worked out from the key widths rather than written into each layout. And in landscape the app now stays visible whenever there is room for both.</string>
+    <string name="apptour62__emoji_eyebrow">Emoji</string>
+    <string name="apptour62__emoji_title">The word finds its emoji</string>
+    <string name="apptour62__emoji_body">Type a word and the emoji that means it is offered in the strip — in about fifty languages, from the same data the system itself uses. It rides along next to the suggestions instead of taking one of their seats. There is also an optional row of your pinned and recently used emojis above the keys.</string>
+    <string name="apptour62__helpers_eyebrow">Four small helpers</string>
+    <string name="apptour62__helpers_title">Incognito, clean links, and the answer to the sum</string>
+    <string name="apptour62__helpers_body">Incognito mode stops anything being remembered while it is on — nothing learned, nothing kept. Pasted links can have their tracking parameters removed on the way into the field. Type a sum ending in = and the answer appears as a suggestion. And with the number row switched on, the letters show their digits again.</string>
+    <string name="apptour62__selection_eyebrow">Selecting and moving</string>
+    <string name="apptour62__selection_title">See what you have selected</string>
+    <string name="apptour62__selection_body">The row that used to stand empty during a selection now counts its words and characters. New buttons jump to the very start and end of the field, and copying can leave the stray spaces at the edges behind. The actions row steps aside as soon as a selection begins, instead of talking over it.</string>
+    <string name="apptour62__clipboard_eyebrow">Clipboard</string>
+    <string name="apptour62__clipboard_title">Find a clip by what it says</string>
+    <string name="apptour62__clipboard_body">The clipboard can be searched now, across everything in it. What you just copied is offered in the suggestion strip as a pill you can dismiss, and copying the same text twice counts as twice, so it comes back. Deleting a clip now also deletes the file behind it, instead of leaving the picture on your phone.</string>
+    <string name="apptour62__gestures_eyebrow">Gestures</string>
+    <string name="apptour62__gestures_title">Hold ?123, slide, let go</string>
+    <string name="apptour62__gestures_body">Hold the symbol key, slide onto the character you want and let go: it is inserted and the letters are back, without switching in and out. Swiping up on the space bar now reaches the line above, not just the word before it. And the gap between the keys can be set across a range you can actually see.</string>
+    <string name="apptour62__export_eyebrow">New: dictations as files</string>
+    <string name="apptour62__export_title">Every dictation into a folder you choose</string>
+    <string name="apptour62__export_body">Pick a folder once and every finished dictation is also written into it as a plain text file, the moment it is done. Whatever watches that folder — a notes app, a sync tool, your backup — gets your transcripts without Dictate having to learn its language.</string>
+    <string name="apptour62__more_eyebrow">Also</string>
+    <string name="apptour62__more_title">A lot of small things</string>
+    <string name="apptour62__more_body">Suggestions now look at the two words before the cursor in every language, not just in English. A backup can be made without your API keys, so it can be passed on safely. Azure\'s own transcription models are reachable, choosing a model for offline use now switches to the offline engine as well, and every request has a time limit that fits the wait. Dictations appear in the history the moment they are sent, imports say which step they are on and can be cancelled, and text lands more reliably in the apps that were fussy about it.</string>
+    <string name="apptour62__outro_eyebrow">That is 6.2</string>
+    <string name="apptour62__outro_title">Same keyboard, more of it yours</string>
+    <string name="apptour62__outro_body">Nothing about the way you dictate has changed — your own key, your own server, or a model on the device. You can revisit any tour under Settings › About.</string>
     <string name="about__website__title" comment="Preference title linking to the marketing website">Website</string>
     <string name="about__repository__title" comment="Preference title">Repository (GitHub)</string>
     <string name="about__repository__summary" comment="Preference summary">Source code, discussions, issues and info</string>
