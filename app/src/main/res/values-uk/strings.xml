@@ -1327,9 +1327,7 @@
     <string name="dictate__custom_words_budget_info">Кожне слово звідси вирушає з кожним диктуванням, а мовна модель читає лише близько {budget} токенів контексту. Ваш список займає з них приблизно {tokens}.</string>
     <string name="dictate__custom_words_budget_over">Ваш список довший за те, що читає мовна модель. До неї доходить приблизно {fits} з ваших {count} слів; решта надсилається з кожним диктуванням і ігнорується. Для більшого словника скористайтеся власними замінами — вони точні, працюють офлайн і нічого не коштують.</string>
     <string name="dictate__custom_words_import">Імпортувати список слів</string>
-    <string name="dictate__custom_words_import_summary">Додати слова з текстового файлу, по одному в рядку</string>
     <string name="dictate__custom_words_export">Експортувати список слів</string>
-    <string name="dictate__custom_words_export_summary">Зберегти ваші слова як текстовий файл, по одному в рядку</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">Імпортувати список слів</string>
     <string name="dictate__custom_words_import_fitting">{count} нових слів із цього файлу вміщуються у ваш список.</string>

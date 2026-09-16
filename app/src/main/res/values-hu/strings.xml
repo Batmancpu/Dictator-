@@ -1481,9 +1481,7 @@
     <string name="dictate__custom_words_budget_info">Az itteni szavak mindegyike minden diktálással együtt megy el, és a beszédmodell ebből csak körülbelül {budget} token kontextust olvas. A listád ebből nagyjából {tokens} tokent foglal.</string>
     <string name="dictate__custom_words_budget_over">A listád hosszabb annál, mint amennyit a beszédmodell elolvas. A {count} szavadból nagyjából {fits} jut el hozzá; a többi minden diktáláskor elmegy, és figyelmen kívül marad. Nagyobb szókincshez használd az egyéni cseréket — azok pontosak, offline is működnek, és semmibe sem kerülnek.</string>
     <string name="dictate__custom_words_import">Szólista importálása</string>
-    <string name="dictate__custom_words_import_summary">Szavak hozzáadása szövegfájlból, soronként egy</string>
     <string name="dictate__custom_words_export">Szólista exportálása</string>
-    <string name="dictate__custom_words_export_summary">A szavaid mentése szövegfájlba, soronként egy</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">Szólista importálása</string>
     <string name="dictate__custom_words_import_fitting">Ebből a fájlból {count} új szó fér bele a listádba.</string>

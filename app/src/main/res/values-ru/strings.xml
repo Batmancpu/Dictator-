@@ -1488,9 +1488,7 @@
     <string name="dictate__custom_words_budget_info">Каждое слово отсюда уходит с каждой диктовкой, а речевая модель читает лишь около {budget} токенов контекста. Ваш список занимает из них примерно {tokens}.</string>
     <string name="dictate__custom_words_budget_over">Ваш список длиннее того, что читает речевая модель. До неё доходит примерно {fits} из ваших {count} слов; остальные отправляются при каждой диктовке и игнорируются. Для большого словаря используйте собственные замены — они точные, работают офлайн и ничего не стоят.</string>
     <string name="dictate__custom_words_import">Импортировать список слов</string>
-    <string name="dictate__custom_words_import_summary">Добавить слова из текстового файла, по одному в строке</string>
     <string name="dictate__custom_words_export">Экспортировать список слов</string>
-    <string name="dictate__custom_words_export_summary">Сохранить ваши слова как текстовый файл, по одному в строке</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">Импортировать список слов</string>
     <string name="dictate__custom_words_import_fitting">{count} новых слов из этого файла помещаются в ваш список.</string>

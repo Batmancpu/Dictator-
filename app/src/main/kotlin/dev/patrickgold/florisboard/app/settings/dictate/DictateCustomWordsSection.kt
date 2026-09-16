@@ -14,29 +14,40 @@ import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceModel
 import dev.patrickgold.florisboard.app.settings.search.settingsSearchAnchor
@@ -59,19 +70,21 @@ import org.florisboard.lib.compose.florisDialogScroll
 import org.florisboard.lib.compose.stringRes
 
 /**
- * The custom-words list on the formatting screen: the editor, what it costs, and the two ways a list
- * can arrive without being typed one word at a time (issue #389).
+ * The custom-words list on the formatting screen: one row, and behind it everything that belongs to
+ * the list (issue #389).
  *
- * The editor itself is untouched — pasting a block into it always worked, so the thing that was
- * missing is a file, not a better text field. What is new around it is the part the text field could
- * never show: this list is appended to the transcription prompt on **every** request, the speech model
- * truncates that prompt at a fixed number of tokens, and nothing anywhere says so. A word past the end
- * is not a slow word, it is a word that does nothing while still being sent.
+ * The editor itself is untouched in spirit — pasting a block into it always worked, so what was
+ * missing is a file, not a better text field. Importing and exporting live **inside** the editor
+ * dialog rather than as rows beside it: they are two more ways of filling the same field, and a
+ * settings screen that lists them separately makes one feature look like three.
  *
- * So the section states its own cost in the summary line, warns before the line is reached, says
- * plainly what is happening once it is crossed, and points at custom mappings — which are exact, run
- * offline and cost nothing — for the vocabulary that will never fit. See [CustomWordList] for why the
- * budget is what it is.
+ * What the row and the dialog say about cost is the other half. This list is appended to the
+ * transcription prompt on **every** request, the speech model truncates that prompt at a fixed number
+ * of tokens, and nothing anywhere used to say so. A word past the end is not a slow word, it is a word
+ * that does nothing while still being sent. So the summary line states the cost, the dialog restates
+ * it live while you paste, and a card turns into a warning once the line is crossed and points at
+ * custom mappings — exact, offline, free — for the vocabulary that will never fit. See
+ * [CustomWordList] for why the budget is what it is.
  */
 @Composable
 internal fun PreferenceUiScope<FlorisPreferenceModel>.CustomWordsSection(pref: PreferenceData<String>) {
@@ -82,18 +95,22 @@ internal fun PreferenceUiScope<FlorisPreferenceModel>.CustomWordsSection(pref: P
     val words = remember(raw) { CustomWordList.parse(raw) }
     val tokens = remember(words) { CustomWordList.estimateTokens(words) }
 
-    // An import worked out but not yet written: the user still has to see what it would do.
+    // The editor's text while it is open. Saveable because the file picker is another activity, and a
+    // low-memory device may rebuild this one underneath it.
+    var editorText by rememberSaveable { mutableStateOf<String?>(null) }
+    // An import worked out but not yet applied: the user still has to see what it would do.
     var pendingImport by remember { mutableStateOf<CustomWordList.ImportReport?>(null) }
 
     val importLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument(),
     ) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
+        val existing = editorText ?: pref.get()
         scope.launch {
             // A word list can be an address book's worth of names, so reading and planning stay off
             // the main thread — and nothing is written before the user has seen how much it is.
             val report = withContext(Dispatchers.IO) {
-                readText(context, uri)?.let { CustomWordList.plan(pref.get(), it) }
+                readText(context, uri)?.let { CustomWordList.plan(existing, it) }
             }
             when {
                 report == null -> context.showLongToast(R.string.dictate__file_unreadable)
@@ -107,34 +124,33 @@ internal fun PreferenceUiScope<FlorisPreferenceModel>.CustomWordsSection(pref: P
         ActivityResultContracts.CreateDocument("text/plain"),
     ) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
+        // What is on screen, not what was last saved: the export button sits next to the text field.
+        val text = CustomWordList.toFileText(CustomWordList.parse(editorText ?: pref.get()))
         scope.launch {
-            val ok = withContext(Dispatchers.IO) {
-                writeText(context, uri, CustomWordList.toFileText(CustomWordList.parse(pref.get())))
-            }
+            val ok = withContext(Dispatchers.IO) { writeText(context, uri, text) }
             context.showLongToast(
                 if (ok) R.string.dictate__file_export_done else R.string.dictate__file_export_failed,
             )
         }
     }
 
-    // Both summaries are resolved here rather than inside the provider lambda, which is an ordinary
-    // function and cannot read resources.
-    val emptySummary = stringRes(R.string.dictate__custom_words_summary_empty)
-    val countSummary = stringRes(
-        R.string.dictate__custom_words_summary,
-        "count" to words.size,
-        "tokens" to tokens,
-        "budget" to CustomWordList.TOKEN_BUDGET,
-    )
-    TextInputPreference(
-        pref = pref,
+    Preference(
         icon = Icons.Default.MenuBook,
+        modifier = Modifier.settingsSearchAnchor("dictate__custom_words_title"),
         title = stringRes(R.string.dictate__custom_words_title),
-        placeholder = stringRes(R.string.dictate__custom_words_placeholder),
-        multiline = true,
         // What the list costs belongs on the row itself: it is the only number that explains both the
         // cap and why a word that is in the list still does not arrive.
-        summaryProvider = { value -> if (value.isBlank()) emptySummary else countSummary },
+        summary = if (words.isEmpty()) {
+            stringRes(R.string.dictate__custom_words_summary_empty)
+        } else {
+            stringRes(
+                R.string.dictate__custom_words_summary,
+                "count" to words.size,
+                "tokens" to tokens,
+                "budget" to CustomWordList.TOKEN_BUDGET,
+            )
+        },
+        onClick = { editorText = raw },
     )
 
     when {
@@ -156,25 +172,24 @@ internal fun PreferenceUiScope<FlorisPreferenceModel>.CustomWordsSection(pref: P
         )
     }
 
-    Preference(
-        icon = Icons.Default.FileDownload,
-        modifier = Modifier.settingsSearchAnchor("dictate__custom_words_import"),
-        title = stringRes(R.string.dictate__custom_words_import),
-        summary = stringRes(R.string.dictate__custom_words_import_summary),
-        // "text/*" is the honest filter, but plenty of SAF providers hand a .txt over as an opaque
-        // byte stream, and a file the user can see in their file manager but not here is a support
-        // ticket rather than a safety feature.
-        onClick = { importLauncher.launch(arrayOf("text/*", "application/octet-stream")) },
-    )
-    if (words.isNotEmpty()) {
-        Preference(
-            icon = Icons.Default.FileUpload,
-            modifier = Modifier.settingsSearchAnchor("dictate__custom_words_export"),
-            title = stringRes(R.string.dictate__custom_words_export),
-            summary = stringRes(R.string.dictate__custom_words_export_summary),
-            onClick = {
+    editorText?.let { text ->
+        CustomWordsEditorDialog(
+            text = text,
+            onTextChange = { editorText = it },
+            onImport = {
+                // "text/*" is the honest filter, but plenty of SAF providers hand a .txt over as an
+                // opaque byte stream, and a file the user can see in their file manager but not here
+                // is a support ticket rather than a safety feature.
+                importLauncher.launch(arrayOf("text/*", "application/octet-stream"))
+            },
+            onExport = {
                 exportLauncher.launch(context.getString(R.string.dictate__custom_words_export_filename))
             },
+            onConfirm = {
+                scope.launch { pref.set(text.trim()) }
+                editorText = null
+            },
+            onDismiss = { editorText = null },
         )
     }
 
@@ -184,9 +199,16 @@ internal fun PreferenceUiScope<FlorisPreferenceModel>.CustomWordsSection(pref: P
             onDismiss = { pendingImport = null },
             onConfirm = { alsoToDictionary ->
                 pendingImport = null
+                // An import is its own confirmed action, so it is written straight through rather than
+                // left to the editor's OK — otherwise a later Cancel would silently undo a file the
+                // user just approved, and the personal-dictionary half (which is written now) could
+                // not be undone with it anyway.
+                report.merged?.let { merged ->
+                    editorText = merged
+                    scope.launch { pref.set(merged) }
+                }
                 scope.launch {
                     val addedToDictionary = withContext(Dispatchers.IO) {
-                        report.merged?.let { pref.set(it) }
                         if (alsoToDictionary) addToPersonalDictionary(context, report.fromFile) else 0
                     }
                     if (alsoToDictionary) {
@@ -208,6 +230,127 @@ internal fun PreferenceUiScope<FlorisPreferenceModel>.CustomWordsSection(pref: P
 }
 
 /**
+ * The editor: a text field with room to actually read a list in, what that list costs, and the two
+ * buttons that fill it from a file or hand it to somebody else.
+ *
+ * Wider and taller than a stock alert dialog on purpose. This field can hold fifty proper nouns, and
+ * the platform default width turned that into a four-line porthole — the same reason the import and
+ * export buttons are in here rather than on the screen behind it: it is all one job.
+ */
+@Composable
+private fun CustomWordsEditorDialog(
+    text: String,
+    onTextChange: (String) -> Unit,
+    onImport: () -> Unit,
+    onExport: () -> Unit,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val words = remember(text) { CustomWordList.parse(text) }
+    val tokens = remember(words) { CustomWordList.estimateTokens(words) }
+    val overBudget = tokens > CustomWordList.TOKEN_BUDGET
+
+    JetPrefAlertDialog(
+        modifier = Modifier.fillMaxWidth(0.96f),
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        scrollModifier = florisDialogScroll(),
+        title = stringRes(R.string.dictate__custom_words_title),
+        confirmLabel = stringRes(R.string.action__ok),
+        dismissLabel = stringRes(R.string.action__cancel),
+        onConfirm = onConfirm,
+        onDismiss = onDismiss,
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            OutlinedTextField(
+                value = text,
+                onValueChange = onTextChange,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    // Tall enough to read a vocabulary in, and capped low enough that the two buttons
+                    // below still fit on screen: the dialog's own height is bounded, so a taller field
+                    // does not make the dialog taller, it pushes whatever follows out of sight. The
+                    // device test found exactly that at 360.dp — with a full list the buttons started
+                    // below the fold, and the only way back to them was a scroll gesture the text
+                    // field swallows.
+                    .heightIn(min = 200.dp, max = 280.dp),
+                singleLine = false,
+                placeholder = { Text(stringRes(R.string.dictate__custom_words_placeholder)) },
+            )
+            Text(
+                modifier = Modifier.padding(top = 6.dp),
+                text = if (words.isEmpty()) {
+                    stringRes(R.string.dictate__custom_words_summary_empty)
+                } else {
+                    stringRes(
+                        R.string.dictate__custom_words_summary,
+                        "count" to words.size,
+                        "tokens" to tokens,
+                        "budget" to CustomWordList.TOKEN_BUDGET,
+                    )
+                },
+                style = MaterialTheme.typography.bodySmall,
+                // Red is the whole point of the live count: it goes red exactly when pasting one more
+                // word stops adding anything.
+                color = if (overBudget) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
+            )
+            Spacer(Modifier.height(12.dp))
+            // Above the explanation, not below it: the buttons must keep the same place whatever the
+            // list does, and the explanation is the one thing here that can be read on the screen
+            // behind this dialog instead.
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                DialogFileButton(
+                    modifier = Modifier.weight(1f),
+                    icon = Icons.Default.FileDownload,
+                    label = stringRes(R.string.action__import),
+                    onClick = onImport,
+                )
+                DialogFileButton(
+                    modifier = Modifier.weight(1f),
+                    icon = Icons.Default.FileUpload,
+                    label = stringRes(R.string.action__export),
+                    enabled = words.isNotEmpty(),
+                    onClick = onExport,
+                )
+            }
+            if (overBudget) {
+                Text(
+                    modifier = Modifier.padding(top = 12.dp),
+                    text = stringRes(
+                        R.string.dictate__custom_words_budget_over,
+                        "fits" to CustomWordList.countWithinBudget(words),
+                        "count" to words.size,
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        }
+    }
+}
+
+/** One of the two file buttons in the editor dialog. */
+@Composable
+private fun DialogFileButton(
+    icon: ImageVector,
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) {
+    OutlinedButton(onClick = onClick, modifier = modifier, enabled = enabled) {
+        Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(18.dp))
+        Text(modifier = Modifier.padding(start = 8.dp), text = label)
+    }
+}
+
+/**
  * What the import would do, before it does it.
  *
  * Every line here exists because the import can silently do less than it looks like it did: words that
@@ -225,6 +368,8 @@ private fun ImportWordsDialog(
     val preview = report.accepted.ifEmpty { report.fromFile }
 
     JetPrefAlertDialog(
+        modifier = Modifier.fillMaxWidth(0.96f),
+        properties = DialogProperties(usePlatformDefaultWidth = false),
         scrollModifier = florisDialogScroll(),
         title = stringRes(R.string.dictate__custom_words_import_title),
         confirmLabel = stringRes(R.string.action__add),

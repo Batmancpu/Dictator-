@@ -1382,9 +1382,7 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__custom_words_budget_info">Elk woord hier gaat met elk dictaat mee, en het spraakmodel leest daarvan maar zo\'n {budget} tokens context. Je lijst gebruikt er ongeveer {tokens}.</string>
     <string name="dictate__custom_words_budget_over">Je lijst is langer dan het spraakmodel leest. Ongeveer {fits} van je {count} woorden komen aan; de rest gaat bij elk dictaat mee en wordt genegeerd. Gebruik voor een grotere woordenschat eigen vervangingen — die zijn exact, werken offline en kosten niets.</string>
     <string name="dictate__custom_words_import">Woordenlijst importeren</string>
-    <string name="dictate__custom_words_import_summary">Woorden uit een tekstbestand toevoegen, één per regel</string>
     <string name="dictate__custom_words_export">Woordenlijst exporteren</string>
-    <string name="dictate__custom_words_export_summary">Je woorden als tekstbestand opslaan, één per regel</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">Woordenlijst importeren</string>
     <string name="dictate__custom_words_import_fitting">{count} nieuwe woorden uit dit bestand passen in je lijst.</string>

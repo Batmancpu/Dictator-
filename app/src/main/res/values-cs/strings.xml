@@ -1498,9 +1498,7 @@
     <string name="dictate__custom_words_budget_info">Každé slovo odsud jede s každým diktováním a řečový model z toho přečte jen asi {budget} tokenů kontextu. Tvůj seznam z nich zabírá asi {tokens}.</string>
     <string name="dictate__custom_words_budget_over">Tvůj seznam je delší, než kolik řečový model přečte. K modelu se dostane asi {fits} z tvých {count} slov; zbytek se posílá při každém diktování a ignoruje se. Na větší slovní zásobu použij vlastní nahrazení — jsou přesná, fungují offline a nic nestojí.</string>
     <string name="dictate__custom_words_import">Importovat seznam slov</string>
-    <string name="dictate__custom_words_import_summary">Přidat slova z textového souboru, jedno na řádek</string>
     <string name="dictate__custom_words_export">Exportovat seznam slov</string>
-    <string name="dictate__custom_words_export_summary">Uložit tvá slova jako textový soubor, jedno na řádek</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">Importovat seznam slov</string>
     <string name="dictate__custom_words_import_fitting">{count} nových slov z tohoto souboru se do tvého seznamu vejde.</string>

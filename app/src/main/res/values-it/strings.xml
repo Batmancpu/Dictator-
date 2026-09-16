@@ -1265,9 +1265,7 @@
     <string name="dictate__custom_words_budget_info">Ogni parola qui viaggia con ogni dettatura, e il modello vocale ne legge solo circa {budget} token di contesto. Il tuo elenco ne occupa circa {tokens}.</string>
     <string name="dictate__custom_words_budget_over">Il tuo elenco è più lungo di quanto il modello vocale legga. Circa {fits} delle tue {count} parole lo raggiungono; il resto viene inviato a ogni dettatura e ignorato. Per un vocabolario più ampio usa le sostituzioni personalizzate: sono esatte, funzionano offline e non costano nulla.</string>
     <string name="dictate__custom_words_import">Importa un elenco di parole</string>
-    <string name="dictate__custom_words_import_summary">Aggiungi parole da un file di testo, una per riga</string>
     <string name="dictate__custom_words_export">Esporta l\'elenco di parole</string>
-    <string name="dictate__custom_words_export_summary">Salva le tue parole come file di testo, una per riga</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">Importa un elenco di parole</string>
     <string name="dictate__custom_words_import_fitting">{count} nuove parole di questo file entrano nel tuo elenco.</string>

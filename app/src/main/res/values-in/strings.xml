@@ -1437,9 +1437,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__custom_words_budget_info">Setiap kata di sini ikut terkirim pada setiap dikte, dan model suara hanya membaca sekitar {budget} token konteks. Daftarmu memakai sekitar {tokens} di antaranya.</string>
     <string name="dictate__custom_words_budget_over">Daftarmu lebih panjang daripada yang dibaca model suara. Sekitar {fits} dari {count} katamu sampai ke sana; sisanya dikirim pada setiap dikte lalu diabaikan. Untuk kosakata yang lebih banyak gunakan pemetaan khusus — tepat, bekerja luring, dan tidak memakan biaya.</string>
     <string name="dictate__custom_words_import">Impor daftar kata</string>
-    <string name="dictate__custom_words_import_summary">Tambahkan kata dari berkas teks, satu per baris</string>
     <string name="dictate__custom_words_export">Ekspor daftar kata</string>
-    <string name="dictate__custom_words_export_summary">Simpan katamu sebagai berkas teks, satu per baris</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">Impor daftar kata</string>
     <string name="dictate__custom_words_import_fitting">{count} kata baru dari berkas ini muat di daftarmu.</string>

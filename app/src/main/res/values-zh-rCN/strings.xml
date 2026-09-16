@@ -1477,9 +1477,7 @@
     <string name="dictate__custom_words_budget_info">这里的每个词都会随每次听写一起发送，而语音模型只读取其中约 {budget} 个词元的上下文。你的列表约占 {tokens} 个。</string>
     <string name="dictate__custom_words_budget_over">你的列表比语音模型能读取的更长。{count} 个词中约有 {fits} 个能送达，其余的每次听写都会发送并被忽略。词汇量较大时请改用自定义替换，它精确、可离线工作，而且不产生任何费用。</string>
     <string name="dictate__custom_words_import">导入词表</string>
-    <string name="dictate__custom_words_import_summary">从文本文件添加词语，每行一个</string>
     <string name="dictate__custom_words_export">导出词表</string>
-    <string name="dictate__custom_words_export_summary">将你的词语保存为文本文件，每行一个</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">导入词表</string>
     <string name="dictate__custom_words_import_fitting">此文件中有 {count} 个新词可以放进你的列表。</string>

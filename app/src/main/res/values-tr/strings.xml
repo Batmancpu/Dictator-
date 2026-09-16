@@ -1461,9 +1461,7 @@
     <string name="dictate__custom_words_budget_info">Buradaki her kelime her dikteyle birlikte gönderilir ve konuşma modeli bunun yalnızca yaklaşık {budget} jetonluk bağlamını okur. Listen bunun yaklaşık {tokens} kadarını kullanıyor.</string>
     <string name="dictate__custom_words_budget_over">Listen, konuşma modelinin okuduğundan uzun. {count} kelimenin yaklaşık {fits} tanesi modele ulaşıyor; geri kalanı her diktede gönderilip yok sayılıyor. Daha geniş bir sözcük dağarcığı için özel eşleştirmeleri kullan — onlar birebirdir, çevrimdışı çalışır ve hiçbir maliyeti yoktur.</string>
     <string name="dictate__custom_words_import">Kelime listesi içe aktar</string>
-    <string name="dictate__custom_words_import_summary">Bir metin dosyasından kelime ekle, her satırda bir tane</string>
     <string name="dictate__custom_words_export">Kelime listesini dışa aktar</string>
-    <string name="dictate__custom_words_export_summary">Kelimelerini metin dosyası olarak kaydet, her satırda bir tane</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">Kelime listesi içe aktar</string>
     <string name="dictate__custom_words_import_fitting">Bu dosyadaki {count} yeni kelime listene sığıyor.</string>

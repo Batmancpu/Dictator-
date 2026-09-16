@@ -1340,9 +1340,7 @@
     <string name="dictate__custom_words_budget_info">كل كلمة هنا تُرسل مع كل إملاء، ونموذج الكلام لا يقرأ منها سوى نحو {budget} رمزًا من السياق. قائمتك تشغل منها نحو {tokens}.</string>
     <string name="dictate__custom_words_budget_over">قائمتك أطول مما يقرأه نموذج الكلام. يصل إليه نحو {fits} من كلماتك البالغة {count}، أما البقية فتُرسل مع كل إملاء ويجري تجاهلها. لمفردات أكثر استخدم الاستبدالات المخصصة — فهي دقيقة وتعمل دون اتصال ولا تكلف شيئًا.</string>
     <string name="dictate__custom_words_import">استيراد قائمة كلمات</string>
-    <string name="dictate__custom_words_import_summary">إضافة كلمات من ملف نصي، كلمة في كل سطر</string>
     <string name="dictate__custom_words_export">تصدير قائمة الكلمات</string>
-    <string name="dictate__custom_words_export_summary">حفظ كلماتك كملف نصي، كلمة في كل سطر</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">استيراد قائمة كلمات</string>
     <string name="dictate__custom_words_import_fitting">{count} كلمة جديدة من هذا الملف تتسع في قائمتك.</string>

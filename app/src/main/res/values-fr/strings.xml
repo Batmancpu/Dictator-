@@ -1360,9 +1360,7 @@
     <string name="dictate__custom_words_budget_info">Chaque mot ici part avec chaque dictée, et le modèle vocal n\'en lit qu\'environ {budget} jetons de contexte. Votre liste en occupe environ {tokens}.</string>
     <string name="dictate__custom_words_budget_over">Votre liste est plus longue que ce que le modèle vocal lit. Environ {fits} de vos {count} mots lui parviennent ; le reste part à chaque dictée et est ignoré. Pour un vocabulaire plus vaste, utilisez les correspondances personnalisées — elles sont exactes, fonctionnent hors ligne et ne coûtent rien.</string>
     <string name="dictate__custom_words_import">Importer une liste de mots</string>
-    <string name="dictate__custom_words_import_summary">Ajouter des mots depuis un fichier texte, un par ligne</string>
     <string name="dictate__custom_words_export">Exporter la liste de mots</string>
-    <string name="dictate__custom_words_export_summary">Enregistrer vos mots dans un fichier texte, un par ligne</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">Importer une liste de mots</string>
     <string name="dictate__custom_words_import_fitting">{count} nouveaux mots de ce fichier tiennent dans votre liste.</string>

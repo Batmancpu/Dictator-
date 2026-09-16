@@ -1464,9 +1464,7 @@
     <string name="dictate__custom_words_budget_info">Cada palabra de aquí viaja con cada dictado, y el modelo de voz solo lee unos {budget} tokens de contexto. Tu lista ocupa unos {tokens}.</string>
     <string name="dictate__custom_words_budget_over">Tu lista es más larga de lo que el modelo de voz lee. Unas {fits} de tus {count} palabras le llegan; el resto se envía en cada dictado y se ignora. Para un vocabulario más amplio usa las asignaciones personalizadas: son exactas, funcionan sin conexión y no cuestan nada.</string>
     <string name="dictate__custom_words_import">Importar una lista de palabras</string>
-    <string name="dictate__custom_words_import_summary">Añadir palabras desde un archivo de texto, una por línea</string>
     <string name="dictate__custom_words_export">Exportar la lista de palabras</string>
-    <string name="dictate__custom_words_export_summary">Guardar tus palabras como archivo de texto, una por línea</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">Importar una lista de palabras</string>
     <string name="dictate__custom_words_import_fitting">{count} palabras nuevas de este archivo caben en tu lista.</string>

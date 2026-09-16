@@ -1427,9 +1427,7 @@
     <string name="dictate__custom_words_budget_info">Katrs vārds no šejienes tiek nosūtīts līdzi ikvienai diktēšanai, un runas modelis no tā izlasa tikai aptuveni {budget} marķieru konteksta. Tavs saraksts aizņem aptuveni {tokens}.</string>
     <string name="dictate__custom_words_budget_over">Tavs saraksts ir garāks, nekā runas modelis izlasa. Tam sasniedz aptuveni {fits} no taviem {count} vārdiem; pārējie tiek sūtīti ar katru diktēšanu un ignorēti. Plašākai vārdnīcai izmanto pielāgotās aizstāšanas — tās ir precīzas, darbojas bezsaistē un neko nemaksā.</string>
     <string name="dictate__custom_words_import">Importēt vārdu sarakstu</string>
-    <string name="dictate__custom_words_import_summary">Pievienot vārdus no teksta faila, pa vienam rindā</string>
     <string name="dictate__custom_words_export">Eksportēt vārdu sarakstu</string>
-    <string name="dictate__custom_words_export_summary">Saglabāt savus vārdus kā teksta failu, pa vienam rindā</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">Importēt vārdu sarakstu</string>
     <string name="dictate__custom_words_import_fitting">{count} jauni vārdi no šī faila ietilpst tavā sarakstā.</string>

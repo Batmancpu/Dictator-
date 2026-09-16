@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.settings.search.settingsSearchAnchor
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
@@ -316,6 +317,9 @@ private fun ImportMappingsDialog(
     onConfirm: () -> Unit,
 ) {
     JetPrefAlertDialog(
+        // Same width as the word-list dialogs; a rule is wider than a word and wraps badly otherwise.
+        modifier = Modifier.fillMaxWidth(0.96f),
+        properties = DialogProperties(usePlatformDefaultWidth = false),
         scrollModifier = florisDialogScroll(),
         title = stringRes(R.string.dictate__mappings_import_title),
         confirmLabel = stringRes(R.string.action__add),

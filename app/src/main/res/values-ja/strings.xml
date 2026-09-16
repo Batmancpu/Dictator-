@@ -1414,9 +1414,7 @@
     <string name="dictate__custom_words_budget_info">ここの単語は口述のたびに毎回送られますが、音声モデルが読むのは約 {budget} トークン分の文脈だけです。このリストはそのうち約 {tokens} を使っています。</string>
     <string name="dictate__custom_words_budget_over">リストが音声モデルの読み取れる長さを超えています。{count} 語のうち約 {fits} 語だけが届き、残りは毎回送られたうえで無視されます。語彙が多い場合はカスタム置換をお使いください。正確で、オフラインでも動き、費用もかかりません。</string>
     <string name="dictate__custom_words_import">単語リストを読み込む</string>
-    <string name="dictate__custom_words_import_summary">テキストファイルから単語を追加（1行に1語）</string>
     <string name="dictate__custom_words_export">単語リストを書き出す</string>
-    <string name="dictate__custom_words_export_summary">単語をテキストファイルとして保存（1行に1語）</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">単語リストを読み込む</string>
     <string name="dictate__custom_words_import_fitting">このファイルの新しい単語 {count} 語がリストに収まります。</string>

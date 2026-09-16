@@ -1473,9 +1473,7 @@
     <string name="dictate__custom_words_budget_info">Jedes Wort hier wird bei jeder Diktatanfrage mitgeschickt, und das Sprachmodell liest davon nur etwa {budget} Tokens Kontext. Deine Liste belegt davon etwa {tokens}.</string>
     <string name="dictate__custom_words_budget_over">Deine Liste ist länger, als das Sprachmodell liest. Etwa {fits} deiner {count} Wörter kommen an; der Rest wird bei jedem Diktat mitgeschickt und ignoriert. Für einen größeren Wortschatz nimm eigene Zuordnungen — die sind exakt, funktionieren offline und kosten nichts.</string>
     <string name="dictate__custom_words_import">Wortliste importieren</string>
-    <string name="dictate__custom_words_import_summary">Wörter aus einer Textdatei übernehmen, eines pro Zeile</string>
     <string name="dictate__custom_words_export">Wortliste exportieren</string>
-    <string name="dictate__custom_words_export_summary">Deine Wörter als Textdatei sichern, eines pro Zeile</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">Wortliste importieren</string>
     <string name="dictate__custom_words_import_fitting">{count} neue Wörter aus dieser Datei passen in deine Liste.</string>

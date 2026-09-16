@@ -1499,9 +1499,7 @@
     <string name="dictate__custom_words_budget_info">Każde słowo stąd jedzie z każdym dyktowaniem, a model mowy czyta tylko około {budget} tokenów kontekstu. Twoja lista zajmuje z tego około {tokens}.</string>
     <string name="dictate__custom_words_budget_over">Twoja lista jest dłuższa, niż model mowy czyta. Około {fits} z Twoich {count} słów do niego dociera; reszta jest wysyłana przy każdym dyktowaniu i ignorowana. Do większego słownictwa użyj własnych zamian — są dokładne, działają offline i nic nie kosztują.</string>
     <string name="dictate__custom_words_import">Importuj listę słów</string>
-    <string name="dictate__custom_words_import_summary">Dodaj słowa z pliku tekstowego, po jednym w wierszu</string>
     <string name="dictate__custom_words_export">Eksportuj listę słów</string>
-    <string name="dictate__custom_words_export_summary">Zapisz swoje słowa jako plik tekstowy, po jednym w wierszu</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">Importuj listę słów</string>
     <string name="dictate__custom_words_import_fitting">{count} nowych słów z tego pliku mieści się na Twojej liście.</string>

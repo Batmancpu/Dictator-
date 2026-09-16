@@ -1352,9 +1352,7 @@
     <string name="dictate__custom_words_budget_info">Cada paraula d\'aquí viatja amb cada dictat, i el model de veu només en llegeix uns {budget} tokens de context. La teva llista n\'ocupa uns {tokens}.</string>
     <string name="dictate__custom_words_budget_over">La teva llista és més llarga del que el model de veu llegeix. Unes {fits} de les teves {count} paraules hi arriben; la resta s\'envia a cada dictat i s\'ignora. Per a un vocabulari més ampli fes servir les correspondències personalitzades: són exactes, funcionen sense connexió i no costen res.</string>
     <string name="dictate__custom_words_import">Importa una llista de paraules</string>
-    <string name="dictate__custom_words_import_summary">Afegeix paraules des d\'un fitxer de text, una per línia</string>
     <string name="dictate__custom_words_export">Exporta la llista de paraules</string>
-    <string name="dictate__custom_words_export_summary">Desa les teves paraules com a fitxer de text, una per línia</string>
     <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title">Importa una llista de paraules</string>
     <string name="dictate__custom_words_import_fitting">{count} paraules noves d\'aquest fitxer caben a la teva llista.</string>

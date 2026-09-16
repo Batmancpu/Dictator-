@@ -2231,9 +2231,7 @@
     <string name="dictate__custom_words_budget_info" comment="Info card shown once the word list uses most of the prompt budget. Placeholders: the budget and the estimated tokens in use.">Every word here travels with every dictation, and the speech model reads only about {budget} tokens of context. Your list is using about {tokens}.</string>
     <string name="dictate__custom_words_budget_over" comment="Warning card shown when the word list is longer than the speech model can read. Placeholders: how many words still reach the model, and how many there are in total.">Your list is longer than the speech model reads. About {fits} of your {count} words reach it; the rest are sent with every dictation and ignored. For a longer vocabulary use custom mappings — they are exact, work offline and cost nothing.</string>
     <string name="dictate__custom_words_import" comment="Row that opens a file picker to import a word list">Import a word list</string>
-    <string name="dictate__custom_words_import_summary" comment="Summary of the import row">Add words from a text file, one per line</string>
     <string name="dictate__custom_words_export" comment="Row that saves the word list as a text file">Export the word list</string>
-    <string name="dictate__custom_words_export_summary" comment="Summary of the export row">Save your words as a text file, one per line</string>
     <string name="dictate__custom_words_export_filename" comment="Default file name for the word list export">dictate_words.txt</string>
     <string name="dictate__custom_words_import_title" comment="Title of the dialog shown before an imported word list is written">Import a word list</string>
     <string name="dictate__custom_words_import_fitting" comment="Import dialog: how many new words from the file fit into the list. Placeholder inserts the count.">{count} new words from this file fit in your list.</string>
