@@ -115,6 +115,49 @@ internal fun shouldTightenSpaceBefore(
     return !textBefore[textBefore.length - 2].isWhitespace()
 }
 
+/**
+ * Whether the phantom space that follows an accepted candidate should be written into the editor at
+ * once instead of being remembered and inserted in front of the next word (issue #393).
+ *
+ * The phantom space has always been a *decision* — "this word is finished" — that only turned into a
+ * character once the next one arrived. That decision is invisible: pick `hello` off the strip and the
+ * cursor sits against the `o`, while every mainstream keyboard already shows it one space further on.
+ * Writing the space now makes the decision visible. It stays provisional either way, because
+ * [materializedSpaceSurvives] takes it back for anything that does not want a space in front of it —
+ * so the text that ends up in the field is the same text as before, only shown a keystroke earlier.
+ *
+ * [textAfterCandidate] is why this is not simply "always": completing a word in the middle of a
+ * sentence puts the cursor in front of a space that is already there, and a second one would be a
+ * genuine double space nobody typed.
+ */
+internal fun shouldMaterializePhantomSpace(
+    candidate: String,
+    textAfterCandidate: String,
+    supportsAutoSpace: Boolean,
+    symbolsPrecedingPhantomSpace: String,
+): Boolean {
+    if (!supportsAutoSpace || candidate.isEmpty()) return false
+    val last = candidate.last()
+    if (!last.isLetterOrDigit() && !symbolsPrecedingPhantomSpace.contains(last)) return false
+    return textAfterCandidate.isEmpty() || !textAfterCandidate.first().isWhitespace()
+}
+
+/**
+ * Whether a space written ahead by [shouldMaterializePhantomSpace] survives [next] being committed
+ * behind it, or has to be taken back first (issue #393).
+ *
+ * The same question the phantom space always asked, turned around: that one decided whether to
+ * *insert* the space, this one whether to *keep* it. So the answer has to come off the same list, or
+ * `hello` followed by a comma would read `hello ,` on the new path and `hello,` on the old one.
+ *
+ * An empty commit changes nothing and therefore takes nothing away — deleting a selection is a commit
+ * of `""`, and it has no opinion about the space in front of it.
+ */
+internal fun materializedSpaceSurvives(next: String, symbolsFollowingPhantomSpace: String): Boolean {
+    if (next.isEmpty()) return true
+    return next.first().isLetterOrDigit() || symbolsFollowingPhantomSpace.contains(next.first())
+}
+
 class EditorInstance(context: Context) : AbstractEditorInstance(context) {
     companion object {
         private const val SPACE = " "
@@ -276,8 +319,15 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
 
         val punctuationRule = nlpManager.getActivePunctuationRule()
         val content = activeContent
+        // A space this keyboard put there itself is not part of what the user wrote, so the question
+        // "does a mark belong tight against the last word?" has to be asked past it — whether it was an
+        // auto-space or the space written ahead of the next word (issue #393). Without this, `hello` off
+        // the strip followed by a full stop lost the auto-space *after* the stop, because the materialized
+        // space in front of it made the text read as already finished.
         val textBefore = content.getTextBeforeCursor(3).let { textBefore ->
-            if (autoSpace.isActive && textBefore.isNotEmpty() && textBefore.last() == ' ') {
+            if ((autoSpace.isActive || phantomSpace.isMaterialized) &&
+                textBefore.isNotEmpty() && textBefore.last() == ' '
+            ) {
                 textBefore.dropLast(1)
             } else {
                 textBefore
@@ -317,6 +367,11 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
             autoSpace.setInactive()
         }
         val isPhantomSpaceActive = phantomSpace.determine(char)
+        // The space written ahead of this character (issue #393) is taken back for whatever the phantom
+        // space would never have been inserted for — a comma, a bracket, a full stop. Read before the
+        // state is cleared, applied through the same `deletePreviousSpace` that the auto-space and the
+        // tightening rule use, so nothing flickers and no two of them can delete twice.
+        val isDropMaterializedSpace = phantomSpace.shouldDropMaterialized(char)
         phantomSpace.setInactive()
         // Loses to anything that wants a space in that exact spot, so the two never fight over one
         // position — removing a space and inserting one in the same commit is a no-op with extra steps.
@@ -324,7 +379,7 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
             shouldTightenSpaceBeforePunctuation(char)
         return super.commitChar(
             char = char,
-            deletePreviousSpace = isDeletePreviousSpace || isTightenSpace,
+            deletePreviousSpace = isDeletePreviousSpace || isTightenSpace || isDropMaterializedSpace,
             insertSpaceBeforeChar = isInsertAutoSpaceBeforeChar || isPhantomSpaceActive,
             insertSpaceAfterChar = isInsertAutoSpaceAfterChar,
         )
@@ -343,13 +398,26 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
      * @return True on success, false if an error occurred or the input connection is invalid.
      */
     override fun commitText(text: String): Boolean {
+        // The space is already on the screen (issue #393), so a space key press is the user agreeing
+        // with it, not asking for a second one — the same bargain the phantom space always made, only
+        // now it is the *first* press that is absorbed rather than the promise that is redeemed. Left
+        // to the general path below it would delete the space and write an identical one back, which
+        // costs the editor a round trip to change nothing.
+        if (text == SPACE && phantomSpace.hasStandingMaterializedSpace()) {
+            autoSpace.setInactive()
+            phantomSpace.setInactive()
+            return true
+        }
         val isPhantomSpaceActive = phantomSpace.determine(text)
+        val isDropMaterializedSpace = phantomSpace.shouldDropMaterialized(text)
         autoSpace.setInactive()
         phantomSpace.setInactive()
-        return if (isPhantomSpaceActive) {
-            super.commitText("$SPACE$text")
-        } else {
-            super.commitText(text)
+        return when {
+            isPhantomSpaceActive -> super.commitText("$SPACE$text")
+            // No `deletePreviousSpace` on this path, so the removal and the commit are batched into one
+            // edit by hand — an emoji or a symbol behind an accepted candidate must not flash a space.
+            isDropMaterializedSpace -> replaceTextBeforeCursor(1, text)
+            else -> super.commitText(text)
         }
     }
 
@@ -411,20 +479,36 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
         if (text.isEmpty() || activeInfo.isRawInputEditor) return false
         val content = activeContent
         val replaceRange = completionReplacementRange(content.composing, content.currentWord)
+        // Issue #393: the space an accepted candidate promises is written here rather than in front of
+        // the next key press, so the cursor stands where the user can see the word is finished. What
+        // follows the range about to be overwritten — not what follows the cursor, which may still be
+        // inside that range — is what decides whether there is room for it.
+        val rangeTail = if (replaceRange.isValid) {
+            (replaceRange.end - content.selection.end).coerceAtLeast(0)
+        } else {
+            0
+        }
+        val materialize = shouldMaterializePhantomSpace(
+            candidate = text,
+            textAfterCandidate = content.textAfterSelection.drop(rangeTail),
+            supportsAutoSpace = subtypeManager.activeSubtype.primaryLocale.supportsAutoSpace,
+            symbolsPrecedingPhantomSpace = nlpManager.getActivePunctuationRule().symbolsPrecedingPhantomSpace,
+        )
+        val trailingSpace = if (materialize) SPACE else ""
         return if (replaceRange.isValid) {
-            phantomSpace.setActive(showComposingRegion = false, candidate = candidate)
+            phantomSpace.setActive(showComposingRegion = false, candidate = candidate, materialized = materialize)
             super.finalizeComposingText(
-                text = text,
+                text = "$text$trailingSpace",
                 range = replaceRange,
                 rangeText = if (content.composing.isValid) content.composingText else content.currentWordText,
             )
         } else {
             val isPhantomSpaceActive = phantomSpace.determine(text)
-            phantomSpace.setActive(showComposingRegion = false, candidate = candidate)
+            phantomSpace.setActive(showComposingRegion = false, candidate = candidate, materialized = materialize)
             return if (isPhantomSpaceActive) {
-                super.commitText("$SPACE$text")
+                super.commitText("$SPACE$text$trailingSpace")
             } else {
-                super.commitText(text)
+                super.commitText("$text$trailingSpace")
             }.also {
                 // handled in finalizeComposingText if there was a range to replace
                 updateLastCommitPosition()
@@ -775,6 +859,7 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
      * @return True on success, false if an error occurred or the input connection is invalid.
      */
     fun performEnter(): Boolean {
+        dropPendingMaterializedSpace()
         autoSpace.setInactive()
         phantomSpace.setInactive()
         return if (activeInfo.isRawInputEditor) {
@@ -800,6 +885,7 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
      * @return True on success, false if an error occurred or the input connection is invalid.
      */
     fun performEnterAction(action: ImeOptions.Action): Boolean {
+        dropPendingMaterializedSpace()
         autoSpace.setInactive()
         phantomSpace.setInactive()
         val ic = currentInputConnection() ?: return false
@@ -848,6 +934,41 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
              (punctuationRule.symbolsFollowingPhantomSpace.contains(text[0]) || text[0].isLetterOrDigit())
     }
 
+    /**
+     * Whether the space written ahead of the next word is still standing where it was put, and still
+     * ours to take back (issue #393).
+     *
+     * Asks the editor rather than trusting the flag on its own. A materialized space is a real
+     * character: the app may have rewritten the field, an autocomplete may have run, the user may have
+     * moved the cursor between the commit and the next key — and deleting a character we did not write
+     * is the one mistake this feature must never make.
+     */
+    private fun PhantomSpaceState.hasStandingMaterializedSpace(): Boolean {
+        if (!isMaterialized) return false
+        val content = activeContent
+        val selection = content.selection
+        if (selection.isNotValid || selection.isSelectionMode || selection.start <= 0) return false
+        return content.getTextBeforeCursor(1) == SPACE
+    }
+
+    /** Whether committing [text] has to take the materialized space back first — see [materializedSpaceSurvives]. */
+    private fun PhantomSpaceState.shouldDropMaterialized(text: String): Boolean {
+        if (!hasStandingMaterializedSpace()) return false
+        return !materializedSpaceSurvives(text, nlpManager.getActivePunctuationRule().symbolsFollowingPhantomSpace)
+    }
+
+    /**
+     * Takes back the space written ahead of a word that never came (issue #393).
+     *
+     * For the boundaries that end the line rather than continue it: Enter, and the editor action that
+     * sends. The space was written on the promise of a next word, and a message must not go out with a
+     * trailing one where it never had one before.
+     */
+    private fun dropPendingMaterializedSpace() {
+        if (!phantomSpace.hasStandingMaterializedSpace()) return
+        replaceTextBeforeCursor(1, "")
+    }
+
     class AutoSpaceState {
         companion object {
             private const val F_IS_ACTIVE = 0x1
@@ -882,6 +1003,7 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
             private const val F_IS_ACTIVE = 0x1
             private const val F_SHOW_COMPOSING_REGION = 0x2
             private const val F_STAY_ACTIVE_NEXT_UPDATE = 0x4
+            private const val F_IS_MATERIALIZED = 0x8
         }
 
         private val state = AtomicInteger(0)
@@ -897,15 +1019,24 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
         val showComposingRegion: Boolean
             get() = state.get() and F_SHOW_COMPOSING_REGION != 0
 
+        /**
+         * Whether the promised space has already been written into the editor (issue #393). It is a real
+         * character from that moment on — what stays pending is only the right to take it back again.
+         */
+        val isMaterialized: Boolean
+            get() = state.get() and F_IS_MATERIALIZED != 0
+
         fun setActive(
             showComposingRegion: Boolean,
             stayActiveNextUpdate: Boolean = true,
             candidate: SuggestionCandidate? = null,
+            materialized: Boolean = false,
         ) {
             state.set(
                 F_IS_ACTIVE
                     or (if (showComposingRegion) F_SHOW_COMPOSING_REGION else 0)
                     or (if (stayActiveNextUpdate) F_STAY_ACTIVE_NEXT_UPDATE else 0)
+                    or (if (materialized) F_IS_MATERIALIZED else 0)
             )
             candidateForRevert = candidate
         }
