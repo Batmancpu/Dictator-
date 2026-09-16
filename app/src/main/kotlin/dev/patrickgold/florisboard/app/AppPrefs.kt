@@ -1738,6 +1738,20 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             default = Color(0xFF30B7E6), // Dictate light blue
             serializer = ColorPreferenceSerializer,
         )
+        // What the high-contrast switch (#387) replaced, so turning it off puts the user's own themes
+        // back. The switch itself is not a preference: its state is read off dayThemeId/nightThemeId,
+        // so picking another theme by hand turns it off instead of leaving a stored "on" lying about
+        // the keyboard someone is looking at.
+        val themeIdBeforeHighContrastDay = custom(
+            key = "theme__day_theme_id_before_high_contrast",
+            default = extCoreTheme("floris_day"),
+            serializer = ExtensionComponentName.Serializer,
+        )
+        val themeIdBeforeHighContrastNight = custom(
+            key = "theme__night_theme_id_before_high_contrast",
+            default = extCoreTheme("floris_night"),
+            serializer = ExtensionComponentName.Serializer,
+        )
         val sunriseTime = localTime(
             key = "theme__sunrise_time",
             default = LocalTime(6, 0),

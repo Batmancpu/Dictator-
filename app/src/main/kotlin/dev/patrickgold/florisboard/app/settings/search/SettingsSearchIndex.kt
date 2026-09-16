@@ -339,6 +339,7 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.pref__smartbar__flip_toggles__label, R.string.settings__smartbar__title, Routes.Settings.Smartbar, anchor = "pref__smartbar__flip_toggles__label"),
         SettingsSearchEntry(R.string.pref__smartbar__shared_actions_auto_expand_collapse__label, R.string.settings__smartbar__title, Routes.Settings.Smartbar, anchor = "pref__smartbar__shared_actions_auto_expand_collapse__label"),
         SettingsSearchEntry(R.string.pref__smartbar__extended_actions_placement__label, R.string.settings__smartbar__title, Routes.Settings.Smartbar, anchor = "pref__smartbar__extended_actions_placement__label"),
+        SettingsSearchEntry(R.string.pref__theme__high_contrast__label, R.string.settings__theme__title, Routes.Settings.Theme, anchor = "pref__theme__high_contrast__label"),
         SettingsSearchEntry(R.string.pref__theme__mode__label, R.string.settings__theme__title, Routes.Settings.Theme, anchor = "pref__theme__mode__label"),
         SettingsSearchEntry(R.string.pref__theme__day, R.string.settings__theme__title, Routes.Settings.Theme, anchor = "pref__theme__day"),
         SettingsSearchEntry(R.string.pref__theme__night, R.string.settings__theme__title, Routes.Settings.Theme, anchor = "pref__theme__night"),

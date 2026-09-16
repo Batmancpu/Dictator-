@@ -189,6 +189,8 @@
     <string name="settings__localization__subtype_delete_confirmation_title" comment="Title of the subtype delete confirmation dialog">Potvrzení odstranění</string>
     <string name="settings__localization__subtype_delete_confirmation_warning" comment="Warning message in the confirmation dialog to confirm the user's intent to delete">Opravdu chcete odstranit tento podtyp?</string>
     <string name="settings__theme__title" comment="Title of the Theme screen">Motiv</string>
+    <string name="pref__theme__high_contrast__label" comment="Label of the switch that turns on the measured high-contrast theme pair">Vysoký kontrast</string>
+    <string name="pref__theme__high_contrast__summary" comment="Summary of the high-contrast switch. 7:1 is the WCAG AAA contrast ratio for body text; keep the ratio as digits.">Orámované klávesy, každý popisek změřen na 7:1. Nastaví den i noc.</string>
     <string name="pref__theme__mode__label" comment="Label of the theme mode preference">Režim motivu</string>
     <string name="pref__theme__sunrise_time__label" comment="Label of the sunrise time preference">Čas východu slunce</string>
     <string name="pref__theme__sunset_time__label" comment="Label of the sunset time preference">Čas západu slunce</string>

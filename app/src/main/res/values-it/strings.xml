@@ -183,6 +183,8 @@
     <string name="settings__localization__subtype_delete_confirmation_title" comment="Title of the subtype delete confirmation dialog">Conferma eliminazione</string>
     <string name="settings__localization__subtype_delete_confirmation_warning" comment="Warning message in the confirmation dialog to confirm the user's intent to delete">Sei sicuro di voler eliminare questo sottotipo?</string>
     <string name="settings__theme__title" comment="Title of the Theme screen">Tema</string>
+    <string name="pref__theme__high_contrast__label" comment="Label of the switch that turns on the measured high-contrast theme pair">Contrasto elevato</string>
+    <string name="pref__theme__high_contrast__summary" comment="Summary of the high-contrast switch. 7:1 is the WCAG AAA contrast ratio for body text; keep the ratio as digits.">Tasti contornati, ogni etichetta misurata a 7:1. Imposta giorno e notte.</string>
     <string name="pref__theme__mode__label" comment="Label of the theme mode preference">Modalità tema</string>
     <string name="pref__theme__sunrise_time__label" comment="Label of the sunrise time preference">Ora dell\'alba</string>
     <string name="pref__theme__sunset_time__label" comment="Label of the sunset time preference">Ora del tramonto</string>

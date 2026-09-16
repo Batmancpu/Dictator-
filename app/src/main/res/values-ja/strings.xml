@@ -183,6 +183,8 @@
     <string name="settings__localization__subtype_delete_confirmation_title" comment="Title of the subtype delete confirmation dialog">削除の確認</string>
     <string name="settings__localization__subtype_delete_confirmation_warning" comment="Warning message in the confirmation dialog to confirm the user's intent to delete">このサブタイプを削除してもよろしいですか？</string>
     <string name="settings__theme__title" comment="Title of the Theme screen">テーマ</string>
+    <string name="pref__theme__high_contrast__label" comment="Label of the switch that turns on the measured high-contrast theme pair">ハイコントラスト</string>
+    <string name="pref__theme__high_contrast__summary" comment="Summary of the high-contrast switch. 7:1 is the WCAG AAA contrast ratio for body text; keep the ratio as digits.">枠線付きのキー、すべての文字を 7:1 で測定。昼と夜のテーマを設定します。</string>
     <string name="pref__theme__mode__label" comment="Label of the theme mode preference">テーマモード</string>
     <string name="pref__theme__sunrise_time__label" comment="Label of the sunrise time preference">日の出時刻</string>
     <string name="pref__theme__sunset_time__label" comment="Label of the sunset time preference">日の入り時刻</string>

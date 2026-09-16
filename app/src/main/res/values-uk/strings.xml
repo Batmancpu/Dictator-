@@ -181,6 +181,8 @@
     <string name="settings__localization__subtype_delete_confirmation_title" comment="Title of the subtype delete confirmation dialog">Підтвердження видалення</string>
     <string name="settings__localization__subtype_delete_confirmation_warning" comment="Warning message in the confirmation dialog to confirm the user's intent to delete">Ви впевнені, що хочете видалити цей підтип?</string>
     <string name="settings__theme__title" comment="Title of the Theme screen">Тема</string>
+    <string name="pref__theme__high_contrast__label" comment="Label of the switch that turns on the measured high-contrast theme pair">Висока контрастність</string>
+    <string name="pref__theme__high_contrast__summary" comment="Summary of the high-contrast switch. 7:1 is the WCAG AAA contrast ratio for body text; keep the ratio as digits.">Обведені клавіші, кожен напис виміряно на 7:1. Задає день і ніч.</string>
     <string name="pref__theme__mode__label" comment="Label of the theme mode preference">Режим теми</string>
     <string name="pref__theme__sunrise_time__label" comment="Label of the sunrise time preference">Час сходу</string>
     <string name="pref__theme__sunset_time__label" comment="Label of the sunset time preference">Час заходу</string>
