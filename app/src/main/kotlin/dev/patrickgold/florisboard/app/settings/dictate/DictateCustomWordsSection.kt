@@ -64,8 +64,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.florisboard.lib.android.showLongToast
-import org.florisboard.lib.compose.FlorisInfoCard
-import org.florisboard.lib.compose.FlorisWarningCard
 import org.florisboard.lib.compose.florisDialogScroll
 import org.florisboard.lib.compose.stringRes
 
@@ -82,9 +80,11 @@ import org.florisboard.lib.compose.stringRes
  * transcription prompt on **every** request, the speech model truncates that prompt at a fixed number
  * of tokens, and nothing anywhere used to say so. A word past the end is not a slow word, it is a word
  * that does nothing while still being sent. So the summary line states the cost, the dialog restates
- * it live while you paste, and a card turns into a warning once the line is crossed and points at
- * custom mappings — exact, offline, free — for the vocabulary that will never fit. See
- * [CustomWordList] for why the budget is what it is.
+ * it live while you paste, and a line of small text below the buttons says what that costs — grey while
+ * the list is only filling up, red once it is past the line and words are actually being dropped,
+ * pointing at custom mappings for the vocabulary that will never fit. All of it inside the dialog:
+ * the screen behind is a list of settings, not the place to explain one. See [CustomWordList] for why
+ * the budget is what it is.
  */
 @Composable
 internal fun PreferenceUiScope<FlorisPreferenceModel>.CustomWordsSection(pref: PreferenceData<String>) {
@@ -152,25 +152,6 @@ internal fun PreferenceUiScope<FlorisPreferenceModel>.CustomWordsSection(pref: P
         },
         onClick = { editorText = raw },
     )
-
-    when {
-        tokens > CustomWordList.TOKEN_BUDGET -> FlorisWarningCard(
-            modifier = Modifier.padding(all = 8.dp),
-            text = stringRes(
-                R.string.dictate__custom_words_budget_over,
-                "fits" to CustomWordList.countWithinBudget(words),
-                "count" to words.size,
-            ),
-        )
-        tokens > CustomWordList.WARN_TOKENS -> FlorisInfoCard(
-            modifier = Modifier.padding(all = 8.dp),
-            text = stringRes(
-                R.string.dictate__custom_words_budget_info,
-                "budget" to CustomWordList.TOKEN_BUDGET,
-                "tokens" to tokens,
-            ),
-        )
-    }
 
     editorText?.let { text ->
         CustomWordsEditorDialog(
@@ -249,6 +230,7 @@ private fun CustomWordsEditorDialog(
     val words = remember(text) { CustomWordList.parse(text) }
     val tokens = remember(words) { CustomWordList.estimateTokens(words) }
     val overBudget = tokens > CustomWordList.TOKEN_BUDGET
+    val hasNote = tokens > CustomWordList.WARN_TOKENS
 
     JetPrefAlertDialog(
         modifier = Modifier.fillMaxWidth(0.96f),
@@ -266,13 +248,19 @@ private fun CustomWordsEditorDialog(
                 onValueChange = onTextChange,
                 modifier = Modifier
                     .fillMaxWidth()
-                    // Tall enough to read a vocabulary in, and capped low enough that the two buttons
-                    // below still fit on screen: the dialog's own height is bounded, so a taller field
-                    // does not make the dialog taller, it pushes whatever follows out of sight. The
-                    // device test found exactly that at 360.dp — with a full list the buttons started
-                    // below the fold, and the only way back to them was a scroll gesture the text
-                    // field swallows.
-                    .heightIn(min = 200.dp, max = 280.dp),
+                    // The dialog's own height is bounded, so a taller field does not make the dialog
+                    // taller — it pushes whatever follows out of sight. The device test found exactly
+                    // that at 360.dp: with a full list the buttons started below the fold, and the
+                    // only way back to them was a scroll gesture the text field swallows.
+                    //
+                    // Hence two sizes. With nothing below the buttons the field can have the room;
+                    // once the budget note appears the field yields some of it — the note only shows
+                    // when the list is long enough to be scrolling anyway, and at that point what it
+                    // says matters more than four more visible lines of the list.
+                    .heightIn(
+                        min = if (hasNote) 160.dp else 200.dp,
+                        max = if (hasNote) 200.dp else 280.dp,
+                    ),
                 singleLine = false,
                 placeholder = { Text(stringRes(R.string.dictate__custom_words_placeholder)) },
             )
@@ -319,16 +307,33 @@ private fun CustomWordsEditorDialog(
                     onClick = onExport,
                 )
             }
-            if (overBudget) {
+            // Plain small text, not a card. Two states, and the difference between them is whether
+            // anything is being lost yet: an approaching list still sends every word, so it is said in
+            // the same muted grey as the count; a list past the line is dropping words on every
+            // dictation, so it is said in red. Both live here rather than on the screen behind,
+            // because this is where the list is edited and where the fix is.
+            if (hasNote) {
                 Text(
                     modifier = Modifier.padding(top = 12.dp),
-                    text = stringRes(
-                        R.string.dictate__custom_words_budget_over,
-                        "fits" to CustomWordList.countWithinBudget(words),
-                        "count" to words.size,
-                    ),
+                    text = if (overBudget) {
+                        stringRes(
+                            R.string.dictate__custom_words_budget_over,
+                            "fits" to CustomWordList.countWithinBudget(words),
+                            "count" to words.size,
+                        )
+                    } else {
+                        stringRes(
+                            R.string.dictate__custom_words_budget_info,
+                            "budget" to CustomWordList.TOKEN_BUDGET,
+                            "tokens" to tokens,
+                        )
+                    },
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error,
+                    color = if (overBudget) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
                 )
             }
         }
