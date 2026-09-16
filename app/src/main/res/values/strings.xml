@@ -1969,9 +1969,28 @@
     <string name="dictate__providers_single_call_title" comment="Toggle: send audio directly to a multimodal chat model in one call">Single-call multimodal</string>
     <string name="dictate__providers_single_call_summary" comment="Short summary for the single-call multimodal toggle">One audio-capable model transcribes and formats in a single request.</string>
     <string name="dictate__providers_rewording_single_call_note" comment="Info shown at the rewording provider when single-call is active at the transcription provider">Not used right now — your transcription provider does rewording in its single call.</string>
-    <string name="dictate__providers_test" comment="Button that checks the provider's base URL and API key">Test connection</string>
-    <string name="dictate__providers_test_success" comment="Shown after a successful connection test. {count} is the number of available models.">Connected · {count} models</string>
-    <string name="dictate__providers_test_failed" comment="Generic fallback shown when a connection test fails without a specific message">Connection failed</string>
+    <string name="dictate__providers_test" comment="Button that checks whether the provider accepts the entered API key and endpoint">Test connection</string>
+    <string name="dictate__providers_test_transcribe" comment="Button that sends a short bundled speech sample through the selected transcription model">Test transcription</string>
+    <string name="dictate__providers_check_no_key" comment="Shown when a test is started before an API key has been entered">Enter your API key first.</string>
+    <string name="dictate__providers_check_credentials_ok" comment="Successful connection test at a provider with a live model catalog. {count} is the number of models it returned.">Credentials verified · {count} models</string>
+    <string name="dictate__providers_check_credentials_ok_nocount" comment="Successful connection test at a provider whose model list ships with the app, so no model count was learned from the network">Credentials verified</string>
+    <string name="dictate__providers_check_endpoint_ok" comment="Successful connection test at a server that asks for no key at all, such as a local Ollama. {count} is the number of models it returned.">Server reached · {count} models</string>
+    <string name="dictate__providers_check_credentials_untested" comment="Second line after a successful connection test, saying what was not checked">Transcription not tested.</string>
+    <string name="dictate__providers_check_transcription_ok" comment="Successful transcription test: the provider returned a transcript for the sample">Transcription verified</string>
+    <string name="dictate__providers_check_transcription_text" comment="Second line after a successful transcription test, showing what came back. {text} is the transcript.">Came back as: “{text}”</string>
+    <string name="dictate__providers_check_transcription_empty" comment="Second line when the provider accepted the sample but returned no text at all">The request went through, but no text came back — the connection works, this model did not understand the sample.</string>
+    <string name="dictate__providers_check_failed_connection" comment="Headline when the connection test failed">Connection test failed</string>
+    <string name="dictate__providers_check_failed_transcription" comment="Headline when the transcription test failed">Transcription test failed</string>
+    <string name="dictate__providers_check_err_auth" comment="What to do when the provider rejected the key">The key was rejected. Check it, and that the endpoint belongs to the same account.</string>
+    <string name="dictate__providers_check_err_quota" comment="What to do when the key works but the account has nothing left to spend">The key works, but the account is out of quota or over a rate limit. Check your plan with the provider.</string>
+    <string name="dictate__providers_check_err_network" comment="What to do when the server could not be reached at all">The server could not be reached. Check the address and your internet connection.</string>
+    <string name="dictate__providers_check_err_timeout" comment="What to do when the provider did not answer in time">No answer in time. The provider may be busy — try again.</string>
+    <string name="dictate__providers_check_err_server" comment="What to do when the provider itself reported an error">The provider reported an error of its own. Nothing to change here; try again later.</string>
+    <string name="dictate__providers_check_err_format" comment="What to do when the provider refused the sample audio">The provider refused the sample audio. It may not accept this format.</string>
+    <string name="dictate__providers_check_err_unknown" comment="Fallback when a failure fits none of the known categories">The request failed.</string>
+    <string name="dictate__providers_azure_link_signup" comment="Link next to the Azure endpoint field: the page where a new Azure account is created">Create an Azure account</string>
+    <string name="dictate__providers_azure_link_portal" comment="Link next to the Azure endpoint field: the Azure portal, where the key and endpoint are found">Azure portal</string>
+    <string name="dictate__providers_azure_link_guide" comment="Link next to the Azure endpoint field: Microsoft's own setup guide and prerequisites for the MAI-Transcribe model">Setup guide</string>
     <!-- Dictate Cloud: prepaid credit bought in the app, as an alternative to bringing your own API key -->
     <string name="dictate__cloud_title" comment="Title of the Dictate Cloud screen and the row linking to it">Dictate Cloud</string>
     <string name="dictate__cloud_row_summary_none" comment="Summary of the Dictate Cloud row when no credit account exists">Buy dictation credit — no API key needed</string>

@@ -10,11 +10,12 @@
 
 package dev.patrickgold.florisboard.app.settings.dictate
 
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -41,6 +42,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -49,6 +51,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.LaunchedEffect
@@ -65,6 +68,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.patrickgold.florisboard.R
@@ -73,6 +77,10 @@ import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.app.LocalNavController
 import dev.patrickgold.florisboard.app.Routes
 import dev.patrickgold.florisboard.dictate.dictateProxyConfig
+import dev.patrickgold.florisboard.dictate.provider.ConnectionCheck
+import dev.patrickgold.florisboard.dictate.provider.ConnectionCheckSample
+import dev.patrickgold.florisboard.dictate.provider.ConnectionCheckScope
+import dev.patrickgold.florisboard.dictate.provider.DictateApiException
 import dev.patrickgold.florisboard.dictate.provider.LocalModelCatalog
 import dev.patrickgold.florisboard.dictate.provider.LocalModelManager
 import dev.patrickgold.florisboard.dictate.provider.OpenAiCompatibleClient
@@ -82,6 +90,7 @@ import dev.patrickgold.florisboard.dictate.provider.ProviderPreset
 import dev.patrickgold.florisboard.dictate.provider.ProviderRegistry
 import dev.patrickgold.florisboard.dictate.provider.TranscriptionApi
 import dev.patrickgold.florisboard.dictate.provider.singleCallApplies
+import dev.patrickgold.florisboard.lib.compose.FlorisHyperlinkText
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
 import dev.patrickgold.jetpref.datastore.model.collectAsState
 import dev.patrickgold.jetpref.datastore.ui.DialogSliderPreference
@@ -90,6 +99,7 @@ import dev.patrickgold.jetpref.datastore.ui.PreferenceGroup
 import dev.patrickgold.jetpref.datastore.ui.SwitchPreference
 import dev.patrickgold.jetpref.material.ui.JetPrefAlertDialog
 import kotlinx.coroutines.launch
+import org.florisboard.lib.android.stringRes
 import org.florisboard.lib.compose.florisDialogScroll
 import org.florisboard.lib.compose.persistentVerticalScrollbar
 import org.florisboard.lib.compose.stringRes
@@ -557,6 +567,22 @@ private fun providerSummary(
  * and the relevant model fields; custom endpoints additionally edit a display name and base URL and can
  * be deleted ([onDelete] != null). All fields are committed together on confirm.
  */
+/**
+ * Where an Azure Speech resource comes from, in the order someone without one needs them (#384).
+ *
+ * Deliberately three links and not one. [ProviderPreset.apiKeyUrl] already points at the resource
+ * creation blade, which is the right target for the setup wizard's single button but assumes both an
+ * account and a subscription; the reporter's frustration was about everything that has to exist before
+ * a key does. The guide is Microsoft's own prerequisites page for MAI-Transcribe, which is also where
+ * the region list this dialog summarises is kept current.
+ *
+ * None carries a locale segment, so Microsoft serves each in the reader's own language (checked
+ * 2026-09-16).
+ */
+private const val AZURE_SIGNUP_URL = "https://azure.microsoft.com/free/"
+private const val AZURE_PORTAL_URL = "https://portal.azure.com/"
+private const val AZURE_GUIDE_URL = "https://learn.microsoft.com/azure/ai-services/speech-service/mai-transcribe"
+
 @Composable
 private fun ProviderEditorDialog(
     preset: ProviderPreset?,
@@ -717,8 +743,33 @@ private fun ProviderEditorDialog(
                     text = stringRes(R.string.dictate__providers_azure_endpoint),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 12.dp),
+                    modifier = Modifier.padding(bottom = 4.dp),
                 )
+                // Azure is the one provider here where getting as far as this dialog is the easy part:
+                // an account, a subscription, a Speech resource in one of the six regions, and only then
+                // a key. Someone who has spent that afternoon and is told "connection failed" needs the
+                // way back to Microsoft, not just a verdict — so the three pages that matter stand right
+                // where the endpoint and the key are typed (#384). Locale-free URLs: Microsoft redirects
+                // each of them to the reader's own language.
+                ProvideTextStyle(MaterialTheme.typography.bodySmall) {
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.padding(bottom = 12.dp),
+                    ) {
+                        FlorisHyperlinkText(
+                            text = stringRes(R.string.dictate__providers_azure_link_signup),
+                            url = AZURE_SIGNUP_URL,
+                        )
+                        FlorisHyperlinkText(
+                            text = stringRes(R.string.dictate__providers_azure_link_portal),
+                            url = AZURE_PORTAL_URL,
+                        )
+                        FlorisHyperlinkText(
+                            text = stringRes(R.string.dictate__providers_azure_link_guide),
+                            url = AZURE_GUIDE_URL,
+                        )
+                    }
+                }
             }
             if (isCustom) {
                 EditorField(
@@ -751,7 +802,25 @@ private fun ProviderEditorDialog(
                 placeholder = stringRes(R.string.dictate__api_key_placeholder),
                 isSecret = true,
             )
-            ConnectionTestRow(preset = effectivePreset, apiKey = apiKey)
+            // Keyed on everything a check could have been about, so that changing any of it does not
+            // merely stale the verdict but removes it, together with the coroutine that was still
+            // fetching one (#384). A result from the previous configuration must never be read as a
+            // verdict on this one — that is half of what the reporter ran into.
+            key(
+                effectivePreset.id,
+                effectivePreset.baseUrl,
+                apiKey.trim(),
+                transcriptionModel.trim(),
+                transcriptionViaChat,
+            ) {
+                ProviderCheckSection(
+                    preset = effectivePreset,
+                    apiKey = apiKey,
+                    transcriptionModel = transcriptionModel,
+                    transcriptionViaChat = transcriptionViaChat,
+                    showTranscription = showTranscription,
+                )
+            }
             if (showTranscription) {
                 EditorField(
                     // When single-call is on, this one model does both transcription and rewording (#130),
@@ -976,73 +1045,205 @@ private fun RealtimeModelPickerDialog(
     }
 }
 
+/** A finished check, in the two lines the section shows: a verdict and the evidence or the way out. */
+private data class CheckOutcome(val ok: Boolean, val headline: String, val detail: String?)
+
 /**
- * A "Test connection" action with an inline result. Performs a lightweight `listModels()` call against
- * the provider's base URL with the currently entered key, so the user can verify the endpoint + key are
- * reachable before saving. A model count on success doubles as proof the catalog loads.
+ * The two checks under the key field, and the rule that each says only what it established (issue #384).
+ *
+ * There used to be one button. It counted whatever `listModels()` returned and called any number a
+ * success — which for Azure, ElevenLabs and AssemblyAI is a list compiled into the app, so the reporter
+ * got "Connected · 2 models" from an endpoint that does not exist, with a key nothing had looked at, and
+ * went hunting for the fault somewhere else entirely. A check that cannot fail is worse than no check:
+ * it spends the user's trust and answers a question they did not ask.
+ *
+ * Hence two actions with two different claims. **Test connection** makes one authenticated request per
+ * provider ([OpenAiCompatibleClient.checkCredentials]) and reports the key and the endpoint — and says
+ * in the same breath that transcription was not tested, because it was not. **Test transcription** sends
+ * [ConnectionCheckSample] through the selected model and is the only one that can say dictation works.
+ *
+ * That it costs something is carried by the separate, named button alone. There was a sentence under the
+ * two of them explaining the sample and the billing; it was three lines in a dialog that is already the
+ * tallest in the app, for a fact a labelled button that nothing presses on its own already makes plain.
+ * Removed on Jannis's call — the requirement was that a billed check be explicit and user-triggered, and
+ * a button of its own is both.
+ *
+ * The whole section is keyed on the configuration by its caller, which is what makes the second half of
+ * the report true: editing the key, the endpoint or the model does not merely grey the old verdict out,
+ * it takes the section out of composition — the result is gone and [rememberCoroutineScope] cancels a
+ * test still in flight, so an answer about the previous configuration can never land on the new one.
  */
 @Composable
-private fun ConnectionTestRow(preset: ProviderPreset, apiKey: String) {
+private fun ProviderCheckSection(
+    preset: ProviderPreset,
+    apiKey: String,
+    transcriptionModel: String,
+    transcriptionViaChat: Boolean,
+    showTranscription: Boolean,
+) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val prefs by FlorisPreferenceStore
-    var testing by remember { mutableStateOf(false) }
-    // null = not run yet; Pair(ok, message) once a test finished.
-    var result by remember { mutableStateOf<Pair<Boolean, String>?>(null) }
-    val okColor = MaterialTheme.colorScheme.primary
-    val errColor = MaterialTheme.colorScheme.error
-    val failedFallback = stringRes(R.string.dictate__providers_test_failed)
-    // Resolved here (composable scope) so the background coroutine can format without touching Compose.
-    val successTemplate = context.getString(R.string.dictate__providers_test_success)
+    var running by remember { mutableStateOf(false) }
+    var result by remember { mutableStateOf<CheckOutcome?>(null) }
+    // Green and red, not the scheme's primary and error. A verdict is the one place in this app where
+    // the colour carries meaning rather than decoration, and `primary` is the user's own accent (#387) —
+    // on a blue or purple theme "passed" read as a link. Which pair applies is decided by the surface's
+    // luminance rather than by the system's dark mode, because the app theme can be forced either way
+    // and AMOLED is darker still.
+    val onDark = MaterialTheme.colorScheme.surface.luminance() < 0.5f
+    val okColor = if (onDark) Color(0xFF81C784) else Color(0xFF2E7D32)
+    val errColor = if (onDark) Color(0xFFE57373) else Color(0xFFC62828)
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        result?.let { (ok, message) ->
-            Text(
-                text = message,
-                color = if (ok) okColor else errColor,
-                modifier = Modifier.weight(1f).padding(end = 8.dp),
-            )
-        } ?: Spacer(Modifier.weight(1f))
-        TextButton(
-            enabled = !testing,
-            onClick = {
-                testing = true
-                result = null
-                scope.launch {
-                    result = try {
-                        // Left on the default two minutes even when the user raised their own limit
-                        // (#337): the point of a test button is a quick verdict, and one that can sit
-                        // there for ten minutes answers a different question than the one being asked.
-                        val count = OpenAiCompatibleClient
-                            .from(
-                                preset, apiKey.trim(),
-                                baseUrlOverride = preset.baseUrl,
-                                proxy = prefs.dictate.dictateProxyConfig(),
-                                trustUserCerts = prefs.dictate.trustUserCertificates.get(),
-                            )
-                            .listModels()
-                            .size
-                        true to successTemplate.replace("{count}", count.toString())
-                    } catch (e: Exception) {
-                        false to (e.message ?: failedFallback)
-                    } finally {
-                        testing = false
-                    }
-                }
-            },
-        ) {
-            if (testing) {
-                CircularProgressIndicator(modifier = Modifier.padding(end = 8.dp).size(16.dp))
+    // Same rule the dictation path follows: what stands in the field, else the preset's default.
+    val model = transcriptionModel.trim().ifBlank { preset.defaultTranscriptionModel.orEmpty() }
+    // A provider with a key page wants a key; one without (Ollama, a server of one's own) is keyless by
+    // design. The same question [ProviderAccount.isConfigured] asks, and answering it here turns a
+    // confusing 401 — or ElevenLabs' "workspace 1anonymous1 not found" — into the one sentence that helps.
+    val needsKey = preset.apiKeyUrl != null && apiKey.isBlank()
+
+    fun startCheck(transcription: Boolean, check: suspend (OpenAiCompatibleClient) -> ConnectionCheck) {
+        if (needsKey) {
+            result = CheckOutcome(false, context.stringRes(R.string.dictate__providers_check_no_key), null)
+            return
+        }
+        running = true
+        result = null
+        scope.launch {
+            result = try {
+                // Left on the default two minutes even when the user raised their own limit (#337): the
+                // point of a test button is a quick verdict, and one that can sit there for ten minutes
+                // answers a different question than the one being asked.
+                val client = OpenAiCompatibleClient.from(
+                    preset, apiKey.trim(),
+                    baseUrlOverride = preset.baseUrl,
+                    proxy = prefs.dictate.dictateProxyConfig(),
+                    useChatAudio = transcriptionViaChat,
+                    trustUserCerts = prefs.dictate.trustUserCertificates.get(),
+                )
+                checkOutcome(context, check(client))
+            } catch (e: Exception) {
+                failureOutcome(context, e, transcription)
+            } finally {
+                running = false
             }
-            Text(stringRes(R.string.dictate__providers_test))
         }
     }
+
+    Column(modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End,
+        ) {
+            if (running) {
+                CircularProgressIndicator(modifier = Modifier.padding(end = 8.dp).size(16.dp))
+            }
+            TextButton(
+                enabled = !running,
+                onClick = { startCheck(transcription = false) { it.checkCredentials() } },
+            ) {
+                Text(stringRes(R.string.dictate__providers_test))
+            }
+            if (showTranscription) {
+                TextButton(
+                    enabled = !running,
+                    onClick = {
+                        startCheck(transcription = true) { client ->
+                            client.checkTranscription(
+                                sample = ConnectionCheckSample.file(context),
+                                model = model,
+                                language = ConnectionCheckSample.LANGUAGE,
+                            )
+                        }
+                    },
+                ) {
+                    Text(stringRes(R.string.dictate__providers_test_transcribe))
+                }
+            }
+        }
+        result?.let { outcome ->
+            Text(
+                text = outcome.headline,
+                color = if (outcome.ok) okColor else errColor,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            outcome.detail?.let { detail ->
+                Text(
+                    text = detail,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+/** Turns a passed check into the two lines shown, claiming its scope and nothing above it. */
+private fun checkOutcome(context: Context, check: ConnectionCheck): CheckOutcome = when (check.scope) {
+    ConnectionCheckScope.TRANSCRIPTION -> CheckOutcome(
+        ok = true,
+        headline = context.stringRes(R.string.dictate__providers_check_transcription_ok),
+        // The transcript is evidence, not a score: the sample is synthesised speech and a model is free
+        // to mishear it. Showing what came back lets the user judge that for themselves; an empty answer
+        // is a different result and says so, because the request went through but nothing was understood.
+        detail = check.transcript?.takeIf { it.isNotBlank() }
+            ?.let { context.stringRes(R.string.dictate__providers_check_transcription_text, "text" to it) }
+            ?: context.stringRes(R.string.dictate__providers_check_transcription_empty),
+    )
+    ConnectionCheckScope.CREDENTIALS -> CheckOutcome(
+        ok = true,
+        headline = check.liveModelCount
+            ?.let { context.stringRes(R.string.dictate__providers_check_credentials_ok, "count" to it.toString()) }
+            ?: context.stringRes(R.string.dictate__providers_check_credentials_ok_nocount),
+        detail = context.stringRes(R.string.dictate__providers_check_credentials_untested),
+    )
+    // Keyless by design, so there is nothing to verify and the honest verdict is smaller, not bigger.
+    ConnectionCheckScope.ENDPOINT -> CheckOutcome(
+        ok = true,
+        headline = context.stringRes(
+            R.string.dictate__providers_check_endpoint_ok,
+            "count" to (check.liveModelCount ?: 0),
+        ),
+        detail = context.stringRes(R.string.dictate__providers_check_credentials_untested),
+    )
+}
+
+/**
+ * Turns a failed check into a verdict plus the next thing to do.
+ *
+ * The headline names the step that failed, because the two buttons fail for overlapping reasons and the
+ * user has to know which one they are reading. The detail is the app's own sentence about this kind of
+ * failure followed by the provider's verbatim words — neither is enough alone: ours says what to change,
+ * theirs names the model or the region that ours cannot know about.
+ */
+private fun failureOutcome(context: Context, e: Exception, transcription: Boolean): CheckOutcome {
+    val kind = (e as? DictateApiException)?.kind ?: DictateApiException.Kind.UNKNOWN
+    val advice = context.stringRes(
+        when (kind) {
+            DictateApiException.Kind.INVALID_API_KEY -> R.string.dictate__providers_check_err_auth
+            DictateApiException.Kind.QUOTA_EXCEEDED -> R.string.dictate__providers_check_err_quota
+            DictateApiException.Kind.NETWORK -> R.string.dictate__providers_check_err_network
+            DictateApiException.Kind.TIMEOUT -> R.string.dictate__providers_check_err_timeout
+            DictateApiException.Kind.SERVER_ERROR -> R.string.dictate__providers_check_err_server
+            DictateApiException.Kind.FORMAT_NOT_SUPPORTED,
+            DictateApiException.Kind.CONTENT_SIZE_LIMIT,
+            -> R.string.dictate__providers_check_err_format
+            else -> R.string.dictate__providers_check_err_unknown
+        },
+    )
+    val raw = e.message?.takeIf { it.isNotBlank() && it != advice }
+    return CheckOutcome(
+        ok = false,
+        headline = context.stringRes(
+            if (transcription) {
+                R.string.dictate__providers_check_failed_transcription
+            } else {
+                R.string.dictate__providers_check_failed_connection
+            },
+        ),
+        detail = listOfNotNull(advice, raw).joinToString(" "),
+    )
 }
 
 /**

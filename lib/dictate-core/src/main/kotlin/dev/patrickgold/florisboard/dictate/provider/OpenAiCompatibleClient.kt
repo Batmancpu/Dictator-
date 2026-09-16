@@ -967,13 +967,14 @@ class OpenAiCompatibleClient(
     }
 
     override suspend fun listModels(): List<ModelInfo> {
-        // Providers without a model-list endpoint (ElevenLabs, AssemblyAI, #143) ship a curated list
-        // instead; return it offline so the picker/connection test work (key validated on first use).
+        // Providers without a usable model-list endpoint (ElevenLabs, AssemblyAI, #143) ship a curated
+        // list instead, and it is returned offline so the picker fills even on a train. That is fine for
+        // a picker and was a lie as a connection test, which is why the test no longer comes through here
+        // at all — see [checkCredentials] (#384).
         if (config.transcriptionApi in NO_MODELS_CATALOG_APIS) {
-            // Azure is the only one of them whose address is the user's own, so it is the only one with
-            // something to get wrong here. Nothing is fetched either way — this just lets the connection
-            // test answer the question its label promises instead of counting two ids and calling it a
-            // success while the endpoint is still a template (#349).
+            // Azure's address is the user's own, so it is the one whose picker can be opened against an
+            // endpoint that was never filled in. Nothing is fetched either way; this only refuses to
+            // offer model ids for a resource that does not exist yet (#349).
             if (config.transcriptionApi == TranscriptionApi.AZURE_FAST_TRANSCRIPTION) {
                 azureTranscribeUrl()
             }
@@ -1056,6 +1057,90 @@ class OpenAiCompatibleClient(
                 )
             }
             .sortedBy { it.id.lowercase() }
+    }
+
+    /**
+     * One authenticated request, made only to find out whether the key and the endpoint belong together
+     * (issue #384).
+     *
+     * This used to be [listModels] and nothing else, which is why "Test connection" could pass against a
+     * hostname that does not resolve: the three providers whose catalog is curated answer that call from
+     * a list compiled into the app, without a socket being opened. So each of them gets a request of its
+     * own here — one that a wrong key refuses — and none of them reports a model count, because the
+     * number the picker shows was never learned from the network.
+     *
+     * Everything else has a live `/models` catalog, and fetching it *is* an authenticated request; the
+     * count that comes back is real and worth showing. A keyless endpoint (Ollama, a server of one's own)
+     * goes down the same path and gets [ConnectionCheckScope.ENDPOINT]: it answered, and there was no
+     * credential in the request to have been accepted.
+     *
+     * What none of this establishes is that the selected model can transcribe — see [checkTranscription].
+     */
+    suspend fun checkCredentials(): ConnectionCheck {
+        val scope = if (config.apiKey.isBlank()) {
+            ConnectionCheckScope.ENDPOINT
+        } else {
+            ConnectionCheckScope.CREDENTIALS
+        }
+        when (config.transcriptionApi) {
+            // The base-models catalog: the wrong namespace for the picker (per-locale custom-speech
+            // models, none of which `enhancedMode.model` accepts, see [ProviderRegistry.AZURE]) but
+            // exactly the right shape for this — the resource key opens it, so a 401 means the key is
+            // wrong and a DNS failure means the endpoint is. [azureTranscribeUrl] runs first because a
+            // blank or still-templated endpoint deserves the sentence it already writes, not a socket
+            // error. Endpoint and auth header read from Microsoft's REST reference, 2026-09-09.
+            TranscriptionApi.AZURE_FAST_TRANSCRIPTION -> {
+                azureTranscribeUrl()
+                val request = Request.Builder()
+                    .url(config.normalizedBaseUrl + "speechtotext/models/base?api-version=$AZURE_API_VERSION")
+                    .header("Ocp-Apim-Subscription-Key", config.apiKey)
+                    .get()
+                    .build()
+                executeForBody(request, maxRetries = 1)
+                return ConnectionCheck(scope)
+            }
+            // `GET /v1/models` mixes TTS and STT with no clean filter, which is why it is not the picker's
+            // source — but it is authenticated, measured against the live API on 2026-09-16: a wrong key
+            // answers 401 `invalid_api_key`, so it settles the only question asked here.
+            TranscriptionApi.ELEVENLABS_MULTIPART -> {
+                val request = Request.Builder()
+                    .url(config.normalizedBaseUrl + "models")
+                    .header("xi-api-key", config.apiKey)
+                    .get()
+                    .build()
+                executeForBody(request, maxRetries = 1)
+                return ConnectionCheck(scope)
+            }
+            // AssemblyAI publishes no models endpoint at all, so the probe is the cheapest authenticated
+            // GET it does have: one page of the account's own transcript list, capped at a single entry.
+            // Nothing is read out of it — only whether the key was accepted. Measured 2026-09-16: a wrong
+            // key answers 401 "Authentication error, API token missing/invalid".
+            TranscriptionApi.ASSEMBLYAI_ASYNC -> {
+                val request = Request.Builder()
+                    .url(config.normalizedBaseUrl + "v2/transcript?limit=1")
+                    .header("authorization", config.apiKey)
+                    .get()
+                    .build()
+                executeForBody(request, maxRetries = 1)
+                return ConnectionCheck(scope)
+            }
+            else -> return ConnectionCheck(scope, liveModelCount = listModels().size)
+        }
+    }
+
+    /**
+     * The only check that proves dictation works: the app's own transcription path, with the sample
+     * standing in for the recording (issue #384).
+     *
+     * Deliberately [transcribe] itself rather than a lighter imitation of it — the point is that every
+     * step a real dictation depends on has to hold, including the ones a credential check cannot see: the
+     * selected model existing, the resource's region hosting it, the account having quota, and the
+     * provider accepting the container. It is a billed request for the same reason, which is why the UI
+     * asks for it separately instead of folding it into the button next to the key field.
+     */
+    suspend fun checkTranscription(sample: File, model: String, language: String? = null): ConnectionCheck {
+        val result = transcribe(TranscriptionRequest(audioFile = sample, model = model, language = language))
+        return ConnectionCheck(ConnectionCheckScope.TRANSCRIPTION, transcript = result.text.trim())
     }
 
     /**
