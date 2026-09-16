@@ -1252,6 +1252,17 @@
     <string name="dictate__floating_button_design_pill_summary">Po uaktywnieniu rozszerza się, pokazując licznik czasu i wykres dźwięku na żywo.</string>
     <string name="dictate__floating_button_design_ring">Pierścień</string>
     <string name="dictate__floating_button_design_ring_summary">Kompaktowe kółko z pierścieniem animowanym podczas nagrywania i transkrypcji.</string>
+    <string name="dictate__floating_button_apps_title">Widoczność w aplikacjach</string>
+    <string name="dictate__floating_button_apps_summary_all">We wszystkich aplikacjach</string>
+    <string name="dictate__floating_button_apps_summary_only">Tylko w {n} aplikacjach</string>
+    <string name="dictate__floating_button_apps_summary_except">Wszędzie poza {n} aplikacjami</string>
+    <string name="dictate__floating_button_apps_scope_all">Wszystkie aplikacje</string>
+    <string name="dictate__floating_button_apps_scope_only">Tylko aplikacje poniżej</string>
+    <string name="dictate__floating_button_apps_scope_except">Wszystkie poza aplikacjami poniżej</string>
+    <string name="dictate__floating_button_apps_note">Nad pominiętą aplikacją przycisk nigdy się nie pojawi, a Dictate nie czyta w niej pól tekstowych. Aplikacja, która z zasady nie akceptuje usług ułatwień dostępu, i tak zobaczy, że usługa jest włączona.</string>
+    <string name="dictate__floating_button_apps_list_title">Aplikacje</string>
+    <string name="dictate__floating_button_apps_search">Szukaj aplikacji</string>
+    <string name="dictate__floating_button_apps_none">Nie znaleziono aplikacji dla „{search_term}”</string>
     <string name="dictate__floating_button_design_title">Styl przycisku</string>
     <string name="dictate__floating_button_haptic_summary_off">Bez wibracji po dotknięciu.</string>
     <string name="dictate__floating_button_haptic_summary_on">Krótka wibracja po dotknięciu przycisku.</string>

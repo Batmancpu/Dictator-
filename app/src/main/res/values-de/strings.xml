@@ -1155,6 +1155,17 @@
     <string name="dictate__floating_button_show_with_keyboard_title">Mit Dictate-Tastatur anzeigen</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Der Button erscheint auch, während die Dictate-Tastatur aktiv ist.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Ausgeblendet, während die Dictate-Tastatur aktiv ist, da diese bereits eine Mikrofontaste hat.</string>
+    <string name="dictate__floating_button_apps_title">App-Sichtbarkeit</string>
+    <string name="dictate__floating_button_apps_summary_all">In jeder App</string>
+    <string name="dictate__floating_button_apps_summary_only">Nur in {n} Apps</string>
+    <string name="dictate__floating_button_apps_summary_except">Überall außer in {n} Apps</string>
+    <string name="dictate__floating_button_apps_scope_all">Jede App</string>
+    <string name="dictate__floating_button_apps_scope_only">Nur die Apps unten</string>
+    <string name="dictate__floating_button_apps_scope_except">Jede App außer denen unten</string>
+    <string name="dictate__floating_button_apps_note">Über einer ausgelassenen App wird der Button nie gezeichnet, und Dictate liest dort keine Textfelder. Eine App, die grundsätzlich etwas gegen Bedienungshilfen hat, merkt trotzdem, dass der Dienst eingeschaltet ist.</string>
+    <string name="dictate__floating_button_apps_list_title">Apps</string>
+    <string name="dictate__floating_button_apps_search">Apps durchsuchen</string>
+    <string name="dictate__floating_button_apps_none">Keine App für „{search_term}“ gefunden</string>
     <string name="dictate__floating_button_design_title">Button-Stil</string>
     <string name="dictate__floating_button_design_ring">Ring</string>
     <string name="dictate__floating_button_design_ring_summary">Kompakter Kreis mit einem Ring, der beim Aufnehmen und Transkribieren animiert.</string>

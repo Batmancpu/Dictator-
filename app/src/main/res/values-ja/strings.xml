@@ -1167,6 +1167,17 @@
     <string name="dictate__floating_button_design_pill_summary">アクティブ時に展開し、タイマーとライブ波形を表示します。</string>
     <string name="dictate__floating_button_design_ring">リング</string>
     <string name="dictate__floating_button_design_ring_summary">録音・文字起こし中にアニメーションするリング付きのコンパクトな円。</string>
+    <string name="dictate__floating_button_apps_title">アプリごとの表示</string>
+    <string name="dictate__floating_button_apps_summary_all">すべてのアプリで表示</string>
+    <string name="dictate__floating_button_apps_summary_only">{n} 個のアプリでのみ表示</string>
+    <string name="dictate__floating_button_apps_summary_except">{n} 個のアプリ以外で表示</string>
+    <string name="dictate__floating_button_apps_scope_all">すべてのアプリ</string>
+    <string name="dictate__floating_button_apps_scope_only">下で選んだアプリのみ</string>
+    <string name="dictate__floating_button_apps_scope_except">下で選んだアプリ以外すべて</string>
+    <string name="dictate__floating_button_apps_note">選ばなかったアプリの上にボタンが描画されることはなく、Dictate がそのアプリのテキスト欄を読むこともありません。ユーザー補助サービス自体を拒むアプリには、サービスが有効であること自体は引き続き分かります。</string>
+    <string name="dictate__floating_button_apps_list_title">アプリ</string>
+    <string name="dictate__floating_button_apps_search">アプリを検索</string>
+    <string name="dictate__floating_button_apps_none">「{search_term}」に一致するアプリはありません</string>
     <string name="dictate__floating_button_design_title">ボタンのスタイル</string>
     <string name="dictate__floating_button_haptic_summary_off">タップ時に振動しません。</string>
     <string name="dictate__floating_button_haptic_summary_on">ボタンをタップすると短く振動します。</string>

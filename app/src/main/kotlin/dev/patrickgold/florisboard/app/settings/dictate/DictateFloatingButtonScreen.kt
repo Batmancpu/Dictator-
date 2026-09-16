@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.Adjust
+import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.BlurOn
 import androidx.compose.material.icons.filled.ColorLens
@@ -51,6 +52,9 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.settings.search.settingsSearchAnchor
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
+import dev.patrickgold.florisboard.app.LocalNavController
+import dev.patrickgold.florisboard.app.Routes
+import dev.patrickgold.florisboard.dictate.DictateFloatingButtonAppScope
 import dev.patrickgold.florisboard.dictate.overlay.DictateAccessibilityService
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
 import dev.patrickgold.jetpref.datastore.model.collectAsState
@@ -83,8 +87,12 @@ fun DictateFloatingButtonScreen() = FlorisScreen {
 
     content {
         val context = LocalContext.current
+        val navController = LocalNavController.current
         val lifecycleOwner = LocalLifecycleOwner.current
         val enabled by prefs.dictate.floatingButtonEnabled.collectAsState()
+        val appScope by prefs.dictate.floatingButtonAppScope.collectAsState()
+        val apps by prefs.dictate.floatingButtonApps.collectAsState()
+        val appCount = apps.packages.size
 
         // Opening this screen clears the "New" badge on the Dictate settings entry.
         LaunchedEffect(Unit) { prefs.dictate.floatingButtonHintSeen.set(true) }
@@ -159,6 +167,23 @@ fun DictateFloatingButtonScreen() = FlorisScreen {
                 title = stringRes(R.string.dictate__floating_button_show_with_keyboard_title),
                 summaryOn = stringRes(R.string.dictate__floating_button_show_with_keyboard_summary_on),
                 summaryOff = stringRes(R.string.dictate__floating_button_show_with_keyboard_summary_off),
+            )
+
+            // Where it may appear at all (issue #392), directly under the other "where" switch: a
+            // banking app that objects to overlays, or an app that already has a microphone of its own.
+            Preference(
+                icon = Icons.Default.Apps,
+                modifier = Modifier.settingsSearchAnchor("dictate__floating_button_apps_title"),
+                title = stringRes(R.string.dictate__floating_button_apps_title),
+                summary = when (appScope) {
+                    DictateFloatingButtonAppScope.ALL ->
+                        stringRes(R.string.dictate__floating_button_apps_summary_all)
+                    DictateFloatingButtonAppScope.ONLY_SELECTED ->
+                        stringRes(R.string.dictate__floating_button_apps_summary_only, "n" to appCount)
+                    DictateFloatingButtonAppScope.EXCEPT_SELECTED ->
+                        stringRes(R.string.dictate__floating_button_apps_summary_except, "n" to appCount)
+                },
+                onClick = { navController.navigate(Routes.Settings.DictateFloatingButtonApps) },
             )
 
             ListPreference(

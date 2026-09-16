@@ -1234,6 +1234,17 @@
     <string name="dictate__floating_button_design_pill_summary">Aktív állapotban kibővül, és időzítőt meg élő hullámformát mutat.</string>
     <string name="dictate__floating_button_design_ring">Gyűrű</string>
     <string name="dictate__floating_button_design_ring_summary">Kompakt kör gyűrűvel, amely felvétel és átírás közben animálódik.</string>
+    <string name="dictate__floating_button_apps_title">Láthatóság alkalmazásonként</string>
+    <string name="dictate__floating_button_apps_summary_all">Minden alkalmazásban</string>
+    <string name="dictate__floating_button_apps_summary_only">Csak {n} alkalmazásban</string>
+    <string name="dictate__floating_button_apps_summary_except">Mindenhol, kivéve {n} alkalmazásban</string>
+    <string name="dictate__floating_button_apps_scope_all">Minden alkalmazás</string>
+    <string name="dictate__floating_button_apps_scope_only">Csak az alábbi alkalmazások</string>
+    <string name="dictate__floating_button_apps_scope_except">Minden, kivéve az alábbi alkalmazásokat</string>
+    <string name="dictate__floating_button_apps_note">A kihagyott alkalmazások fölé a gomb soha nem kerül ki, és a Dictate nem olvassa ott a szövegmezőket. Az az alkalmazás, amelyik eleve tiltakozik a kisegítő szolgáltatások ellen, továbbra is látni fogja, hogy a szolgáltatás be van kapcsolva.</string>
+    <string name="dictate__floating_button_apps_list_title">Alkalmazások</string>
+    <string name="dictate__floating_button_apps_search">Alkalmazások keresése</string>
+    <string name="dictate__floating_button_apps_none">Nincs találat erre: „{search_term}”</string>
     <string name="dictate__floating_button_design_title">Gomb stílusa</string>
     <string name="dictate__floating_button_haptic_summary_off">Nincs rezgés koppintáskor.</string>
     <string name="dictate__floating_button_haptic_summary_on">Rövid rezgés, amikor megérinti a gombot.</string>

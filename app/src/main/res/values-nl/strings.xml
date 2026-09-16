@@ -1135,6 +1135,17 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__floating_button_design_pill_summary">Klapt uit wanneer actief om een timer en een live golfvorm te tonen.</string>
     <string name="dictate__floating_button_design_ring">Ring</string>
     <string name="dictate__floating_button_design_ring_summary">Compacte cirkel met een ring die animeert tijdens opnemen en transcriberen.</string>
+    <string name="dictate__floating_button_apps_title">Zichtbaarheid per app</string>
+    <string name="dictate__floating_button_apps_summary_all">In elke app</string>
+    <string name="dictate__floating_button_apps_summary_only">Alleen in {n} apps</string>
+    <string name="dictate__floating_button_apps_summary_except">Overal behalve in {n} apps</string>
+    <string name="dictate__floating_button_apps_scope_all">Elke app</string>
+    <string name="dictate__floating_button_apps_scope_only">Alleen de apps hieronder</string>
+    <string name="dictate__floating_button_apps_scope_except">Elke app behalve die hieronder</string>
+    <string name="dictate__floating_button_apps_note">De knop wordt nooit over een app getekend die je weglaat, en Dictate leest daar geen tekstvelden. Een app die toegankelijkheidsdiensten sowieso weigert, ziet nog steeds dat de dienst aanstaat.</string>
+    <string name="dictate__floating_button_apps_list_title">Apps</string>
+    <string name="dictate__floating_button_apps_search">Apps zoeken</string>
+    <string name="dictate__floating_button_apps_none">Geen app gevonden voor ‘{search_term}’</string>
     <string name="dictate__floating_button_design_title">Knopstijl</string>
     <string name="dictate__floating_button_haptic_summary_off">Geen trilling bij tikken.</string>
     <string name="dictate__floating_button_haptic_summary_on">Een korte tril wanneer je op de knop tikt.</string>

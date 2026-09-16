@@ -212,6 +212,14 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val accentColor: Int,
     )
 
+    /** An [Emission] and the three signals from outside the bubble that can suppress it. */
+    private data class Surroundings(
+        val emission: Emission,
+        val recognitionActive: Boolean,
+        val screenOn: Boolean,
+        val allowedInApp: Boolean,
+    )
+
     /** Starts observing the feature toggle + focus + design + dictation state to drive the bubble. */
     fun start() {
         scope.launch {
@@ -236,13 +244,24 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
             ) { inputs, design, size, imeVisible, color ->
                 Emission(inputs, design, size, imeVisible, color.toArgb())
             }
+            // Whether this app is one the button may appear over at all (#392). Built from the same
+            // foreground-package flow the per-app anchors already ride on, so nothing new has to watch for
+            // the app changing — a window change updates that flow, and the filter re-decides with it.
+            val allowedInApp = combine(
+                DictateAccessibilityService.foregroundPackage,
+                prefs.dictate.floatingButtonAppScope.asFlow(),
+                prefs.dictate.floatingButtonApps.asFlow(),
+            ) { pkg, scope, apps ->
+                BubbleApps.allows(scope, apps.toSet(), pkg)
+            }
             combine(
                 emissions,
                 RecognitionBridge.active,
                 DictateAccessibilityService.screenOn,
-            ) { emission, recogActive, screenOn ->
-                Triple(emission, recogActive, screenOn)
-            }.collect { (emission, recogActive, screenOn) ->
+                allowedInApp,
+            ) { emission, recogActive, screenOn, appAllowed ->
+                Surroundings(emission, recogActive, screenOn, appAllowed)
+            }.collect { (emission, recogActive, screenOn, appAllowed) ->
                 val (inputs, design, size, imeVisible, accent) = emission
                 val (enabled, showWithKeyboard, focused, dictateKeyboard, state) = inputs
                 if (design != currentDesign || size.scale != sizeScale || accent != accentColor) {
@@ -268,12 +287,15 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
                     hiddenByOwnKeyboard = hiddenByOwnKeyboard,
                     recognitionActive = recogActive,
                     screenOn = screenOn,
+                    allowedInApp = appAllowed,
                 )
                 if (show) ensureShown() else hide()
                 // The rewording menu is a window of its own and does not come down with hide(). Tied to the
                 // screen alone on purpose: taking it away whenever the bubble hides would be a different
-                // change, about focus, not about the screen.
-                if (!screenOn) hidePromptMenu()
+                // change, about focus, not about the screen. The app filter is the exception, and for the
+                // same reason it beats everything else: "nothing over this app" has to mean every window
+                // we own, and a menu left standing would be the one that stayed (#392).
+                if (!screenOn || !appAllowed) hidePromptMenu()
                 recordingState = state as? DictateController.UiState.Recording
                 applyState(state)
                 manageForeground(state)

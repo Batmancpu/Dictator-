@@ -1018,6 +1018,17 @@
     <string name="dictate__floating_button_design_pill_summary">Si espande quando attivo per mostrare un timer e una forma d’onda in tempo reale.</string>
     <string name="dictate__floating_button_design_ring">Anello</string>
     <string name="dictate__floating_button_design_ring_summary">Cerchio compatto con un anello animato durante registrazione e trascrizione.</string>
+    <string name="dictate__floating_button_apps_title">Visibilità per app</string>
+    <string name="dictate__floating_button_apps_summary_all">In tutte le app</string>
+    <string name="dictate__floating_button_apps_summary_only">Solo in {n} app</string>
+    <string name="dictate__floating_button_apps_summary_except">Ovunque tranne in {n} app</string>
+    <string name="dictate__floating_button_apps_scope_all">Tutte le app</string>
+    <string name="dictate__floating_button_apps_scope_only">Solo le app qui sotto</string>
+    <string name="dictate__floating_button_apps_scope_except">Tutte tranne le app qui sotto</string>
+    <string name="dictate__floating_button_apps_note">Il pulsante non viene mai disegnato sopra un\'app che escludi, e Dictate non ne legge i campi di testo. Un\'app che rifiuta i servizi di accessibilità in quanto tali vedrà comunque che il servizio è attivo.</string>
+    <string name="dictate__floating_button_apps_list_title">App</string>
+    <string name="dictate__floating_button_apps_search">Cerca app</string>
+    <string name="dictate__floating_button_apps_none">Nessuna app trovata per «{search_term}»</string>
     <string name="dictate__floating_button_design_title">Stile del pulsante</string>
     <string name="dictate__floating_button_haptic_summary_off">Nessuna vibrazione al tocco.</string>
     <string name="dictate__floating_button_haptic_summary_on">Una breve vibrazione quando tocchi il pulsante.</string>

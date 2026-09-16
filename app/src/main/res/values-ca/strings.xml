@@ -1105,6 +1105,17 @@
     <string name="dictate__floating_button_design_pill_summary">S’amplia quan està actiu per mostrar un temporitzador i una forma d’ona en directe.</string>
     <string name="dictate__floating_button_design_ring">Anella</string>
     <string name="dictate__floating_button_design_ring_summary">Cercle compacte amb una anella animada mentre es grava i es transcriu.</string>
+    <string name="dictate__floating_button_apps_title">Visibilitat per aplicació</string>
+    <string name="dictate__floating_button_apps_summary_all">A totes les aplicacions</string>
+    <string name="dictate__floating_button_apps_summary_only">Només a {n} aplicacions</string>
+    <string name="dictate__floating_button_apps_summary_except">A tot arreu excepte a {n} aplicacions</string>
+    <string name="dictate__floating_button_apps_scope_all">Totes les aplicacions</string>
+    <string name="dictate__floating_button_apps_scope_only">Només les aplicacions de sota</string>
+    <string name="dictate__floating_button_apps_scope_except">Totes excepte les aplicacions de sota</string>
+    <string name="dictate__floating_button_apps_note">El botó no es dibuixa mai sobre una aplicació que deixis fora, i Dictate no en llegeix els camps de text. Una aplicació que rebutja els serveis d\'accessibilitat en general continuarà veient que el servei està activat.</string>
+    <string name="dictate__floating_button_apps_list_title">Aplicacions</string>
+    <string name="dictate__floating_button_apps_search">Cerca aplicacions</string>
+    <string name="dictate__floating_button_apps_none">No s\'ha trobat cap aplicació per a «{search_term}»</string>
     <string name="dictate__floating_button_design_title">Estil del botó</string>
     <string name="dictate__floating_button_haptic_summary_off">Sense vibració en tocar.</string>
     <string name="dictate__floating_button_haptic_summary_on">Una vibració breu en tocar el botó.</string>

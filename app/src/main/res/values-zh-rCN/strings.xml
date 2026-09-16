@@ -1230,6 +1230,17 @@
     <string name="dictate__floating_button_design_pill_summary">激活时展开，显示计时器和实时波形。</string>
     <string name="dictate__floating_button_design_ring">圆环</string>
     <string name="dictate__floating_button_design_ring_summary">紧凑的圆形，录音和转写时圆环会有动画。</string>
+    <string name="dictate__floating_button_apps_title">按应用显示</string>
+    <string name="dictate__floating_button_apps_summary_all">在所有应用中显示</string>
+    <string name="dictate__floating_button_apps_summary_only">仅在 {n} 个应用中显示</string>
+    <string name="dictate__floating_button_apps_summary_except">除 {n} 个应用外都显示</string>
+    <string name="dictate__floating_button_apps_scope_all">所有应用</string>
+    <string name="dictate__floating_button_apps_scope_only">仅下列应用</string>
+    <string name="dictate__floating_button_apps_scope_except">除下列应用外的所有应用</string>
+    <string name="dictate__floating_button_apps_note">被排除的应用上方永远不会绘制按钮，Dictate 也不会读取其中的文本框。但对于本身就抵触无障碍服务的应用，它仍然能看出该服务已开启。</string>
+    <string name="dictate__floating_button_apps_list_title">应用</string>
+    <string name="dictate__floating_button_apps_search">搜索应用</string>
+    <string name="dictate__floating_button_apps_none">未找到与“{search_term}”匹配的应用</string>
     <string name="dictate__floating_button_design_title">按钮样式</string>
     <string name="dictate__floating_button_haptic_summary_off">点按时不振动。</string>
     <string name="dictate__floating_button_haptic_summary_on">点按按钮时短暂振动。</string>

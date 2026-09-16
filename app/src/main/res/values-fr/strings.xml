@@ -1113,6 +1113,17 @@
     <string name="dictate__floating_button_design_pill_summary">S’agrandit lorsqu’il est actif pour afficher un minuteur et une forme d’onde en direct.</string>
     <string name="dictate__floating_button_design_ring">Anneau</string>
     <string name="dictate__floating_button_design_ring_summary">Cercle compact avec un anneau animé pendant l’enregistrement et la transcription.</string>
+    <string name="dictate__floating_button_apps_title">Visibilité par application</string>
+    <string name="dictate__floating_button_apps_summary_all">Dans toutes les applications</string>
+    <string name="dictate__floating_button_apps_summary_only">Seulement dans {n} applications</string>
+    <string name="dictate__floating_button_apps_summary_except">Partout sauf dans {n} applications</string>
+    <string name="dictate__floating_button_apps_scope_all">Toutes les applications</string>
+    <string name="dictate__floating_button_apps_scope_only">Uniquement les applications ci-dessous</string>
+    <string name="dictate__floating_button_apps_scope_except">Toutes sauf les applications ci-dessous</string>
+    <string name="dictate__floating_button_apps_note">Le bouton n\'est jamais dessiné au-dessus d\'une application que vous excluez, et Dictate n\'y lit aucun champ de texte. Une application qui refuse les services d\'accessibilité en général verra toujours que le service est activé.</string>
+    <string name="dictate__floating_button_apps_list_title">Applications</string>
+    <string name="dictate__floating_button_apps_search">Rechercher une application</string>
+    <string name="dictate__floating_button_apps_none">Aucune application trouvée pour « {search_term} »</string>
     <string name="dictate__floating_button_design_title">Style du bouton</string>
     <string name="dictate__floating_button_haptic_summary_off">Pas de vibration au toucher.</string>
     <string name="dictate__floating_button_haptic_summary_on">Une brève vibration quand vous touchez le bouton.</string>

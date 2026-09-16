@@ -23,6 +23,7 @@ import dev.patrickgold.florisboard.app.settings.theme.ColorPreferenceSerializer
 import dev.patrickgold.florisboard.app.settings.theme.DisplayKbdAfterDialogs
 import dev.patrickgold.florisboard.app.settings.theme.SnyggLevel
 import dev.patrickgold.florisboard.app.setup.NotificationPermissionState
+import dev.patrickgold.florisboard.dictate.DictateFloatingButtonAppScope
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonDesign
 import dev.patrickgold.florisboard.dictate.DictateLongformMode
 import dev.patrickgold.florisboard.dictate.audio.AudioSpeedUp
@@ -36,6 +37,7 @@ import dev.patrickgold.florisboard.dictate.data.mappings.DictateMappings
 import dev.patrickgold.florisboard.dictate.gif.GifContentFilter
 import dev.patrickgold.florisboard.dictate.gif.GifHistory
 import dev.patrickgold.florisboard.dictate.overlay.BubbleAnchors
+import dev.patrickgold.florisboard.dictate.overlay.BubbleApps
 import dev.patrickgold.florisboard.dictate.provider.DictateProxyType
 import dev.patrickgold.florisboard.dictate.provider.ProviderAccounts
 import dev.patrickgold.florisboard.dictate.sticker.StickerHistory
@@ -585,6 +587,21 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "dictate__floating_button_positions",
             default = BubbleAnchors.Empty,
             serializer = BubbleAnchors.Serializer,
+        )
+        // Which apps the button may appear over (issue #392). ALL by default, so the setting changes
+        // nothing until someone opens it. Note the load order: the accessibility service can connect
+        // before the preference store has finished loading, so the first value the bubble sees is this
+        // default — it fails open, and the flow re-emits the real one a moment later.
+        val floatingButtonAppScope = enum(
+            key = "dictate__floating_button_app_scope",
+            default = DictateFloatingButtonAppScope.ALL,
+        )
+        // The apps themselves. One list for both directions of floatingButtonAppScope, so switching the
+        // mode keeps the selection rather than silently emptying it.
+        val floatingButtonApps = custom(
+            key = "dictate__floating_button_apps",
+            default = BubbleApps.Empty,
+            serializer = BubbleApps.Serializer,
         )
         // Vibrate briefly when the button is tapped.
         val floatingButtonHaptic = boolean(

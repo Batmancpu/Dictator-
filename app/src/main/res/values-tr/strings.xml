@@ -1214,6 +1214,17 @@
     <string name="dictate__floating_button_design_pill_summary">Etkinken genişleyerek bir sayaç ve canlı dalga biçimi gösterir.</string>
     <string name="dictate__floating_button_design_ring">Halka</string>
     <string name="dictate__floating_button_design_ring_summary">Kayıt ve yazıya dökme sırasında animasyonlu bir halkaya sahip kompakt daire.</string>
+    <string name="dictate__floating_button_apps_title">Uygulama görünürlüğü</string>
+    <string name="dictate__floating_button_apps_summary_all">Her uygulamada</string>
+    <string name="dictate__floating_button_apps_summary_only">Yalnızca {n} uygulamada</string>
+    <string name="dictate__floating_button_apps_summary_except">{n} uygulama dışında her yerde</string>
+    <string name="dictate__floating_button_apps_scope_all">Her uygulama</string>
+    <string name="dictate__floating_button_apps_scope_only">Yalnızca aşağıdaki uygulamalar</string>
+    <string name="dictate__floating_button_apps_scope_except">Aşağıdakiler dışındaki her uygulama</string>
+    <string name="dictate__floating_button_apps_note">Dışarıda bıraktığınız bir uygulamanın üzerine düğme hiçbir zaman çizilmez ve Dictate orada metin alanlarını okumaz. Erişilebilirlik hizmetlerine ilkesel olarak karşı çıkan bir uygulama, hizmetin açık olduğunu yine de görecektir.</string>
+    <string name="dictate__floating_button_apps_list_title">Uygulamalar</string>
+    <string name="dictate__floating_button_apps_search">Uygulama ara</string>
+    <string name="dictate__floating_button_apps_none">“{search_term}” için uygulama bulunamadı</string>
     <string name="dictate__floating_button_design_title">Düğme stili</string>
     <string name="dictate__floating_button_haptic_summary_off">Dokununca titreşim yok.</string>
     <string name="dictate__floating_button_haptic_summary_on">Düğmeye dokununca kısa bir titreşim.</string>

@@ -1093,6 +1093,17 @@
     <string name="dictate__floating_button_design_pill_summary">تتوسّع عند النشاط لإظهار مؤقّت وموجة صوتية حية.</string>
     <string name="dictate__floating_button_design_ring">حلقة</string>
     <string name="dictate__floating_button_design_ring_summary">دائرة مدمجة بحلقة متحركة أثناء التسجيل والنسخ.</string>
+    <string name="dictate__floating_button_apps_title">الظهور حسب التطبيق</string>
+    <string name="dictate__floating_button_apps_summary_all">في كل التطبيقات</string>
+    <string name="dictate__floating_button_apps_summary_only">في {n} تطبيقات فقط</string>
+    <string name="dictate__floating_button_apps_summary_except">في كل مكان عدا {n} تطبيقات</string>
+    <string name="dictate__floating_button_apps_scope_all">كل التطبيقات</string>
+    <string name="dictate__floating_button_apps_scope_only">التطبيقات أدناه فقط</string>
+    <string name="dictate__floating_button_apps_scope_except">كل التطبيقات عدا الموجودة أدناه</string>
+    <string name="dictate__floating_button_apps_note">لا يُرسم الزر أبدًا فوق تطبيق تستبعده، ولا يقرأ Dictate حقول النص فيه. أما التطبيق الذي يرفض خدمات إمكانية الوصول من حيث المبدأ فسيظل يرى أن الخدمة مفعَّلة.</string>
+    <string name="dictate__floating_button_apps_list_title">التطبيقات</string>
+    <string name="dictate__floating_button_apps_search">البحث في التطبيقات</string>
+    <string name="dictate__floating_button_apps_none">لم يُعثر على تطبيق لـ «{search_term}»</string>
     <string name="dictate__floating_button_design_title">نمط الزر</string>
     <string name="dictate__floating_button_haptic_summary_off">بدون اهتزاز عند النقر.</string>
     <string name="dictate__floating_button_haptic_summary_on">اهتزاز قصير عند النقر على الزر.</string>

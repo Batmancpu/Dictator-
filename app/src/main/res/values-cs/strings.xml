@@ -1251,6 +1251,17 @@
     <string name="dictate__floating_button_design_pill_summary">Při aktivitě se rozšíří a zobrazí časovač a živý průběh zvuku.</string>
     <string name="dictate__floating_button_design_ring">Prstenec</string>
     <string name="dictate__floating_button_design_ring_summary">Kompaktní kruh s prstencem animovaným při nahrávání a přepisu.</string>
+    <string name="dictate__floating_button_apps_title">Viditelnost v aplikacích</string>
+    <string name="dictate__floating_button_apps_summary_all">Ve všech aplikacích</string>
+    <string name="dictate__floating_button_apps_summary_only">Jen v {n} aplikacích</string>
+    <string name="dictate__floating_button_apps_summary_except">Všude kromě {n} aplikací</string>
+    <string name="dictate__floating_button_apps_scope_all">Všechny aplikace</string>
+    <string name="dictate__floating_button_apps_scope_only">Jen aplikace níže</string>
+    <string name="dictate__floating_button_apps_scope_except">Všechny kromě aplikací níže</string>
+    <string name="dictate__floating_button_apps_note">Nad aplikací, kterou vynecháte, se tlačítko nikdy nevykreslí a Dictate v ní nečte textová pole. Aplikace, které vadí služby přístupnosti jako takové, stejně pozná, že je služba zapnutá.</string>
+    <string name="dictate__floating_button_apps_list_title">Aplikace</string>
+    <string name="dictate__floating_button_apps_search">Hledat aplikace</string>
+    <string name="dictate__floating_button_apps_none">Pro „{search_term}“ nebyla nalezena žádná aplikace</string>
     <string name="dictate__floating_button_design_title">Styl tlačítka</string>
     <string name="dictate__floating_button_haptic_summary_off">Bez vibrace při klepnutí.</string>
     <string name="dictate__floating_button_haptic_summary_on">Krátké zavibrování při klepnutí na tlačítko.</string>

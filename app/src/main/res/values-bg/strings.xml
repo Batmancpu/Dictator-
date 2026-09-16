@@ -1235,6 +1235,17 @@
     <string name="dictate__floating_button_design_pill_summary">Когато е активна, се разширява, за да покаже таймер и форма на вълната на живо.</string>
     <string name="dictate__floating_button_design_ring">Пръстен</string>
     <string name="dictate__floating_button_design_ring_summary">Компактен кръг с пръстен, анимиран при запис и транскрибиране.</string>
+    <string name="dictate__floating_button_apps_title">Видимост по приложение</string>
+    <string name="dictate__floating_button_apps_summary_all">Във всички приложения</string>
+    <string name="dictate__floating_button_apps_summary_only">Само в {n} приложения</string>
+    <string name="dictate__floating_button_apps_summary_except">Навсякъде освен в {n} приложения</string>
+    <string name="dictate__floating_button_apps_scope_all">Всички приложения</string>
+    <string name="dictate__floating_button_apps_scope_only">Само приложенията по-долу</string>
+    <string name="dictate__floating_button_apps_scope_except">Всички освен приложенията по-долу</string>
+    <string name="dictate__floating_button_apps_note">Върху изключено приложение бутонът никога не се показва и Dictate не чете текстовите му полета. Приложение, което по принцип възразява срещу услугите за достъпност, пак ще види, че услугата е включена.</string>
+    <string name="dictate__floating_button_apps_list_title">Приложения</string>
+    <string name="dictate__floating_button_apps_search">Търсене на приложения</string>
+    <string name="dictate__floating_button_apps_none">Няма намерено приложение за „{search_term}“</string>
     <string name="dictate__floating_button_design_title">Стил на бутона</string>
     <string name="dictate__floating_button_haptic_summary_off">Без вибрация при докосване.</string>
     <string name="dictate__floating_button_haptic_summary_on">Кратка вибрация при докосване на бутона.</string>

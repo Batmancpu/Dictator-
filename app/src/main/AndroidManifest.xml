@@ -31,6 +31,13 @@
     <!-- Android 11+ only: Define that FlorisBoard requests to see all apps that
           ship with an IME or Spell Check service. This is used to guide the user
           in the Settings Ui why FlorisBoard may not be working.
+
+          The launcher/home entries are for the floating button's per-app visibility list (issue #392):
+          the picker has to show names and icons for the apps someone can choose between. This is the
+          policy-safe way to ask — deliberately NOT QUERY_ALL_PACKAGES, which is a restricted permission
+          needing its own Play declaration and a poor thing for a keyboard to be asking for. The price is
+          that an app with no launcher entry cannot be listed; the picker adds back the ones the button
+          has actually been used in, from the remembered positions.
      -->
     <queries>
         <intent>
@@ -38,6 +45,14 @@
         </intent>
         <intent>
             <action android:name="android.service.textservice.SpellCheckerService"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.LAUNCHER"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.HOME"/>
         </intent>
     </queries>
 

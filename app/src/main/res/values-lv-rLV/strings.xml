@@ -1180,6 +1180,17 @@
     <string name="dictate__floating_button_design_pill_summary">Aktīvā stāvoklī izvēršas, rādot taimeri un tiešraides viļņu formu.</string>
     <string name="dictate__floating_button_design_ring">Gredzens</string>
     <string name="dictate__floating_button_design_ring_summary">Kompakts aplis ar gredzenu, kas animējas ieraksta un transkripcijas laikā.</string>
+    <string name="dictate__floating_button_apps_title">Redzamība lietotnēs</string>
+    <string name="dictate__floating_button_apps_summary_all">Visās lietotnēs</string>
+    <string name="dictate__floating_button_apps_summary_only">Tikai {n} lietotnēs</string>
+    <string name="dictate__floating_button_apps_summary_except">Visur, izņemot {n} lietotnes</string>
+    <string name="dictate__floating_button_apps_scope_all">Visas lietotnes</string>
+    <string name="dictate__floating_button_apps_scope_only">Tikai zemāk atzīmētās lietotnes</string>
+    <string name="dictate__floating_button_apps_scope_except">Visas, izņemot zemāk atzīmētās</string>
+    <string name="dictate__floating_button_apps_note">Virs izlaistas lietotnes poga nekad netiek zīmēta, un Dictate tajā nelasa teksta laukus. Lietotne, kas iebilst pret pieejamības pakalpojumiem kā tādiem, tik un tā redzēs, ka pakalpojums ir ieslēgts.</string>
+    <string name="dictate__floating_button_apps_list_title">Lietotnes</string>
+    <string name="dictate__floating_button_apps_search">Meklēt lietotnes</string>
+    <string name="dictate__floating_button_apps_none">Nav atrasta neviena lietotne vaicājumam “{search_term}”</string>
     <string name="dictate__floating_button_design_title">Pogas stils</string>
     <string name="dictate__floating_button_haptic_summary_off">Bez vibrācijas, pieskaroties.</string>
     <string name="dictate__floating_button_haptic_summary_on">Īsa vibrācija, pieskaroties pogai.</string>

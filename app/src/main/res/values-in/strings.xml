@@ -1190,6 +1190,17 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__floating_button_design_pill_summary">Membesar saat aktif untuk menampilkan pengatur waktu dan gelombang langsung.</string>
     <string name="dictate__floating_button_design_ring">Cincin</string>
     <string name="dictate__floating_button_design_ring_summary">Lingkaran ringkas dengan cincin yang beranimasi saat merekam dan menstranskripsi.</string>
+    <string name="dictate__floating_button_apps_title">Tampil di aplikasi</string>
+    <string name="dictate__floating_button_apps_summary_all">Di semua aplikasi</string>
+    <string name="dictate__floating_button_apps_summary_only">Hanya di {n} aplikasi</string>
+    <string name="dictate__floating_button_apps_summary_except">Di mana saja kecuali {n} aplikasi</string>
+    <string name="dictate__floating_button_apps_scope_all">Semua aplikasi</string>
+    <string name="dictate__floating_button_apps_scope_only">Hanya aplikasi di bawah</string>
+    <string name="dictate__floating_button_apps_scope_except">Semua kecuali aplikasi di bawah</string>
+    <string name="dictate__floating_button_apps_note">Tombol tidak pernah digambar di atas aplikasi yang Anda kecualikan, dan Dictate tidak membaca kolom teks di dalamnya. Aplikasi yang memang menolak layanan aksesibilitas tetap akan melihat bahwa layanan ini aktif.</string>
+    <string name="dictate__floating_button_apps_list_title">Aplikasi</string>
+    <string name="dictate__floating_button_apps_search">Cari aplikasi</string>
+    <string name="dictate__floating_button_apps_none">Tidak ada aplikasi untuk “{search_term}”</string>
     <string name="dictate__floating_button_design_title">Gaya tombol</string>
     <string name="dictate__floating_button_haptic_summary_off">Tanpa getaran saat diketuk.</string>
     <string name="dictate__floating_button_haptic_summary_on">Getaran singkat saat Anda mengetuk tombol.</string>

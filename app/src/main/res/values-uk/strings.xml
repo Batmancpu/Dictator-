@@ -1080,6 +1080,17 @@
     <string name="dictate__floating_button_design_pill_summary">Коли активна, розгортається, показуючи таймер і живу форму хвилі.</string>
     <string name="dictate__floating_button_design_ring">Кільце</string>
     <string name="dictate__floating_button_design_ring_summary">Компактне коло з кільцем, що анімується під час запису й транскрибування.</string>
+    <string name="dictate__floating_button_apps_title">Видимість у застосунках</string>
+    <string name="dictate__floating_button_apps_summary_all">У всіх застосунках</string>
+    <string name="dictate__floating_button_apps_summary_only">Лише у {n} застосунках</string>
+    <string name="dictate__floating_button_apps_summary_except">Скрізь, крім {n} застосунків</string>
+    <string name="dictate__floating_button_apps_scope_all">Усі застосунки</string>
+    <string name="dictate__floating_button_apps_scope_only">Лише застосунки нижче</string>
+    <string name="dictate__floating_button_apps_scope_except">Усі, крім застосунків нижче</string>
+    <string name="dictate__floating_button_apps_note">Над вилученим застосунком кнопка не малюється ніколи, і Dictate не читає в ньому текстові поля. Застосунок, який заперечує проти служб доступності як таких, усе одно побачить, що службу ввімкнено.</string>
+    <string name="dictate__floating_button_apps_list_title">Застосунки</string>
+    <string name="dictate__floating_button_apps_search">Пошук застосунків</string>
+    <string name="dictate__floating_button_apps_none">Застосунків за запитом «{search_term}» не знайдено</string>
     <string name="dictate__floating_button_design_title">Стиль кнопки</string>
     <string name="dictate__floating_button_haptic_summary_off">Без вібрації під час дотику.</string>
     <string name="dictate__floating_button_haptic_summary_on">Коротка вібрація під час дотику до кнопки.</string>
