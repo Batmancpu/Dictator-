@@ -182,6 +182,9 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
     private var holding = false
     private var holdJob: Job? = null
 
+    /** The deferred adding of the cancel button; see [manageCancel]. */
+    private var cancelShowJob: Job? = null
+
     /** Polls the mic level while recording to drive the waveform. */
     private var tickerJob: Job? = null
 
@@ -398,7 +401,20 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
     // --- Cancel button (shown while recording) ---------------------------------------------------
 
     private fun manageCancel(state: DictateController.UiState, shown: Boolean) {
-        if (shown && state is DictateController.UiState.Recording) showCancel() else hideCancel()
+        if (shown && state is DictateController.UiState.Recording) {
+            if (cancelAdded || cancelShowJob?.isActive == true) return
+            // A few frames later: adding a window is a round trip to the window manager, and the pill's
+            // first step is drawn in this very frame. The button fades in over the opening anyway, so
+            // nobody sees the difference — while the first frame no longer carries the cost.
+            cancelShowJob = scope.launch {
+                delay(CANCEL_SHOW_DELAY_MS)
+                if (added && DictateController.state.value is DictateController.UiState.Recording) showCancel()
+            }
+        } else {
+            cancelShowJob?.cancel()
+            cancelShowJob = null
+            hideCancel()
+        }
     }
 
     private fun showCancel() {
@@ -408,6 +424,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         runCatching {
             // It lands at the far end of the *settled* pill straight away (the touch window is sized to
             // the settled shape), so it fades in over the pill's opening rather than popping up alone.
+            service.noteOwnWindowChange()
             v.alpha = 0f
             windowManager.addView(v, lp)
             cancelAdded = true
@@ -418,7 +435,10 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
 
     private fun hideCancel() {
         val v = cancelView
-        if (cancelAdded && v != null) runCatching { windowManager.removeView(v) }
+        if (cancelAdded && v != null) {
+            service.noteOwnWindowChange()
+            runCatching { windowManager.removeView(v) }
+        }
         cancelAdded = false
     }
 
@@ -461,6 +481,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val v = undoView ?: createUndoView().also { undoView = it }
         val lp = undoParams ?: createUndoParams().also { undoParams = it }
         runCatching {
+            service.noteOwnWindowChange()
             windowManager.addView(v, lp)
             undoAdded = true
             positionUndo()
@@ -469,7 +490,10 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
 
     private fun hideUndo() {
         val v = undoView
-        if (undoAdded && v != null) runCatching { windowManager.removeView(v) }
+        if (undoAdded && v != null) {
+            service.noteOwnWindowChange()
+            runCatching { windowManager.removeView(v) }
+        }
         undoAdded = false
     }
 
@@ -1118,7 +1142,10 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         lp.width = s.shapeWidth
         lp.height = s.shapeHeight
         val v = rootView
-        if (added && v != null) runCatching { windowManager.updateViewLayout(v, lp) }
+        if (added && v != null) {
+            service.noteOwnWindowChange()
+            runCatching { windowManager.updateViewLayout(v, lp) }
+        }
     }
 
     /**
@@ -2531,6 +2558,9 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
          * system had shoved aside rather than something placed there.
          */
         private const val EDGE_MARGIN_DP = 16
+
+        /** How long the cancel button waits before its window is added; see [manageCancel]. */
+        private const val CANCEL_SHOW_DELAY_MS = 40L
 
         /** Aurora orb (#253): three blobs, started apart and orbiting at rates that never quite repeat. */
         private const val FULL_TURN = 6.2831855f

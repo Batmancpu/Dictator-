@@ -86,6 +86,39 @@ class DictateAccessibilityService : AccessibilityService() {
     }
 
     /**
+     * Until when [AccessibilityEvent.TYPE_WINDOWS_CHANGED] events are the bubble's own doing.
+     *
+     * When a recording starts or stops, the bubble resizes its touch window and adds or removes its side
+     * buttons, and the window manager answers with a show animation on the window (400 ms on the A55),
+     * every frame of which arrives here as a windows-changed event. Each one used to cost a synchronous
+     * focused-node fetch from the app in front — two round trips of ~14 ms on the main thread — and the
+     * burst starved the pill's own opening animation of frames for ~100 ms (traced 2026-09-17). Nothing
+     * about the user's focus changes while our own windows are churning, so those events are ignored.
+     */
+    @Volatile
+    private var ownWindowChangeUntil = 0L
+
+    /** Called by the bubble right before it adds, removes or resizes one of its own windows. */
+    fun noteOwnWindowChange() {
+        ownWindowChangeUntil = SystemClock.uptimeMillis() + OWN_WINDOW_CHANGE_MS
+    }
+
+    /**
+     * Whether a windows-changed event can have moved the input focus at all. A window merely moving,
+     * resizing, changing its z-order or its title cannot, and while our own windows are changing (see
+     * [ownWindowChangeUntil]) nothing is worth a node fetch. The bounds test alone would already have cut
+     * the burst, since a show animation changes nothing but bounds; the quiet period also covers the add
+     * and the remove that start and end it.
+     */
+    private fun windowsChangedMayMoveFocus(event: AccessibilityEvent): Boolean {
+        if (SystemClock.uptimeMillis() < ownWindowChangeUntil) return false
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return true
+        val changes = event.windowChanges
+        // No detail at all is read as "anything could have changed".
+        return changes == 0 || (changes and GEOMETRY_ONLY_WINDOW_CHANGES.inv()) != 0
+    }
+
+    /**
      * The package named by the last window-state change, kept only as [currentAppPackage]'s fallback.
      *
      * A field rather than a parameter because the read can also come from the debounced runnable, which
@@ -151,8 +184,12 @@ class DictateAccessibilityService : AccessibilityService() {
             // transition on top of the accessibility framework's notification timeout (#222).
             AccessibilityEvent.TYPE_VIEW_FOCUSED,
             AccessibilityEvent.TYPE_VIEW_CLICKED,
-            AccessibilityEvent.TYPE_WINDOWS_CHANGED,
             -> updateEditableFocusImmediately()
+            // Only when the change could have moved the focus — see [windowsChangedMayMoveFocus] for the
+            // burst that made the distinction necessary.
+            AccessibilityEvent.TYPE_WINDOWS_CHANGED -> {
+                if (windowsChangedMayMoveFocus(event)) updateEditableFocusImmediately()
+            }
             // Same handling, but this is the one event that names the app it came from even when that
             // app's nodes are out of reach — which is what [currentAppPackage] falls back on (#392).
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
@@ -1358,6 +1395,14 @@ class DictateAccessibilityService : AccessibilityService() {
         }
         // Debounce window for focus re-checks so a typing burst triggers at most one focused-node fetch.
         private const val FOCUS_UPDATE_DEBOUNCE_MS = 150L
+        // How long after the bubble changed one of its own windows a windows-changed event still counts
+        // as its own doing. The window manager's show animation runs 400 ms on the A55; this covers it.
+        private const val OWN_WINDOW_CHANGE_MS = 500L
+        // Window changes that cannot move the input focus: geometry and cosmetics.
+        private val GEOMETRY_ONLY_WINDOW_CHANGES = AccessibilityEvent.WINDOWS_CHANGE_BOUNDS or
+            AccessibilityEvent.WINDOWS_CHANGE_LAYER or
+            AccessibilityEvent.WINDOWS_CHANGE_TITLE or
+            AccessibilityEvent.WINDOWS_CHANGE_ACCESSIBILITY_FOCUSED
         // Real-time overlay preview (#128): min gap between accessibility writes while streaming, so live
         // typing into another app doesn't flood the accessibility channel. It used to be 0 — every single
         // update written through — which is a lot of writes into a foreign app for no visible gain over a
