@@ -11,17 +11,16 @@
 package dev.patrickgold.florisboard.dictate.overlay
 
 import kotlin.test.Test
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.assertEquals
 
 /**
- * Which way the pill opens when a recording starts (issue #399).
+ * Which end of the bubble holds still when it changes width (issue #399).
  *
- * The report is that start and stop are not in the same place: the button is tapped at the right wall,
- * the pill opens inwards from there, and the stop glyph is suddenly a pill's width away. The fix mirrors
- * the pill so the icon stays at the wall — but only where the pill really does open leftwards. Mirroring
- * it in the other cases would move the icon by the same amount in the other direction, so the direction
- * is what these tests pin down, not the side.
+ * The report is that start and stop are not in the same place: the button is tapped, the pill opens to
+ * make room for a timer and a waveform, and the stop glyph has moved. Mirroring the row is only half of
+ * the answer — the window underneath it has to grow away from the same side, or the mirror carries the
+ * button off in the other direction instead. So what these tests pin down is the promise itself: the end
+ * the finger is at does not move, whatever the pill does to the other one.
  *
  * Measurements are a 1080 px screen with a pill that is 144 px at rest and 486 px open, roughly what the
  * stock size produces at a phone's density.
@@ -29,53 +28,75 @@ import kotlin.test.assertTrue
 class BubbleOpenDirectionTest {
 
     private val screen = 1080
-    private val open = 486
     private val resting = 144
+    private val open = 486
     private val margin = 24
+    private val growth = open - resting
 
-    /** The x of a snapped bubble at either wall. */
-    private val atLeftWall = margin
-    private val atRightWall = screen - resting - margin
+    /** The free travel left for a bubble [width] px wide. */
+    private fun maxX(width: Int) = screen - width
 
-    private fun opens(
-        edge: BubbleEdge,
+    private fun placed(
         x: Int,
+        widthDelta: Int,
+        onRight: Boolean,
+        newWidth: Int,
         snapToEdge: Boolean = true,
-    ) = bubbleOpensLeftwards(
-        edge = edge,
+    ) = bubbleXAfterResize(
         x = x,
-        expandedWidth = open,
-        screenWidth = screen,
+        widthDelta = widthDelta,
+        onRight = onRight,
+        maxX = maxX(newWidth),
+        margin = margin,
         snapToEdge = snapToEdge,
     )
 
+    /** Opening a pill snapped at the right wall leaves its right edge exactly where it was. */
     @Test
-    fun `a snapped bubble opens away from the wall it is parked at`() {
-        assertTrue(opens(BubbleEdge.RIGHT, atRightWall))
-        assertFalse(opens(BubbleEdge.LEFT, atLeftWall))
+    fun `a snapped pill on the right grows inwards from a fixed right edge`() {
+        val x = maxX(resting) - margin
+        val opened = placed(x, growth, onRight = true, newWidth = open)
+        assertEquals(x + resting, opened + open, "the right edge moved")
+        assertEquals(maxX(open) - margin, opened)
     }
 
+    /** And on the left, its left edge. */
     @Test
-    fun `a snapped bubble reads its wall, not the room it happens to have`() {
-        // The x a snapped window sits at is about to be recomputed from the anchored edge anyway, so the
-        // room left of it says nothing. Right-anchored with the whole screen free to the right still opens
-        // leftwards, because the snap will put it back at the wall before it is drawn open.
-        assertTrue(opens(BubbleEdge.RIGHT, x = 0))
+    fun `a snapped pill on the left grows outwards from a fixed left edge`() {
+        val opened = placed(margin, growth, onRight = false, newWidth = open)
+        assertEquals(margin, opened, "the left edge moved")
     }
 
+    /**
+     * The same promise with snapping off, which is where it used to break: the x was merely clamped, so a
+     * pill with room to its right grew straight out from under the finger that had opened it.
+     */
     @Test
-    fun `a bubble dropped in the open grows to the right past a stationary icon`() {
-        // Nothing is snapping it anywhere: the window keeps the x it was dropped at, so the left edge —
-        // and the icon laid out from it — does not move. Even on the right half of the screen.
-        assertFalse(opens(BubbleEdge.LEFT, x = 100, snapToEdge = false))
-        assertFalse(opens(BubbleEdge.RIGHT, x = screen - open, snapToEdge = false))
+    fun `a pill dropped in the open still grows away from the side it is on`() {
+        // Right-hand side, with room to spare to the right: the right edge is still the one that holds.
+        val x = 400
+        val opened = placed(x, growth, onRight = true, newWidth = open, snapToEdge = false)
+        assertEquals(x + resting, opened + open, "the right edge moved")
+        // Left-hand side: the x it was dropped at is the one that holds.
+        assertEquals(x, placed(x, growth, onRight = false, newWidth = open, snapToEdge = false))
     }
 
+    /** Collapsing is the same rule with the sign turned round, so the button lands back where it started. */
     @Test
-    fun `a bubble dropped too near the wall to open has to open inwards`() {
-        // One pixel further than the screen can hold is already the case that moves the window's left
-        // edge, and with it the icon.
-        assertTrue(opens(BubbleEdge.RIGHT, x = screen - open + 1, snapToEdge = false))
-        assertTrue(opens(BubbleEdge.RIGHT, x = atRightWall, snapToEdge = false))
+    fun `collapsing returns the pill to the spot it opened from`() {
+        val x = 400
+        val opened = placed(x, growth, onRight = true, newWidth = open, snapToEdge = false)
+        val closed = placed(opened, -growth, onRight = true, newWidth = resting, snapToEdge = false)
+        assertEquals(x, closed)
+    }
+
+    /** Nothing may be placed off-screen, however the arithmetic came out. */
+    @Test
+    fun `a pill too wide for the room it has is kept on screen`() {
+        assertEquals(0, placed(x = 8, widthDelta = growth, onRight = true, newWidth = open, snapToEdge = false))
+        assertEquals(
+            maxX(open),
+            placed(x = screen, widthDelta = 0, onRight = false, newWidth = open, snapToEdge = false),
+        )
     }
 }

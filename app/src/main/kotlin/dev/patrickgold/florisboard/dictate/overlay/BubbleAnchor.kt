@@ -21,35 +21,43 @@ enum class BubbleEdge {
 }
 
 /**
- * Which way a design that changes size has to open: towards the left, or towards the right (issue #399).
+ * Where a bubble that has just changed width has to sit for the end the user is pointing at to stay
+ * exactly where it was (issue #399).
  *
- * The pill is the only design that grows, and where it grows *to* decides whether its icon stays under
- * the finger that tapped it. Only one case moves the window's left edge, and with it everything laid out
- * from that edge: a pill that cannot grow to the right. Then it opens inwards and the icon has to be
- * mirrored to the far end to stay put.
+ * The pill is the only design that changes size — a recording adds an elapsed timer and a waveform to it
+ * — and which end of it holds still decides whether the button the user tapped is still under their
+ * finger a moment later. The rule is one sentence: the bubble grows away from the side of the screen it
+ * is parked at. On the right that means the right edge is the fixed one and the window's x has to move by
+ * the whole change in width; on the left the x simply stays, and the growth runs off to the right by
+ * itself. Which end holds is the same answer the skin mirrors its row by and the cancel button picks its
+ * side by, so all three move together or not at all.
  *
  * Kept next to the anchor, and free of Android types, because it is the second half of the same question
  * — the anchor says which wall the bubble is parked at, this says what that means for a shape that is
  * about to get wider — and because both are arithmetic that should be provable without a phone.
  *
- * @param edge The wall the bubble is anchored to.
- * @param x The window's current left edge, before it grows.
- * @param expandedWidth What the design measures fully open.
- * @param screenWidth The width of the frame the window is positioned in.
- * @param snapToEdge Whether the bubble is held against its wall. When it is, the anchored edge alone
- *  decides: a snapped window keeps its margin to that wall, so a right-anchored one can only grow inwards.
- *  When it is not, the window keeps the x it was dropped at and grows to the right — unless that would run
- *  past the screen, which is the one case the position gets pulled back from.
+ * @param x The window's left edge before the resize.
+ * @param widthDelta How much wider the bubble just became; negative when it collapsed again.
+ * @param onRight Whether the bubble is on the right-hand side of the screen.
+ * @param maxX The free horizontal travel, i.e. the screen width minus the bubble's *new* width.
+ * @param margin The gap kept to the wall when snapped.
+ * @param snapToEdge Whether the bubble is held against its wall. A snapped bubble is put back at the wall
+ *  outright, which keeps the outward end fixed for the same reason and to the same pixel.
  */
-fun bubbleOpensLeftwards(
-    edge: BubbleEdge,
+fun bubbleXAfterResize(
     x: Int,
-    expandedWidth: Int,
-    screenWidth: Int,
+    widthDelta: Int,
+    onRight: Boolean,
+    maxX: Int,
+    margin: Int,
     snapToEdge: Boolean,
-): Boolean {
-    if (snapToEdge) return edge == BubbleEdge.RIGHT
-    return x + expandedWidth > screenWidth
+): Int {
+    val raw = when {
+        snapToEdge -> if (onRight) maxX - margin else margin
+        onRight -> x - widthDelta
+        else -> x
+    }
+    return raw.coerceIn(0, maxX.coerceAtLeast(0))
 }
 
 /**
