@@ -1334,8 +1334,10 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__recording_animation_static_description">Blijft tijdens het opnemen een effen rode stip</string>
     <string name="dictate__recording_animation_pulse_label">Pulserend</string>
     <string name="dictate__recording_animation_pulse_description">Pulseert in een gelijkmatig tempo</string>
-    <string name="dictate__recording_animation_level_label">Volgt je stem</string>
+    <string name="dictate__recording_animation_level_label">Volgt je stem (stip)</string>
     <string name="dictate__recording_animation_level_description">Reageert op het microfoonniveau en laat zien dat de mic je hoort</string>
+    <string name="dictate__recording_animation_wave_label">Volgt je stem (golf)</string>
+    <string name="dictate__recording_animation_wave_description">Tekent de laatste seconden als een live golfvorm, zodat je ziet wanneer je stil bent geworden</string>
     <string name="dictate__skip_silent_title">Stille opnames overslaan</string>
     <string name="dictate__skip_silent_summary">Voorkomt gehallucineerde tekst en overbodige API-aanroepen bij stille audio</string>
     <string name="dictate__trim_silent_gaps_title">Lange pauzes inkorten</string>

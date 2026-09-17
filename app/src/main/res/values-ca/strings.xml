@@ -1304,8 +1304,10 @@
     <string name="dictate__recording_animation_static_description">Es manté un punt vermell fix mentre graveu</string>
     <string name="dictate__recording_animation_pulse_label">Polsant</string>
     <string name="dictate__recording_animation_pulse_description">Batega a un ritme constant</string>
-    <string name="dictate__recording_animation_level_label">Segueix la vostra veu</string>
+    <string name="dictate__recording_animation_level_label">Segueix la vostra veu (punt)</string>
     <string name="dictate__recording_animation_level_description">Reacciona al nivell del micròfon i mostra que us capta</string>
+    <string name="dictate__recording_animation_wave_label">Segueix la vostra veu (ona)</string>
+    <string name="dictate__recording_animation_wave_description">Dibuixa els darrers segons com una ona en directe, així veieu quan heu callat</string>
     <string name="dictate__skip_silent_title">Omet les gravacions silencioses</string>
     <string name="dictate__skip_silent_summary">Evita el text al·lucinat i les crides a l\'API inútils en àudio silenciós</string>
     <string name="dictate__trim_silent_gaps_title">Retalla les pauses llargues</string>

@@ -1433,8 +1433,10 @@
     <string name="dictate__recording_animation_static_description">Felvétel közben egyszínű piros pont marad</string>
     <string name="dictate__recording_animation_pulse_label">Lüktető</string>
     <string name="dictate__recording_animation_pulse_description">Egyenletes ütemben lüktet</string>
-    <string name="dictate__recording_animation_level_label">Követi a hangját</string>
+    <string name="dictate__recording_animation_level_label">Követi a hangját (pont)</string>
     <string name="dictate__recording_animation_level_description">Reagál a mikrofon szintjére, így látszik, hogy hallja Önt</string>
+    <string name="dictate__recording_animation_wave_label">Követi a hangját (hullám)</string>
+    <string name="dictate__recording_animation_wave_description">Az utolsó másodperceket élő hullámformaként rajzolja ki, így látja, mikor hallgatott el</string>
     <string name="dictate__skip_silent_title">Néma felvételek kihagyása</string>
     <string name="dictate__skip_silent_summary">Kerüli a kitalált szöveget és a felesleges API-hívásokat néma hangnál</string>
     <string name="dictate__trim_silent_gaps_title">Hosszú szünetek levágása</string>

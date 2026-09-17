@@ -1416,8 +1416,10 @@
     <string name="dictate__recording_animation_static_description">Permanece como un punto rojo fijo mientras grabas</string>
     <string name="dictate__recording_animation_pulse_label">Pulsante</string>
     <string name="dictate__recording_animation_pulse_description">Late a un ritmo constante</string>
-    <string name="dictate__recording_animation_level_label">Sigue tu voz</string>
+    <string name="dictate__recording_animation_level_label">Sigue tu voz (punto)</string>
     <string name="dictate__recording_animation_level_description">Reacciona al nivel del micrófono y muestra que te está captando</string>
+    <string name="dictate__recording_animation_wave_label">Sigue tu voz (onda)</string>
+    <string name="dictate__recording_animation_wave_description">Dibuja los últimos segundos como una onda en vivo, para que veas cuándo te has quedado en silencio</string>
     <string name="dictate__skip_silent_title">Omitir grabaciones silenciosas</string>
     <string name="dictate__skip_silent_summary">Evita texto alucinado y llamadas a la API inútiles en audio silencioso</string>
     <string name="dictate__trim_silent_gaps_title">Recortar pausas largas</string>

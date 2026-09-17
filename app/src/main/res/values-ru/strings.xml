@@ -1440,8 +1440,10 @@
     <string name="dictate__recording_animation_static_description">Во время записи остаётся сплошной красной точкой</string>
     <string name="dictate__recording_animation_pulse_label">Пульсирующий</string>
     <string name="dictate__recording_animation_pulse_description">Пульсирует в постоянном ритме</string>
-    <string name="dictate__recording_animation_level_label">Следует за голосом</string>
+    <string name="dictate__recording_animation_level_label">Следует за голосом (точка)</string>
     <string name="dictate__recording_animation_level_description">Реагирует на уровень микрофона, показывая, что он вас слышит</string>
+    <string name="dictate__recording_animation_wave_label">Следует за голосом (волна)</string>
+    <string name="dictate__recording_animation_wave_description">Рисует последние секунды живой волной, чтобы было видно, когда вы замолчали</string>
     <string name="dictate__skip_silent_title">Пропускать тихие записи</string>
     <string name="dictate__skip_silent_summary">Избегайте выдуманного текста и лишних вызовов API при тихой записи</string>
     <string name="dictate__trim_silent_gaps_title">Обрезать длинные паузы</string>

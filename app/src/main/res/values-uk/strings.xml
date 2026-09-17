@@ -1279,8 +1279,10 @@
     <string name="dictate__recording_animation_static_description">Під час запису залишається суцільною червоною крапкою</string>
     <string name="dictate__recording_animation_pulse_label">Пульсуючий</string>
     <string name="dictate__recording_animation_pulse_description">Пульсує в рівному ритмі</string>
-    <string name="dictate__recording_animation_level_label">Слідує за голосом</string>
+    <string name="dictate__recording_animation_level_label">Слідує за голосом (крапка)</string>
     <string name="dictate__recording_animation_level_description">Реагує на рівень мікрофона, показуючи, що вас чути</string>
+    <string name="dictate__recording_animation_wave_label">Слідує за голосом (хвиля)</string>
+    <string name="dictate__recording_animation_wave_description">Малює останні секунди живою хвилею, щоб було видно, коли ви замовкли</string>
     <string name="dictate__skip_silent_title">Пропускати тихі записи</string>
     <string name="dictate__skip_silent_summary">Уникайте вигаданого тексту й зайвих викликів API при тихому записі</string>
     <string name="dictate__trim_silent_gaps_title">Обрізати довгі паузи</string>

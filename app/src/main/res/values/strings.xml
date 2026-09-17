@@ -2175,8 +2175,10 @@
     <string name="dictate__recording_animation_static_description" comment="Option description">Stays a solid red dot while recording</string>
     <string name="dictate__recording_animation_pulse_label" comment="Option: steady pulse">Pulsing</string>
     <string name="dictate__recording_animation_pulse_description" comment="Option description">Pulses at a steady rate</string>
-    <string name="dictate__recording_animation_level_label" comment="Option: reacts to microphone level">Follows your voice</string>
+    <string name="dictate__recording_animation_level_label" comment="Option: reacts to microphone level">Follows your voice (Dot)</string>
     <string name="dictate__recording_animation_level_description" comment="Option description">Reacts to the microphone level, showing that the mic is picking you up</string>
+    <string name="dictate__recording_animation_wave_label" comment="Option: live waveform">Follows your voice (Wave)</string>
+    <string name="dictate__recording_animation_wave_description" comment="Option description">Draws the last seconds as a live waveform, so you can see when you have gone quiet</string>
     <string name="dictate__skip_silent_title" comment="Setting: skip transcribing recordings that contain no speech">Skip silent recordings</string>
     <string name="dictate__skip_silent_summary" comment="Summary for the skip-silent-recordings setting">Avoid ghost text and wasted API calls on silent audio</string>
     <string name="dictate__trim_silent_gaps_title" comment="Setting: cut long pauses out of a recording before uploading it (issue #232)">Trim long pauses</string>

@@ -20,10 +20,20 @@ import kotlin.math.sqrt
 internal class AudioLevelSmoother {
     private var level = 0f
 
+    /**
+     * The gated and curved value of the window last passed to [update], before any smoothing — what the
+     * microphone actually did in those 50 ms. The waveform (issue #371) draws one bar per window and must
+     * not have them averaged into each other; the gate and the curve are shared with the dot so both
+     * read the same scale.
+     */
+    var peak = 0f
+        private set
+
     fun update(amplitude: Int): Float {
         val normalized = (amplitude.coerceIn(0, PCM16_MAX) / VISUAL_FULL_SCALE).coerceIn(0f, 1f)
         val gated = ((normalized - NOISE_GATE) / (1f - NOISE_GATE)).coerceIn(0f, 1f)
         val curved = sqrt(gated)
+        peak = curved
         val rate = if (curved > level) ATTACK else RELEASE
         level += (curved - level) * rate
         if (level < REST_EPSILON && curved == 0f) level = 0f
@@ -32,6 +42,7 @@ internal class AudioLevelSmoother {
 
     fun reset(): Float {
         level = 0f
+        peak = 0f
         return level
     }
 

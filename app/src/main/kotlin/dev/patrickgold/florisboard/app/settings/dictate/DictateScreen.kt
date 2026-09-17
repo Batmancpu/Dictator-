@@ -443,6 +443,11 @@ fun DictateRecordingScreen() = FlorisScreen {
                     label = stringRes(R.string.dictate__recording_animation_level_label),
                     description = stringRes(R.string.dictate__recording_animation_level_description),
                 )
+                entry(
+                    key = DictateRecordingAnimation.WAVE,
+                    label = stringRes(R.string.dictate__recording_animation_wave_label),
+                    description = stringRes(R.string.dictate__recording_animation_wave_description),
+                )
             },
         )
         SwitchPreference(

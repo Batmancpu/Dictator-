@@ -1413,8 +1413,10 @@
     <string name="dictate__recording_animation_static_description">Kayıt sırasında düz kırmızı bir nokta olarak kalır</string>
     <string name="dictate__recording_animation_pulse_label">Nabız gibi</string>
     <string name="dictate__recording_animation_pulse_description">Sabit bir hızda atar</string>
-    <string name="dictate__recording_animation_level_label">Sesinizi izler</string>
+    <string name="dictate__recording_animation_level_label">Sesinizi izler (nokta)</string>
     <string name="dictate__recording_animation_level_description">Mikrofon seviyesine tepki vererek sizi duyduğunu gösterir</string>
+    <string name="dictate__recording_animation_wave_label">Sesinizi izler (dalga)</string>
+    <string name="dictate__recording_animation_wave_description">Son saniyeleri canlı bir dalga olarak çizer, böylece ne zaman sustuğunuzu görürsünüz</string>
     <string name="dictate__skip_silent_title">Sessiz kayıtları atla</string>
     <string name="dictate__skip_silent_summary">Sessiz seste uydurma metni ve gereksiz API çağrılarını önler</string>
     <string name="dictate__trim_silent_gaps_title">Uzun duraklamaları kırp</string>

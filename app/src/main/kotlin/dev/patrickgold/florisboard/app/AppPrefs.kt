@@ -424,6 +424,8 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         // layout's record button (issue #238). Defaults to LEVEL (mic-reactive), which doubles as
         // feedback that the microphone is hearing something; PULSE restores the pre-rewrite look and
         // STATIC removes the movement entirely for anyone who finds it distracting while speaking.
+        // WAVE (issue #371) swaps the Smartbar dot for a scrolling waveform, which is the only one of
+        // the four that shows whether the *last* second was quiet.
         val recordingAnimation = enum(
             key = "dictate__recording_animation",
             default = DictateRecordingAnimation.LEVEL,

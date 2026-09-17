@@ -172,9 +172,13 @@ fun DictateSmartbarUi(state: DictateController.UiState, modifier: Modifier = Mod
 }
 
 @Composable
-private fun RecordingContent(state: DictateController.UiState.Recording) {
+private fun RowScope.RecordingContent(state: DictateController.UiState.Recording) {
     val prefs by FlorisPreferenceStore
     val context = LocalContext.current
+    // The indicator mode is needed out here, not just inside the dot: WAVE (#371) is a different *layout*
+    // for this bar, not a different animation of the same dot — the dot gives way to a waveform that
+    // takes whatever width the buttons leave over.
+    val animation by prefs.dictate.recordingAnimation.collectAsState()
     // Long-form segmented dictation (#170): whether the "Next segment" button is active and how many cut
     // segments are transcribing in the background.
     val segmented by DictateController.segmentedRecording.collectFlowAsState()
@@ -248,8 +252,12 @@ private fun RecordingContent(state: DictateController.UiState.Recording) {
                 }
             }
         }
-        RecordingAudioDot(paused = state.paused, frozen = ptt.discarding)
-        Spacer(modifier = Modifier.width(10.dp))
+        // In WAVE mode the waveform *is* the indicator and stands after the timer, so the dot and its
+        // spacer are not drawn at all — two mic-reactive things on one bar would only compete.
+        if (animation != DictateRecordingAnimation.WAVE) {
+            RecordingAudioDot(paused = state.paused, frozen = ptt.discarding)
+            Spacer(modifier = Modifier.width(10.dp))
+        }
         SnyggText(text = formatElapsed(elapsedMs))
         // Segmented mode: how many cut segments are transcribing in the background right now.
         if (segmentsInFlight > 0) {
@@ -258,6 +266,23 @@ private fun RecordingContent(state: DictateController.UiState.Recording) {
             Spacer(modifier = Modifier.width(2.dp))
             SnyggText(text = "$segmentsInFlight")
         }
+    }
+
+    // The waveform takes the whole slack between the timer and the right-hand buttons (#371). Weighted
+    // rather than a fixed size because how much is left over differs by screen, orientation, language
+    // chip and long-form mode; it draws nothing at all once that is down to a stub (see MIN_BARS).
+    if (animation == DictateRecordingAnimation.WAVE) {
+        RecordingWaveform(
+            color = RecordingRed,
+            paused = state.paused,
+            // Same distinction the dot makes: a thrown-away recording stops moving but stays at full
+            // strength, because the bar is only still there for the discard animation.
+            frozen = ptt.discarding,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(0.5f)
+                .padding(start = 10.dp, end = 6.dp),
+        )
     }
 
     // Right group: language chip + (in long-form mode) the "Next segment" button, otherwise the

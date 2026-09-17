@@ -1389,8 +1389,10 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__recording_animation_static_description">Tetap berupa titik merah solid saat merekam</string>
     <string name="dictate__recording_animation_pulse_label">Berdenyut</string>
     <string name="dictate__recording_animation_pulse_description">Berdenyut dengan laju tetap</string>
-    <string name="dictate__recording_animation_level_label">Mengikuti suara Anda</string>
+    <string name="dictate__recording_animation_level_label">Mengikuti suara Anda (titik)</string>
     <string name="dictate__recording_animation_level_description">Bereaksi terhadap level mikrofon, menandakan suara Anda tertangkap</string>
+    <string name="dictate__recording_animation_wave_label">Mengikuti suara Anda (gelombang)</string>
+    <string name="dictate__recording_animation_wave_description">Menggambar beberapa detik terakhir sebagai gelombang langsung, sehingga terlihat kapan Anda berhenti bicara</string>
     <string name="dictate__skip_silent_title">Lewati rekaman senyap</string>
     <string name="dictate__skip_silent_summary">Hindari teks halusinasi dan panggilan API sia-sia pada audio senyap</string>
     <string name="dictate__trim_silent_gaps_title">Pangkas jeda panjang</string>

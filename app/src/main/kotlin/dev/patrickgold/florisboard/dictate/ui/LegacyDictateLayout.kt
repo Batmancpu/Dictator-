@@ -624,7 +624,9 @@ private fun LegacyRecordRow(
         // thumb, so the same factors that read well on a 12 dp dot would be jarring here.
         val animation by prefs.dictate.recordingAnimation.collectAsState()
         val isRecording = recording != null && !recording.paused
-        val level = if (animation == DictateRecordingAnimation.LEVEL && isRecording) {
+        // WAVE has no home on a button the size of a thumb, so here it is treated as LEVEL (#371) — the
+        // waveform belongs to the Smartbar's bar, this key keeps following the voice by size.
+        val level = if (animation.followsVoice && isRecording) {
             DictateController.audioLevel.collectAsState().value
         } else {
             0f
@@ -636,7 +638,7 @@ private fun LegacyRecordRow(
             animationSpec = infiniteRepeatable(tween(PULSE_DURATION_MS), RepeatMode.Reverse),
             label = "recordPulse",
         )
-        val recordScale = if (animation == DictateRecordingAnimation.LEVEL) 1f + 0.03f * level else pulse
+        val recordScale = if (animation.followsVoice) 1f + 0.03f * level else pulse
         val interaction = remember { MutableInteractionSource() }
         val feedback = LocalInputFeedbackController.current
         Box(
