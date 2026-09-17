@@ -1077,6 +1077,8 @@
     <!-- Dictate strings -->
     <string name="quick_action__ime_ui_mode_editing">Textbearbeitung</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">Cursor bewegen, Text auswählen und bearbeiten</string>
+    <string name="quick_action__ime_ui_mode_scan">Text scannen</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Gedruckten Text fotografieren und einfügen</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Tippen zum Diktieren, erneut tippen zum Transkribieren</string>
     <string name="quick_action__dictate_live_prompt">Live-Prompt</string>
@@ -2250,4 +2252,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Sticker-Ordner</string>
+    <string name="scan__take_photo">Foto aufnehmen</string>
+    <string name="scan__pick_image">Bild wählen</string>
+    <string name="scan__retake">Erneut versuchen</string>
+    <string name="scan__empty_hint">Gedruckten Text fotografieren und die gewünschte Stelle antippen.</string>
+    <string name="scan__latin_only">Nur lateinische Schrift</string>
+    <string name="scan__reading">Foto wird gelesen …</string>
+    <string name="scan__no_text">Kein Text im Foto gefunden.</string>
+    <string name="scan__failed">Das Foto konnte nicht gelesen werden.</string>
+    <string name="scan__no_camera">Keine Kamera-App gefunden.</string>
+    <string name="scan__select_all">Alles auswählen</string>
+    <string name="scan__discard">Verwerfen</string>
+    <string name="scan__approve">Übernehmen</string>
 </resources>

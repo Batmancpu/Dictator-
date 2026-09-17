@@ -1009,6 +1009,8 @@
     <!-- Dictate strings -->
     <string name="quick_action__ime_ui_mode_editing">Edició de text</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">Mou el cursor, selecciona i edita el text</string>
+    <string name="quick_action__ime_ui_mode_scan">Escaneja text</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Fotografia un text imprès i insereix-lo</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Toca per dictar, torna a tocar per transcriure</string>
     <string name="quick_action__dictate_live_prompt">Instrucció en directe</string>
@@ -2208,4 +2210,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Carpeta d\'adhesius</string>
+    <string name="scan__take_photo">Fes una foto</string>
+    <string name="scan__pick_image">Tria una imatge</string>
+    <string name="scan__retake">Torna-ho a provar</string>
+    <string name="scan__empty_hint">Fotografia un text imprès i toca la part que vulguis.</string>
+    <string name="scan__latin_only">Només alfabet llatí</string>
+    <string name="scan__reading">S\'està llegint la foto…</string>
+    <string name="scan__no_text">No s\'ha trobat cap text a la foto.</string>
+    <string name="scan__failed">No s\'ha pogut llegir la foto.</string>
+    <string name="scan__no_camera">No s\'ha trobat cap aplicació de càmera.</string>
+    <string name="scan__select_all">Selecciona-ho tot</string>
+    <string name="scan__discard">Descarta</string>
+    <string name="scan__approve">Accepta</string>
 </resources>

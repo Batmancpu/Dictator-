@@ -94,6 +94,10 @@ data class QuickActionArrangement(
                 // Local sticker panel (issue #280): the folder the user picked, no network involved.
                 // Like the GIF action it sits in the list until dragged into the bar.
                 QuickAction.InsertKey(TextKeyData.IME_UI_MODE_STICKER),
+                // Scan text (issue #390): camera → recognised lines → the one you tap. Here and not
+                // higher up, because it is answering a question most fields never ask; the issue itself
+                // says it is not a Smartbar default.
+                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_SCAN),
                 QuickAction.InsertKey(TextKeyData.TOGGLE_COMPACT_LAYOUT),
                 // Split keyboard for two thumbs on a wide window (issue #362). Next to one-handed
                 // because they are the same kind of answer: greyed out below 600dp, where two halves

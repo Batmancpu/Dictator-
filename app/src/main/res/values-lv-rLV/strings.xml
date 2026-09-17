@@ -1084,6 +1084,8 @@
     <!-- Dictate strings -->
     <string name="quick_action__ime_ui_mode_editing">Teksta rediģēšana</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">Pārvietojiet kursoru, atlasiet un rediģējiet tekstu</string>
+    <string name="quick_action__ime_ui_mode_scan">Skenēt tekstu</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Nofotografējiet drukātu tekstu un ievietojiet to</string>
     <string name="quick_action__ime_ui_mode_dictate">Diktēšana</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Pieskarieties, lai diktētu, pieskarieties vēlreiz, lai transkribētu</string>
     <string name="quick_action__dictate_live_prompt">Balss norādījums</string>
@@ -2283,4 +2285,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Uzlīmju mape</string>
+    <string name="scan__take_photo">Uzņemt fotoattēlu</string>
+    <string name="scan__pick_image">Izvēlēties attēlu</string>
+    <string name="scan__retake">Mēģināt vēlreiz</string>
+    <string name="scan__empty_hint">Nofotografējiet drukātu tekstu un pieskarieties vajadzīgajai daļai.</string>
+    <string name="scan__latin_only">Tikai latīņu raksts</string>
+    <string name="scan__reading">Notiek fotoattēla nolasīšana…</string>
+    <string name="scan__no_text">Fotoattēlā nav atrasts teksts.</string>
+    <string name="scan__failed">Fotoattēlu neizdevās nolasīt.</string>
+    <string name="scan__no_camera">Nav atrasta neviena kameras lietotne.</string>
+    <string name="scan__select_all">Atlasīt visu</string>
+    <string name="scan__discard">Atmest</string>
+    <string name="scan__approve">Apstiprināt</string>
 </resources>

@@ -92,7 +92,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -132,6 +131,7 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withTimeoutOrNull
+import org.florisboard.lib.compose.onAccent
 import org.florisboard.lib.compose.stringRes
 import org.florisboard.lib.snygg.SnyggSelector
 import org.florisboard.lib.snygg.ui.SnyggColumn
@@ -507,6 +507,11 @@ private fun LegacyActionKey(
         LegacyEditAction.EDITING -> ThemedIconKey(KeyCode.NOOP, action.icon, label, modifier) {
             keyboardManager.activeState.imeUiMode = ImeUiMode.EDITING
         }
+        // Scan text (issue #390), opened the same direct way. The panel asks for the photo itself, so
+        // this is only ever a way in, never a shutter.
+        LegacyEditAction.SCAN -> ThemedIconKey(KeyCode.NOOP, action.icon, label, modifier) {
+            keyboardManager.activeState.imeUiMode = ImeUiMode.SCAN
+        }
     }
 }
 
@@ -570,7 +575,7 @@ private fun LegacyRecordRow(
     val rewording = dictateState as? DictateController.UiState.Rewording
     // The button is non-interactive while the audio is being transcribed or reworded.
     val busy = dictateState is DictateController.UiState.Transcribing || rewording != null
-    val onAccent = if (accent.luminance() > 0.5f) Color.Black else Color.White
+    val onAccent = accent.onAccent()
     val sideKey = Modifier.fillMaxHeight().aspectRatio(1f)
 
     // Long-form segmented dictation (#170): whether the "Next segment" button replaces pause and how many
@@ -933,7 +938,7 @@ private fun EnterCharPopup(
     selectedIndex: Int,
     accent: Color,
 ) {
-    val onAccent = if (accent.luminance() > 0.5f) Color.Black else Color.White
+    val onAccent = accent.onAccent()
     val positionProvider = remember {
         object : PopupPositionProvider {
             override fun calculatePosition(

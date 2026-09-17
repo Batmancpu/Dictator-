@@ -1094,6 +1094,8 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <!-- Dictate strings -->
     <string name="quick_action__ime_ui_mode_editing">Edit teks</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">Pindahkan kursor, pilih, dan edit teks</string>
+    <string name="quick_action__ime_ui_mode_scan">Pindai teks</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Foto teks cetak lalu sisipkan</string>
     <string name="quick_action__ime_ui_mode_dictate">Dikte</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Ketuk untuk mendikte, ketuk lagi untuk mentranskripsi</string>
     <string name="quick_action__dictate_live_prompt">Perintah suara</string>
@@ -2293,4 +2295,16 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Folder stiker</string>
+    <string name="scan__take_photo">Ambil foto</string>
+    <string name="scan__pick_image">Pilih gambar</string>
+    <string name="scan__retake">Coba lagi</string>
+    <string name="scan__empty_hint">Foto teks cetak lalu ketuk bagian yang Anda inginkan.</string>
+    <string name="scan__latin_only">Hanya aksara Latin</string>
+    <string name="scan__reading">Membaca foto…</string>
+    <string name="scan__no_text">Tidak ada teks yang ditemukan di foto.</string>
+    <string name="scan__failed">Foto tidak dapat dibaca.</string>
+    <string name="scan__no_camera">Aplikasi kamera tidak ditemukan.</string>
+    <string name="scan__select_all">Pilih semua</string>
+    <string name="scan__discard">Buang</string>
+    <string name="scan__approve">Terima</string>
 </resources>

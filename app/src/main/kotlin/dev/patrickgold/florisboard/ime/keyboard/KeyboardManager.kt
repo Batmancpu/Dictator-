@@ -1402,7 +1402,6 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         if (returnToPanel) activeState.imeUiMode = ImeUiMode.GIF
     }
 
-
     override fun onInputKeyDown(data: KeyData) {
         val windowController = FlorisImeService.windowControllerOrNull()
         windowController?.editor?.disableIfNoGestureInProgress()
@@ -1429,9 +1428,9 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             pendingAutoCorrection = null
         }
         val windowController = FlorisImeService.windowControllerOrNull() ?: return@batchEdit
-        // Only one of the three can be open at a time — each is reached from its own panel — so the
+        // Only one of the four can be open at a time — each is reached from its own panel — so the
         // first one that answers has consumed the key.
-        val consumedBySearch = handleSearchKey(
+        val consumedInSmartbarSlot = handleSearchKey(
             query = emojiSearchQuery,
             data = data,
             onEnter = { /* swallow: the results are already filtered */ },
@@ -1452,7 +1451,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             onEnter = { /* swallow: the results are already filtered */ },
             onExit = { closeClipboardSearch() },
         )
-        if (consumedBySearch) {
+        if (consumedInSmartbarSlot) {
             return@batchEdit
         }
         when (data.code) {
@@ -1507,9 +1506,18 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             KeyCode.IME_HIDE_UI -> FlorisImeService.hideUi()
             KeyCode.IME_PREV_SUBTYPE -> subtypeManager.switchToPrevSubtype()
             KeyCode.IME_NEXT_SUBTYPE -> subtypeManager.switchToNextSubtype()
-            KeyCode.IME_UI_MODE_TEXT -> { closeEmojiSearch(returnToMedia = false); activeState.imeUiMode = ImeUiMode.TEXT }
-            KeyCode.IME_UI_MODE_MEDIA -> { closeEmojiSearch(returnToMedia = false); activeState.imeUiMode = ImeUiMode.MEDIA }
-            KeyCode.IME_UI_MODE_CLIPBOARD -> { closeEmojiSearch(returnToMedia = false); activeState.imeUiMode = ImeUiMode.CLIPBOARD }
+            KeyCode.IME_UI_MODE_TEXT -> {
+                closeEmojiSearch(returnToMedia = false)
+                activeState.imeUiMode = ImeUiMode.TEXT
+            }
+            KeyCode.IME_UI_MODE_MEDIA -> {
+                closeEmojiSearch(returnToMedia = false)
+                activeState.imeUiMode = ImeUiMode.MEDIA
+            }
+            KeyCode.IME_UI_MODE_CLIPBOARD -> {
+                closeEmojiSearch(returnToMedia = false)
+                activeState.imeUiMode = ImeUiMode.CLIPBOARD
+            }
             // Opens the KLIPY GIF search panel (its own ImeUiMode, like the media/history panels); resets
             // any previous search so it opens on the home view (recent GIFs + trending).
             KeyCode.IME_UI_MODE_GIF -> {
@@ -1527,6 +1535,13 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             KeyCode.IME_UI_MODE_EDITING -> {
                 closeEmojiSearch(returnToMedia = false)
                 activeState.imeUiMode = ImeUiMode.EDITING
+            }
+            // Opens the scan panel (issue #390). Nothing is captured here — the panel is the surface that
+            // asks for a photo, so that opening it from an old session shows what was already recognised
+            // instead of firing the camera at whoever only wanted to look.
+            KeyCode.IME_UI_MODE_SCAN -> {
+                closeEmojiSearch(returnToMedia = false)
+                activeState.imeUiMode = ImeUiMode.SCAN
             }
             KeyCode.IME_UI_MODE_DICTATE -> dev.patrickgold.florisboard.dictate.DictateController.onMicClick(appContext)
             KeyCode.DICTATE_LIVE_PROMPT -> dev.patrickgold.florisboard.dictate.DictateController.startLivePrompt(appContext)

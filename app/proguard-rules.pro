@@ -40,3 +40,17 @@
 # optional providers) so release builds behave like debug.
 -keep class ai.onnxruntime.** { *; }
 -dontwarn ai.onnxruntime.**
+
+# ML Kit text recognition (issue #390). Its components are discovered at runtime: the merged manifest
+# lists ComponentRegistrar implementations as <meta-data> *values* on MlKitComponentDiscoveryService,
+# and they are instantiated from those strings by name. AAPT writes keep rules for manifest components
+# themselves, but not for names buried in their meta-data, and no ML Kit artifact ships a rule of its
+# own — the only consumer rules in the entire dependency tree keep protobuf fields and native methods.
+#
+# What that cost: a release build where every scan answered "the photo could not be read", while debug
+# worked. The debug DEX carries TextRegistrar, CommonComponentRegistrar and VisionCommonRegistrar; the
+# minified one carries their names but not their definitions, so component discovery finds no recogniser.
+#
+# This is Firebase's own rule — ML Kit is built on the same component framework.
+-keep class * implements com.google.firebase.components.ComponentRegistrar { <init>(); }
+-keepnames class com.google.firebase.components.ComponentRegistrar

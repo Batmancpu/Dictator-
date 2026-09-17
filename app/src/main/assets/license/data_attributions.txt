@@ -127,3 +127,19 @@ The monochrome outlines come from two collections, both freely licensed:
 
 Soniox publish no vector mark, so theirs was traced from their own app icon and fitted to the same
 size as the rest.
+
+9. On-device text recognition ("Scan text")
+--------------------------------------------
+
+Files: libmlkit_google_ocr_pipeline.so (bundled with the ML Kit dependency below)
+
+Photographing printed text and inserting part of it is done entirely on the device. The recogniser is
+Google's ML Kit Text Recognition v2, included in its bundled form, which ships the Latin-script model
+inside the app rather than downloading it — so the feature never makes a network request of any kind,
+not even on first use.
+
+  - ML Kit Text Recognition v2 (com.google.mlkit:text-recognition), © Google LLC, Apache License 2.0.
+    https://developers.google.com/ml-kit/vision/text-recognition/v2
+
+No camera permission is declared for this: the system camera app takes the picture and hands the file
+back, and the photo is deleted from our cache as soon as it has been read.

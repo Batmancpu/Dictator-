@@ -180,6 +180,9 @@ class QuickActionArrangementTest : FunSpec({
             )
             restored.dynamicActions.first() shouldBe QuickAction.InsertKey(TextKeyData.CLIPBOARD_SELECT_ALL)
             restored.contains(QuickAction.InsertKey(TextKeyData.IME_UI_MODE_EDITING)) shouldBe true
+            // Scan text (issue #390) is the same story one release later: it ships switched off nowhere,
+            // it is simply new, and an existing arrangement has to grow to include it.
+            restored.contains(QuickAction.InsertKey(TextKeyData.IME_UI_MODE_SCAN)) shouldBe true
         }
 
         test("an action already in the arrangement is not added a second time") {

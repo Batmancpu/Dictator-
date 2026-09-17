@@ -1139,6 +1139,8 @@
     <!-- Dictate strings -->
     <string name="quick_action__ime_ui_mode_editing">Редактиране</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">Преместване на курсора, избор и редактиране на текст</string>
+    <string name="quick_action__ime_ui_mode_scan">Сканиране на текст</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Снимайте печатен текст и го вмъкнете</string>
     <string name="quick_action__ime_ui_mode_dictate">Диктовка</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Докоснете, за да диктувате, докоснете отново за транскрибиране</string>
     <string name="quick_action__dictate_live_prompt">Гласова инструкция</string>
@@ -2338,4 +2340,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Папка със стикери</string>
+    <string name="scan__take_photo">Снимка</string>
+    <string name="scan__pick_image">Избор на изображение</string>
+    <string name="scan__retake">Опитайте отново</string>
+    <string name="scan__empty_hint">Снимайте печатен текст и докоснете желаната част.</string>
+    <string name="scan__latin_only">Само латиница</string>
+    <string name="scan__reading">Четене на снимката…</string>
+    <string name="scan__no_text">В снимката не е открит текст.</string>
+    <string name="scan__failed">Снимката не можа да бъде прочетена.</string>
+    <string name="scan__no_camera">Не е намерено приложение за камера.</string>
+    <string name="scan__select_all">Избери всичко</string>
+    <string name="scan__discard">Отхвърли</string>
+    <string name="scan__approve">Приеми</string>
 </resources>

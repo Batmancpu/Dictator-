@@ -1039,6 +1039,8 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <!-- Dictate strings -->
     <string name="quick_action__ime_ui_mode_editing">Tekst bewerken</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">Cursor verplaatsen, tekst selecteren en bewerken</string>
+    <string name="quick_action__ime_ui_mode_scan">Tekst scannen</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Gedrukte tekst fotograferen en invoegen</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Tik om te dicteren, tik nogmaals om te transcriberen</string>
     <string name="quick_action__dictate_live_prompt">Live-instructie</string>
@@ -2238,4 +2240,16 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Stickermap</string>
+    <string name="scan__take_photo">Foto maken</string>
+    <string name="scan__pick_image">Afbeelding kiezen</string>
+    <string name="scan__retake">Opnieuw proberen</string>
+    <string name="scan__empty_hint">Fotografeer gedrukte tekst en tik op het gewenste deel.</string>
+    <string name="scan__latin_only">Alleen Latijns schrift</string>
+    <string name="scan__reading">Foto wordt gelezen…</string>
+    <string name="scan__no_text">Geen tekst gevonden in de foto.</string>
+    <string name="scan__failed">De foto kon niet worden gelezen.</string>
+    <string name="scan__no_camera">Geen camera-app gevonden.</string>
+    <string name="scan__select_all">Alles selecteren</string>
+    <string name="scan__discard">Verwerpen</string>
+    <string name="scan__approve">Overnemen</string>
 </resources>

@@ -286,6 +286,25 @@
             android:excludeFromRecents="true"
             android:exported="false"/>
 
+        <!-- Scan text trampoline (issue #390): the keyboard cannot start an activity for a result, so
+             this one opens the system camera (or the photo picker) and leaves the image in the cache.
+             NB: no android:noHistory, for the same reason as the trampoline above – the camera coming
+             to the foreground would destroy it and its result would never arrive.
+             No CAMERA permission is declared anywhere in this manifest, and that is what makes the
+             feature possible: ACTION_IMAGE_CAPTURE is only gated on apps that declare it.
+             android:taskAffinity="" is load-bearing and was learned the hard way: without it this
+             activity joins the *settings app's* task, the camera stacks on top of that, and finishing
+             brings the settings app forward instead of the app the user was typing in. They never got
+             back to their field, and the scan was discarded for belonging to a different app. An empty
+             affinity gives it a throwaway task of its own, so finishing returns to whatever was in
+             front before. -->
+        <activity
+            android:name="dev.patrickgold.florisboard.dictate.scan.ScanCaptureActivity"
+            android:theme="@style/FlorisAppTheme.Transparent"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:exported="false"/>
+
         <!-- "Share → Dictate" for a voice message (issue #301). The other half of the trampoline
              above: that one puts a file's text into the field you are typing in, this one answers
              the reverse — you are in Signal holding the audio and want to know what it says, with no

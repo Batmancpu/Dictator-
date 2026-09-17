@@ -1118,6 +1118,8 @@
     <!-- Dictate strings -->
     <string name="quick_action__ime_ui_mode_editing">Metin düzenleme</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">İmleci taşıyın, metni seçin ve düzenleyin</string>
+    <string name="quick_action__ime_ui_mode_scan">Metin tara</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Basılı metni fotoğraflayıp ekleyin</string>
     <string name="quick_action__ime_ui_mode_dictate">Dikte</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Dikte etmek için dokunun, yazıya dökmek için tekrar dokunun</string>
     <string name="quick_action__dictate_live_prompt">Canlı komut</string>
@@ -2317,4 +2319,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Çıkartma klasörü</string>
+    <string name="scan__take_photo">Fotoğraf çek</string>
+    <string name="scan__pick_image">Görsel seç</string>
+    <string name="scan__retake">Tekrar dene</string>
+    <string name="scan__empty_hint">Basılı metni fotoğraflayın ve istediğiniz kısma dokunun.</string>
+    <string name="scan__latin_only">Yalnızca Latin alfabesi</string>
+    <string name="scan__reading">Fotoğraf okunuyor…</string>
+    <string name="scan__no_text">Fotoğrafta metin bulunamadı.</string>
+    <string name="scan__failed">Fotoğraf okunamadı.</string>
+    <string name="scan__no_camera">Kamera uygulaması bulunamadı.</string>
+    <string name="scan__select_all">Tümünü seç</string>
+    <string name="scan__discard">Vazgeç</string>
+    <string name="scan__approve">Onayla</string>
 </resources>

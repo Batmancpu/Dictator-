@@ -102,6 +102,7 @@ import dev.patrickgold.jetpref.datastore.model.collectAsState as collectPrefAsSt
 import kotlinx.coroutines.launch
 import org.florisboard.lib.android.showLongToast
 import org.florisboard.lib.android.showShortToast
+import org.florisboard.lib.compose.onAccent
 import org.florisboard.lib.compose.panelScrollbar
 import org.florisboard.lib.compose.stringRes
 import org.florisboard.lib.snygg.ui.SnyggBox
@@ -460,9 +461,11 @@ fun StickerPanel(
                                         // this panel already — the scrollbar and the ring around a
                                         // sticker waiting for its second tap. The tab pill was the
                                         // one thing left painting that same meaning in grey (#317).
-                                        .background(
-                                            if (selected) accent.copy(alpha = 0.28f) else Color(0x18808080)
-                                        )
+                                        //
+                                        // At full opacity, not at 28 %: over a dark keyboard a washed
+                                        // accent composites to a muddy near-black that reads as "some
+                                        // dark pill" rather than as the colour the user chose.
+                                        .background(if (selected) accent else Color(0x18808080))
                                         .clickable {
                                             // The emoji categories have always ticked; these tabs are
                                             // the same gesture in the same place and were the one
@@ -496,6 +499,10 @@ fun StickerPanel(
                                         } else {
                                             FlorisImeUi.SmartbarCandidateWordSecondaryText.elementName
                                         },
+                                        // The themed colour was resolved against the panel, not against
+                                        // a pill filled with the accent, so the selected tab picks its
+                                        // own readable one.
+                                        color = if (selected) accent.onAccent() else null,
                                         text = category.name.ifBlank { rootLabel },
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,

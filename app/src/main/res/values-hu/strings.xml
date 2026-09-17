@@ -1138,6 +1138,8 @@
     <!-- Dictate strings -->
     <string name="quick_action__ime_ui_mode_editing">Szövegszerkesztés</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">Kurzormozgatás, kijelölés és szövegszerkesztés</string>
+    <string name="quick_action__ime_ui_mode_scan">Szöveg beolvasása</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Fényképezze le a nyomtatott szöveget és illessze be</string>
     <string name="quick_action__ime_ui_mode_dictate">Diktálás</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Koppintson a diktáláshoz, majd újra az átíráshoz</string>
     <string name="quick_action__dictate_live_prompt">Élő utasítás</string>
@@ -2337,4 +2339,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Matricamappa</string>
+    <string name="scan__take_photo">Fénykép készítése</string>
+    <string name="scan__pick_image">Kép választása</string>
+    <string name="scan__retake">Újrapróbálkozás</string>
+    <string name="scan__empty_hint">Fényképezze le a nyomtatott szöveget, majd koppintson a kívánt részre.</string>
+    <string name="scan__latin_only">Csak latin írás</string>
+    <string name="scan__reading">Fénykép beolvasása…</string>
+    <string name="scan__no_text">Nem található szöveg a fényképen.</string>
+    <string name="scan__failed">A fényképet nem sikerült beolvasni.</string>
+    <string name="scan__no_camera">Nem található kameraalkalmazás.</string>
+    <string name="scan__select_all">Összes kijelölése</string>
+    <string name="scan__discard">Elvetés</string>
+    <string name="scan__approve">Elfogadás</string>
 </resources>

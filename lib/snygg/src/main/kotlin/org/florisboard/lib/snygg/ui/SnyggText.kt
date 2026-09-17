@@ -21,6 +21,7 @@ import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -70,6 +71,11 @@ fun SnyggText(
     // to this fraction of it; null keeps the size fixed (issue #346). Expressed as a fraction rather than
     // an absolute floor so it stays relative to whatever the theme and the font-scale setting resolved to.
     autoSizeMinRatio: Float? = null,
+    // Optional override for text that sits on a surface the caller painted itself — a button filled with
+    // the user's accent, say, where the themed foreground was chosen against the panel's background and
+    // not against that. Use `Color.onAccent()` to pick it; null keeps the themed colour, which is right
+    // everywhere else.
+    color: Color? = null,
     text: String,
 ) {
     ProvideSnyggStyle(elementName, attributes, selector) { style ->
@@ -83,7 +89,7 @@ fun SnyggText(
                 .snyggBackground(style, allowClip = false)
                 .snyggPadding(style),
             text = text,
-            color = style.foreground(),
+            color = color ?: style.foreground(),
             // A malformed (e.g. third-party) theme can resolve a size to a non-finite value; since the font
             // scale multiplies every sp size, a NaN/∞ would reach Compose's Text and crash it on measure
             // ("lineHeight can't be negative (NaN)"). Coerce those to Unspecified so a bad theme can't crash

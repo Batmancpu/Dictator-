@@ -30,7 +30,14 @@ enum class ImeUiMode(val value: Int) {
      * surface. The values are packed into [dev.patrickgold.florisboard.ime.keyboard.KeyboardState], so
      * adding a mode past the region's width silently truncates it — see the note there.
      */
-    EDITING(7);
+    EDITING(7),
+
+    /**
+     * The scan panel (issue #390): the photo just taken, with every recognised line as a tappable
+     * region over it. Nothing about it is persisted — the session lives in
+     * [dev.patrickgold.florisboard.dictate.scan.ScanController] and dies with the keyboard window.
+     */
+    SCAN(8);
 
     companion object {
         fun fromInt(int: Int) = entries.firstOrNull { it.value == int } ?: TEXT

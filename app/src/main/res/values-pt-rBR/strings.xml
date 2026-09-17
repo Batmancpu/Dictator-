@@ -943,6 +943,8 @@
     <!-- Dictate strings -->
     <string name="quick_action__ime_ui_mode_editing">Edição de texto</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">Mova o cursor, selecione e edite o texto</string>
+    <string name="quick_action__ime_ui_mode_scan">Digitalizar texto</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Fotografar texto impresso e inseri-lo</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Toque para ditar, toque novamente para transcrever</string>
     <string name="quick_action__dictate_live_prompt">Instrução ao vivo</string>
@@ -2142,4 +2144,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Pasta de figurinhas</string>
+    <string name="scan__take_photo">Tirar foto</string>
+    <string name="scan__pick_image">Escolher imagem</string>
+    <string name="scan__retake">Tentar novamente</string>
+    <string name="scan__empty_hint">Fotografe um texto impresso e toque na parte que quiser.</string>
+    <string name="scan__latin_only">Apenas alfabeto latino</string>
+    <string name="scan__reading">Lendo a foto…</string>
+    <string name="scan__no_text">Nenhum texto encontrado na foto.</string>
+    <string name="scan__failed">Não foi possível ler a foto.</string>
+    <string name="scan__no_camera">Nenhum aplicativo de câmera encontrado.</string>
+    <string name="scan__select_all">Selecionar tudo</string>
+    <string name="scan__discard">Descartar</string>
+    <string name="scan__approve">Aceitar</string>
 </resources>

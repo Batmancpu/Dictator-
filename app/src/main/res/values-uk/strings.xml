@@ -984,6 +984,8 @@
     <!-- Dictate strings -->
     <string name="quick_action__ime_ui_mode_editing">Редагування тексту</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">Переміщення курсора, виділення та редагування тексту</string>
+    <string name="quick_action__ime_ui_mode_scan">Сканувати текст</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Сфотографувати друкований текст і вставити його</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Торкніться, щоб диктувати, торкніться ще раз для транскрибування</string>
     <string name="quick_action__dictate_live_prompt">Голосова інструкція</string>
@@ -2183,4 +2185,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Тека зі стікерами</string>
+    <string name="scan__take_photo">Зробити фото</string>
+    <string name="scan__pick_image">Вибрати зображення</string>
+    <string name="scan__retake">Спробувати ще раз</string>
+    <string name="scan__empty_hint">Сфотографуйте друкований текст і торкніться потрібної частини.</string>
+    <string name="scan__latin_only">Лише латиниця</string>
+    <string name="scan__reading">Читання фото…</string>
+    <string name="scan__no_text">На фото не знайдено тексту.</string>
+    <string name="scan__failed">Не вдалося прочитати фото.</string>
+    <string name="scan__no_camera">Застосунок камери не знайдено.</string>
+    <string name="scan__select_all">Вибрати все</string>
+    <string name="scan__discard">Відхилити</string>
+    <string name="scan__approve">Прийняти</string>
 </resources>

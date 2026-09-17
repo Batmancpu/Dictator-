@@ -1134,6 +1134,8 @@
     <!-- Dictate strings -->
     <string name="quick_action__ime_ui_mode_editing">文本编辑</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">移动光标、选择和编辑文本</string>
+    <string name="quick_action__ime_ui_mode_scan">扫描文字</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">拍摄印刷文字并插入</string>
     <string name="quick_action__ime_ui_mode_dictate">听写</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">点按开始听写，再次点按进行转录</string>
     <string name="quick_action__dictate_live_prompt">实时指令</string>
@@ -2332,4 +2334,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">贴纸文件夹</string>
+    <string name="scan__take_photo">拍照</string>
+    <string name="scan__pick_image">选择图片</string>
+    <string name="scan__retake">重试</string>
+    <string name="scan__empty_hint">拍摄印刷文字，然后点按需要的部分。</string>
+    <string name="scan__latin_only">仅支持拉丁字母</string>
+    <string name="scan__reading">正在读取照片…</string>
+    <string name="scan__no_text">照片中未找到文字。</string>
+    <string name="scan__failed">无法读取照片。</string>
+    <string name="scan__no_camera">未找到相机应用。</string>
+    <string name="scan__select_all">全选</string>
+    <string name="scan__discard">放弃</string>
+    <string name="scan__approve">确认</string>
 </resources>

@@ -38,6 +38,19 @@
     <string name="gif__setup_needed_action" comment="Button to open settings">Set up GIF search</string>
     <string name="gif__copied_to_clipboard" comment="Toast when a GIF is copied as a fallback">GIF copied to clipboard — long-press to paste</string>
     <string name="gif__insert_failed" comment="Toast when a GIF could not be inserted or copied">Couldn\'t insert the GIF</string>
+    <!-- Scan text (issue #390) -->
+    <string name="scan__take_photo" comment="Button in the scan panel, opens the system camera">Take photo</string>
+    <string name="scan__pick_image" comment="Button in the scan panel, opens the photo picker">Choose image</string>
+    <string name="scan__retake" comment="Button shown after a scan failed, opens the camera again">Try again</string>
+    <string name="scan__empty_hint" comment="Shown in the scan panel before anything has been photographed">Photograph printed text and tap the part you want.</string>
+    <string name="scan__latin_only" comment="Quiet note in the scan panel: the recogniser reads Latin script only">Latin script only</string>
+    <string name="scan__reading" comment="Shown while the photo is being read">Reading the photo…</string>
+    <string name="scan__no_text" comment="Shown when the photo contained no readable text">No text found in the photo.</string>
+    <string name="scan__failed" comment="Shown when the photo could not be read at all">The photo could not be read.</string>
+    <string name="scan__no_camera" comment="Toast when no camera app is installed">No camera app found.</string>
+    <string name="scan__select_all" comment="Button below the scanned photo: marks every recognised line">Select all</string>
+    <string name="scan__discard" comment="Button below the scanned photo: throws the scan away and starts over">Discard</string>
+    <string name="scan__approve" comment="Button below the scanned photo: inserts the marked lines at the cursor">Approve</string>
     <!-- Local stickers (issue #280) -->
     <string name="prefs__media__sticker__title" comment="Settings group title">Stickers</string>
     <string name="prefs__media__sticker_folder__title" comment="Preference title, opens the folder picker">Sticker folder</string>
@@ -206,6 +219,8 @@
     <string name="quick_action__ime_ui_mode_sticker__tooltip">Insert your own stickers</string>
     <string name="quick_action__ime_ui_mode_editing" comment="Opens the text editing panel: cursor pad, select, cut/copy/paste. Mind the limited space.">Text editing</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">Move the cursor, select and edit text</string>
+    <string name="quick_action__ime_ui_mode_scan" comment="Opens the scan panel: photograph printed text and insert part of it. Mind the limited space.">Scan text</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Photograph printed text and insert it</string>
     <string name="quick_action__ime_ui_mode_dictate" comment="Please mind the limited available space for the quick action strings">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Tap to dictate, tap again to transcribe</string>
     <string name="quick_action__dictate_live_prompt" comment="Please mind the limited available space for the quick action strings">Live prompt</string>

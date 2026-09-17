@@ -1155,6 +1155,8 @@
     <!-- Dictate strings -->
     <string name="quick_action__ime_ui_mode_editing">Úpravy textu</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">Přesouvání kurzoru, výběr a úpravy textu</string>
+    <string name="quick_action__ime_ui_mode_scan">Skenovat text</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Vyfotit tištěný text a vložit ho</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Klepnutím diktujte, dalším klepnutím přepište</string>
     <string name="quick_action__dictate_live_prompt">Pokyn naživo</string>
@@ -2354,4 +2356,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Složka se samolepkami</string>
+    <string name="scan__take_photo">Vyfotit</string>
+    <string name="scan__pick_image">Vybrat obrázek</string>
+    <string name="scan__retake">Zkusit znovu</string>
+    <string name="scan__empty_hint">Vyfoťte tištěný text a klepněte na požadovanou část.</string>
+    <string name="scan__latin_only">Pouze latinka</string>
+    <string name="scan__reading">Čtení fotografie…</string>
+    <string name="scan__no_text">Na fotografii nebyl nalezen žádný text.</string>
+    <string name="scan__failed">Fotografii se nepodařilo přečíst.</string>
+    <string name="scan__no_camera">Nebyla nalezena žádná aplikace fotoaparátu.</string>
+    <string name="scan__select_all">Vybrat vše</string>
+    <string name="scan__discard">Zahodit</string>
+    <string name="scan__approve">Použít</string>
 </resources>

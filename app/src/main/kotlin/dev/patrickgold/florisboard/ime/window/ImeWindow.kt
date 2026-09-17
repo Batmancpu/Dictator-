@@ -64,6 +64,7 @@ import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.app.devtools.DevtoolsOverlay
 import dev.patrickgold.florisboard.dictate.DictateLegacyLayout
 import dev.patrickgold.florisboard.dictate.gif.GifPanel
+import dev.patrickgold.florisboard.dictate.scan.ScanPanel
 import dev.patrickgold.florisboard.dictate.sticker.StickerPanel
 import dev.patrickgold.florisboard.dictate.ui.DictateHistoryLayout
 import dev.patrickgold.florisboard.dictate.ui.DictateInputLayout
@@ -297,6 +298,9 @@ private fun ImeInnerWindow() {
                 // are auto-mirrored icons, so a right-to-left script gets a pad that points the way its
                 // text runs (issue #386).
                 ImeUiMode.EDITING -> ProvideActualLayoutDirection { EditingPanel() }
+                // The scan panel shows a photograph, and a photograph has no reading direction to
+                // mirror — the actual one keeps the header's back arrow pointing the way out.
+                ImeUiMode.SCAN -> ProvideActualLayoutDirection { ScanPanel() }
             }
             ImeSystemUiFloating()
         }

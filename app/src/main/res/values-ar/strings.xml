@@ -997,6 +997,8 @@
     <!-- Dictate strings -->
     <string name="quick_action__ime_ui_mode_editing">تحرير النص</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">تحريك المؤشر وتحديد النص وتحريره</string>
+    <string name="quick_action__ime_ui_mode_scan">مسح النص</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">صوّر نصًا مطبوعًا وأدرجه</string>
     <string name="quick_action__ime_ui_mode_dictate">الإملاء</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">انقر للإملاء، وانقر مرة أخرى للتفريغ النصي</string>
     <string name="quick_action__dictate_live_prompt">أمر صوتي</string>
@@ -2196,4 +2198,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">مجلد الملصقات</string>
+    <string name="scan__take_photo">التقاط صورة</string>
+    <string name="scan__pick_image">اختيار صورة</string>
+    <string name="scan__retake">إعادة المحاولة</string>
+    <string name="scan__empty_hint">صوّر نصًا مطبوعًا ثم انقر على الجزء الذي تريده.</string>
+    <string name="scan__latin_only">الحروف اللاتينية فقط</string>
+    <string name="scan__reading">جارٍ قراءة الصورة…</string>
+    <string name="scan__no_text">لم يُعثر على نص في الصورة.</string>
+    <string name="scan__failed">تعذّرت قراءة الصورة.</string>
+    <string name="scan__no_camera">لم يُعثر على تطبيق كاميرا.</string>
+    <string name="scan__select_all">تحديد الكل</string>
+    <string name="scan__discard">تجاهل</string>
+    <string name="scan__approve">قبول</string>
 </resources>

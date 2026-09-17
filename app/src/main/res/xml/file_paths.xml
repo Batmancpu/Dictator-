@@ -7,6 +7,12 @@
     <cache-path
         name="gif_media"
         path="gif-media/"/>
+    <!-- The photo the system camera takes for "scan text" (issue #390). It exists for seconds: the
+         keyboard decodes it as soon as it has it back and deletes it before the recogniser even runs,
+         and what is left in memory never reaches the history or the clipboard. -->
+    <cache-path
+        name="scan_capture"
+        path="scan-pending/"/>
     <!-- PNG and GIF versions of a sticker, made for apps that will not take a WebP. In the cache, so
          that clearing it frees the space: losing one costs a second to make again, and the choice
          belongs to whoever is short of storage. -->

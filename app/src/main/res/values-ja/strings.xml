@@ -1071,6 +1071,8 @@
     <!-- Dictate strings -->
     <string name="quick_action__ime_ui_mode_editing">テキスト編集</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">カーソル移動、選択、テキスト編集</string>
+    <string name="quick_action__ime_ui_mode_scan">テキストをスキャン</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">印刷された文字を撮影して挿入します</string>
     <string name="quick_action__ime_ui_mode_dictate">音声入力</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">タップして音声入力、もう一度タップで文字起こし</string>
     <string name="quick_action__dictate_live_prompt">音声指示</string>
@@ -2270,4 +2272,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">ステッカーのフォルダ</string>
+    <string name="scan__take_photo">写真を撮る</string>
+    <string name="scan__pick_image">画像を選ぶ</string>
+    <string name="scan__retake">もう一度試す</string>
+    <string name="scan__empty_hint">印刷された文字を撮影し、必要な部分をタップしてください。</string>
+    <string name="scan__latin_only">ラテン文字のみ</string>
+    <string name="scan__reading">写真を読み取っています…</string>
+    <string name="scan__no_text">写真から文字が見つかりませんでした。</string>
+    <string name="scan__failed">写真を読み取れませんでした。</string>
+    <string name="scan__no_camera">カメラアプリが見つかりません。</string>
+    <string name="scan__select_all">すべて選択</string>
+    <string name="scan__discard">破棄</string>
+    <string name="scan__approve">確定</string>
 </resources>

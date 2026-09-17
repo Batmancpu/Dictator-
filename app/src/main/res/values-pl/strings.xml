@@ -1156,6 +1156,8 @@
     <!-- Dictate strings -->
     <string name="quick_action__ime_ui_mode_editing">Edycja tekstu</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">Przesuwaj kursor, zaznaczaj i edytuj tekst</string>
+    <string name="quick_action__ime_ui_mode_scan">Skanuj tekst</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Sfotografuj drukowany tekst i wstaw go</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Dotknij, aby dyktować, dotknij ponownie, aby transkrybować</string>
     <string name="quick_action__dictate_live_prompt">Polecenie na żywo</string>
@@ -2355,4 +2357,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Folder z naklejkami</string>
+    <string name="scan__take_photo">Zrób zdjęcie</string>
+    <string name="scan__pick_image">Wybierz obraz</string>
+    <string name="scan__retake">Spróbuj ponownie</string>
+    <string name="scan__empty_hint">Sfotografuj drukowany tekst i dotknij wybranego fragmentu.</string>
+    <string name="scan__latin_only">Tylko alfabet łaciński</string>
+    <string name="scan__reading">Odczytywanie zdjęcia…</string>
+    <string name="scan__no_text">Nie znaleziono tekstu na zdjęciu.</string>
+    <string name="scan__failed">Nie udało się odczytać zdjęcia.</string>
+    <string name="scan__no_camera">Nie znaleziono aplikacji aparatu.</string>
+    <string name="scan__select_all">Zaznacz wszystko</string>
+    <string name="scan__discard">Odrzuć</string>
+    <string name="scan__approve">Zatwierdź</string>
 </resources>
