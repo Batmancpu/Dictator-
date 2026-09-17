@@ -19,8 +19,10 @@ import kotlin.test.assertEquals
  * The report is that start and stop are not in the same place: the button is tapped, the pill opens to
  * make room for a timer and a waveform, and the stop glyph has moved. Mirroring the row is only half of
  * the answer — the window underneath it has to grow away from the same side, or the mirror carries the
- * button off in the other direction instead. So what these tests pin down is the promise itself: the end
- * the finger is at does not move, whatever the pill does to the other one.
+ * button off in the other direction instead. The window is therefore measured from the wall the bubble
+ * is on, and the window manager pins that edge itself; what the controller owns is the conversion it
+ * reads and writes that window through. So what these tests pin down is the promise itself: the end the
+ * finger is at does not move, whatever the pill does to the other one.
  *
  * Measurements are a 1080 px screen with a pill that is 144 px at rest and 486 px open, roughly what the
  * stock size produces at a phone's density.
@@ -31,72 +33,46 @@ class BubbleOpenDirectionTest {
     private val resting = 144
     private val open = 486
     private val margin = 24
-    private val growth = open - resting
 
-    /** The free travel left for a bubble [width] px wide. */
-    private fun maxX(width: Int) = screen - width
+    private fun fromWall(x: Int, width: Int, onRight: Boolean) = bubbleXFromWall(x, width, screen, onRight)
 
-    private fun placed(
-        x: Int,
-        widthDelta: Int,
-        onRight: Boolean,
-        newWidth: Int,
-        snapToEdge: Boolean = true,
-    ) = bubbleXAfterResize(
-        x = x,
-        widthDelta = widthDelta,
-        onRight = onRight,
-        maxX = maxX(newWidth),
-        margin = margin,
-        snapToEdge = snapToEdge,
-    )
-
-    /** Opening a pill snapped at the right wall leaves its right edge exactly where it was. */
+    /** A pill at the right wall keeps its gap to that wall whatever its width, so its right edge stays put. */
     @Test
-    fun `a snapped pill on the right grows inwards from a fixed right edge`() {
-        val x = maxX(resting) - margin
-        val opened = placed(x, growth, onRight = true, newWidth = open)
-        assertEquals(x + resting, opened + open, "the right edge moved")
-        assertEquals(maxX(open) - margin, opened)
+    fun `a pill on the right grows inwards from a fixed right edge`() {
+        val restingLeft = fromWall(margin, resting, onRight = true)
+        val openLeft = fromWall(margin, open, onRight = true)
+        assertEquals(screen - margin, restingLeft + resting)
+        assertEquals(restingLeft + resting, openLeft + open, "the right edge moved")
     }
 
-    /** And on the left, its left edge. */
+    /** On the left the gap to the wall *is* the left edge, so there is nothing to convert. */
     @Test
-    fun `a snapped pill on the left grows outwards from a fixed left edge`() {
-        val opened = placed(margin, growth, onRight = false, newWidth = open)
-        assertEquals(margin, opened, "the left edge moved")
+    fun `a pill on the left grows outwards from a fixed left edge`() {
+        assertEquals(margin, fromWall(margin, resting, onRight = false))
+        assertEquals(margin, fromWall(margin, open, onRight = false))
     }
 
-    /**
-     * The same promise with snapping off, which is where it used to break: the x was merely clamped, so a
-     * pill with room to its right grew straight out from under the finger that had opened it.
-     */
+    /** Dropped in the open with snapping off, the same gap to the right wall still holds the right edge. */
     @Test
     fun `a pill dropped in the open still grows away from the side it is on`() {
-        // Right-hand side, with room to spare to the right: the right edge is still the one that holds.
-        val x = 400
-        val opened = placed(x, growth, onRight = true, newWidth = open, snapToEdge = false)
-        assertEquals(x + resting, opened + open, "the right edge moved")
-        // Left-hand side: the x it was dropped at is the one that holds.
-        assertEquals(x, placed(x, growth, onRight = false, newWidth = open, snapToEdge = false))
+        val left = 400
+        val gap = fromWall(left, resting, onRight = true)
+        assertEquals(left + resting, fromWall(gap, open, onRight = true) + open, "the right edge moved")
     }
 
-    /** Collapsing is the same rule with the sign turned round, so the button lands back where it started. */
+    /** The conversion is its own inverse, so a left edge written from the wall reads back as itself. */
     @Test
-    fun `collapsing returns the pill to the spot it opened from`() {
-        val x = 400
-        val opened = placed(x, growth, onRight = true, newWidth = open, snapToEdge = false)
-        val closed = placed(opened, -growth, onRight = true, newWidth = resting, snapToEdge = false)
-        assertEquals(x, closed)
+    fun `reading back a left edge through the wall gives the same edge`() {
+        for (left in listOf(0, margin, 400, screen - open)) {
+            assertEquals(left, fromWall(fromWall(left, open, onRight = true), open, onRight = true))
+            assertEquals(left, fromWall(fromWall(left, open, onRight = false), open, onRight = false))
+        }
     }
 
-    /** Nothing may be placed off-screen, however the arithmetic came out. */
+    /** The resting place is the margin on either side, which is where the old left-edge rule put it. */
     @Test
-    fun `a pill too wide for the room it has is kept on screen`() {
-        assertEquals(0, placed(x = 8, widthDelta = growth, onRight = true, newWidth = open, snapToEdge = false))
-        assertEquals(
-            maxX(open),
-            placed(x = screen, widthDelta = 0, onRight = false, newWidth = open, snapToEdge = false),
-        )
+    fun `the margin from the wall is the resting spot on both sides`() {
+        assertEquals(screen - resting - margin, fromWall(margin, resting, onRight = true))
+        assertEquals(margin, fromWall(margin, resting, onRight = false))
     }
 }

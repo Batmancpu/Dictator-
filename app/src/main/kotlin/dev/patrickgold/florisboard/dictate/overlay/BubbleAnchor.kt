@@ -21,44 +21,32 @@ enum class BubbleEdge {
 }
 
 /**
- * Where a bubble that has just changed width has to sit for the end the user is pointing at to stay
- * exactly where it was (issue #399).
+ * The bubble's horizontal position, measured from the other end of the screen (issue #399).
  *
  * The pill is the only design that changes size — a recording adds an elapsed timer and a waveform to it
  * — and which end of it holds still decides whether the button the user tapped is still under their
- * finger a moment later. The rule is one sentence: the bubble grows away from the side of the screen it
- * is parked at. On the right that means the right edge is the fixed one and the window's x has to move by
- * the whole change in width; on the left the x simply stays, and the growth runs off to the right by
- * itself. Which end holds is the same answer the skin mirrors its row by and the cancel button picks its
- * side by, so all three move together or not at all.
+ * finger a moment later. The overlay window is therefore measured *from the wall the bubble is parked
+ * at*: its `x` is the gap to that wall, and the edge against the wall is the one the window manager holds
+ * still when the window changes size, in the same relayout that carries the new width. That is what lets
+ * the pill open as smoothly on the right as it always did on the left, where the fixed edge and the edge
+ * the window is measured from have always been the same one.
+ *
+ * The controller itself keeps thinking in left edges, because the anchor, the drag and the side buttons
+ * all do, so every read and write of the window's `x` on the right goes through this conversion. It is
+ * its own inverse: a left edge in gives the gap to the wall out, and the other way round. On the left the
+ * two are the same number.
  *
  * Kept next to the anchor, and free of Android types, because it is the second half of the same question
- * — the anchor says which wall the bubble is parked at, this says what that means for a shape that is
- * about to get wider — and because both are arithmetic that should be provable without a phone.
+ * — the anchor says which wall the bubble is parked at, this says what a position means from that wall —
+ * and because both are arithmetic that should be provable without a phone.
  *
- * @param x The window's left edge before the resize.
- * @param widthDelta How much wider the bubble just became; negative when it collapsed again.
+ * @param x A left edge, or the gap to the right wall; the result is the other one.
+ * @param width The bubble's width.
+ * @param screenWidth The width of the frame the bubble is placed in.
  * @param onRight Whether the bubble is on the right-hand side of the screen.
- * @param maxX The free horizontal travel, i.e. the screen width minus the bubble's *new* width.
- * @param margin The gap kept to the wall when snapped.
- * @param snapToEdge Whether the bubble is held against its wall. A snapped bubble is put back at the wall
- *  outright, which keeps the outward end fixed for the same reason and to the same pixel.
  */
-fun bubbleXAfterResize(
-    x: Int,
-    widthDelta: Int,
-    onRight: Boolean,
-    maxX: Int,
-    margin: Int,
-    snapToEdge: Boolean,
-): Int {
-    val raw = when {
-        snapToEdge -> if (onRight) maxX - margin else margin
-        onRight -> x - widthDelta
-        else -> x
-    }
-    return raw.coerceIn(0, maxX.coerceAtLeast(0))
-}
+fun bubbleXFromWall(x: Int, width: Int, screenWidth: Int, onRight: Boolean): Int =
+    if (onRight) screenWidth - x - width else x
 
 /**
  * Where the floating button sits, expressed as what the user meant rather than where the pixels were
