@@ -21,6 +21,38 @@ enum class BubbleEdge {
 }
 
 /**
+ * Which way a design that changes size has to open: towards the left, or towards the right (issue #399).
+ *
+ * The pill is the only design that grows, and where it grows *to* decides whether its icon stays under
+ * the finger that tapped it. Only one case moves the window's left edge, and with it everything laid out
+ * from that edge: a pill that cannot grow to the right. Then it opens inwards and the icon has to be
+ * mirrored to the far end to stay put.
+ *
+ * Kept next to the anchor, and free of Android types, because it is the second half of the same question
+ * — the anchor says which wall the bubble is parked at, this says what that means for a shape that is
+ * about to get wider — and because both are arithmetic that should be provable without a phone.
+ *
+ * @param edge The wall the bubble is anchored to.
+ * @param x The window's current left edge, before it grows.
+ * @param expandedWidth What the design measures fully open.
+ * @param screenWidth The width of the frame the window is positioned in.
+ * @param snapToEdge Whether the bubble is held against its wall. When it is, the anchored edge alone
+ *  decides: a snapped window keeps its margin to that wall, so a right-anchored one can only grow inwards.
+ *  When it is not, the window keeps the x it was dropped at and grows to the right — unless that would run
+ *  past the screen, which is the one case the position gets pulled back from.
+ */
+fun bubbleOpensLeftwards(
+    edge: BubbleEdge,
+    x: Int,
+    expandedWidth: Int,
+    screenWidth: Int,
+    snapToEdge: Boolean,
+): Boolean {
+    if (snapToEdge) return edge == BubbleEdge.RIGHT
+    return x + expandedWidth > screenWidth
+}
+
+/**
  * Where the floating button sits, expressed as what the user meant rather than where the pixels were
  * (issue #323).
  *

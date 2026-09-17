@@ -662,6 +662,9 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
             DictateFloatingButtonDesign.LATTICE -> LatticeSkin(context)
         }
         skin = newSkin
+        // Before the first layout pass: a pill built for the right edge has to be mirrored already when it
+        // is measured, or its first frame is the unmirrored one.
+        newSkin.onAnchorSideChanged(anchoredToRight)
         val root = newSkin.root
         attachTouch(root)
         // Reposition only when the view's *width* changes (the pill expanding/collapsing). A plain
@@ -943,6 +946,16 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val lp = params ?: return
         anchor = BubbleAnchor.capture(lp.x, lp.y, travelX(), travelY())
         anchorIsPlaced = true
+        syncSkinToAnchor()
+    }
+
+    /**
+     * Tells the skin which wall the bubble is parked at, so a design that grows can grow the right way
+     * (#399). Called from every place the anchor is set — read back off the screen, or restored for an
+     * app — and once for each freshly built skin, which is the whole of it: nothing else assigns [anchor].
+     */
+    private fun syncSkinToAnchor() {
+        skin?.onAnchorSideChanged(anchoredToRight)
     }
 
     /**
@@ -1011,6 +1024,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val saved = pkg?.let { prefs.dictate.floatingButtonPositions.get().toMap()[it] } ?: return
         anchor = saved
         anchorIsPlaced = true
+        syncSkinToAnchor()
         applyAnchor()
     }
 
@@ -1326,6 +1340,15 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         fun sideButtonBackground(): GradientDrawable? = null
         val sideButtonForeground: Int? get() = null
 
+        /**
+         * Which side of the screen the bubble is parked at, told to the skin whenever it changes.
+         *
+         * Only a design that *grows* has anything to do with it. A design that stays the same size never
+         * moves its glyph, so the default is to ignore it; see the pill's override for why the side
+         * matters there (#399).
+         */
+        fun onAnchorSideChanged(onRight: Boolean) {}
+
         fun applyState(state: DictateController.UiState)
         fun showFlash(kind: FlashKind)
         fun onRecordingTick(level: Float, elapsedMs: Long)
@@ -1588,6 +1611,10 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
             fontFeatureSettings = "tnum"
             isSingleLine = true
             gravity = Gravity.CENTER
+            // The pill mirrors itself when it is parked at the right edge (see [onAnchorSideChanged]), and
+            // that flips the paragraph direction of everything inside it. An elapsed time is not a
+            // sentence — it reads the same way round wherever the bubble sits.
+            textDirection = View.TEXT_DIRECTION_LTR
         }
         // Thinner bars: more bars across a similar width than the ring's waveform.
         private val wave = WaveformView(context, barCount = 13)
@@ -1613,6 +1640,9 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         private var expandAnim: ValueAnimator? = null
         private var displayedSecond = -1L
 
+        /** Which way the row currently runs, or null before the side has ever been told. */
+        private var mirrored: Boolean? = null
+
         override val fixedHeight: Int = pillHeight
 
         override val root: View = LinearLayout(context).apply {
@@ -1625,6 +1655,51 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
             setPadding(pad, 0, pad, 0)
             addView(icon, LinearLayout.LayoutParams(iconSize, iconSize))
             addView(expand, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT))
+        }
+
+        /**
+         * Keeps the icon under the finger that tapped it (#399).
+         *
+         * The pill is the one design that changes size: it opens to the side, and at the right edge it can
+         * only open *inwards*, so the window's left edge is what moves. With the icon as the first child
+         * that dragged the icon along with it — you tapped the mic at the wall and the stop glyph was
+         * suddenly a pill's width away, with the cancel button now sitting where you were looking. The tap
+         * still worked (the whole pill toggles, and the edge it grew from stays under the finger), but
+         * nothing on screen said so.
+         *
+         * Mirroring the row fixes the appearance rather than the geometry: at the right edge the icon is
+         * laid out last, so it stays at the wall while the timer and waveform grow away from it, and the
+         * cancel button ends up at the far end instead of beside the glyph. At the left edge the pill
+         * already grew away from a stationary icon, so nothing changes there.
+         *
+         * Set as a layout direction rather than by reordering the children so the margins inside the row
+         * mirror with it, and pinned explicitly in both directions — an RTL *locale* would otherwise
+         * decide this, and which wall the bubble is parked at has nothing to do with the language.
+         */
+        override fun onAnchorSideChanged(onRight: Boolean) {
+            val mirror = opensLeftwards(onRight)
+            if (mirrored == mirror) return
+            mirrored = mirror
+            root.layoutDirection = if (mirror) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
+        }
+
+        /**
+         * Which way the pill will open, asked of the geometry rather than assumed from the side.
+         *
+         * It has to give the same answer as [repositionForSize], because that is what actually decides
+         * where the window ends up once it has grown — mirroring against the direction it really opens in
+         * would move the icon the other way and make the complaint worse rather than better. The rule
+         * itself is [bubbleOpensLeftwards], where it can be asked without a phone.
+         */
+        private fun opensLeftwards(onRight: Boolean): Boolean {
+            val lp = params ?: return onRight
+            return bubbleOpensLeftwards(
+                edge = if (onRight) BubbleEdge.RIGHT else BubbleEdge.LEFT,
+                x = lp.x,
+                expandedWidth = pillHeight + expandedContentWidth,
+                screenWidth = screenWidth(),
+                snapToEdge = prefs.dictate.floatingButtonSnapToEdge.get(),
+            )
         }
 
         override fun applyState(state: DictateController.UiState) {
