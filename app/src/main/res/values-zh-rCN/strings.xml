@@ -74,6 +74,7 @@
     <string name="quick_action__clipboard_cut__tooltip">执行剪贴板剪切</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">粘贴</string>
     <string name="quick_action__clipboard_paste__tooltip">执行剪贴板粘贴</string>
+    <string name="quick_action__clipboard_select">选择</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">全选</string>
     <string name="quick_action__clipboard_select_all__tooltip">执行剪贴板全选</string>
     <string name="quick_action__forward_delete" comment="Please mind the limited available space for the quick action strings">向前删除</string>
@@ -107,6 +108,8 @@
     <string name="quick_action__resize_mode__tooltip">切换调整大小模式</string>
     <string name="quick_action__toggle_number_row" comment="Quick action that shows or hides the row of digit keys above the letters. Please mind the limited available space for the quick action strings">数字行</string>
     <string name="quick_action__toggle_number_row__tooltip">显示或隐藏数字行</string>
+    <string name="quick_action__view_numeric_advanced" comment="Quick action that replaces the whole keyboard with a number pad (digits, arithmetic signs, brackets). Not to be confused with the number row above. Please mind the limited available space for the quick action strings">数字键盘</string>
+    <string name="quick_action__view_numeric_advanced__tooltip">切换到数字键盘</string>
     <string name="quick_action__drag_marker" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">拖动标记</string>
     <string name="quick_action__drag_marker__tooltip" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">当前拖动标记位置</string>
     <string name="quick_action__noop" comment="Noop=no operation; this action is only used as a placeholder in the actions editor drag and drop screen">无</string>
@@ -187,6 +190,8 @@
     <string name="settings__localization__subtype_delete_confirmation_title" comment="Title of the subtype delete confirmation dialog">删除前确认</string>
     <string name="settings__localization__subtype_delete_confirmation_warning" comment="Warning message in the confirmation dialog to confirm the user's intent to delete">你确定要删除此子类型嘛？</string>
     <string name="settings__theme__title" comment="Title of the Theme screen">主题</string>
+    <string name="pref__theme__high_contrast__label" comment="Label of the switch that turns on the measured high-contrast theme pair">高对比度</string>
+    <string name="pref__theme__high_contrast__summary" comment="Summary of the high-contrast switch. 7:1 is the WCAG AAA contrast ratio for body text; keep the ratio as digits.">按键带描边，每处文字对比度均达 7:1。同时设置日间和夜间主题。</string>
     <string name="pref__theme__mode__label" comment="Label of the theme mode preference">主题模式</string>
     <string name="pref__theme__sunrise_time__label" comment="Label of the sunrise time preference">日出时间</string>
     <string name="pref__theme__sunset_time__label" comment="Label of the sunset time preference">日落时间</string>
@@ -694,6 +699,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Dictate 似乎反复停止工作…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">回退到上一个键盘以停止无限崩溃循环。点击查看错误详情</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">返回键盘</string>
     <string name="clipboard__header_title">剪贴板</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">搜索剪贴板</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">没有包含该内容的剪贴项</string>
@@ -1082,6 +1088,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">移动光标到页首</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">移动光标到页尾</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">打开剪贴板管理器 / 历史</string>
+    <string name="enum__swipe_action__switch_to_editing_context">打开文本编辑面板</string>
     <string name="enum__swipe_action__switch_to_media_context" comment="Enum value label">打开表情符号面板</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Shift 键</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">恢复</string>
@@ -1125,6 +1132,10 @@
         <item quantity="other">候选</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">文本编辑</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">移动光标、选择和编辑文本</string>
+    <string name="quick_action__ime_ui_mode_scan">扫描文字</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">拍摄印刷文字并插入</string>
     <string name="quick_action__ime_ui_mode_dictate">听写</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">点按开始听写，再次点按进行转录</string>
     <string name="quick_action__dictate_live_prompt">实时指令</string>
@@ -1221,6 +1232,17 @@
     <string name="dictate__floating_button_design_pill_summary">激活时展开，显示计时器和实时波形。</string>
     <string name="dictate__floating_button_design_ring">圆环</string>
     <string name="dictate__floating_button_design_ring_summary">紧凑的圆形，录音和转写时圆环会有动画。</string>
+    <string name="dictate__floating_button_apps_title">按应用显示</string>
+    <string name="dictate__floating_button_apps_summary_all">在所有应用中显示</string>
+    <string name="dictate__floating_button_apps_summary_only">仅在 {n} 个应用中显示</string>
+    <string name="dictate__floating_button_apps_summary_except">除 {n} 个应用外都显示</string>
+    <string name="dictate__floating_button_apps_scope_all">所有应用</string>
+    <string name="dictate__floating_button_apps_scope_only">仅下列应用</string>
+    <string name="dictate__floating_button_apps_scope_except">除下列应用外的所有应用</string>
+    <string name="dictate__floating_button_apps_note">被排除的应用上方永远不会绘制按钮，Dictate 也不会读取其中的文本框。但对于本身就抵触无障碍服务的应用，它仍然能看出该服务已开启。</string>
+    <string name="dictate__floating_button_apps_list_title">应用</string>
+    <string name="dictate__floating_button_apps_search">搜索应用</string>
+    <string name="dictate__floating_button_apps_none">未找到与“{search_term}”匹配的应用</string>
     <string name="dictate__floating_button_design_title">按钮样式</string>
     <string name="dictate__floating_button_haptic_summary_off">点按时不振动。</string>
     <string name="dictate__floating_button_haptic_summary_on">点按按钮时短暂振动。</string>
@@ -1346,8 +1368,27 @@
     <string name="dictate__providers_field_transcription_model">转录模型</string>
     <string name="dictate__providers_field_chat_model">改写模型</string>
     <string name="dictate__providers_test">测试连接</string>
-    <string name="dictate__providers_test_success">已连接 · {count} 个模型</string>
-    <string name="dictate__providers_test_failed">连接失败</string>
+    <string name="dictate__providers_test_transcribe">测试转录</string>
+    <string name="dictate__providers_check_no_key">请先输入 API 密钥。</string>
+    <string name="dictate__providers_check_credentials_ok">凭据已验证 · {count} 个模型</string>
+    <string name="dictate__providers_check_credentials_ok_nocount">凭据已验证</string>
+    <string name="dictate__providers_check_endpoint_ok">已连接服务器 · {count} 个模型</string>
+    <string name="dictate__providers_check_credentials_untested">尚未测试转录。</string>
+    <string name="dictate__providers_check_transcription_ok">转录已验证</string>
+    <string name="dictate__providers_check_transcription_text">返回内容：“{text}”</string>
+    <string name="dictate__providers_check_transcription_empty">请求成功，但没有返回文字——连接正常，只是该模型没听懂这段样本。</string>
+    <string name="dictate__providers_check_failed_connection">连接测试失败</string>
+    <string name="dictate__providers_check_failed_transcription">转录测试失败</string>
+    <string name="dictate__providers_check_err_auth">密钥被拒绝。请检查密钥，以及地址是否属于同一账户。</string>
+    <string name="dictate__providers_check_err_quota">密钥有效，但账户额度用尽或超出限制。请在服务商处查看你的套餐。</string>
+    <string name="dictate__providers_check_err_network">无法连接服务器。请检查地址和网络连接。</string>
+    <string name="dictate__providers_check_err_timeout">未在限定时间内收到回应。服务商可能繁忙，请重试。</string>
+    <string name="dictate__providers_check_err_server">服务商报告了自身错误。这里无需改动，请稍后重试。</string>
+    <string name="dictate__providers_check_err_format">服务商拒绝了该语音样本，可能不支持这种格式。</string>
+    <string name="dictate__providers_check_err_unknown">请求失败。</string>
+    <string name="dictate__providers_azure_link_signup">创建 Azure 账户</string>
+    <string name="dictate__providers_azure_link_portal">Azure 门户</string>
+    <string name="dictate__providers_azure_link_guide">设置指南</string>
     <string name="dictate__providers_network_group">网络</string>
     <string name="dictate__request_timeout_title">请求超时</string>
     <string name="dictate__request_timeout_summary">{v} 秒 · 自建服务器较慢时可调高</string>
@@ -1388,8 +1429,10 @@
     <string name="dictate__recording_animation_static_description">录音时保持为一个纯红色圆点</string>
     <string name="dictate__recording_animation_pulse_label">脉动</string>
     <string name="dictate__recording_animation_pulse_description">以固定节奏跳动</string>
-    <string name="dictate__recording_animation_level_label">跟随你的声音</string>
+    <string name="dictate__recording_animation_level_label">跟随你的声音（圆点）</string>
     <string name="dictate__recording_animation_level_description">根据麦克风音量变化，表明麦克风正在拾音</string>
+    <string name="dictate__recording_animation_wave_label">跟随你的声音（波形）</string>
+    <string name="dictate__recording_animation_wave_description">将最近几秒绘制成实时波形，便于看出你何时停止说话</string>
     <string name="dictate__skip_silent_title">跳过静音录音</string>
     <string name="dictate__skip_silent_summary">避免静音录音产生幻觉文本和浪费 API 调用</string>
     <string name="dictate__trim_silent_gaps_title">裁剪长停顿</string>
@@ -1466,6 +1509,26 @@
     <string name="dictate__custom_words_title">自定义词汇</string>
     <string name="dictate__custom_words_summary_empty">添加姓名或专业术语以正确拼写</string>
     <string name="dictate__custom_words_placeholder">例如：FlorisBoard、Kubernetes、Renée、OAuth、Anthropic</string>
+    <string name="dictate__custom_words_summary">{count} 个词 · 约 {tokens}/{budget} 个词元</string>
+    <string name="dictate__custom_words_budget_info">这里的每个词都会随每次听写一起发送，而语音模型只读取其中约 {budget} 个词元的上下文。你的列表约占 {tokens} 个。</string>
+    <string name="dictate__custom_words_budget_over">你的列表比语音模型能读取的更长。{count} 个词中约有 {fits} 个能送达，其余的每次听写都会发送并被忽略。词汇量较大时请改用自定义替换，它精确、可离线工作，而且不产生任何费用。</string>
+    <string name="dictate__custom_words_import">导入词表</string>
+    <string name="dictate__custom_words_export">导出词表</string>
+    <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
+    <string name="dictate__custom_words_import_title">导入词表</string>
+    <string name="dictate__custom_words_import_fitting">此文件中有 {count} 个新词可以放进你的列表。</string>
+    <string name="dictate__custom_words_import_known">其中 {count} 个已经在列表里了。</string>
+    <string name="dictate__custom_words_import_nofit">有 {count} 个没放下——语音模型只读取约 {budget} 个词元的上下文，它们即使被发送也会被忽略。</string>
+    <string name="dictate__custom_words_import_unusable">{count} 行没有可拼写的内容，已跳过。</string>
+    <string name="dictate__custom_words_import_truncated">只读取了文件中的前 {count} 条。</string>
+    <string name="dictate__custom_words_import_also_dictionary">同时加入个人词典</string>
+    <string name="dictate__custom_words_import_also_dictionary_summary">这个列表只告诉语音模型一个词该怎么写。个人词典才是键盘在你打字时使用的词典——它没有长度限制，所以文件中的每个词都会加入，而不只是上面放得下的那些。</string>
+    <string name="dictate__custom_words_import_empty">在该文件中未找到词语</string>
+    <string name="dictate__custom_words_import_done">已添加 {count} 个词</string>
+    <string name="dictate__custom_words_import_done_dictionary">已添加 {count} 个词，并将 {dict} 个加入你的个人词典</string>
+    <string name="dictate__file_unreadable">无法读取该文件</string>
+    <string name="dictate__file_export_done">文件已保存</string>
+    <string name="dictate__file_export_failed">无法写入该文件</string>
     <string name="dictate__rewording_group">改写（AI 编辑）</string>
     <string name="dictate__rewording_title">改写（AI）</string>
     <string name="dictate__rewording_summary_on">开启——使用 AI 改写、翻译和格式化</string>
@@ -1645,6 +1708,16 @@
     <string name="dictate__mappings_field_to_placeholder">例如 GitHub</string>
     <string name="dictate__mappings_group">替换规则</string>
     <string name="dictate__mappings_matchcase_summary">仅在大小写完全一致时才替换。</string>
+    <string name="dictate__mappings_import">导入规则</string>
+    <string name="dictate__mappings_export">导出规则</string>
+    <string name="dictate__mappings_export_filename">dictate_mappings.tsv</string>
+    <string name="dictate__mappings_import_title">导入规则</string>
+    <string name="dictate__mappings_import_message">此文件中有 {count} 条新规则。要加入你的列表吗？</string>
+    <string name="dictate__mappings_import_known">其中 {count} 条已经在列表里了。</string>
+    <string name="dictate__mappings_import_unusable">{count} 行没有写明替换内容，已跳过。</string>
+    <string name="dictate__mappings_import_format">每行一条规则：听到的内容、一个制表符、应该变成的内容。</string>
+    <string name="dictate__mappings_import_empty">在该文件中未找到规则</string>
+    <string name="dictate__mappings_import_done">已添加 {count} 条规则</string>
     <string name="dictate__mappings_matchcase_title">区分大小写</string>
     <string name="dictate__mappings_opt_caseinsensitive">忽略大小写</string>
     <string name="dictate__mappings_opt_casesensitive">区分大小写</string>
@@ -2016,6 +2089,47 @@
     <string name="apptour61__outro_eyebrow">这就是 6.1</string>
     <string name="apptour61__outro_title">同一块键盘，少了些棱角</string>
     <string name="apptour61__outro_body">你现在的口述方式没有任何变化——自己的密钥、自己的服务器，或是设备上的模型。所有导览都能在 设置 › 关于 中重新查看。</string>
+    <string name="apptour62__cta_try">试试看</string>
+    <string name="apptour62__cta_manage">在哪里关掉</string>
+    <string name="apptour62__art_word">泽雅</string>
+    <string name="apptour62__art_emoji_word">蛋糕</string>
+    <string name="apptour62__art_emoji">🍰</string>
+    <string name="apptour62__intro_eyebrow">Dictate 6.2</string>
+    <string name="apptour62__intro_title">它会记住你的词，还添了五套新外观</string>
+    <string name="apptour62__intro_body">键盘现在能记住任何词典都不认识的词，按键之间可以透出下面的应用，两个拇指也能各占一半。此外还有一把小工具，专门帮你处理每天都在做的事。</string>
+    <string name="apptour62__learning_eyebrow">新功能：边打边学</string>
+    <string name="apptour62__learning_title">词典都不认识的词</string>
+    <string name="apptour62__learning_body">把一个名字或术语输入足够多次，键盘就会把它留下：不再标成错误，而是开始推荐它。这次更新会为所有人打开它，包括此前把它关掉的人。在无痕模式、密码输入框，以及任何不是你一键一键敲出来的内容里都不会学到东西；所有内容都只留在这台设备上，下面的按钮会打开这份清单——以及那个开关。</string>
+    <string name="apptour62__themes_eyebrow">五套新外观</string>
+    <string name="apptour62__themes_title">Glass、Sand、Deep，以及深色 E-Ink</string>
+    <string name="apptour62__themes_body">Dictate Glass 让应用从按键之间的缝隙透出来，而按键本身仍然足够不透明，字看得清；Glass Clear 更通透、更好看，代价是在那些会画到键盘后面的应用里，它们的文字会透过来。Sand 是温暖的浅色主题，Deep 是沉静的深色主题，E-Ink 终于有了夜间版本——自动切换在天黑之后不会再递给你一块白色键盘。</string>
+    <string name="apptour62__split_eyebrow">新功能：分体键盘</string>
+    <string name="apptour62__split_title">两个拇指都够得着，不必伸手</string>
+    <string name="apptour62__split_body">在单手模式和悬浮模式旁边新增的快捷操作，会把每一行拉开，让每个拇指都待在自己那一半。所有布局都能分开，不只是 QWERTY，因为分界点是从键宽算出来的，而不是写进每套布局里。横屏时，只要空间够，应用现在会一直保持可见。</string>
+    <string name="apptour62__emoji_eyebrow">表情符号</string>
+    <string name="apptour62__emoji_title">词会找到自己的表情</string>
+    <string name="apptour62__emoji_body">输入一个词，它所对应的表情就会出现在候选栏里——支持约五十种语言，用的是系统本身所用的同一份数据。它跟在候选词旁边一起走，而不是占掉其中一个位置。此外还可以在按键上方开启一行固定的和最近用过的表情。</string>
+    <string name="apptour62__helpers_eyebrow">四个小帮手</string>
+    <string name="apptour62__helpers_title">无痕、干净的链接，还有算式的答案</string>
+    <string name="apptour62__helpers_body">无痕模式开启期间不会记住任何东西：不学习，也不留存。粘贴的链接可以在进入输入框的路上就去掉追踪参数。输入一个以 = 结尾的算式，答案会作为候选出现。数字行开启时，字母键也会重新显示自己的数字。</string>
+    <string name="apptour62__selection_eyebrow">选择与跳转</string>
+    <string name="apptour62__selection_title">看得见你选了多少</string>
+    <string name="apptour62__selection_body">选中文字时一直空着的那一行，现在会数出其中的词数和字符数。新按钮可以跳到输入框的最开头和最末尾，复制时还能把两端多余的空格留下。一旦开始选择，操作行会主动让开，而不是挡在上面。</string>
+    <string name="apptour62__clipboard_eyebrow">剪贴板</string>
+    <string name="apptour62__clipboard_title">按内容找到那一条</string>
+    <string name="apptour62__clipboard_body">剪贴板现在可以搜索了，涵盖里面的全部内容。刚刚复制的东西会以一枚可以划掉的胶囊形式出现在候选栏里；同一段文字复制两次就算两次，所以它会再回来。删除一条记录现在也会删掉它背后的文件，而不是把图片留在手机上。</string>
+    <string name="apptour62__gestures_eyebrow">手势</string>
+    <string name="apptour62__gestures_title">按住 ?123，滑动，松手</string>
+    <string name="apptour62__gestures_body">按住符号键，滑到想要的字符再松手：字符就输入了，字母也已经回来，不用来回切换。在空格键上向上滑，现在能够到上面一行，而不只是前一个词。按键之间的间距也能在真正看得出差别的范围内调整。</string>
+    <string name="apptour62__export_eyebrow">新功能：口述存成文件</string>
+    <string name="apptour62__export_title">每次口述都写进你选的文件夹</string>
+    <string name="apptour62__export_body">选定一个文件夹之后，每段完成的口述在完成的那一刻都会额外以纯文本文件写进去。不论是什么在盯着那个文件夹——记事应用、同步工具、你的备份——都能拿到你的文字，而 Dictate 不必去学它的那套规矩。</string>
+    <string name="apptour62__more_eyebrow">此外</string>
+    <string name="apptour62__more_title">许多小改进</string>
+    <string name="apptour62__more_body">候选词现在在每种语言里都会看光标前的两个词，而不只是英语。备份可以不带你的 API 密钥生成，因而可以放心转交。Azure 自家的转写模型已经可用，为离线使用选择模型时现在也会一并切换到离线引擎，每个请求也都有与等待时间相称的期限。口述在送出的那一刻就出现在历史记录里，导入会说明自己正处在哪一步并且可以取消，文字进入那些一向挑剔的应用时也更可靠了。</string>
+    <string name="apptour62__outro_eyebrow">这就是 6.2</string>
+    <string name="apptour62__outro_title">还是那块键盘，更多地属于你</string>
+    <string name="apptour62__outro_body">你的口述方式没有任何变化——自己的密钥、自己的服务器，或是设备上的模型。所有导览都能在 设置 › 关于 中重新查看。</string>
     <string name="changelog__v5_0_0">• 新增：滑动输入 — 在按键上滑动即可输入整个单词，配有按需下载的分语言词典。 👆\n• 新增：单词建议与自动更正 — 拼写错误会自动更正，你输入的原词只需一按即可取回。 ✨\n• 新增：实时转录 — 说话时即可看到文字出现，支持 OpenAI、Deepgram、Soniox、AssemblyAI 和 ElevenLabs。 ⚡\n• 新增：又添三家转录服务商 — ElevenLabs Scribe、Deepgram 和 AssemblyAI。 ☁️\n• 新增：经典听写布局 — Dictate 3 的无键盘语音界面回归，可锁定或一滑即达。 🎙️\n• 新增：社区提示词库 — 浏览并分享改写提示词。 📚\n• 新增：带里程碑的听写统计。 📊\n• 新增：离线模型 NVIDIA Parakeet，以及跳过空录音的静音过滤器。 📴\n• 更多：更稳定的悬浮按钮、推理强度控制、触觉反馈、全新的 E-Reader 主题以及数十项修复。 🛠️</string>
     <string name="media__tab__gifs">GIFs</string>
     <string name="prefs__media__gif__title">GIFs</string>
@@ -2222,4 +2336,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">贴纸文件夹</string>
+    <string name="scan__take_photo">拍照</string>
+    <string name="scan__pick_image">选择图片</string>
+    <string name="scan__retake">重试</string>
+    <string name="scan__empty_hint">拍摄印刷文字，然后点按需要的部分。</string>
+    <string name="scan__latin_only">仅支持拉丁字母</string>
+    <string name="scan__reading">正在读取照片…</string>
+    <string name="scan__no_text">照片中未找到文字。</string>
+    <string name="scan__failed">无法读取照片。</string>
+    <string name="scan__no_camera">未找到相机应用。</string>
+    <string name="scan__select_all">全选</string>
+    <string name="scan__discard">放弃</string>
+    <string name="scan__approve">确认</string>
 </resources>

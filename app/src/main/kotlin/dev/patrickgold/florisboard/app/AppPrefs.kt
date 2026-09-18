@@ -23,6 +23,7 @@ import dev.patrickgold.florisboard.app.settings.theme.ColorPreferenceSerializer
 import dev.patrickgold.florisboard.app.settings.theme.DisplayKbdAfterDialogs
 import dev.patrickgold.florisboard.app.settings.theme.SnyggLevel
 import dev.patrickgold.florisboard.app.setup.NotificationPermissionState
+import dev.patrickgold.florisboard.dictate.DictateFloatingButtonAppScope
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonDesign
 import dev.patrickgold.florisboard.dictate.DictateLongformMode
 import dev.patrickgold.florisboard.dictate.audio.AudioSpeedUp
@@ -36,6 +37,7 @@ import dev.patrickgold.florisboard.dictate.data.mappings.DictateMappings
 import dev.patrickgold.florisboard.dictate.gif.GifContentFilter
 import dev.patrickgold.florisboard.dictate.gif.GifHistory
 import dev.patrickgold.florisboard.dictate.overlay.BubbleAnchors
+import dev.patrickgold.florisboard.dictate.overlay.BubbleApps
 import dev.patrickgold.florisboard.dictate.provider.DictateProxyType
 import dev.patrickgold.florisboard.dictate.provider.ProviderAccounts
 import dev.patrickgold.florisboard.dictate.sticker.StickerHistory
@@ -422,6 +424,8 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         // layout's record button (issue #238). Defaults to LEVEL (mic-reactive), which doubles as
         // feedback that the microphone is hearing something; PULSE restores the pre-rewrite look and
         // STATIC removes the movement entirely for anyone who finds it distracting while speaking.
+        // WAVE (issue #371) swaps the Smartbar dot for a scrolling waveform, which is the only one of
+        // the four that shows whether the *last* second was quiet.
         val recordingAnimation = enum(
             key = "dictate__recording_animation",
             default = DictateRecordingAnimation.LEVEL,
@@ -585,6 +589,21 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "dictate__floating_button_positions",
             default = BubbleAnchors.Empty,
             serializer = BubbleAnchors.Serializer,
+        )
+        // Which apps the button may appear over (issue #392). ALL by default, so the setting changes
+        // nothing until someone opens it. Note the load order: the accessibility service can connect
+        // before the preference store has finished loading, so the first value the bubble sees is this
+        // default — it fails open, and the flow re-emits the real one a moment later.
+        val floatingButtonAppScope = enum(
+            key = "dictate__floating_button_app_scope",
+            default = DictateFloatingButtonAppScope.ALL,
+        )
+        // The apps themselves. One list for both directions of floatingButtonAppScope, so switching the
+        // mode keeps the selection rather than silently emptying it.
+        val floatingButtonApps = custom(
+            key = "dictate__floating_button_apps",
+            default = BubbleApps.Empty,
+            serializer = BubbleApps.Serializer,
         )
         // Vibrate briefly when the button is tapped.
         val floatingButtonHaptic = boolean(
@@ -1737,6 +1756,20 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "theme__accent_color",
             default = Color(0xFF30B7E6), // Dictate light blue
             serializer = ColorPreferenceSerializer,
+        )
+        // What the high-contrast switch (#387) replaced, so turning it off puts the user's own themes
+        // back. The switch itself is not a preference: its state is read off dayThemeId/nightThemeId,
+        // so picking another theme by hand turns it off instead of leaving a stored "on" lying about
+        // the keyboard someone is looking at.
+        val themeIdBeforeHighContrastDay = custom(
+            key = "theme__day_theme_id_before_high_contrast",
+            default = extCoreTheme("floris_day"),
+            serializer = ExtensionComponentName.Serializer,
+        )
+        val themeIdBeforeHighContrastNight = custom(
+            key = "theme__night_theme_id_before_high_contrast",
+            default = extCoreTheme("floris_night"),
+            serializer = ExtensionComponentName.Serializer,
         )
         val sunriseTime = localTime(
             key = "theme__sunrise_time",

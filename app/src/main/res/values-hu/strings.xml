@@ -74,6 +74,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Vágólapra kivágás végrehajtása</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Beillesztés</string>
     <string name="quick_action__clipboard_paste__tooltip">Vágólapról beillesztés végrehajtása</string>
+    <string name="quick_action__clipboard_select">Kijelölés</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Mind kijelöl</string>
     <string name="quick_action__clipboard_select_all__tooltip">Összes kijelölése vágólapra végrehajtása</string>
     <string name="quick_action__forward_delete" comment="Please mind the limited available space for the quick action strings">Törlés előre</string>
@@ -107,6 +108,8 @@
     <string name="quick_action__resize_mode__tooltip">Átméretezési mód be/ki</string>
     <string name="quick_action__toggle_number_row" comment="Quick action that shows or hides the row of digit keys above the letters. Please mind the limited available space for the quick action strings">Számsor</string>
     <string name="quick_action__toggle_number_row__tooltip">Számsor megjelenítése vagy elrejtése</string>
+    <string name="quick_action__view_numeric_advanced" comment="Quick action that replaces the whole keyboard with a number pad (digits, arithmetic signs, brackets). Not to be confused with the number row above. Please mind the limited available space for the quick action strings">Számbillentyűzet</string>
+    <string name="quick_action__view_numeric_advanced__tooltip">Váltás a számbillentyűzetre</string>
     <string name="quick_action__drag_marker" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">Húzásjelölő</string>
     <string name="quick_action__drag_marker__tooltip" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">Jelenlegi húzásjelölő pozíciója</string>
     <string name="quick_action__noop" comment="Noop=no operation; this action is only used as a placeholder in the actions editor drag and drop screen">Semmi</string>
@@ -187,6 +190,8 @@
     <string name="settings__localization__subtype_delete_confirmation_title" comment="Title of the subtype delete confirmation dialog">Törlés megerősítése</string>
     <string name="settings__localization__subtype_delete_confirmation_warning" comment="Warning message in the confirmation dialog to confirm the user's intent to delete">Biztosan törli ezt az altípust?</string>
     <string name="settings__theme__title" comment="Title of the Theme screen">Téma</string>
+    <string name="pref__theme__high_contrast__label" comment="Label of the switch that turns on the measured high-contrast theme pair">Magas kontraszt</string>
+    <string name="pref__theme__high_contrast__summary" comment="Summary of the high-contrast switch. 7:1 is the WCAG AAA contrast ratio for body text; keep the ratio as digits.">Körvonalazott gombok, minden felirat 7:1-re mérve. Nappal és éjszaka.</string>
     <string name="pref__theme__mode__label" comment="Label of the theme mode preference">Témamód</string>
     <string name="pref__theme__sunrise_time__label" comment="Label of the sunrise time preference">Napkelte ideje</string>
     <string name="pref__theme__sunset_time__label" comment="Label of the sunset time preference">Napnyugta ideje</string>
@@ -695,6 +700,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Úgy tűnik, hogy a Dictate többször leállt…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Visszalépés az előző billentyűzetre, a végtelen összeomlás megakadályozásához. Érintse meg a hiba részleteinek megtekintéséhez</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">Vissza a billentyűzethez</string>
     <string name="clipboard__header_title">Vágólap</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Keresés a vágólapon</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">Egyik elem sem tartalmazza ezt</string>
@@ -1079,6 +1085,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">Kurzor mozgatása a lap elejére</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">Kurzor mozgatása a lap végére</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Vágólapkezelő/vágólapelőzmények megnyitása</string>
+    <string name="enum__swipe_action__switch_to_editing_context">Szövegszerkesztő panel megnyitása</string>
     <string name="enum__swipe_action__switch_to_media_context" comment="Enum value label">Emodzsi panel megnyitása</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Shift</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Újra</string>
@@ -1129,6 +1136,10 @@
         <item quantity="other">{v} jelölt</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">Szövegszerkesztés</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">Kurzormozgatás, kijelölés és szövegszerkesztés</string>
+    <string name="quick_action__ime_ui_mode_scan">Szöveg beolvasása</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Fényképezze le a nyomtatott szöveget és illessze be</string>
     <string name="quick_action__ime_ui_mode_dictate">Diktálás</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Koppintson a diktáláshoz, majd újra az átíráshoz</string>
     <string name="quick_action__dictate_live_prompt">Élő utasítás</string>
@@ -1225,6 +1236,17 @@
     <string name="dictate__floating_button_design_pill_summary">Aktív állapotban kibővül, és időzítőt meg élő hullámformát mutat.</string>
     <string name="dictate__floating_button_design_ring">Gyűrű</string>
     <string name="dictate__floating_button_design_ring_summary">Kompakt kör gyűrűvel, amely felvétel és átírás közben animálódik.</string>
+    <string name="dictate__floating_button_apps_title">Láthatóság alkalmazásonként</string>
+    <string name="dictate__floating_button_apps_summary_all">Minden alkalmazásban</string>
+    <string name="dictate__floating_button_apps_summary_only">Csak {n} alkalmazásban</string>
+    <string name="dictate__floating_button_apps_summary_except">Mindenhol, kivéve {n} alkalmazásban</string>
+    <string name="dictate__floating_button_apps_scope_all">Minden alkalmazás</string>
+    <string name="dictate__floating_button_apps_scope_only">Csak az alábbi alkalmazások</string>
+    <string name="dictate__floating_button_apps_scope_except">Minden, kivéve az alábbi alkalmazásokat</string>
+    <string name="dictate__floating_button_apps_note">A kihagyott alkalmazások fölé a gomb soha nem kerül ki, és a Dictate nem olvassa ott a szövegmezőket. Az az alkalmazás, amelyik eleve tiltakozik a kisegítő szolgáltatások ellen, továbbra is látni fogja, hogy a szolgáltatás be van kapcsolva.</string>
+    <string name="dictate__floating_button_apps_list_title">Alkalmazások</string>
+    <string name="dictate__floating_button_apps_search">Alkalmazások keresése</string>
+    <string name="dictate__floating_button_apps_none">Nincs találat erre: „{search_term}”</string>
     <string name="dictate__floating_button_design_title">Gomb stílusa</string>
     <string name="dictate__floating_button_haptic_summary_off">Nincs rezgés koppintáskor.</string>
     <string name="dictate__floating_button_haptic_summary_on">Rövid rezgés, amikor megérinti a gombot.</string>
@@ -1350,8 +1372,27 @@
     <string name="dictate__providers_field_transcription_model">Átírási modell</string>
     <string name="dictate__providers_field_chat_model">Átfogalmazási modell</string>
     <string name="dictate__providers_test">Kapcsolat tesztelése</string>
-    <string name="dictate__providers_test_success">Csatlakozva · {count} modell</string>
-    <string name="dictate__providers_test_failed">A kapcsolat sikertelen</string>
+    <string name="dictate__providers_test_transcribe">Átírás tesztelése</string>
+    <string name="dictate__providers_check_no_key">Először add meg az API-kulcsodat.</string>
+    <string name="dictate__providers_check_credentials_ok">Hitelesítő adatok ellenőrizve · {count} modell</string>
+    <string name="dictate__providers_check_credentials_ok_nocount">Hitelesítő adatok ellenőrizve</string>
+    <string name="dictate__providers_check_endpoint_ok">Kiszolgáló elérve · {count} modell</string>
+    <string name="dictate__providers_check_credentials_untested">Az átírás nincs tesztelve.</string>
+    <string name="dictate__providers_check_transcription_ok">Átírás ellenőrizve</string>
+    <string name="dictate__providers_check_transcription_text">Ez jött vissza: „{text}”</string>
+    <string name="dictate__providers_check_transcription_empty">A kérés átment, de nem érkezett szöveg – a kapcsolat működik, ez a modell nem értette meg a mintát.</string>
+    <string name="dictate__providers_check_failed_connection">A kapcsolat tesztje sikertelen</string>
+    <string name="dictate__providers_check_failed_transcription">Az átírás tesztje sikertelen</string>
+    <string name="dictate__providers_check_err_auth">A kulcsot elutasították. Ellenőrizd a kulcsot, és hogy a cím ugyanahhoz a fiókhoz tartozik-e.</string>
+    <string name="dictate__providers_check_err_quota">A kulcs működik, de a fiók kerete elfogyott, vagy túllépted a korlátot. Nézd meg a csomagodat a szolgáltatónál.</string>
+    <string name="dictate__providers_check_err_network">A kiszolgáló nem érhető el. Ellenőrizd a címet és az internetkapcsolatot.</string>
+    <string name="dictate__providers_check_err_timeout">Nem érkezett válasz időben. A szolgáltató lehet, hogy leterhelt – próbáld újra.</string>
+    <string name="dictate__providers_check_err_server">A szolgáltató saját hibát jelez. Itt nincs mit változtatni; próbáld később.</string>
+    <string name="dictate__providers_check_err_format">A szolgáltató elutasította a hangmintát. Lehet, hogy nem fogadja el ezt a formátumot.</string>
+    <string name="dictate__providers_check_err_unknown">A kérés sikertelen.</string>
+    <string name="dictate__providers_azure_link_signup">Azure-fiók létrehozása</string>
+    <string name="dictate__providers_azure_link_portal">Azure Portal</string>
+    <string name="dictate__providers_azure_link_guide">Beállítási útmutató</string>
     <string name="dictate__providers_network_group">Hálózat</string>
     <string name="dictate__request_timeout_title">Kérés időkorlátja</string>
     <string name="dictate__request_timeout_summary">{v} s · saját lassú kiszolgálóhoz növeld</string>
@@ -1392,8 +1433,10 @@
     <string name="dictate__recording_animation_static_description">Felvétel közben egyszínű piros pont marad</string>
     <string name="dictate__recording_animation_pulse_label">Lüktető</string>
     <string name="dictate__recording_animation_pulse_description">Egyenletes ütemben lüktet</string>
-    <string name="dictate__recording_animation_level_label">Követi a hangját</string>
+    <string name="dictate__recording_animation_level_label">Követi a hangját (pont)</string>
     <string name="dictate__recording_animation_level_description">Reagál a mikrofon szintjére, így látszik, hogy hallja Önt</string>
+    <string name="dictate__recording_animation_wave_label">Követi a hangját (hullám)</string>
+    <string name="dictate__recording_animation_wave_description">Az utolsó másodperceket élő hullámformaként rajzolja ki, így látja, mikor hallgatott el</string>
     <string name="dictate__skip_silent_title">Néma felvételek kihagyása</string>
     <string name="dictate__skip_silent_summary">Kerüli a kitalált szöveget és a felesleges API-hívásokat néma hangnál</string>
     <string name="dictate__trim_silent_gaps_title">Hosszú szünetek levágása</string>
@@ -1470,6 +1513,26 @@
     <string name="dictate__custom_words_title">Egyéni szavak</string>
     <string name="dictate__custom_words_summary_empty">Adjon hozzá neveket vagy szakkifejezéseket a helyes írásmódhoz</string>
     <string name="dictate__custom_words_placeholder">pl. FlorisBoard, Kubernetes, Renée, OAuth, Anthropic</string>
+    <string name="dictate__custom_words_summary">{count} szó · nagyjából {tokens} a {budget} tokenből</string>
+    <string name="dictate__custom_words_budget_info">Az itteni szavak mindegyike minden diktálással együtt megy el, és a beszédmodell ebből csak körülbelül {budget} token kontextust olvas. A listád ebből nagyjából {tokens} tokent foglal.</string>
+    <string name="dictate__custom_words_budget_over">A listád hosszabb annál, mint amennyit a beszédmodell elolvas. A {count} szavadból nagyjából {fits} jut el hozzá; a többi minden diktáláskor elmegy, és figyelmen kívül marad. Nagyobb szókincshez használd az egyéni cseréket — azok pontosak, offline is működnek, és semmibe sem kerülnek.</string>
+    <string name="dictate__custom_words_import">Szólista importálása</string>
+    <string name="dictate__custom_words_export">Szólista exportálása</string>
+    <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
+    <string name="dictate__custom_words_import_title">Szólista importálása</string>
+    <string name="dictate__custom_words_import_fitting">Ebből a fájlból {count} új szó fér bele a listádba.</string>
+    <string name="dictate__custom_words_import_known">{count} már benne volt.</string>
+    <string name="dictate__custom_words_import_nofit">{count} kimaradt — a beszédmodell csak körülbelül {budget} token kontextust olvas, így ezek minden diktáláskor elmentek volna, és figyelmen kívül maradtak volna.</string>
+    <string name="dictate__custom_words_import_unusable">{count} sor nem tartalmazott leírható szót, ezeket kihagytuk.</string>
+    <string name="dictate__custom_words_import_truncated">A fájlnak csak az első {count} bejegyzését olvastuk be.</string>
+    <string name="dictate__custom_words_import_also_dictionary">Add hozzá a személyes szótárhoz is</string>
+    <string name="dictate__custom_words_import_also_dictionary_summary">Ez a lista csak a beszédmodellnek mondja meg, hogyan kell egy szót írni. A személyes szótár az, amit a billentyűzet gépelés közben használ — annak nincs hosszkorlátja, így a fájl minden szava bekerül, nem csak azok, amelyek fentebb elférnek.</string>
+    <string name="dictate__custom_words_import_empty">Ebben a fájlban nem található szó</string>
+    <string name="dictate__custom_words_import_done">{count} szó hozzáadva</string>
+    <string name="dictate__custom_words_import_done_dictionary">{count} szó hozzáadva, és {dict} a személyes szótáradhoz</string>
+    <string name="dictate__file_unreadable">Ezt a fájlt nem sikerült beolvasni</string>
+    <string name="dictate__file_export_done">Fájl mentve</string>
+    <string name="dictate__file_export_failed">Ezt a fájlt nem sikerült megírni</string>
     <string name="dictate__rewording_group">Átfogalmazás (MI-szerkesztés)</string>
     <string name="dictate__rewording_title">Átfogalmazás (MI)</string>
     <string name="dictate__rewording_summary_on">Be – átfogalmazás, fordítás és formázás MI-vel</string>
@@ -1649,6 +1712,16 @@
     <string name="dictate__mappings_field_to_placeholder">pl. GitHub</string>
     <string name="dictate__mappings_group">Cserélési szabályok</string>
     <string name="dictate__mappings_matchcase_summary">Csak akkor cserél, ha a kis- és nagybetűk pontosan egyeznek.</string>
+    <string name="dictate__mappings_import">Szabályok importálása</string>
+    <string name="dictate__mappings_export">Szabályok exportálása</string>
+    <string name="dictate__mappings_export_filename">dictate_mappings.tsv</string>
+    <string name="dictate__mappings_import_title">Szabályok importálása</string>
+    <string name="dictate__mappings_import_message">{count} új szabály ebben a fájlban. Hozzáadod a listádhoz?</string>
+    <string name="dictate__mappings_import_known">{count} már benne volt.</string>
+    <string name="dictate__mappings_import_unusable">{count} sor nem nevezett meg cserét, ezeket kihagytuk.</string>
+    <string name="dictate__mappings_import_format">Soronként egy szabály: ami elhangzik, egy tabulátor, aminek lennie kell.</string>
+    <string name="dictate__mappings_import_empty">Ebben a fájlban nem található szabály</string>
+    <string name="dictate__mappings_import_done">{count} szabály hozzáadva</string>
     <string name="dictate__mappings_matchcase_title">Kis- és nagybetű egyezzen</string>
     <string name="dictate__mappings_opt_caseinsensitive">Nem érzékeny a kis- és nagybetűkre</string>
     <string name="dictate__mappings_opt_casesensitive">Érzékeny a kis- és nagybetűkre</string>
@@ -2021,6 +2094,47 @@
     <string name="apptour61__outro_eyebrow">Ez a 6.1</string>
     <string name="apptour61__outro_title">Ugyanaz a billentyűzet, kevesebb éles sarokkal</string>
     <string name="apptour61__outro_body">Semmi nem változik abban, ahogy eddig diktálsz — saját kulcs, saját kiszolgáló vagy egy modell az eszközön. Minden bemutatót újra megtalálsz a Beállítások › Névjegy alatt.</string>
+    <string name="apptour62__cta_try">Kipróbálom</string>
+    <string name="apptour62__cta_manage">Hol kapcsolható ki</string>
+    <string name="apptour62__art_word">Zoya</string>
+    <string name="apptour62__art_emoji_word">torta</string>
+    <string name="apptour62__art_emoji">🍰</string>
+    <string name="apptour62__intro_eyebrow">Dictate 6.2</string>
+    <string name="apptour62__intro_title">Megtanulja a szavaidat, és öt új külsőt kapott</string>
+    <string name="apptour62__intro_body">A billentyűzet mostantól megjegyzi azokat a szavakat, amelyeket egyetlen szótár sem ismer, a billentyűk átengedhetik a mögöttük lévő alkalmazást, és mindkét hüvelykujj kaphat saját felet. Ráadásul egy marék apró segítség ahhoz, amit nap mint nap csinálsz.</string>
+    <string name="apptour62__learning_eyebrow">Új: gépelés közben tanul</string>
+    <string name="apptour62__learning_title">A szavak, amelyeket egyetlen szótár sem ismer</string>
+    <string name="apptour62__learning_body">Írj be egy nevet vagy szakszót elég sokszor, és a billentyűzet megtartja: nem jelöli többé hibának, hanem felajánlja. Ez a frissítés mindenkinél bekapcsolja, azoknál is, akik korábban kikapcsolták. Inkognitómódban, jelszómezőkben és mindabból, amit nem billentyűről billentyűre írtál, semmit nem tanul; minden ezen az eszközön marad, az alábbi gomb pedig megnyitja a listát — és a kapcsolót.</string>
+    <string name="apptour62__themes_eyebrow">Öt új külső</string>
+    <string name="apptour62__themes_title">Glass, Sand, Deep és egy sötét E-Ink</string>
+    <string name="apptour62__themes_body">A Dictate Glass a billentyűk közötti réseken át engedi látni az alkalmazást, miközben maguk a billentyűk elég takarók maradnak ahhoz, hogy olvasni lehessen rajtuk; a Glass Clear tovább megy és szebb, cserébe a billentyűzet mögé rajzoló alkalmazások szövege átüt rajta. A Sand meleg világos téma, a Deep egy nyugodt sötét, az E-Ink pedig végre kapott éjszakai változatot, így az automatikus váltás sötétedés után már nem ad fehér billentyűzetet.</string>
+    <string name="apptour62__split_eyebrow">Új: osztott billentyűzet</string>
+    <string name="apptour62__split_title">Mindkét hüvelykujj, nyújtózás nélkül</string>
+    <string name="apptour62__split_body">Egy új gyorsművelet — az egykezes és a lebegő mód mellett — széthúzza a sorokat, hogy minden hüvelykujj a maga felén maradjon. Minden kiosztás osztható, nem csak a QWERTY, mert a törésvonal a billentyűszélességekből adódik, nem pedig kiosztásonként beírt adat. Fekvő tájolásban pedig az alkalmazás mostantól látható marad, ha mindkettőnek van hely.</string>
+    <string name="apptour62__emoji_eyebrow">Emodzsik</string>
+    <string name="apptour62__emoji_title">A szó megtalálja az emodzsiját</string>
+    <string name="apptour62__emoji_body">Írj be egy szót, és a jelentését hordozó emodzsi megjelenik a javaslatsávban — körülbelül ötven nyelven, ugyanabból az adatból, amit a rendszer is használ. A javaslatok mellett utazik, nem veszi el egyikük helyét sem. Van ezen kívül egy választható sor a kitűzött és a nemrég használt emodzsikkal a billentyűk fölött.</string>
+    <string name="apptour62__helpers_eyebrow">Négy kis segítség</string>
+    <string name="apptour62__helpers_title">Inkognitó, tiszta linkek és a művelet eredménye</string>
+    <string name="apptour62__helpers_body">Az inkognitómód megakadályozza, hogy bármi megjegyződjön, amíg be van kapcsolva: semmi tanulás, semmi megőrzés. A beillesztett linkekről eltávolíthatók a követőparaméterek még a mezőbe érkezés előtt. Írj be egy =-lel végződő műveletet, és az eredmény javaslatként jelenik meg. Bekapcsolt számsor mellett pedig a betűk újra mutatják a számjegyüket.</string>
+    <string name="apptour62__selection_eyebrow">Kijelölés és ugrás</string>
+    <string name="apptour62__selection_title">Lásd, mennyit jelöltél ki</string>
+    <string name="apptour62__selection_body">A sor, amely kijelöléskor eddig üresen állt, mostantól megszámolja a benne lévő szavakat és karaktereket. Új gombok ugranak a mező legelejére és legvégére, a másolás pedig hátrahagyhatja a széleken maradt fölösleges szóközöket. A műveletsor félreáll, amint egy kijelölés elkezdődik, ahelyett hogy belebeszélne.</string>
+    <string name="apptour62__clipboard_eyebrow">Vágólap</string>
+    <string name="apptour62__clipboard_title">Keresd meg a részletet arról, ami benne van</string>
+    <string name="apptour62__clipboard_body">A vágólapon mostantól lehet keresni, mindenben, ami rajta van. Amit épp kimásoltál, a javaslatsávban jelenik meg egy pirulaként, amelyet el is tüntethetsz, és ugyanazt a szöveget kétszer kimásolni két másolásnak számít, így visszatér. Egy elem törlése most már a mögötte lévő fájlt is törli, ahelyett hogy a képet a telefonon hagyná.</string>
+    <string name="apptour62__gestures_eyebrow">Gesztusok</string>
+    <string name="apptour62__gestures_title">Tartsd a ?123-at, húzd, engedd el</string>
+    <string name="apptour62__gestures_body">Tartsd nyomva a szimbólumbillentyűt, húzd rá a kívánt karakterre, és engedd el: beszúródik, a betűk pedig már vissza is jöttek, oda-vissza váltogatás nélkül. A szóközön felfelé húzás mostantól a fölötte lévő sort éri el, nem csak az előző szót. A billentyűk közötti rés pedig olyan tartományban állítható, amelyen a különbség tényleg látszik.</string>
+    <string name="apptour62__export_eyebrow">Új: diktálások fájlként</string>
+    <string name="apptour62__export_title">Minden diktálás egy általad választott mappába</string>
+    <string name="apptour62__export_body">Válassz egyszer egy mappát, és minden elkészült diktálás oda is bekerül egyszerű szövegfájlként, abban a pillanatban, amikor kész van. Bármi figyeli azt a mappát — egy jegyzetalkalmazás, egy szinkronizáló eszköz, a mentésed —, megkapja a szövegeidet anélkül, hogy a Dictate-nek meg kellene tanulnia a nyelvét.</string>
+    <string name="apptour62__more_eyebrow">Ezenkívül</string>
+    <string name="apptour62__more_title">Sok apróság</string>
+    <string name="apptour62__more_body">A javaslatok mostantól minden nyelven a kurzor előtti két szót nézik, nem csak angolul. A mentés elkészíthető az API-kulcsaid nélkül, így nyugodtan továbbadható. Az Azure saját átírási modelljei elérhetők, az offline modell választása immár az offline motorra is átvált, és minden kérésnek a várakozáshoz illő határideje van. A diktálások a küldés pillanatában megjelennek az előzményekben, az importálás megmondja, melyik lépésnél tart, és megszakítható, a szöveg pedig megbízhatóbban ér célba azokban az alkalmazásokban, amelyek nehezen fogadták.</string>
+    <string name="apptour62__outro_eyebrow">Ez a 6.2</string>
+    <string name="apptour62__outro_title">Ugyanaz a billentyűzet, több belőle a tiéd</string>
+    <string name="apptour62__outro_body">Semmi nem változik abban, ahogy diktálsz — saját kulcs, saját kiszolgáló vagy egy modell az eszközön. Minden bemutatót újra megtalálsz a Beállítások › Névjegy alatt.</string>
     <string name="changelog__v5_0_0">• ÚJ: Húzásos gépelés — húzza az ujját a billentyűkön, hogy egész szavakat írjon, igény szerint letöltődő, nyelvenkénti szótárakkal. 👆\n• ÚJ: Szójavaslatok és automatikus javítás — az elgépelések automatikusan javulnak, és a beírt szó egy koppintásra marad. ✨\n• ÚJ: Valós idejű átírás — nézze, ahogy a szavak megjelennek beszéd közben, OpenAI, Deepgram, Soniox, AssemblyAI és ElevenLabs használatával. ⚡\n• ÚJ: Három további átírási szolgáltató — ElevenLabs Scribe, Deepgram és AssemblyAI. ☁️\n• ÚJ: Klasszikus diktálási elrendezés — a Dictate 3 billentyűzet nélküli hangképernyője visszatért, rögzítve vagy egy húzásnyira. 🎙️\n• ÚJ: Közösségi prompt-könyvtár — böngésszen és osszon meg újrafogalmazási prompteket. 📚\n• ÚJ: Diktálási statisztikák mérföldkövekkel. 📊\n• ÚJ: Offline modell NVIDIA Parakeet, valamint egy csendszűrő, amely kihagyja az üres felvételeket. 📴\n• Továbbá: stabilabb lebegő gomb, gondolkodási erőfeszítés vezérlése, haptikus visszajelzés, új E-Reader téma és több tucat javítás. 🛠️</string>
     <string name="media__tab__gifs">GIF-ek</string>
     <string name="prefs__media__gif__title">GIF-ek</string>
@@ -2227,4 +2341,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Matricamappa</string>
+    <string name="scan__take_photo">Fénykép készítése</string>
+    <string name="scan__pick_image">Kép választása</string>
+    <string name="scan__retake">Újrapróbálkozás</string>
+    <string name="scan__empty_hint">Fényképezze le a nyomtatott szöveget, majd koppintson a kívánt részre.</string>
+    <string name="scan__latin_only">Csak latin írás</string>
+    <string name="scan__reading">Fénykép beolvasása…</string>
+    <string name="scan__no_text">Nem található szöveg a fényképen.</string>
+    <string name="scan__failed">A fényképet nem sikerült beolvasni.</string>
+    <string name="scan__no_camera">Nem található kameraalkalmazás.</string>
+    <string name="scan__select_all">Összes kijelölése</string>
+    <string name="scan__discard">Elvetés</string>
+    <string name="scan__approve">Elfogadás</string>
 </resources>

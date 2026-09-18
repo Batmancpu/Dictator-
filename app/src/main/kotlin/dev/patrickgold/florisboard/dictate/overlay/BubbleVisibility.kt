@@ -57,6 +57,13 @@ object BubbleVisibility {
      * (#67), and [screenOn] is the display being interactive — the button's window layer deliberately
      * outlives the keyguard, so nobody takes it away for us and an always-on display would happily draw
      * it on a phone its owner believes to be off (#269).
+     *
+     * [allowedInApp] is the per-app filter (#392), and it sits among the suppressors on purpose: it beats
+     * [pinsBubble] too. Someone who has said "never over my banking app" has said it about the whole
+     * window, not about the windows that happen to appear while nothing is running — a dictation started
+     * in another app and carried in here is exactly the moment the promise would otherwise break. The
+     * recording itself is untouched: it belongs to the microphone foreground service, not to this window,
+     * so it keeps running and gets its button back on the way out (#293).
      */
     fun shouldShow(
         enabled: Boolean,
@@ -65,9 +72,11 @@ object BubbleVisibility {
         hiddenByOwnKeyboard: Boolean,
         recognitionActive: Boolean,
         screenOn: Boolean,
+        allowedInApp: Boolean,
     ): Boolean = enabled &&
         (focused || pinsBubble(state)) &&
         !hiddenByOwnKeyboard &&
         !recognitionActive &&
-        screenOn
+        screenOn &&
+        allowedInApp
 }

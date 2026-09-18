@@ -61,6 +61,13 @@ import org.florisboard.lib.snygg.ui.SnyggText
 private val ChipShape = RoundedCornerShape(percent = 20)
 
 /**
+ * How much of the user's accent colour washes over a highlighted chip. It is the one colour a theme
+ * cannot control on this strip, so the high-contrast pair (#387) is measured against it at both
+ * extremes the user can pick — see `HighContrastThemeTest`. Changing it changes that guarantee.
+ */
+const val HIGHLIGHT_WASH_ALPHA = 0.22f
+
+/**
  * The contextual prompt chip strip shown in the Smartbar's center area, in place of the candidates,
  * while there is an active text selection and rewording is enabled (roadmap 4.3). Each chip runs the
  * matching prompt via [DictateController.applyPrompt] on the current selection (or, for free prompts,
@@ -235,7 +242,7 @@ internal fun DictatePromptChip(
             .then(
                 if (highlighted) {
                     Modifier
-                        .background(accent.copy(alpha = 0.22f))
+                        .background(accent.copy(alpha = HIGHLIGHT_WASH_ALPHA))
                         .border(1.5.dp, accent, ChipShape)
                 } else {
                     Modifier

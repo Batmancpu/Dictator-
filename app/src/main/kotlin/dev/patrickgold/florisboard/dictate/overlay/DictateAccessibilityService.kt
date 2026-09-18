@@ -86,6 +86,47 @@ class DictateAccessibilityService : AccessibilityService() {
     }
 
     /**
+     * Until when [AccessibilityEvent.TYPE_WINDOWS_CHANGED] events are the bubble's own doing.
+     *
+     * When a recording starts or stops, the bubble resizes its touch window and adds or removes its side
+     * buttons, and the window manager answers with a show animation on the window (400 ms on the A55),
+     * every frame of which arrives here as a windows-changed event. Each one used to cost a synchronous
+     * focused-node fetch from the app in front — two round trips of ~14 ms on the main thread — and the
+     * burst starved the pill's own opening animation of frames for ~100 ms (traced 2026-09-17). Nothing
+     * about the user's focus changes while our own windows are churning, so those events are ignored.
+     */
+    @Volatile
+    private var ownWindowChangeUntil = 0L
+
+    /** Called by the bubble right before it adds, removes or resizes one of its own windows. */
+    fun noteOwnWindowChange() {
+        ownWindowChangeUntil = SystemClock.uptimeMillis() + OWN_WINDOW_CHANGE_MS
+    }
+
+    /**
+     * Whether a windows-changed event can have moved the input focus at all. A window merely moving,
+     * resizing, changing its z-order or its title cannot, and while our own windows are changing (see
+     * [ownWindowChangeUntil]) nothing is worth a node fetch. The bounds test alone would already have cut
+     * the burst, since a show animation changes nothing but bounds; the quiet period also covers the add
+     * and the remove that start and end it.
+     */
+    private fun windowsChangedMayMoveFocus(event: AccessibilityEvent): Boolean {
+        if (SystemClock.uptimeMillis() < ownWindowChangeUntil) return false
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return true
+        val changes = event.windowChanges
+        // No detail at all is read as "anything could have changed".
+        return changes == 0 || (changes and GEOMETRY_ONLY_WINDOW_CHANGES.inv()) != 0
+    }
+
+    /**
+     * The package named by the last window-state change, kept only as [currentAppPackage]'s fallback.
+     *
+     * A field rather than a parameter because the read can also come from the debounced runnable, which
+     * has no event to carry it. It is a hint, never a source of truth.
+     */
+    private var lastWindowStatePackage: String? = null
+
+    /**
      * Runs a focus check as soon as Android tells us that the input target or window changed. Any pending
      * selection debounce is stale at that point, so cancel it rather than letting an old callback delay or
      * overwrite this state. These event types are not emitted for every typed character, unlike selection
@@ -143,9 +184,18 @@ class DictateAccessibilityService : AccessibilityService() {
             // transition on top of the accessibility framework's notification timeout (#222).
             AccessibilityEvent.TYPE_VIEW_FOCUSED,
             AccessibilityEvent.TYPE_VIEW_CLICKED,
-            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED,
-            AccessibilityEvent.TYPE_WINDOWS_CHANGED,
             -> updateEditableFocusImmediately()
+            // Only when the change could have moved the focus — see [windowsChangedMayMoveFocus] for the
+            // burst that made the distinction necessary.
+            AccessibilityEvent.TYPE_WINDOWS_CHANGED -> {
+                if (windowsChangedMayMoveFocus(event)) updateEditableFocusImmediately()
+            }
+            // Same handling, but this is the one event that names the app it came from even when that
+            // app's nodes are out of reach — which is what [currentAppPackage] falls back on (#392).
+            AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
+                lastWindowStatePackage = event.packageName?.toString()
+                updateEditableFocusImmediately()
+            }
             // This is the only subscribed event which can arrive for every keystroke. Keep it coalesced
             // so caret moves and text selection do not cause a focused-node IPC round trip per character.
             AccessibilityEvent.TYPE_VIEW_TEXT_SELECTION_CHANGED -> scheduleFocusUpdate()
@@ -285,10 +335,25 @@ class DictateAccessibilityService : AccessibilityService() {
         // appear runs through this method, so a missed ACTION_SCREEN_ON heals on the next event instead of
         // hiding the button for the rest of the session (#269).
         refreshScreenState()
+        // Which app we are in has to be settled first now: in an app the user has filtered the button out
+        // of, we do not go looking at its fields at all (#392). The bubble controller asks the same
+        // question again over its own flows — that one is what overrules a dictation in flight, this one is
+        // what keeps us out of the node tree. Neither replaces the other; a preference read is a map
+        // lookup, a focused-node fetch is IPC.
+        val pkg = currentAppPackage()
+        if (!pkg.isNullOrEmpty() && pkg != packageName && _foregroundPackage.value != pkg) {
+            _foregroundPackage.value = pkg
+            flogDebug { "foreground app = $pkg" }
+        }
+        val blocked = !BubbleApps.allows(
+            scope = prefs.dictate.floatingButtonAppScope.get(),
+            selected = prefs.dictate.floatingButtonApps.get().toSet(),
+            pkg = _foregroundPackage.value,
+        )
         // Show the bubble whenever there is somewhere to dictate: either an editable field holds focus, or a
         // soft keyboard is physically out (covers apps whose fields don't report an accessible editable focus).
         val imeShown = isImeWindowShown()
-        val focused = focusedEditableNode() != null || imeShown
+        val focused = !blocked && (focusedEditableNode() != null || imeShown)
         if (_editableFocused.value != focused) {
             _editableFocused.value = focused
             flogDebug { "editable field focused = $focused" }
@@ -302,17 +367,20 @@ class DictateAccessibilityService : AccessibilityService() {
             _dictateKeyboardActive.value = dictateKeyboard
             flogDebug { "Dictate keyboard active = $dictateKeyboard" }
         }
-        val pkg = currentAppPackage()
-        if (!pkg.isNullOrEmpty() && pkg != packageName && _foregroundPackage.value != pkg) {
-            _foregroundPackage.value = pkg
-            flogDebug { "foreground app = $pkg" }
-        }
     }
 
     /**
      * The package of the foreground *application* window (ignoring IME/system windows), for per-app bubble
-     * positioning. Reading it from the focused application window avoids the churn of TYPE_WINDOW_STATE_CHANGED
-     * events that fire for the keyboard and transient popups with their own package names.
+     * positioning and for the per-app visibility filter. Reading it from the focused application window
+     * avoids the churn of TYPE_WINDOW_STATE_CHANGED events that fire for the keyboard and transient popups
+     * with their own package names.
+     *
+     * The last resort is that event's package after all (#392), and only when both window reads come back
+     * with nothing. That case stopped being hypothetical once the filter existed: an app hardened enough
+     * to object to overlays is also the kind that marks its nodes accessibility-data-sensitive, which
+     * hides them from a service that — like this one — does not claim to be an accessibility tool. The
+     * event's package survives that, because it describes the event rather than the screen. Keeping it as
+     * a fallback rather than a source leaves the churn argument above intact.
      */
     private fun currentAppPackage(): String? = runCatching {
         val fromAppWindow = windows
@@ -320,7 +388,7 @@ class DictateAccessibilityService : AccessibilityService() {
             .sortedByDescending { it.isFocused }
             .firstOrNull()
             ?.root?.packageName?.toString()
-        fromAppWindow ?: rootInActiveWindow?.packageName?.toString()
+        fromAppWindow ?: rootInActiveWindow?.packageName?.toString() ?: lastWindowStatePackage
     }.getOrNull()
 
     /** Whether the Dictate keyboard itself is the currently selected input method (handles .debug). */
@@ -1327,6 +1395,14 @@ class DictateAccessibilityService : AccessibilityService() {
         }
         // Debounce window for focus re-checks so a typing burst triggers at most one focused-node fetch.
         private const val FOCUS_UPDATE_DEBOUNCE_MS = 150L
+        // How long after the bubble changed one of its own windows a windows-changed event still counts
+        // as its own doing. The window manager's show animation runs 400 ms on the A55; this covers it.
+        private const val OWN_WINDOW_CHANGE_MS = 500L
+        // Window changes that cannot move the input focus: geometry and cosmetics.
+        private val GEOMETRY_ONLY_WINDOW_CHANGES = AccessibilityEvent.WINDOWS_CHANGE_BOUNDS or
+            AccessibilityEvent.WINDOWS_CHANGE_LAYER or
+            AccessibilityEvent.WINDOWS_CHANGE_TITLE or
+            AccessibilityEvent.WINDOWS_CHANGE_ACCESSIBILITY_FOCUSED
         // Real-time overlay preview (#128): min gap between accessibility writes while streaming, so live
         // typing into another app doesn't flood the accessibility channel. It used to be 0 — every single
         // update written through — which is a lot of writes into a foreign app for no visible gain over a

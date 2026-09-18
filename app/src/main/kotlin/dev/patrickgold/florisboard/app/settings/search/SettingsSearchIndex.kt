@@ -123,6 +123,7 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.dictate__floating_button_service_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_service_title"),
         SettingsSearchEntry(R.string.dictate__floating_button_mic_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_mic_title"),
         SettingsSearchEntry(R.string.dictate__floating_button_show_with_keyboard_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_show_with_keyboard_title"),
+        SettingsSearchEntry(R.string.dictate__floating_button_apps_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_apps_title"),
         SettingsSearchEntry(R.string.dictate__floating_button_design_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_design_title"),
         SettingsSearchEntry(R.string.dictate__floating_button_size_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_size_title"),
         SettingsSearchEntry(R.string.dictate__floating_button_snap_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_snap_title"),
@@ -135,6 +136,7 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.dictate__history_enable_title, R.string.dictate__history_title, Routes.Settings.DictateHistory, parentRes = R.string.dictate__title),
         SettingsSearchEntry(R.string.dictate__history_audio_title, R.string.dictate__history_title, Routes.Settings.DictateHistory, parentRes = R.string.dictate__title),
         SettingsSearchEntry(R.string.dictate__history_retention_title, R.string.dictate__history_title, Routes.Settings.DictateHistory, parentRes = R.string.dictate__title),
+        SettingsSearchEntry(R.string.dictate__history_export_title, R.string.dictate__history_title, Routes.Settings.DictateHistory, parentRes = R.string.dictate__title),
         SettingsSearchEntry(R.string.dictate__mappings_empty_title, R.string.dictate__mappings_title, Routes.Settings.DictateMappings, parentRes = R.string.dictate__title, anchor = "dictate__mappings_empty_title"),
         SettingsSearchEntry(R.string.dictate__mappings_add, R.string.dictate__mappings_title, Routes.Settings.DictateMappings, parentRes = R.string.dictate__title, anchor = "dictate__mappings_add"),
         SettingsSearchEntry(R.string.dictate__providers_add_custom, R.string.dictate__providers_title, Routes.Settings.DictateProviders, parentRes = R.string.dictate__title, anchor = "dictate__providers_add_custom"),
@@ -187,6 +189,11 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.dictate__style_prompt_title, R.string.dictate__formatting_title, Routes.Settings.DictateFormatting, parentRes = R.string.dictate__title),
         SettingsSearchEntry(R.string.dictate__style_prompt_custom_title, R.string.dictate__formatting_title, Routes.Settings.DictateFormatting, parentRes = R.string.dictate__title),
         SettingsSearchEntry(R.string.dictate__custom_words_title, R.string.dictate__formatting_title, Routes.Settings.DictateFormatting, parentRes = R.string.dictate__title),
+        // Hand-added (issue #389); the generator is lossy, so a rerun of it must be diffed before keeping.
+        // Both point at the custom-words row: importing and exporting live inside its dialog, so the
+        // row is where a search for either of them has to land.
+        SettingsSearchEntry(R.string.dictate__custom_words_import, R.string.dictate__formatting_title, Routes.Settings.DictateFormatting, parentRes = R.string.dictate__title, anchor = "dictate__custom_words_title"),
+        SettingsSearchEntry(R.string.dictate__custom_words_export, R.string.dictate__formatting_title, Routes.Settings.DictateFormatting, parentRes = R.string.dictate__title, anchor = "dictate__custom_words_title"),
         SettingsSearchEntry(R.string.dictate__mappings_title, R.string.dictate__formatting_title, Routes.Settings.DictateFormatting, parentRes = R.string.dictate__title, anchor = "dictate__mappings_title"),
         SettingsSearchEntry(R.string.dictate__push_to_talk_title, R.string.dictate__recording_group, Routes.Settings.DictateRecording, parentRes = R.string.dictate__title, anchor = "dictate__push_to_talk_title"),
         SettingsSearchEntry(R.string.dictate__realtime_title, R.string.dictate__recording_group, Routes.Settings.DictateRecording, parentRes = R.string.dictate__title, anchor = "dictate__realtime_title"),
@@ -333,6 +340,7 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.pref__smartbar__flip_toggles__label, R.string.settings__smartbar__title, Routes.Settings.Smartbar, anchor = "pref__smartbar__flip_toggles__label"),
         SettingsSearchEntry(R.string.pref__smartbar__shared_actions_auto_expand_collapse__label, R.string.settings__smartbar__title, Routes.Settings.Smartbar, anchor = "pref__smartbar__shared_actions_auto_expand_collapse__label"),
         SettingsSearchEntry(R.string.pref__smartbar__extended_actions_placement__label, R.string.settings__smartbar__title, Routes.Settings.Smartbar, anchor = "pref__smartbar__extended_actions_placement__label"),
+        SettingsSearchEntry(R.string.pref__theme__high_contrast__label, R.string.settings__theme__title, Routes.Settings.Theme, anchor = "pref__theme__high_contrast__label"),
         SettingsSearchEntry(R.string.pref__theme__mode__label, R.string.settings__theme__title, Routes.Settings.Theme, anchor = "pref__theme__mode__label"),
         SettingsSearchEntry(R.string.pref__theme__day, R.string.settings__theme__title, Routes.Settings.Theme, anchor = "pref__theme__day"),
         SettingsSearchEntry(R.string.pref__theme__night, R.string.settings__theme__title, Routes.Settings.Theme, anchor = "pref__theme__night"),

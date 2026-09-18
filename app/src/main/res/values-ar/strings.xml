@@ -72,6 +72,7 @@
     <string name="quick_action__clipboard_cut__tooltip">تنفيذ قص للحافظة</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">لصق</string>
     <string name="quick_action__clipboard_paste__tooltip">تنفيذ لصق للحافظة</string>
+    <string name="quick_action__clipboard_select">تحديد</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">تحديد الكل</string>
     <string name="quick_action__clipboard_select_all__tooltip">تنفيذ تحديد الكل للحافظة</string>
     <string name="quick_action__ime_ui_mode_clipboard" comment="Please mind the limited available space for the quick action strings">الحافظة</string>
@@ -100,6 +101,8 @@
     <string name="quick_action__split_layout__tooltip">تفعيل لوحة المفاتيح المقسمة</string>
     <string name="quick_action__toggle_number_row" comment="Quick action that shows or hides the row of digit keys above the letters. Please mind the limited available space for the quick action strings">صف الأرقام</string>
     <string name="quick_action__toggle_number_row__tooltip">إظهار صف الأرقام أو إخفاؤه</string>
+    <string name="quick_action__view_numeric_advanced" comment="Quick action that replaces the whole keyboard with a number pad (digits, arithmetic signs, brackets). Not to be confused with the number row above. Please mind the limited available space for the quick action strings">لوحة الأرقام</string>
+    <string name="quick_action__view_numeric_advanced__tooltip">التبديل إلى لوحة الأرقام</string>
     <string name="quick_action__drag_marker" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">سحب التمييز</string>
     <string name="quick_action__drag_marker__tooltip" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">موضع علامة السحب الحالي</string>
     <string name="quick_action__noop" comment="Noop=no operation; this action is only used as a placeholder in the actions editor drag and drop screen">لا شَيْء</string>
@@ -179,6 +182,8 @@
     <string name="settings__localization__subtype_delete_confirmation_title" comment="Title of the subtype delete confirmation dialog">تأكيد الحذف</string>
     <string name="settings__localization__subtype_delete_confirmation_warning" comment="Warning message in the confirmation dialog to confirm the user's intent to delete">هل أنت متيقِّن أنك تريد حذف النوع الفرعي؟</string>
     <string name="settings__theme__title" comment="Title of the Theme screen">المظهر</string>
+    <string name="pref__theme__high_contrast__label" comment="Label of the switch that turns on the measured high-contrast theme pair">تباين عالٍ</string>
+    <string name="pref__theme__high_contrast__summary" comment="Summary of the high-contrast switch. 7:1 is the WCAG AAA contrast ratio for body text; keep the ratio as digits.">مفاتيح محدَّدة بإطار، وكل نص مقاس بنسبة 7:1. يضبط النهار والليل.</string>
     <string name="pref__theme__mode__label" comment="Label of the theme mode preference">وضع الثيم</string>
     <string name="pref__theme__sunrise_time__label" comment="Label of the sunrise time preference">وقت الشروق</string>
     <string name="pref__theme__sunset_time__label" comment="Label of the sunset time preference">وقت الغروب</string>
@@ -570,6 +575,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">يبدو أن Dictate يوقف عن العمل بشكل متكرر…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">تم العودة إلى لوحة المفاتيح السابقة لإيقاف التعطل المتكرر الغير منتهي. انقر لعرض تفاصيل الخطأ</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">العودة إلى لوحة المفاتيح</string>
     <string name="clipboard__header_title">الحافظة</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">البحث في الحافظة</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">لا يوجد عنصر يحتوي على ذلك</string>
@@ -911,6 +917,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">حرك المؤشر إلى بداية الصفحة</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">حرك المؤشر إلى نهاية الصفحة</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">فتح مدير الحافظة /السجل</string>
+    <string name="enum__swipe_action__switch_to_editing_context">فتح لوحة تحرير النص</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">مفتاح التحويل shift</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">إعادة</string>
     <string name="enum__swipe_action__undo" comment="Enum value label">تراجع</string>
@@ -988,6 +995,10 @@
         <item quantity="other">{v} مرشحون</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">تحرير النص</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">تحريك المؤشر وتحديد النص وتحريره</string>
+    <string name="quick_action__ime_ui_mode_scan">مسح النص</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">صوّر نصًا مطبوعًا وأدرجه</string>
     <string name="quick_action__ime_ui_mode_dictate">الإملاء</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">انقر للإملاء، وانقر مرة أخرى للتفريغ النصي</string>
     <string name="quick_action__dictate_live_prompt">أمر صوتي</string>
@@ -1084,6 +1095,17 @@
     <string name="dictate__floating_button_design_pill_summary">تتوسّع عند النشاط لإظهار مؤقّت وموجة صوتية حية.</string>
     <string name="dictate__floating_button_design_ring">حلقة</string>
     <string name="dictate__floating_button_design_ring_summary">دائرة مدمجة بحلقة متحركة أثناء التسجيل والنسخ.</string>
+    <string name="dictate__floating_button_apps_title">الظهور حسب التطبيق</string>
+    <string name="dictate__floating_button_apps_summary_all">في كل التطبيقات</string>
+    <string name="dictate__floating_button_apps_summary_only">في {n} تطبيقات فقط</string>
+    <string name="dictate__floating_button_apps_summary_except">في كل مكان عدا {n} تطبيقات</string>
+    <string name="dictate__floating_button_apps_scope_all">كل التطبيقات</string>
+    <string name="dictate__floating_button_apps_scope_only">التطبيقات أدناه فقط</string>
+    <string name="dictate__floating_button_apps_scope_except">كل التطبيقات عدا الموجودة أدناه</string>
+    <string name="dictate__floating_button_apps_note">لا يُرسم الزر أبدًا فوق تطبيق تستبعده، ولا يقرأ Dictate حقول النص فيه. أما التطبيق الذي يرفض خدمات إمكانية الوصول من حيث المبدأ فسيظل يرى أن الخدمة مفعَّلة.</string>
+    <string name="dictate__floating_button_apps_list_title">التطبيقات</string>
+    <string name="dictate__floating_button_apps_search">البحث في التطبيقات</string>
+    <string name="dictate__floating_button_apps_none">لم يُعثر على تطبيق لـ «{search_term}»</string>
     <string name="dictate__floating_button_design_title">نمط الزر</string>
     <string name="dictate__floating_button_haptic_summary_off">بدون اهتزاز عند النقر.</string>
     <string name="dictate__floating_button_haptic_summary_on">اهتزاز قصير عند النقر على الزر.</string>
@@ -1209,8 +1231,27 @@
     <string name="dictate__providers_field_transcription_model">نموذج التفريغ النصي</string>
     <string name="dictate__providers_field_chat_model">نموذج إعادة الصياغة</string>
     <string name="dictate__providers_test">اختبار الاتصال</string>
-    <string name="dictate__providers_test_success">متصل · {count} نماذج</string>
-    <string name="dictate__providers_test_failed">فشل الاتصال</string>
+    <string name="dictate__providers_test_transcribe">اختبار التفريغ النصي</string>
+    <string name="dictate__providers_check_no_key">أدخل مفتاح واجهة البرمجة أولاً.</string>
+    <string name="dictate__providers_check_credentials_ok">تم التحقق من بيانات الاعتماد · {count} نموذجًا</string>
+    <string name="dictate__providers_check_credentials_ok_nocount">تم التحقق من بيانات الاعتماد</string>
+    <string name="dictate__providers_check_endpoint_ok">تم الوصول إلى الخادم · {count} نموذجًا</string>
+    <string name="dictate__providers_check_credentials_untested">لم يُختبر التفريغ النصي.</string>
+    <string name="dictate__providers_check_transcription_ok">تم التحقق من التفريغ النصي</string>
+    <string name="dictate__providers_check_transcription_text">جاء الرد: “{text}”</string>
+    <string name="dictate__providers_check_transcription_empty">نجح الطلب لكن لم يصل أي نص — الاتصال يعمل، لكن هذا النموذج لم يفهم العيّنة.</string>
+    <string name="dictate__providers_check_failed_connection">فشل اختبار الاتصال</string>
+    <string name="dictate__providers_check_failed_transcription">فشل اختبار التفريغ النصي</string>
+    <string name="dictate__providers_check_err_auth">رُفض المفتاح. تحقق منه ومن أن العنوان يخص الحساب نفسه.</string>
+    <string name="dictate__providers_check_err_quota">المفتاح يعمل، لكن الحساب استنفد حصته أو تجاوز حد الاستخدام. راجع خطتك لدى المزوّد.</string>
+    <string name="dictate__providers_check_err_network">تعذّر الوصول إلى الخادم. تحقق من العنوان ومن اتصالك بالإنترنت.</string>
+    <string name="dictate__providers_check_err_timeout">لا استجابة في الوقت المحدد. قد يكون المزوّد مشغولًا — أعد المحاولة.</string>
+    <string name="dictate__providers_check_err_server">أبلغ المزوّد عن خطأ من جانبه. لا شيء يمكن تغييره هنا؛ أعد المحاولة لاحقًا.</string>
+    <string name="dictate__providers_check_err_format">رفض المزوّد العيّنة الصوتية. قد لا يقبل هذه الصيغة.</string>
+    <string name="dictate__providers_check_err_unknown">فشل الطلب.</string>
+    <string name="dictate__providers_azure_link_signup">إنشاء حساب Azure</string>
+    <string name="dictate__providers_azure_link_portal">بوابة Azure</string>
+    <string name="dictate__providers_azure_link_guide">دليل الإعداد</string>
     <string name="dictate__providers_network_group">الشبكة</string>
     <string name="dictate__request_timeout_title">مهلة الطلب</string>
     <string name="dictate__request_timeout_summary">{v} ثانية · ارفعها إذا كان خادمك بطيئًا</string>
@@ -1251,8 +1292,10 @@
     <string name="dictate__recording_animation_static_description">يبقى نقطة حمراء ثابتة أثناء التسجيل</string>
     <string name="dictate__recording_animation_pulse_label">نابض</string>
     <string name="dictate__recording_animation_pulse_description">ينبض بوتيرة ثابتة</string>
-    <string name="dictate__recording_animation_level_label">يتبع صوتك</string>
+    <string name="dictate__recording_animation_level_label">يتبع صوتك (نقطة)</string>
     <string name="dictate__recording_animation_level_description">يتفاعل مع مستوى الميكروفون ليظهر أنه يلتقط صوتك</string>
+    <string name="dictate__recording_animation_wave_label">يتبع صوتك (موجة)</string>
+    <string name="dictate__recording_animation_wave_description">يرسم الثواني الأخيرة كموجة صوتية حية، لترى متى توقفت عن الكلام</string>
     <string name="dictate__skip_silent_title">تخطّي التسجيلات الصامتة</string>
     <string name="dictate__skip_silent_summary">تجنّب النصوص المُختلَقة واستدعاءات API المهدورة في الصوت الصامت</string>
     <string name="dictate__trim_silent_gaps_title">اقتصاص فترات التوقف الطويلة</string>
@@ -1329,6 +1372,26 @@
     <string name="dictate__custom_words_title">كلمات مخصّصة</string>
     <string name="dictate__custom_words_summary_empty">أضِف أسماء أو مصطلحات تقنية لكتابتها بشكل صحيح</string>
     <string name="dictate__custom_words_placeholder">مثال: FlorisBoard، Kubernetes، Renée، OAuth، Anthropic</string>
+    <string name="dictate__custom_words_summary">{count} كلمة · نحو {tokens} من {budget} رمزًا</string>
+    <string name="dictate__custom_words_budget_info">كل كلمة هنا تُرسل مع كل إملاء، ونموذج الكلام لا يقرأ منها سوى نحو {budget} رمزًا من السياق. قائمتك تشغل منها نحو {tokens}.</string>
+    <string name="dictate__custom_words_budget_over">قائمتك أطول مما يقرأه نموذج الكلام. يصل إليه نحو {fits} من كلماتك البالغة {count}، أما البقية فتُرسل مع كل إملاء ويجري تجاهلها. لمفردات أكثر استخدم الاستبدالات المخصصة — فهي دقيقة وتعمل دون اتصال ولا تكلف شيئًا.</string>
+    <string name="dictate__custom_words_import">استيراد قائمة كلمات</string>
+    <string name="dictate__custom_words_export">تصدير قائمة الكلمات</string>
+    <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
+    <string name="dictate__custom_words_import_title">استيراد قائمة كلمات</string>
+    <string name="dictate__custom_words_import_fitting">{count} كلمة جديدة من هذا الملف تتسع في قائمتك.</string>
+    <string name="dictate__custom_words_import_known">{count} منها كانت موجودة بالفعل.</string>
+    <string name="dictate__custom_words_import_nofit">{count} منها بقيت خارج القائمة — نموذج الكلام لا يقرأ سوى نحو {budget} رمزًا من السياق، فكانت سترسل مع كل إملاء ثم يجري تجاهلها.</string>
+    <string name="dictate__custom_words_import_unusable">{count} من الأسطر لم تحتوِ على شيء يُكتب، وجرى تخطيها.</string>
+    <string name="dictate__custom_words_import_truncated">لم تُقرأ سوى أول {count} مدخل من الملف.</string>
+    <string name="dictate__custom_words_import_also_dictionary">أضفها أيضًا إلى القاموس الشخصي</string>
+    <string name="dictate__custom_words_import_also_dictionary_summary">هذه القائمة تخبر نموذج الكلام فقط بكيفية كتابة الكلمة. أما القاموس الشخصي فهو ما تستخدمه لوحة المفاتيح أثناء الكتابة، وليس له حد للطول، لذا تدخل إليه كل كلمة في الملف وليس فقط ما يتسع أعلاه.</string>
+    <string name="dictate__custom_words_import_empty">لم يُعثر على كلمات في هذا الملف</string>
+    <string name="dictate__custom_words_import_done">تمت إضافة {count} كلمة</string>
+    <string name="dictate__custom_words_import_done_dictionary">تمت إضافة {count} كلمة، و{dict} إلى قاموسك الشخصي</string>
+    <string name="dictate__file_unreadable">تعذّرت قراءة هذا الملف</string>
+    <string name="dictate__file_export_done">تم حفظ الملف</string>
+    <string name="dictate__file_export_failed">تعذّرت كتابة هذا الملف</string>
     <string name="dictate__rewording_group">إعادة الصياغة (تحرير بالذكاء الاصطناعي)</string>
     <string name="dictate__rewording_title">إعادة الصياغة (ذكاء اصطناعي)</string>
     <string name="dictate__rewording_summary_on">مُفعّل – أعد الصياغة وترجم ونسّق بالذكاء الاصطناعي</string>
@@ -1508,6 +1571,16 @@
     <string name="dictate__mappings_field_to_placeholder">مثال: GitHub</string>
     <string name="dictate__mappings_group">قواعد الاستبدال</string>
     <string name="dictate__mappings_matchcase_summary">الاستبدال فقط عند تطابق حالة الأحرف تمامًا.</string>
+    <string name="dictate__mappings_import">استيراد القواعد</string>
+    <string name="dictate__mappings_export">تصدير القواعد</string>
+    <string name="dictate__mappings_export_filename">dictate_mappings.tsv</string>
+    <string name="dictate__mappings_import_title">استيراد القواعد</string>
+    <string name="dictate__mappings_import_message">{count} قاعدة جديدة في هذا الملف. هل تريد إضافتها إلى قائمتك؟</string>
+    <string name="dictate__mappings_import_known">{count} منها كانت موجودة بالفعل.</string>
+    <string name="dictate__mappings_import_unusable">{count} من الأسطر لم تحدد أي استبدال، وجرى تخطيها.</string>
+    <string name="dictate__mappings_import_format">قاعدة واحدة في كل سطر: ما يُسمع، ثم مسافة جدولة، ثم ما ينبغي أن يصير إليه.</string>
+    <string name="dictate__mappings_import_empty">لم يُعثر على قواعد في هذا الملف</string>
+    <string name="dictate__mappings_import_done">تمت إضافة {count} قاعدة</string>
     <string name="dictate__mappings_matchcase_title">مطابقة حالة الأحرف</string>
     <string name="dictate__mappings_opt_caseinsensitive">تجاهل حالة الأحرف</string>
     <string name="dictate__mappings_opt_casesensitive">حساس لحالة الأحرف</string>
@@ -1880,6 +1953,47 @@
     <string name="apptour61__outro_eyebrow">هذه هي 6.1</string>
     <string name="apptour61__outro_title">لوحة المفاتيح نفسها، بحواف أقل</string>
     <string name="apptour61__outro_body">لا يتغير شيء في طريقة إملائك حتى الآن — مفتاحك الخاص أو خادمك الخاص أو نموذج على الجهاز. تجد كل الجولات من جديد في الإعدادات › حول التطبيق.</string>
+    <string name="apptour62__cta_try">جرّبها</string>
+    <string name="apptour62__cta_manage">أين تُطفأ</string>
+    <string name="apptour62__art_word">زويا</string>
+    <string name="apptour62__art_emoji_word">كعكة</string>
+    <string name="apptour62__art_emoji">🍰</string>
+    <string name="apptour62__intro_eyebrow">Dictate 6.2</string>
+    <string name="apptour62__intro_title">تتعلّم كلماتك، ولها خمسة مظاهر جديدة</string>
+    <string name="apptour62__intro_body">صارت لوحة المفاتيح تتذكّر الكلمات التي لا يعرفها أي قاموس، ويمكن للمفاتيح أن تُظهر التطبيق من خلفها، ولكل إبهام نصفه الخاص. وإلى جانب ذلك حفنة من المساعدات الصغيرة لما تفعله كل يوم.</string>
+    <string name="apptour62__learning_eyebrow">جديد: تتعلّم أثناء كتابتك</string>
+    <string name="apptour62__learning_title">الكلمات التي لا يعرفها أي قاموس</string>
+    <string name="apptour62__learning_body">اكتب اسمًا أو مصطلحًا مرات كافية، فتحتفظ به لوحة المفاتيح: تتوقف عن اعتباره خطأ وتبدأ باقتراحه. هذا التحديث يشغّل الميزة للجميع، بمن فيهم من كان قد أطفأها. ولا يُتعلَّم شيء في وضع التصفح المتخفي ولا في حقول كلمات المرور ولا مما لم تكتبه حرفًا بحرف؛ ويبقى كل شيء على هذا الجهاز، والزر أدناه يفتح القائمة — والمفتاح.</string>
+    <string name="apptour62__themes_eyebrow">خمسة مظاهر جديدة</string>
+    <string name="apptour62__themes_title">Glass وSand وDeep وE-Ink ليلي</string>
+    <string name="apptour62__themes_body">يُظهر Dictate Glass التطبيق من خلال الفراغات بين المفاتيح، بينما تبقى المفاتيح نفسها معتمة بما يكفي للقراءة عليها؛ ويذهب Glass Clear أبعد ويبدو أجمل، مقابل أن يظهر نص التطبيقات التي ترسم خلف لوحة المفاتيح من خلالها. وSand مظهر فاتح دافئ، وDeep مظهر داكن هادئ، وصار لـ E-Ink أخيرًا نسخة ليلية — فلم تعد المبادلة التلقائية تعطيك لوحة مفاتيح بيضاء بعد حلول الظلام.</string>
+    <string name="apptour62__split_eyebrow">جديد: لوحة مفاتيح مقسومة</string>
+    <string name="apptour62__split_title">كلا الإبهامين، بلا مدّ اليد</string>
+    <string name="apptour62__split_body">إجراء سريع جديد، إلى جانب وضع اليد الواحدة والوضع العائم، يفرّق الصفوف ليبقى كل إبهام في نصفه. وكل التخطيطات تنقسم، لا QWERTY وحدها، لأن موضع القسمة يُحسب من عرض المفاتيح بدل أن يُكتب في كل تخطيط. وفي الوضع الأفقي يبقى التطبيق ظاهرًا كلما اتّسع المكان للاثنين.</string>
+    <string name="apptour62__emoji_eyebrow">الإيموجي</string>
+    <string name="apptour62__emoji_title">الكلمة تجد إيموجيها</string>
+    <string name="apptour62__emoji_body">اكتب كلمة، فيظهر الإيموجي الذي يعنيها في شريط الاقتراحات — بنحو خمسين لغة، من البيانات نفسها التي يستخدمها النظام. وهو يسير إلى جانب الاقتراحات بدل أن يأخذ مقعد أحدها. وهناك أيضًا صف اختياري لإيموجياتك المثبّتة والمستخدمة حديثًا فوق المفاتيح.</string>
+    <string name="apptour62__helpers_eyebrow">أربعة مساعدات صغيرة</string>
+    <string name="apptour62__helpers_title">التخفي، روابط نظيفة، وجواب العملية الحسابية</string>
+    <string name="apptour62__helpers_body">يمنع وضع التصفح المتخفي تذكّر أي شيء ما دام مفعّلًا — لا تعلّم ولا حفظ. ويمكن إزالة معاملات التتبع من الروابط الملصوقة قبل وصولها إلى الحقل. اكتب عملية حسابية تنتهي بـ = فتظهر النتيجة كاقتراح. وعند تشغيل صف الأرقام تعود الحروف تُظهر أرقامها.</string>
+    <string name="apptour62__selection_eyebrow">التحديد والتنقل</string>
+    <string name="apptour62__selection_title">اعرف كم حدّدت</string>
+    <string name="apptour62__selection_body">الصف الذي كان يقف فارغًا أثناء التحديد صار يعدّ كلماته وحروفه. وأزرار جديدة تقفز إلى بداية الحقل ونهايته تمامًا، ويمكن للنسخ أن يترك المسافات الزائدة عند الأطراف خلفه. ويتنحّى صف الإجراءات جانبًا فور بدء التحديد بدل أن يزاحمه.</string>
+    <string name="apptour62__clipboard_eyebrow">الحافظة</string>
+    <string name="apptour62__clipboard_title">ابحث عن قصاصة بما فيها</string>
+    <string name="apptour62__clipboard_body">صار بالإمكان البحث في الحافظة، عبر كل ما فيها. وما نسخته للتو يُعرض في شريط الاقتراحات كقُرص يمكنك صرفه، ونسخ النص نفسه مرتين يُحسب مرتين، فيعود من جديد. وحذف قصاصة صار يحذف الملف خلفها أيضًا، بدل ترك الصورة على هاتفك.</string>
+    <string name="apptour62__gestures_eyebrow">الإيماءات</string>
+    <string name="apptour62__gestures_title">‏?123 مع الاستمرار، ثم التمرير والإفلات</string>
+    <string name="apptour62__gestures_body">اضغط مع الاستمرار على مفتاح الرموز، مرّر إلى الحرف الذي تريده ثم أفلت: يُدرَج الحرف وتعود الحروف الأبجدية، دون تنقّل ذهابًا وإيابًا. والسحب لأعلى على مفتاح المسافة صار يصل إلى السطر الذي فوقه، لا إلى الكلمة السابقة فقط. والمسافة بين المفاتيح يمكن ضبطها ضمن مدى يُرى فعلًا.</string>
+    <string name="apptour62__export_eyebrow">جديد: الإملاءات كملفات</string>
+    <string name="apptour62__export_title">كل إملاء في مجلد تختاره</string>
+    <string name="apptour62__export_body">اختر مجلدًا مرة واحدة، فيُكتب كل إملاء منتهٍ فيه أيضًا كملف نصي بسيط، في اللحظة التي ينتهي فيها. وأيًّا كان ما يراقب ذلك المجلد — تطبيق ملاحظات أو أداة مزامنة أو نسختك الاحتياطية — فسيحصل على نصوصك دون أن يضطر Dictate إلى تعلّم لغته.</string>
+    <string name="apptour62__more_eyebrow">وأيضًا</string>
+    <string name="apptour62__more_title">أشياء صغيرة كثيرة</string>
+    <string name="apptour62__more_body">صارت الاقتراحات ترى الكلمتين السابقتين للمؤشر في كل لغة، لا في الإنجليزية وحدها. ويمكن إنشاء نسخة احتياطية بلا مفاتيح الواجهات البرمجية، فتُمرَّر بأمان. ونماذج التفريغ الخاصة بـ Azure صارت متاحة، واختيار نموذج للعمل دون اتصال صار يبدّل إلى المحرك المحلي أيضًا، ولكل طلب مهلة تناسب انتظاره. وتظهر الإملاءات في السجل لحظة إرسالها، وتقول عمليات الاستيراد في أي خطوة هي ويمكن إلغاؤها، ويصل النص بثبات أكبر إلى التطبيقات التي كانت عسيرة معه.</string>
+    <string name="apptour62__outro_eyebrow">هذه هي 6.2</string>
+    <string name="apptour62__outro_title">اللوحة نفسها، وأكثر منها لك</string>
+    <string name="apptour62__outro_body">لا يتغير شيء في طريقة إملائك — مفتاحك الخاص أو خادمك الخاص أو نموذج على الجهاز. تجد كل الجولات من جديد في الإعدادات › حول التطبيق.</string>
     <string name="changelog__v5_0_0">• جديد: الكتابة بالسحب — اسحب عبر المفاتيح لكتابة كلمات كاملة، مع قواميس لكل لغة تُنزَّل عند الطلب. 👆\n• جديد: اقتراحات الكلمات والتصحيح التلقائي — تُصحَّح الأخطاء المطبعية تلقائيًا وتبقى الكلمة التي كتبتها على بُعد نقرة واحدة. ✨\n• جديد: النسخ الفوري — شاهد كلماتك تظهر أثناء حديثك، مع OpenAI وDeepgram وSoniox وAssemblyAI وElevenLabs. ⚡\n• جديد: ثلاثة مزوّدي نسخ إضافيين — ElevenLabs Scribe وDeepgram وAssemblyAI. ☁️\n• جديد: تخطيط الإملاء الكلاسيكي — عادت شاشة الصوت بلا لوحة مفاتيح من Dictate 3، مثبتة أو على بُعد سحبة واحدة. 🎙️\n• جديد: مكتبة موجّهات المجتمع — تصفح موجّهات إعادة الصياغة وشاركها. 📚\n• جديد: إحصاءات الإملاء مع محطات إنجاز. 📊\n• جديد: نموذج NVIDIA Parakeet دون اتصال، إضافة إلى مرشّح صمت يتخطى التسجيلات الفارغة. 📴\n• المزيد: زر عائم أكثر ثباتًا، والتحكم في جهد الاستدلال، وردود لمسية، وسمة E-Reader جديدة، وعشرات الإصلاحات. 🛠️</string>
     <string name="media__tab__gifs">GIFs</string>
     <string name="prefs__media__gif__title">GIFs</string>
@@ -2086,4 +2200,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">مجلد الملصقات</string>
+    <string name="scan__take_photo">التقاط صورة</string>
+    <string name="scan__pick_image">اختيار صورة</string>
+    <string name="scan__retake">إعادة المحاولة</string>
+    <string name="scan__empty_hint">صوّر نصًا مطبوعًا ثم انقر على الجزء الذي تريده.</string>
+    <string name="scan__latin_only">الحروف اللاتينية فقط</string>
+    <string name="scan__reading">جارٍ قراءة الصورة…</string>
+    <string name="scan__no_text">لم يُعثر على نص في الصورة.</string>
+    <string name="scan__failed">تعذّرت قراءة الصورة.</string>
+    <string name="scan__no_camera">لم يُعثر على تطبيق كاميرا.</string>
+    <string name="scan__select_all">تحديد الكل</string>
+    <string name="scan__discard">تجاهل</string>
+    <string name="scan__approve">قبول</string>
 </resources>

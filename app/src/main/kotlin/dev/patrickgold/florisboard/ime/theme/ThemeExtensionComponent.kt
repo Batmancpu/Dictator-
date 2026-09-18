@@ -37,6 +37,15 @@ inline fun extPreviewTheme(id: String) = ExtensionComponentName(
     componentId = id,
 )
 
+/**
+ * The measured high-contrast pair (#387) — every label and icon at 7:1 or better against the surface it
+ * sits on, borders on, nothing translucent, and no `--primary` for the user's accent to overwrite. The
+ * switch on the Theme screen sets both of these at once; `HighContrastThemeTest` is what keeps the
+ * numbers true.
+ */
+val HighContrastDayTheme = extCoreTheme("dictate_contrast")
+val HighContrastNightTheme = extCoreTheme("dictate_contrast_night")
+
 interface ThemeExtensionComponent : ExtensionComponent {
     companion object {
         fun defaultStylesheetPath(id: String): String {

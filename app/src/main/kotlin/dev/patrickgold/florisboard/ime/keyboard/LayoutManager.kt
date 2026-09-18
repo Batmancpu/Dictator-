@@ -393,10 +393,6 @@ class LayoutManager(context: Context) {
                 main = LTN(LayoutType.CHARACTERS, subtype.layoutMap.characters)
                 modifier = LTN(LayoutType.CHARACTERS_MOD, extCoreLayout("default"))
             }
-            KeyboardMode.EDITING -> {
-                // Layout for this mode is defined in custom layout xml file.
-                return@async TextKeyboard(arrayOf(), keyboardMode, null, null)
-            }
             KeyboardMode.NUMERIC -> {
                 main = LTN(LayoutType.NUMERIC, subtype.layoutMap.numeric)
             }

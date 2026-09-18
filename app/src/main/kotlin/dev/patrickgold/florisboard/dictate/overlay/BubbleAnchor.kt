@@ -21,6 +21,34 @@ enum class BubbleEdge {
 }
 
 /**
+ * The bubble's horizontal position, measured from the other end of the screen (issue #399).
+ *
+ * The pill is the only design that changes size — a recording adds an elapsed timer and a waveform to it
+ * — and which end of it holds still decides whether the button the user tapped is still under their
+ * finger a moment later. The overlay window is therefore measured *from the wall the bubble is parked
+ * at*: its `x` is the gap to that wall, and the edge against the wall is the one the window manager holds
+ * still when the window changes size, in the same relayout that carries the new width. That is what lets
+ * the pill open as smoothly on the right as it always did on the left, where the fixed edge and the edge
+ * the window is measured from have always been the same one.
+ *
+ * The controller itself keeps thinking in left edges, because the anchor, the drag and the side buttons
+ * all do, so every read and write of the window's `x` on the right goes through this conversion. It is
+ * its own inverse: a left edge in gives the gap to the wall out, and the other way round. On the left the
+ * two are the same number.
+ *
+ * Kept next to the anchor, and free of Android types, because it is the second half of the same question
+ * — the anchor says which wall the bubble is parked at, this says what a position means from that wall —
+ * and because both are arithmetic that should be provable without a phone.
+ *
+ * @param x A left edge, or the gap to the right wall; the result is the other one.
+ * @param width The bubble's width.
+ * @param screenWidth The width of the frame the bubble is placed in.
+ * @param onRight Whether the bubble is on the right-hand side of the screen.
+ */
+fun bubbleXFromWall(x: Int, width: Int, screenWidth: Int, onRight: Boolean): Int =
+    if (onRight) screenWidth - x - width else x
+
+/**
  * Where the floating button sits, expressed as what the user meant rather than where the pixels were
  * (issue #323).
  *

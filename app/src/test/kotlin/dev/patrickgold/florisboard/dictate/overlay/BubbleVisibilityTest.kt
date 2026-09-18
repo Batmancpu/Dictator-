@@ -43,6 +43,7 @@ class BubbleVisibilityTest {
         hiddenByOwnKeyboard: Boolean = false,
         recognitionActive: Boolean = false,
         screenOn: Boolean = true,
+        allowedInApp: Boolean = true,
     ) = BubbleVisibility.shouldShow(
         enabled = enabled,
         focused = focused,
@@ -50,6 +51,7 @@ class BubbleVisibilityTest {
         hiddenByOwnKeyboard = hiddenByOwnKeyboard,
         recognitionActive = recognitionActive,
         screenOn = screenOn,
+        allowedInApp = allowedInApp,
     )
 
     @Test
@@ -85,12 +87,28 @@ class BubbleVisibilityTest {
         assertFalse(BubbleVisibility.pinsBubble(failed))
     }
 
-    /** Each of the three suppressors wins over both reasons to show, including a live recording. */
+    /** Each of the suppressors wins over both reasons to show, including a live recording. */
     @Test
     fun `the suppressors win over everything`() {
         assertFalse(shown(state = recording, focused = true, enabled = false))
         assertFalse(shown(state = recording, focused = true, hiddenByOwnKeyboard = true))
         assertFalse(shown(state = recording, focused = true, recognitionActive = true))
         assertFalse(shown(state = recording, focused = true, screenOn = false))
+        assertFalse(shown(state = recording, focused = true, allowedInApp = false))
+    }
+
+    /**
+     * The decision behind that last line, written out (#392): a dictation started in one app and carried
+     * into an app the user has filtered the button out of does **not** bring the button with it. "Never
+     * over my banking app" is about the window, and a recording walking in is the one case where the
+     * promise would otherwise break. The recording itself is not this rule's business — it belongs to the
+     * microphone foreground service and keeps running (#293).
+     */
+    @Test
+    fun `a filtered-out app beats a dictation in flight`() {
+        assertTrue(shown(state = recording))
+        assertFalse(shown(state = recording, allowedInApp = false))
+        assertFalse(shown(state = transcribing, allowedInApp = false))
+        assertFalse(shown(focused = true, allowedInApp = false))
     }
 }

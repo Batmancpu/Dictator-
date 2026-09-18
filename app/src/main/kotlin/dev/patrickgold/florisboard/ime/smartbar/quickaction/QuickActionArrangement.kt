@@ -73,6 +73,10 @@ data class QuickActionArrangement(
                 // button – it lives as a chip inside the prompt panel/row – so only the panel opener
                 // (DICTATE_PROMPTS) remains here.
                 QuickAction.InsertKey(TextKeyData.DICTATE_PROMPTS),
+                // The text editing panel (issue #386) — cursor pad, select, clipboard — high in the
+                // default order because it is the one surface that replaces a dozen of the actions
+                // further down this list, and because a panel nobody finds is a panel nobody has.
+                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_EDITING),
                 QuickAction.InsertKey(TextKeyData.CLIPBOARD_SELECT_ALL),
                 QuickAction.InsertKey(TextKeyData.UNDO),
                 QuickAction.InsertKey(TextKeyData.REDO),
@@ -90,6 +94,10 @@ data class QuickActionArrangement(
                 // Local sticker panel (issue #280): the folder the user picked, no network involved.
                 // Like the GIF action it sits in the list until dragged into the bar.
                 QuickAction.InsertKey(TextKeyData.IME_UI_MODE_STICKER),
+                // Scan text (issue #390): camera → recognised lines → the one you tap. Here and not
+                // higher up, because it is answering a question most fields never ask; the issue itself
+                // says it is not a Smartbar default.
+                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_SCAN),
                 QuickAction.InsertKey(TextKeyData.TOGGLE_COMPACT_LAYOUT),
                 // Split keyboard for two thumbs on a wide window (issue #362). Next to one-handed
                 // because they are the same kind of answer: greyed out below 600dp, where two halves
@@ -121,6 +129,12 @@ data class QuickActionArrangement(
                 // end for the same reason: worth having in the list, not worth a Smartbar slot for
                 // everyone who never turned the row on in the first place.
                 QuickAction.InsertKey(TextKeyData.TOGGLE_NUMBER_ROW),
+                // The number pad (issue #388). It has always been built and styled, but the only ways to
+                // ask for it were a numeric field deciding for you and a keyboard-mode cycle nobody binds
+                // to a gesture. Next to the number-row toggle because that is the other digit answer, and
+                // at the end for the same reason as the GIF and sticker panels: an IBAN or a serial number
+                // is a real errand, but not one often enough to spend a Smartbar slot on for everyone.
+                QuickAction.InsertKey(TextKeyData.VIEW_NUMERIC_ADVANCED),
             ),
             hiddenActions = listOf(
             ),

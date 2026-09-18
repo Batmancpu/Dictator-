@@ -92,7 +92,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -132,6 +131,7 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.withTimeoutOrNull
+import org.florisboard.lib.compose.onAccent
 import org.florisboard.lib.compose.stringRes
 import org.florisboard.lib.snygg.SnyggSelector
 import org.florisboard.lib.snygg.ui.SnyggColumn
@@ -502,6 +502,16 @@ private fun LegacyActionKey(
         LegacyEditAction.END -> ThemedIconKey(KeyCode.MOVE_END_OF_PAGE, action.icon, label, modifier) {
             keyboardManager.tapKey(KeyCode.MOVE_END_OF_PAGE)
         }
+        // The editing panel (#386) — set directly like the other panel openers above, rather than
+        // through the key code, because this layout never shows a Smartbar for the key to come from.
+        LegacyEditAction.EDITING -> ThemedIconKey(KeyCode.NOOP, action.icon, label, modifier) {
+            keyboardManager.activeState.imeUiMode = ImeUiMode.EDITING
+        }
+        // Scan text (issue #390), opened the same direct way. The panel asks for the photo itself, so
+        // this is only ever a way in, never a shutter.
+        LegacyEditAction.SCAN -> ThemedIconKey(KeyCode.NOOP, action.icon, label, modifier) {
+            keyboardManager.activeState.imeUiMode = ImeUiMode.SCAN
+        }
     }
 }
 
@@ -565,7 +575,7 @@ private fun LegacyRecordRow(
     val rewording = dictateState as? DictateController.UiState.Rewording
     // The button is non-interactive while the audio is being transcribed or reworded.
     val busy = dictateState is DictateController.UiState.Transcribing || rewording != null
-    val onAccent = if (accent.luminance() > 0.5f) Color.Black else Color.White
+    val onAccent = accent.onAccent()
     val sideKey = Modifier.fillMaxHeight().aspectRatio(1f)
 
     // Long-form segmented dictation (#170): whether the "Next segment" button replaces pause and how many
@@ -614,7 +624,9 @@ private fun LegacyRecordRow(
         // thumb, so the same factors that read well on a 12 dp dot would be jarring here.
         val animation by prefs.dictate.recordingAnimation.collectAsState()
         val isRecording = recording != null && !recording.paused
-        val level = if (animation == DictateRecordingAnimation.LEVEL && isRecording) {
+        // WAVE has no home on a button the size of a thumb, so here it is treated as LEVEL (#371) — the
+        // waveform belongs to the Smartbar's bar, this key keeps following the voice by size.
+        val level = if (animation.followsVoice && isRecording) {
             DictateController.audioLevel.collectAsState().value
         } else {
             0f
@@ -626,7 +638,7 @@ private fun LegacyRecordRow(
             animationSpec = infiniteRepeatable(tween(PULSE_DURATION_MS), RepeatMode.Reverse),
             label = "recordPulse",
         )
-        val recordScale = if (animation == DictateRecordingAnimation.LEVEL) 1f + 0.03f * level else pulse
+        val recordScale = if (animation.followsVoice) 1f + 0.03f * level else pulse
         val interaction = remember { MutableInteractionSource() }
         val feedback = LocalInputFeedbackController.current
         Box(
@@ -928,7 +940,7 @@ private fun EnterCharPopup(
     selectedIndex: Int,
     accent: Color,
 ) {
-    val onAccent = if (accent.luminance() > 0.5f) Color.Black else Color.White
+    val onAccent = accent.onAccent()
     val positionProvider = remember {
         object : PopupPositionProvider {
             override fun calculatePosition(

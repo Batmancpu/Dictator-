@@ -2,7 +2,7 @@
   "$": "ime.extension.theme",
   "meta": {
     "id": "org.florisboard.themes",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "title": "Dictate Keyboard default themes",
     "description": "Default themes (both day and night) for the keyboard UI",
     "maintainers": [
@@ -37,14 +37,26 @@
       "isNight": true
     },
     {
+      "id": "dictate_contrast",
+      "label": "Dictate High Contrast (Day)",
+      "authors": [ "DevEmperor" ],
+      "isNight": false
+    },
+    {
+      "id": "dictate_contrast_night",
+      "label": "Dictate High Contrast (Night)",
+      "authors": [ "DevEmperor" ],
+      "isNight": true
+    },
+    {
       "id": "dictate_eink",
-      "label": "Dictate E-Ink (High Contrast)",
+      "label": "Dictate E-Ink (Day)",
       "authors": [ "DevEmperor" ],
       "isNight": false
     },
     {
       "id": "dictate_eink_night",
-      "label": "Dictate E-Ink Night (High Contrast)",
+      "label": "Dictate E-Ink (Night)",
       "authors": [ "DevEmperor" ],
       "isNight": true
     },

@@ -94,6 +94,8 @@ fun QuickAction.computeDisplayName(evaluator: ComputingEvaluator): String {
             KeyCode.IME_UI_MODE_MEDIA -> R.string.quick_action__ime_ui_mode_media
             KeyCode.IME_UI_MODE_GIF -> R.string.quick_action__ime_ui_mode_gif
             KeyCode.IME_UI_MODE_STICKER -> R.string.quick_action__ime_ui_mode_sticker
+            KeyCode.IME_UI_MODE_EDITING -> R.string.quick_action__ime_ui_mode_editing
+            KeyCode.IME_UI_MODE_SCAN -> R.string.quick_action__ime_ui_mode_scan
             KeyCode.IME_UI_MODE_DICTATE -> R.string.quick_action__ime_ui_mode_dictate
             KeyCode.DICTATE_LIVE_PROMPT -> R.string.quick_action__dictate_live_prompt
             KeyCode.DICTATE_PROMPTS -> R.string.quick_action__dictate_prompts
@@ -113,6 +115,7 @@ fun QuickAction.computeDisplayName(evaluator: ComputingEvaluator): String {
             KeyCode.SPLIT_LAYOUT -> R.string.quick_action__split_layout
             KeyCode.TOGGLE_RESIZE_MODE -> R.string.quick_action__resize_mode
             KeyCode.TOGGLE_NUMBER_ROW -> R.string.quick_action__toggle_number_row
+            KeyCode.VIEW_NUMERIC_ADVANCED -> R.string.quick_action__view_numeric_advanced
             KeyCode.DRAG_MARKER -> if (evaluator.state.debugShowDragAndDropHelpers) {
                 R.string.quick_action__drag_marker
             } else {
@@ -144,6 +147,8 @@ fun QuickAction.computeTooltip(evaluator: ComputingEvaluator): String {
             KeyCode.IME_UI_MODE_MEDIA -> R.string.quick_action__ime_ui_mode_media__tooltip
             KeyCode.IME_UI_MODE_GIF -> R.string.quick_action__ime_ui_mode_gif__tooltip
             KeyCode.IME_UI_MODE_STICKER -> R.string.quick_action__ime_ui_mode_sticker__tooltip
+            KeyCode.IME_UI_MODE_EDITING -> R.string.quick_action__ime_ui_mode_editing__tooltip
+            KeyCode.IME_UI_MODE_SCAN -> R.string.quick_action__ime_ui_mode_scan__tooltip
             KeyCode.IME_UI_MODE_DICTATE -> R.string.quick_action__ime_ui_mode_dictate__tooltip
             KeyCode.DICTATE_LIVE_PROMPT -> R.string.quick_action__dictate_live_prompt__tooltip
             KeyCode.DICTATE_PROMPTS -> R.string.quick_action__dictate_prompts__tooltip
@@ -163,6 +168,7 @@ fun QuickAction.computeTooltip(evaluator: ComputingEvaluator): String {
             KeyCode.SPLIT_LAYOUT -> R.string.quick_action__split_layout__tooltip
             KeyCode.TOGGLE_RESIZE_MODE -> R.string.quick_action__resize_mode__tooltip
             KeyCode.TOGGLE_NUMBER_ROW -> R.string.quick_action__toggle_number_row__tooltip
+            KeyCode.VIEW_NUMERIC_ADVANCED -> R.string.quick_action__view_numeric_advanced__tooltip
             KeyCode.DRAG_MARKER -> if (evaluator.state.debugShowDragAndDropHelpers) {
                 R.string.quick_action__drag_marker__tooltip
             } else {

@@ -376,6 +376,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             SwipeAction.SHOW_INPUT_METHOD_PICKER -> TextKeyData.SYSTEM_INPUT_METHOD_PICKER
             SwipeAction.SHOW_SUBTYPE_PICKER -> TextKeyData.SHOW_SUBTYPE_PICKER
             SwipeAction.SWITCH_TO_CLIPBOARD_CONTEXT -> TextKeyData.IME_UI_MODE_CLIPBOARD
+            SwipeAction.SWITCH_TO_EDITING_CONTEXT -> TextKeyData.IME_UI_MODE_EDITING
             SwipeAction.SWITCH_TO_MEDIA_CONTEXT -> TextKeyData.IME_UI_MODE_MEDIA
             SwipeAction.SWITCH_TO_PREV_SUBTYPE -> TextKeyData.IME_PREV_SUBTYPE
             SwipeAction.SWITCH_TO_NEXT_SUBTYPE -> TextKeyData.IME_NEXT_SUBTYPE
@@ -1401,7 +1402,6 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         if (returnToPanel) activeState.imeUiMode = ImeUiMode.GIF
     }
 
-
     override fun onInputKeyDown(data: KeyData) {
         val windowController = FlorisImeService.windowControllerOrNull()
         windowController?.editor?.disableIfNoGestureInProgress()
@@ -1428,9 +1428,9 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             pendingAutoCorrection = null
         }
         val windowController = FlorisImeService.windowControllerOrNull() ?: return@batchEdit
-        // Only one of the three can be open at a time — each is reached from its own panel — so the
+        // Only one of the four can be open at a time — each is reached from its own panel — so the
         // first one that answers has consumed the key.
-        val consumedBySearch = handleSearchKey(
+        val consumedInSmartbarSlot = handleSearchKey(
             query = emojiSearchQuery,
             data = data,
             onEnter = { /* swallow: the results are already filtered */ },
@@ -1451,7 +1451,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             onEnter = { /* swallow: the results are already filtered */ },
             onExit = { closeClipboardSearch() },
         )
-        if (consumedBySearch) {
+        if (consumedInSmartbarSlot) {
             return@batchEdit
         }
         when (data.code) {
@@ -1506,9 +1506,18 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             KeyCode.IME_HIDE_UI -> FlorisImeService.hideUi()
             KeyCode.IME_PREV_SUBTYPE -> subtypeManager.switchToPrevSubtype()
             KeyCode.IME_NEXT_SUBTYPE -> subtypeManager.switchToNextSubtype()
-            KeyCode.IME_UI_MODE_TEXT -> { closeEmojiSearch(returnToMedia = false); activeState.imeUiMode = ImeUiMode.TEXT }
-            KeyCode.IME_UI_MODE_MEDIA -> { closeEmojiSearch(returnToMedia = false); activeState.imeUiMode = ImeUiMode.MEDIA }
-            KeyCode.IME_UI_MODE_CLIPBOARD -> { closeEmojiSearch(returnToMedia = false); activeState.imeUiMode = ImeUiMode.CLIPBOARD }
+            KeyCode.IME_UI_MODE_TEXT -> {
+                closeEmojiSearch(returnToMedia = false)
+                activeState.imeUiMode = ImeUiMode.TEXT
+            }
+            KeyCode.IME_UI_MODE_MEDIA -> {
+                closeEmojiSearch(returnToMedia = false)
+                activeState.imeUiMode = ImeUiMode.MEDIA
+            }
+            KeyCode.IME_UI_MODE_CLIPBOARD -> {
+                closeEmojiSearch(returnToMedia = false)
+                activeState.imeUiMode = ImeUiMode.CLIPBOARD
+            }
             // Opens the KLIPY GIF search panel (its own ImeUiMode, like the media/history panels); resets
             // any previous search so it opens on the home view (recent GIFs + trending).
             KeyCode.IME_UI_MODE_GIF -> {
@@ -1520,6 +1529,19 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             KeyCode.IME_UI_MODE_STICKER -> {
                 closeEmojiSearch(returnToMedia = false)
                 activeState.imeUiMode = ImeUiMode.STICKER
+            }
+            // Opens the text editing panel (issue #386). The keys on it send the very codes handled in
+            // this `when`, so the panel adds a surface and no second implementation of anything.
+            KeyCode.IME_UI_MODE_EDITING -> {
+                closeEmojiSearch(returnToMedia = false)
+                activeState.imeUiMode = ImeUiMode.EDITING
+            }
+            // Opens the scan panel (issue #390). Nothing is captured here — the panel is the surface that
+            // asks for a photo, so that opening it from an old session shows what was already recognised
+            // instead of firing the camera at whoever only wanted to look.
+            KeyCode.IME_UI_MODE_SCAN -> {
+                closeEmojiSearch(returnToMedia = false)
+                activeState.imeUiMode = ImeUiMode.SCAN
             }
             KeyCode.IME_UI_MODE_DICTATE -> dev.patrickgold.florisboard.dictate.DictateController.onMicClick(appContext)
             KeyCode.DICTATE_LIVE_PROMPT -> dev.patrickgold.florisboard.dictate.DictateController.startLivePrompt(appContext)
@@ -1859,6 +1881,16 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
                     // Opens the transcription history panel (issue #140); greyed out only when the history
                     // feature itself is turned off, since the panel is otherwise always available.
                     dev.patrickgold.florisboard.dictate.DictateController.isHistoryEnabled()
+                }
+                KeyCode.VIEW_NUMERIC_ADVANCED -> {
+                    // The number-pad action (issue #388) is for digits in an ordinary text field. In a
+                    // number or phone field the pad is already what opens, so the action can only take
+                    // something away: those layouts deliberately have no ABC key, while the advanced pad
+                    // has one, and it leads to letters with no route back to the digits short of leaving
+                    // the field and coming back. Greyed out rather than hidden, like the split-layout
+                    // action, so a button the user placed in the bar does not disappear from under them.
+                    editorInfo.inputAttributes.type != InputAttributes.Type.NUMBER &&
+                        editorInfo.inputAttributes.type != InputAttributes.Type.PHONE
                 }
                 else -> true
             }

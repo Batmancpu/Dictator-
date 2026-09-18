@@ -90,8 +90,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -391,6 +395,27 @@ object DictateController {
      * read-and-reset peak. Values are smoothed and normalized to 0..1 at 20 Hz.
      */
     val audioLevel: StateFlow<Float> = _audioLevel.asStateFlow()
+
+    private val _audioPeak = MutableSharedFlow<Float>(
+        replay = 0,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+    /**
+     * The same 20 Hz microphone measurement as [audioLevel], but *without* the attack/release smoothing —
+     * each value is the gated, curved peak of its own 50 ms window and nothing else (issue #371).
+     *
+     * A waveform needs this rather than [audioLevel]: the smoother's release of 0.2 per sample takes about
+     * half a second to fall back to zero, so a scrolling trace fed from it would still be drawing bars
+     * half a second after the speaker went quiet — and "am I quiet yet" is the entire question the
+     * waveform exists to answer. The dot keeps the smoothed value, where the damping is what stops it
+     * flickering.
+     *
+     * A stream of events rather than a [StateFlow] on purpose: a state flow conflates equal values, and
+     * silence is a run of exact zeros — the trace would stop scrolling at the very moment the user is
+     * watching it to see that it has gone flat.
+     */
+    val audioPeak: SharedFlow<Float> = _audioPeak.asSharedFlow()
     private var audioLevelJob: Job? = null
 
     // While a recording is active we listen for the screen turning off (device locked / display timeout):
@@ -589,8 +614,12 @@ object DictateController {
     private const val REALTIME_TAIL_IDLE_MS = 1_200L
     private const val REALTIME_TAIL_MAX_MS = 8_000L
 
-    /** 20 Hz is responsive for a voice indicator while avoiding a display-rate UI loop. */
-    private const val AUDIO_LEVEL_SAMPLE_MS = 50L
+    /**
+     * 20 Hz is responsive for a voice indicator while avoiding a display-rate UI loop. Internal because
+     * the waveform (#371) draws one bar per sample and has to scroll at exactly this rate; a copy of the
+     * number in the renderer would eventually drift from this one.
+     */
+    internal const val AUDIO_LEVEL_SAMPLE_MS = 50L
 
     /** Shortest gap between two wake-up pokes at a sleeping rewording server (#189). */
     private const val WARM_UP_THROTTLE_MS = 60_000L
@@ -1310,9 +1339,11 @@ object DictateController {
                 } else {
                     smoother.update(recorder?.maxAmplitude() ?: 0)
                 }
+                _audioPeak.tryEmit(smoother.peak)
                 delay(AUDIO_LEVEL_SAMPLE_MS)
             }
             _audioLevel.value = smoother.reset()
+            _audioPeak.tryEmit(smoother.peak)
         }
     }
 

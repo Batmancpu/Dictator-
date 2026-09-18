@@ -20,12 +20,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brightness2
 import androidx.compose.material.icons.filled.BrightnessAuto
 import androidx.compose.material.icons.filled.ColorLens
+import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.WbTwilight
+import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -36,6 +39,8 @@ import dev.patrickgold.florisboard.app.Routes
 import dev.patrickgold.florisboard.app.enumDisplayEntriesOf
 import dev.patrickgold.florisboard.app.ext.AddonManagementReferenceBox
 import dev.patrickgold.florisboard.app.ext.ExtensionListScreenType
+import dev.patrickgold.florisboard.ime.theme.HighContrastDayTheme
+import dev.patrickgold.florisboard.ime.theme.HighContrastNightTheme
 import dev.patrickgold.florisboard.ime.theme.ThemeManager
 import dev.patrickgold.florisboard.ime.theme.ThemeMode
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
@@ -47,6 +52,7 @@ import dev.patrickgold.jetpref.datastore.ui.ListPreference
 import dev.patrickgold.jetpref.datastore.ui.LocalTimePickerPreference
 import dev.patrickgold.jetpref.datastore.ui.Preference
 import dev.patrickgold.jetpref.datastore.ui.isMaterialYou
+import kotlinx.coroutines.launch
 import org.florisboard.lib.color.ColorMappings
 import org.florisboard.lib.compose.stringRes
 
@@ -69,7 +75,39 @@ fun ThemeScreen() = FlorisScreen {
     content {
         val dayThemeId by prefs.theme.dayThemeId.collectAsState()
         val nightThemeId by prefs.theme.nightThemeId.collectAsState()
+        val scope = rememberCoroutineScope()
 
+        // Not a preference of its own: the switch *is* the pair of theme ids, so choosing another theme
+        // by hand below turns it off rather than leaving a stored "on" that contradicts the keyboard.
+        val highContrast = dayThemeId == HighContrastDayTheme && nightThemeId == HighContrastNightTheme
+        Preference(
+            icon = Icons.Default.Contrast,
+            modifier = Modifier.settingsSearchAnchor("pref__theme__high_contrast__label"),
+            title = stringRes(R.string.pref__theme__high_contrast__label),
+            summary = stringRes(R.string.pref__theme__high_contrast__summary),
+            trailing = {
+                Switch(checked = highContrast, onCheckedChange = null)
+            },
+            onClick = {
+                scope.launch {
+                    if (highContrast) {
+                        // Whatever was there before, unless the stored value is the pair itself — which
+                        // it is for anyone who installed with high contrast already on.
+                        val day = prefs.theme.themeIdBeforeHighContrastDay.get()
+                        val night = prefs.theme.themeIdBeforeHighContrastNight.get()
+                        prefs.theme.dayThemeId.set(day.takeUnless { it == HighContrastDayTheme }
+                            ?: prefs.theme.dayThemeId.default)
+                        prefs.theme.nightThemeId.set(night.takeUnless { it == HighContrastNightTheme }
+                            ?: prefs.theme.nightThemeId.default)
+                    } else {
+                        prefs.theme.themeIdBeforeHighContrastDay.set(dayThemeId)
+                        prefs.theme.themeIdBeforeHighContrastNight.set(nightThemeId)
+                        prefs.theme.dayThemeId.set(HighContrastDayTheme)
+                        prefs.theme.nightThemeId.set(HighContrastNightTheme)
+                    }
+                }
+            },
+        )
         ListPreference(
             prefs.theme.mode,
             icon = Icons.Default.BrightnessAuto,

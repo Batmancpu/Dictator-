@@ -16,11 +16,13 @@
 
 package dev.patrickgold.florisboard.ime.keyboard
 
+// 1 used to be EDITING, FlorisBoard's unfinished cursor-pad keyboard: an enum entry, a branch that
+// returned an empty keyboard, and no layout anywhere. Issue #386 built that idea as a panel
+// ([dev.patrickgold.florisboard.ime.ImeUiMode.EDITING]) instead, which is why it is gone rather than
+// still waiting: two things called EDITING, one of them dead, is worse than the gap.
 enum class KeyboardMode(val value: Int) {
     UNSPECIFIED(-1),
     CHARACTERS(0),
-    @Deprecated(message = "TODO: remove")
-    EDITING(1),
     SYMBOLS(2),
     SYMBOLS2(3),
     NUMERIC(4),

@@ -74,6 +74,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Изрязва в междинната памет</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Поставяне</string>
     <string name="quick_action__clipboard_paste__tooltip">Поставя от междинната памет</string>
+    <string name="quick_action__clipboard_select">Избор</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Избор всички</string>
     <string name="quick_action__clipboard_select_all__tooltip">Избира всичко</string>
     <string name="quick_action__forward_delete" comment="Please mind the limited available space for the quick action strings">Премахване →</string>
@@ -107,6 +108,8 @@
     <string name="quick_action__resize_mode__tooltip">Превключва режима на преоразмеряване</string>
     <string name="quick_action__toggle_number_row" comment="Quick action that shows or hides the row of digit keys above the letters. Please mind the limited available space for the quick action strings">Цифров ред</string>
     <string name="quick_action__toggle_number_row__tooltip">Показване или скриване на цифровия ред</string>
+    <string name="quick_action__view_numeric_advanced" comment="Quick action that replaces the whole keyboard with a number pad (digits, arithmetic signs, brackets). Not to be confused with the number row above. Please mind the limited available space for the quick action strings">Цифрова клавиатура</string>
+    <string name="quick_action__view_numeric_advanced__tooltip">Превключване към цифровата клавиатура</string>
     <string name="quick_action__drag_marker" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">Манипулатор</string>
     <string name="quick_action__drag_marker__tooltip" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">Позиция на влачения елемент</string>
     <string name="quick_action__noop" comment="Noop=no operation; this action is only used as a placeholder in the actions editor drag and drop screen">Липсва</string>
@@ -187,6 +190,8 @@
     <string name="settings__localization__subtype_delete_confirmation_title" comment="Title of the subtype delete confirmation dialog">Потвърждение при премахване</string>
     <string name="settings__localization__subtype_delete_confirmation_warning" comment="Warning message in the confirmation dialog to confirm the user's intent to delete">Желаете ли да премахнете този подвид?</string>
     <string name="settings__theme__title" comment="Title of the Theme screen">Тема</string>
+    <string name="pref__theme__high_contrast__label" comment="Label of the switch that turns on the measured high-contrast theme pair">Висок контраст</string>
+    <string name="pref__theme__high_contrast__summary" comment="Summary of the high-contrast switch. 7:1 is the WCAG AAA contrast ratio for body text; keep the ratio as digits.">Очертани клавиши, всеки надпис измерен при 7:1. Задава деня и нощта.</string>
     <string name="pref__theme__mode__label" comment="Label of the theme mode preference">Режим на тема</string>
     <string name="pref__theme__sunrise_time__label" comment="Label of the sunrise time preference">Време на изгрев</string>
     <string name="pref__theme__sunset_time__label" comment="Label of the sunset time preference">Време на залез</string>
@@ -692,6 +697,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Dictate изглежда спира да работи многократно…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Връщане към предишна клавиатура, за да се спре безкрайния цикъл от сривове. Докоснете, за да видите подробности за грешката</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">Обратно към клавиатурата</string>
     <string name="clipboard__header_title">Междинна памет</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Търсене в клипборда</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">Няма запис, който да съдържа това</string>
@@ -1080,6 +1086,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">Курсорът се премества в началото на страницата</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">Курсорът се премества в края на страницата</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Управление на междинната памет</string>
+    <string name="enum__swipe_action__switch_to_editing_context">Отваряне на панела за редактиране на текст</string>
     <string name="enum__swipe_action__switch_to_media_context" comment="Enum value label">Отваря панела с емоции</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Shift</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Възстановяване</string>
@@ -1130,6 +1137,10 @@
         <item quantity="other">{v} кандидата</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">Редактиране</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">Преместване на курсора, избор и редактиране на текст</string>
+    <string name="quick_action__ime_ui_mode_scan">Сканиране на текст</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Снимайте печатен текст и го вмъкнете</string>
     <string name="quick_action__ime_ui_mode_dictate">Диктовка</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Докоснете, за да диктувате, докоснете отново за транскрибиране</string>
     <string name="quick_action__dictate_live_prompt">Гласова инструкция</string>
@@ -1226,6 +1237,17 @@
     <string name="dictate__floating_button_design_pill_summary">Когато е активна, се разширява, за да покаже таймер и форма на вълната на живо.</string>
     <string name="dictate__floating_button_design_ring">Пръстен</string>
     <string name="dictate__floating_button_design_ring_summary">Компактен кръг с пръстен, анимиран при запис и транскрибиране.</string>
+    <string name="dictate__floating_button_apps_title">Видимост по приложение</string>
+    <string name="dictate__floating_button_apps_summary_all">Във всички приложения</string>
+    <string name="dictate__floating_button_apps_summary_only">Само в {n} приложения</string>
+    <string name="dictate__floating_button_apps_summary_except">Навсякъде освен в {n} приложения</string>
+    <string name="dictate__floating_button_apps_scope_all">Всички приложения</string>
+    <string name="dictate__floating_button_apps_scope_only">Само приложенията по-долу</string>
+    <string name="dictate__floating_button_apps_scope_except">Всички освен приложенията по-долу</string>
+    <string name="dictate__floating_button_apps_note">Върху изключено приложение бутонът никога не се показва и Dictate не чете текстовите му полета. Приложение, което по принцип възразява срещу услугите за достъпност, пак ще види, че услугата е включена.</string>
+    <string name="dictate__floating_button_apps_list_title">Приложения</string>
+    <string name="dictate__floating_button_apps_search">Търсене на приложения</string>
+    <string name="dictate__floating_button_apps_none">Няма намерено приложение за „{search_term}“</string>
     <string name="dictate__floating_button_design_title">Стил на бутона</string>
     <string name="dictate__floating_button_haptic_summary_off">Без вибрация при докосване.</string>
     <string name="dictate__floating_button_haptic_summary_on">Кратка вибрация при докосване на бутона.</string>
@@ -1351,8 +1373,27 @@
     <string name="dictate__providers_field_transcription_model">Модел за транскрибиране</string>
     <string name="dictate__providers_field_chat_model">Модел за преформулиране</string>
     <string name="dictate__providers_test">Тествай връзката</string>
-    <string name="dictate__providers_test_success">Свързано · {count} модела</string>
-    <string name="dictate__providers_test_failed">Връзката е неуспешна</string>
+    <string name="dictate__providers_test_transcribe">Тест на транскрибирането</string>
+    <string name="dictate__providers_check_no_key">Първо въведете своя API ключ.</string>
+    <string name="dictate__providers_check_credentials_ok">Данните за достъп са проверени · {count} модела</string>
+    <string name="dictate__providers_check_credentials_ok_nocount">Данните за достъп са проверени</string>
+    <string name="dictate__providers_check_endpoint_ok">Сървърът е достигнат · {count} модела</string>
+    <string name="dictate__providers_check_credentials_untested">Транскрибирането не е тествано.</string>
+    <string name="dictate__providers_check_transcription_ok">Транскрибирането е проверено</string>
+    <string name="dictate__providers_check_transcription_text">Върна се като: „{text}“</string>
+    <string name="dictate__providers_check_transcription_empty">Заявката премина, но не се върна текст — връзката работи, този модел не разбра пробата.</string>
+    <string name="dictate__providers_check_failed_connection">Тестът на връзката е неуспешен</string>
+    <string name="dictate__providers_check_failed_transcription">Тестът на транскрибирането е неуспешен</string>
+    <string name="dictate__providers_check_err_auth">Ключът беше отхвърлен. Проверете него и дали адресът принадлежи на същия акаунт.</string>
+    <string name="dictate__providers_check_err_quota">Ключът работи, но акаунтът е изчерпал квотата си или е над лимита. Проверете плана си при доставчика.</string>
+    <string name="dictate__providers_check_err_network">Сървърът не можа да бъде достигнат. Проверете адреса и интернет връзката си.</string>
+    <string name="dictate__providers_check_err_timeout">Няма отговор навреме. Доставчикът може да е зает — опитайте отново.</string>
+    <string name="dictate__providers_check_err_server">Доставчикът съобщи собствена грешка. Тук няма какво да се промени; опитайте по-късно.</string>
+    <string name="dictate__providers_check_err_format">Доставчикът отказа звуковата проба. Може да не приема този формат.</string>
+    <string name="dictate__providers_check_err_unknown">Заявката беше неуспешна.</string>
+    <string name="dictate__providers_azure_link_signup">Създаване на акаунт в Azure</string>
+    <string name="dictate__providers_azure_link_portal">Портал на Azure</string>
+    <string name="dictate__providers_azure_link_guide">Ръководство за настройка</string>
     <string name="dictate__providers_network_group">Мрежа</string>
     <string name="dictate__request_timeout_title">Време за изчакване на заявка</string>
     <string name="dictate__request_timeout_summary">{v} с · увеличете при бавен собствен сървър</string>
@@ -1393,8 +1434,10 @@
     <string name="dictate__recording_animation_static_description">Остава плътна червена точка по време на записа</string>
     <string name="dictate__recording_animation_pulse_label">Пулсиращ</string>
     <string name="dictate__recording_animation_pulse_description">Пулсира с постоянна честота</string>
-    <string name="dictate__recording_animation_level_label">Следва гласа ви</string>
+    <string name="dictate__recording_animation_level_label">Следва гласа ви (точка)</string>
     <string name="dictate__recording_animation_level_description">Реагира на нивото на микрофона и показва, че ви улавя</string>
+    <string name="dictate__recording_animation_wave_label">Следва гласа ви (вълна)</string>
+    <string name="dictate__recording_animation_wave_description">Рисува последните секунди като жива вълна, за да виждате кога сте замълчали</string>
     <string name="dictate__skip_silent_title">Прескачане на тихите записи</string>
     <string name="dictate__skip_silent_summary">Избягвайте измислен текст и излишни API заявки при тих запис</string>
     <string name="dictate__trim_silent_gaps_title">Изрязване на дългите паузи</string>
@@ -1471,6 +1514,26 @@
     <string name="dictate__custom_words_title">Персонализирани думи</string>
     <string name="dictate__custom_words_summary_empty">Добавете имена или технически термини за правилно изписване</string>
     <string name="dictate__custom_words_placeholder">напр. FlorisBoard, Kubernetes, Renée, OAuth, Anthropic</string>
+    <string name="dictate__custom_words_summary">{count} думи · около {tokens} от {budget} токена</string>
+    <string name="dictate__custom_words_budget_info">Всяка дума оттук пътува с всяка диктовка, а речевият модел прочита само около {budget} токена контекст. Твоят списък заема около {tokens} от тях.</string>
+    <string name="dictate__custom_words_budget_over">Списъкът ти е по-дълъг от това, което речевият модел прочита. До него стигат около {fits} от твоите {count} думи; останалите се изпращат при всяка диктовка и се пренебрегват. За по-голям речник използвай собствените замени — те са точни, работят офлайн и не струват нищо.</string>
+    <string name="dictate__custom_words_import">Импортиране на списък с думи</string>
+    <string name="dictate__custom_words_export">Експортиране на списъка с думи</string>
+    <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
+    <string name="dictate__custom_words_import_title">Импортиране на списък с думи</string>
+    <string name="dictate__custom_words_import_fitting">{count} нови думи от този файл се побират в списъка ти.</string>
+    <string name="dictate__custom_words_import_known">{count} вече бяха в него.</string>
+    <string name="dictate__custom_words_import_nofit">{count} останаха извън него — речевият модел прочита само около {budget} токена контекст, така че те щяха да се изпращат при всяка диктовка и да се пренебрегват.</string>
+    <string name="dictate__custom_words_import_unusable">{count} реда не съдържаха нищо за изписване и бяха пропуснати.</string>
+    <string name="dictate__custom_words_import_truncated">Прочетени бяха само първите {count} записа от файла.</string>
+    <string name="dictate__custom_words_import_also_dictionary">Добави ги и в личния речник</string>
+    <string name="dictate__custom_words_import_also_dictionary_summary">Този списък само казва на речевия модел как се пише една дума. Личният речник е това, което клавиатурата използва, докато пишеш — той няма ограничение за дължина, така че в него влиза всяка дума от файла, а не само тези, които се побират по-горе.</string>
+    <string name="dictate__custom_words_import_empty">В този файл не са намерени думи</string>
+    <string name="dictate__custom_words_import_done">Добавени са {count} думи</string>
+    <string name="dictate__custom_words_import_done_dictionary">Добавени са {count} думи и {dict} в личния ти речник</string>
+    <string name="dictate__file_unreadable">Този файл не можа да бъде прочетен</string>
+    <string name="dictate__file_export_done">Файлът е запазен</string>
+    <string name="dictate__file_export_failed">Този файл не можа да бъде записан</string>
     <string name="dictate__rewording_group">Преформулиране (ИИ редактиране)</string>
     <string name="dictate__rewording_title">Преформулиране (ИИ)</string>
     <string name="dictate__rewording_summary_on">Вкл. – преформулиране, превод и форматиране с ИИ</string>
@@ -1650,6 +1713,16 @@
     <string name="dictate__mappings_field_to_placeholder">напр. GitHub</string>
     <string name="dictate__mappings_group">Правила за замяна</string>
     <string name="dictate__mappings_matchcase_summary">Замяна само когато регистърът на буквите съвпада точно.</string>
+    <string name="dictate__mappings_import">Импортиране на правила</string>
+    <string name="dictate__mappings_export">Експортиране на правила</string>
+    <string name="dictate__mappings_export_filename">dictate_mappings.tsv</string>
+    <string name="dictate__mappings_import_title">Импортиране на правила</string>
+    <string name="dictate__mappings_import_message">{count} нови правила в този файл. Да бъдат ли добавени към списъка ти?</string>
+    <string name="dictate__mappings_import_known">{count} вече бяха в него.</string>
+    <string name="dictate__mappings_import_unusable">{count} реда не посочваха замяна и бяха пропуснати.</string>
+    <string name="dictate__mappings_import_format">По едно правило на ред: какво се чува, табулация, в какво да се превърне.</string>
+    <string name="dictate__mappings_import_empty">В този файл не са намерени правила</string>
+    <string name="dictate__mappings_import_done">Добавени са {count} правила</string>
     <string name="dictate__mappings_matchcase_title">Съвпадение на регистъра</string>
     <string name="dictate__mappings_opt_caseinsensitive">Без оглед на регистъра</string>
     <string name="dictate__mappings_opt_casesensitive">Чувствителност към регистъра</string>
@@ -2022,6 +2095,47 @@
     <string name="apptour61__outro_eyebrow">Това е 6.1</string>
     <string name="apptour61__outro_title">Същата клавиатура, с по-малко ръбове</string>
     <string name="apptour61__outro_body">Нищо не се променя в начина, по който диктувате досега — собствен ключ, собствен сървър или модел на устройството. Всички обиколки намирате отново в Настройки › Относно.</string>
+    <string name="apptour62__cta_try">Изпробвайте</string>
+    <string name="apptour62__cta_manage">Къде се изключва</string>
+    <string name="apptour62__art_word">Зоя</string>
+    <string name="apptour62__art_emoji_word">торта</string>
+    <string name="apptour62__art_emoji">🍰</string>
+    <string name="apptour62__intro_eyebrow">Dictate 6.2</string>
+    <string name="apptour62__intro_title">Учи вашите думи и има пет нови облика</string>
+    <string name="apptour62__intro_body">Клавиатурата вече може да запомня думите, които никой речник не знае, клавишите могат да пропускат приложението да прозира, а всеки палец получава своя половина. Плюс шепа малки помощници за нещата, които правите всеки ден.</string>
+    <string name="apptour62__learning_eyebrow">Ново: учи, докато пишете</string>
+    <string name="apptour62__learning_title">Думите, които никой речник не знае</string>
+    <string name="apptour62__learning_body">Напишете име или термин достатъчно често и клавиатурата го запазва: спира да го отбелязва като грешка и започва да го предлага. Тази актуализация я включва за всички, включително за онези, които преди са я изключили. В режим „инкогнито", в полета за пароли и от всичко, което не сте написали клавиш по клавиш, не се учи нищо; всичко остава на това устройство, а бутонът отдолу отваря списъка — и превключвателя.</string>
+    <string name="apptour62__themes_eyebrow">Пет нови облика</string>
+    <string name="apptour62__themes_title">Glass, Sand, Deep и тъмен E-Ink</string>
+    <string name="apptour62__themes_body">Dictate Glass пропуска приложението да прозира през процепите между клавишите, докато самите клавиши остават достатъчно плътни, за да се чете върху тях; Glass Clear отива по-далеч и изглежда по-добре, с цената на това, че текстът на приложения, които рисуват зад клавиатурата, прозира. Sand е топъл светъл облик, Deep — спокоен тъмен, а E-Ink най-сетне има нощен вариант, така че автоматичното превключване вече не ви подава бяла клавиатура след мръкване.</string>
+    <string name="apptour62__split_eyebrow">Ново: разделена клавиатура</string>
+    <string name="apptour62__split_title">И двата палеца, без протягане</string>
+    <string name="apptour62__split_body">Ново бързо действие, до режима с една ръка и плаващия режим, разтегля редовете, така че всеки палец да си остане в своята половина. Разделя се всяка подредба, не само QWERTY, защото шевът се изчислява от ширините на клавишите, вместо да е записан във всяка подредба. А в хоризонтален режим приложението вече остава видимо, когато има място и за двете.</string>
+    <string name="apptour62__emoji_eyebrow">Емоджита</string>
+    <string name="apptour62__emoji_title">Думата намира своето емоджи</string>
+    <string name="apptour62__emoji_body">Напишете дума и емоджито, което я означава, се предлага в лентата — на около петдесет езика, от същите данни, които използва и системата. То се движи редом с предложенията, вместо да заема мястото на някое от тях. Има и незадължителен ред с закачените и наскоро използваните ви емоджита над клавишите.</string>
+    <string name="apptour62__helpers_eyebrow">Четирима малки помощници</string>
+    <string name="apptour62__helpers_title">Инкогнито, чисти връзки и отговорът на сметката</string>
+    <string name="apptour62__helpers_body">Режимът „инкогнито" не позволява нищо да бъде запомнено, докато е включен — нищо научено, нищо запазено. От поставените връзки могат да се премахват проследяващите параметри още по пътя към полето. Напишете сметка, завършваща на =, и отговорът се появява като предложение. А когато цифровият ред е включен, буквите отново показват своите цифри.</string>
+    <string name="apptour62__selection_eyebrow">Избиране и придвижване</string>
+    <string name="apptour62__selection_title">Вижте колко сте избрали</string>
+    <string name="apptour62__selection_body">Редът, който досега стоеше празен по време на избор, вече брои думите и знаците в него. Нови бутони скачат в самото начало и в самия край на полето, а копирането може да остави излишните интервали по краищата. Редът с действията се отдръпва веднага щом започне избор, вместо да говори върху него.</string>
+    <string name="apptour62__clipboard_eyebrow">Клипборд</string>
+    <string name="apptour62__clipboard_title">Намерете запис по това, което пише в него</string>
+    <string name="apptour62__clipboard_body">Клипбордът вече може да се търси, из всичко в него. Това, което току-що сте копирали, се предлага в лентата с предложения като хапче, което можете да отхвърлите, а копирането на един и същ текст два пъти се брои като два пъти, така че той се връща. Изтриването на запис вече изтрива и файла зад него, вместо да оставя картинката на телефона ви.</string>
+    <string name="apptour62__gestures_eyebrow">Жестове</string>
+    <string name="apptour62__gestures_title">Задръжте ?123, плъзнете, пуснете</string>
+    <string name="apptour62__gestures_body">Задръжте клавиша за символи, плъзнете до знака, който искате, и пуснете: той се въвежда, а буквите са обратно, без превключване напред-назад. Плъзгането нагоре по интервала вече стига до реда отгоре, а не само до предишната дума. А разстоянието между клавишите може да се настройва в диапазон, който наистина се вижда.</string>
+    <string name="apptour62__export_eyebrow">Ново: диктовките като файлове</string>
+    <string name="apptour62__export_title">Всяка диктовка в папка по ваш избор</string>
+    <string name="apptour62__export_body">Изберете папка веднъж и всяка завършена диктовка се записва и в нея като обикновен текстов файл, в момента, в който е готова. Каквото и да следи тази папка — приложение за бележки, инструмент за синхронизация, резервното ви копие — получава текстовете ви, без Dictate да трябва да учи неговия език.</string>
+    <string name="apptour62__more_eyebrow">Освен това</string>
+    <string name="apptour62__more_title">Много малки неща</string>
+    <string name="apptour62__more_body">Предложенията вече гледат двете думи преди курсора на всеки език, не само на английски. Резервно копие може да се направи без вашите API ключове, за да бъде предадено безопасно. Собствените модели за транскрипция на Azure са достъпни, изборът на модел за работа офлайн вече превключва и към офлайн двигателя, а всяка заявка има срок, който отговаря на чакането. Диктовките се появяват в историята в момента на изпращане, вносът казва на коя стъпка е и може да бъде отменен, а текстът попада по-надеждно в приложенията, на които това се удаваше трудно.</string>
+    <string name="apptour62__outro_eyebrow">Това е 6.2</string>
+    <string name="apptour62__outro_title">Същата клавиатура, повече от нея ваша</string>
+    <string name="apptour62__outro_body">Нищо не се променя в начина, по който диктувате — собствен ключ, собствен сървър или модел на устройството. Всички обиколки намирате отново в Настройки › Относно.</string>
     <string name="changelog__v5_0_0">• НОВО: Писане с плъзгане — плъзгайте по клавишите, за да пишете цели думи, с речници за отделните езици, изтегляни при поискване. 👆\n• НОВО: Предложения за думи и автокорекция — печатните грешки се коригират автоматично, а написаната дума остава на едно докосване. ✨\n• НОВО: Транскрипция в реално време — гледайте как думите ви се появяват, докато говорите, с OpenAI, Deepgram, Soniox, AssemblyAI и ElevenLabs. ⚡\n• НОВО: Още три доставчика на транскрипция — ElevenLabs Scribe, Deepgram и AssemblyAI. ☁️\n• НОВО: Класическа подредба за диктовка — гласовият екран без клавиатура от Dictate 3 се завръща, фиксиран или на едно плъзгане. 🎙️\n• НОВО: Библиотека с промптове от общността — разглеждайте и споделяйте промптове за преформулиране. 📚\n• НОВО: Статистика за диктовка с етапи. 📊\n• НОВО: Офлайн модел NVIDIA Parakeet, плюс филтър за тишина, който пропуска празните записи. 📴\n• Още: по-стабилен плаващ бутон, контрол на усилието на разсъждение, тактилна обратна връзка, нова тема E-Reader и десетки поправки. 🛠️</string>
     <string name="media__tab__gifs">GIFs</string>
     <string name="prefs__media__gif__title">GIFs</string>
@@ -2228,4 +2342,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Папка със стикери</string>
+    <string name="scan__take_photo">Снимка</string>
+    <string name="scan__pick_image">Избор на изображение</string>
+    <string name="scan__retake">Опитайте отново</string>
+    <string name="scan__empty_hint">Снимайте печатен текст и докоснете желаната част.</string>
+    <string name="scan__latin_only">Само латиница</string>
+    <string name="scan__reading">Четене на снимката…</string>
+    <string name="scan__no_text">В снимката не е открит текст.</string>
+    <string name="scan__failed">Снимката не можа да бъде прочетена.</string>
+    <string name="scan__no_camera">Не е намерено приложение за камера.</string>
+    <string name="scan__select_all">Избери всичко</string>
+    <string name="scan__discard">Отхвърли</string>
+    <string name="scan__approve">Приеми</string>
 </resources>

@@ -72,6 +72,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Вирізати</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Вставити</string>
     <string name="quick_action__clipboard_paste__tooltip">Вставити</string>
+    <string name="quick_action__clipboard_select">Виділити</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Обрати все</string>
     <string name="quick_action__clipboard_select_all__tooltip">Виділити все</string>
     <string name="quick_action__ime_ui_mode_clipboard" comment="Please mind the limited available space for the quick action strings">Буфер обміну</string>
@@ -99,6 +100,8 @@
     <string name="quick_action__split_layout__tooltip">Увімкнути розділену клавіатуру</string>
     <string name="quick_action__toggle_number_row" comment="Quick action that shows or hides the row of digit keys above the letters. Please mind the limited available space for the quick action strings">Ряд цифр</string>
     <string name="quick_action__toggle_number_row__tooltip">Показати або приховати ряд цифр</string>
+    <string name="quick_action__view_numeric_advanced" comment="Quick action that replaces the whole keyboard with a number pad (digits, arithmetic signs, brackets). Not to be confused with the number row above. Please mind the limited available space for the quick action strings">Цифрова клавіатура</string>
+    <string name="quick_action__view_numeric_advanced__tooltip">Перейти до цифрової клавіатури</string>
     <string name="quick_action__drag_marker" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">Курсор</string>
     <string name="quick_action__drag_marker__tooltip" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">Поточне положення курсора</string>
     <string name="quick_action__noop" comment="Noop=no operation; this action is only used as a placeholder in the actions editor drag and drop screen">Нічого</string>
@@ -178,6 +181,8 @@
     <string name="settings__localization__subtype_delete_confirmation_title" comment="Title of the subtype delete confirmation dialog">Підтвердження видалення</string>
     <string name="settings__localization__subtype_delete_confirmation_warning" comment="Warning message in the confirmation dialog to confirm the user's intent to delete">Ви впевнені, що хочете видалити цей підтип?</string>
     <string name="settings__theme__title" comment="Title of the Theme screen">Тема</string>
+    <string name="pref__theme__high_contrast__label" comment="Label of the switch that turns on the measured high-contrast theme pair">Висока контрастність</string>
+    <string name="pref__theme__high_contrast__summary" comment="Summary of the high-contrast switch. 7:1 is the WCAG AAA contrast ratio for body text; keep the ratio as digits.">Обведені клавіші, кожен напис виміряно на 7:1. Задає день і ніч.</string>
     <string name="pref__theme__mode__label" comment="Label of the theme mode preference">Режим теми</string>
     <string name="pref__theme__sunrise_time__label" comment="Label of the sunrise time preference">Час сходу</string>
     <string name="pref__theme__sunset_time__label" comment="Label of the sunset time preference">Час заходу</string>
@@ -571,6 +576,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Здається, Dictate постійно перестає працювати…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Повернення до попередньої клавіатури, щоб зупинити нескінченний цикл збою. Натисніть, щоб переглянути деталі про помилку</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">Назад до клавіатури</string>
     <string name="clipboard__header_title">Буфер обміну</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Пошук у буфері обміну</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">Жоден запис цього не містить</string>
@@ -912,6 +918,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">Перемістити курсор на початок тексту</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">Перемістити курсор в кінець тексту</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Відкрити буфер обміну/історію</string>
+    <string name="enum__swipe_action__switch_to_editing_context">Відкрити панель редагування тексту</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Shift</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Повторити</string>
     <string name="enum__swipe_action__undo" comment="Enum value label">Відмінити</string>
@@ -975,6 +982,10 @@
         <item quantity="other">{v} пропозицій</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">Редагування тексту</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">Переміщення курсора, виділення та редагування тексту</string>
+    <string name="quick_action__ime_ui_mode_scan">Сканувати текст</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Сфотографувати друкований текст і вставити його</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Торкніться, щоб диктувати, торкніться ще раз для транскрибування</string>
     <string name="quick_action__dictate_live_prompt">Голосова інструкція</string>
@@ -1071,6 +1082,17 @@
     <string name="dictate__floating_button_design_pill_summary">Коли активна, розгортається, показуючи таймер і живу форму хвилі.</string>
     <string name="dictate__floating_button_design_ring">Кільце</string>
     <string name="dictate__floating_button_design_ring_summary">Компактне коло з кільцем, що анімується під час запису й транскрибування.</string>
+    <string name="dictate__floating_button_apps_title">Видимість у застосунках</string>
+    <string name="dictate__floating_button_apps_summary_all">У всіх застосунках</string>
+    <string name="dictate__floating_button_apps_summary_only">Лише у {n} застосунках</string>
+    <string name="dictate__floating_button_apps_summary_except">Скрізь, крім {n} застосунків</string>
+    <string name="dictate__floating_button_apps_scope_all">Усі застосунки</string>
+    <string name="dictate__floating_button_apps_scope_only">Лише застосунки нижче</string>
+    <string name="dictate__floating_button_apps_scope_except">Усі, крім застосунків нижче</string>
+    <string name="dictate__floating_button_apps_note">Над вилученим застосунком кнопка не малюється ніколи, і Dictate не читає в ньому текстові поля. Застосунок, який заперечує проти служб доступності як таких, усе одно побачить, що службу ввімкнено.</string>
+    <string name="dictate__floating_button_apps_list_title">Застосунки</string>
+    <string name="dictate__floating_button_apps_search">Пошук застосунків</string>
+    <string name="dictate__floating_button_apps_none">Застосунків за запитом «{search_term}» не знайдено</string>
     <string name="dictate__floating_button_design_title">Стиль кнопки</string>
     <string name="dictate__floating_button_haptic_summary_off">Без вібрації під час дотику.</string>
     <string name="dictate__floating_button_haptic_summary_on">Коротка вібрація під час дотику до кнопки.</string>
@@ -1196,8 +1218,27 @@
     <string name="dictate__providers_field_transcription_model">Модель транскрибування</string>
     <string name="dictate__providers_field_chat_model">Модель переформулювання</string>
     <string name="dictate__providers_test">Перевірити підключення</string>
-    <string name="dictate__providers_test_success">Підключено · {count} моделей</string>
-    <string name="dictate__providers_test_failed">Не вдалося підключитися</string>
+    <string name="dictate__providers_test_transcribe">Перевірити транскрибування</string>
+    <string name="dictate__providers_check_no_key">Спершу введіть свій ключ API.</string>
+    <string name="dictate__providers_check_credentials_ok">Дані доступу підтверджено · моделей: {count}</string>
+    <string name="dictate__providers_check_credentials_ok_nocount">Дані доступу підтверджено</string>
+    <string name="dictate__providers_check_endpoint_ok">Сервер доступний · моделей: {count}</string>
+    <string name="dictate__providers_check_credentials_untested">Транскрибування не перевірено.</string>
+    <string name="dictate__providers_check_transcription_ok">Транскрибування підтверджено</string>
+    <string name="dictate__providers_check_transcription_text">Повернулося так: «{text}»</string>
+    <string name="dictate__providers_check_transcription_empty">Запит пройшов, але текст не повернувся — з’єднання працює, ця модель не зрозуміла зразок.</string>
+    <string name="dictate__providers_check_failed_connection">Перевірка з’єднання не вдалася</string>
+    <string name="dictate__providers_check_failed_transcription">Перевірка транскрибування не вдалася</string>
+    <string name="dictate__providers_check_err_auth">Ключ відхилено. Перевірте його та чи належить адреса до того самого облікового запису.</string>
+    <string name="dictate__providers_check_err_quota">Ключ працює, але на рахунку немає квоти або перевищено ліміт. Перевірте свій тариф у постачальника.</string>
+    <string name="dictate__providers_check_err_network">Не вдалося зв’язатися із сервером. Перевірте адресу та підключення до інтернету.</string>
+    <string name="dictate__providers_check_err_timeout">Відповідь не надійшла вчасно. Постачальник може бути завантажений — спробуйте ще раз.</string>
+    <string name="dictate__providers_check_err_server">Постачальник повідомляє про власну помилку. Тут нічого змінювати; спробуйте пізніше.</string>
+    <string name="dictate__providers_check_err_format">Постачальник відхилив звуковий зразок. Можливо, він не приймає цей формат.</string>
+    <string name="dictate__providers_check_err_unknown">Запит не вдався.</string>
+    <string name="dictate__providers_azure_link_signup">Створити обліковий запис Azure</string>
+    <string name="dictate__providers_azure_link_portal">Портал Azure</string>
+    <string name="dictate__providers_azure_link_guide">Посібник із налаштування</string>
     <string name="dictate__providers_network_group">Мережа</string>
     <string name="dictate__request_timeout_title">Час очікування запиту</string>
     <string name="dictate__request_timeout_summary">{v} с · збільште для повільного власного сервера</string>
@@ -1238,8 +1279,10 @@
     <string name="dictate__recording_animation_static_description">Під час запису залишається суцільною червоною крапкою</string>
     <string name="dictate__recording_animation_pulse_label">Пульсуючий</string>
     <string name="dictate__recording_animation_pulse_description">Пульсує в рівному ритмі</string>
-    <string name="dictate__recording_animation_level_label">Слідує за голосом</string>
+    <string name="dictate__recording_animation_level_label">Слідує за голосом (крапка)</string>
     <string name="dictate__recording_animation_level_description">Реагує на рівень мікрофона, показуючи, що вас чути</string>
+    <string name="dictate__recording_animation_wave_label">Слідує за голосом (хвиля)</string>
+    <string name="dictate__recording_animation_wave_description">Малює останні секунди живою хвилею, щоб було видно, коли ви замовкли</string>
     <string name="dictate__skip_silent_title">Пропускати тихі записи</string>
     <string name="dictate__skip_silent_summary">Уникайте вигаданого тексту й зайвих викликів API при тихому записі</string>
     <string name="dictate__trim_silent_gaps_title">Обрізати довгі паузи</string>
@@ -1316,6 +1359,26 @@
     <string name="dictate__custom_words_title">Власні слова</string>
     <string name="dictate__custom_words_summary_empty">Додайте імена або технічні терміни для правильного написання</string>
     <string name="dictate__custom_words_placeholder">напр. FlorisBoard, Kubernetes, Renée, OAuth, Anthropic</string>
+    <string name="dictate__custom_words_summary">{count} слів · приблизно {tokens} з {budget} токенів</string>
+    <string name="dictate__custom_words_budget_info">Кожне слово звідси вирушає з кожним диктуванням, а мовна модель читає лише близько {budget} токенів контексту. Ваш список займає з них приблизно {tokens}.</string>
+    <string name="dictate__custom_words_budget_over">Ваш список довший за те, що читає мовна модель. До неї доходить приблизно {fits} з ваших {count} слів; решта надсилається з кожним диктуванням і ігнорується. Для більшого словника скористайтеся власними замінами — вони точні, працюють офлайн і нічого не коштують.</string>
+    <string name="dictate__custom_words_import">Імпортувати список слів</string>
+    <string name="dictate__custom_words_export">Експортувати список слів</string>
+    <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
+    <string name="dictate__custom_words_import_title">Імпортувати список слів</string>
+    <string name="dictate__custom_words_import_fitting">{count} нових слів із цього файлу вміщуються у ваш список.</string>
+    <string name="dictate__custom_words_import_known">{count} уже були в ньому.</string>
+    <string name="dictate__custom_words_import_nofit">{count} залишилися поза списком — мовна модель читає лише близько {budget} токенів контексту, тож вони надсилалися б із кожним диктуванням і ігнорувалися.</string>
+    <string name="dictate__custom_words_import_unusable">У {count} рядках не знайшлося нічого, що можна записати, — їх пропущено.</string>
+    <string name="dictate__custom_words_import_truncated">Прочитано лише перші {count} записів файлу.</string>
+    <string name="dictate__custom_words_import_also_dictionary">Додати їх і до особистого словника</string>
+    <string name="dictate__custom_words_import_also_dictionary_summary">Цей список лише каже мовній моделі, як пишеться слово. Особистий словник — це те, чим клавіатура користується під час набору: він не має обмеження за довжиною, тож туди потрапляє кожне слово з файлу, а не лише ті, що вміщуються вище.</string>
+    <string name="dictate__custom_words_import_empty">У цьому файлі не знайдено слів</string>
+    <string name="dictate__custom_words_import_done">Додано {count} слів</string>
+    <string name="dictate__custom_words_import_done_dictionary">Додано {count} слів і {dict} до вашого особистого словника</string>
+    <string name="dictate__file_unreadable">Цей файл не вдалося прочитати</string>
+    <string name="dictate__file_export_done">Файл збережено</string>
+    <string name="dictate__file_export_failed">Не вдалося записати цей файл</string>
     <string name="dictate__rewording_group">Переформулювання (редагування ШІ)</string>
     <string name="dictate__rewording_title">Переформулювання (ШІ)</string>
     <string name="dictate__rewording_summary_on">Увімкнено — переформульовуйте, перекладайте та форматуйте за допомогою ШІ</string>
@@ -1495,6 +1558,16 @@
     <string name="dictate__mappings_field_to_placeholder">напр. GitHub</string>
     <string name="dictate__mappings_group">Правила заміни</string>
     <string name="dictate__mappings_matchcase_summary">Замінювати лише за точного збігу регістру.</string>
+    <string name="dictate__mappings_import">Імпортувати правила</string>
+    <string name="dictate__mappings_export">Експортувати правила</string>
+    <string name="dictate__mappings_export_filename">dictate_mappings.tsv</string>
+    <string name="dictate__mappings_import_title">Імпортувати правила</string>
+    <string name="dictate__mappings_import_message">{count} нових правил у цьому файлі. Додати їх до вашого списку?</string>
+    <string name="dictate__mappings_import_known">{count} уже були в ньому.</string>
+    <string name="dictate__mappings_import_unusable">У {count} рядках не вказано заміни — їх пропущено.</string>
+    <string name="dictate__mappings_import_format">Одне правило в рядку: що чути, табуляція, на що це має перетворитися.</string>
+    <string name="dictate__mappings_import_empty">У цьому файлі не знайдено правил</string>
+    <string name="dictate__mappings_import_done">Додано {count} правил</string>
     <string name="dictate__mappings_matchcase_title">Враховувати регістр</string>
     <string name="dictate__mappings_opt_caseinsensitive">Без урахування регістру</string>
     <string name="dictate__mappings_opt_casesensitive">З урахуванням регістру</string>
@@ -1867,6 +1940,47 @@
     <string name="apptour61__outro_eyebrow">Це 6.1</string>
     <string name="apptour61__outro_title">Та сама клавіатура, менше гострих кутів</string>
     <string name="apptour61__outro_body">У тому, як ви диктуєте зараз, нічого не змінюється — власний ключ, власний сервер або модель на пристрої. Усі огляди знову доступні в Налаштування › Про застосунок.</string>
+    <string name="apptour62__cta_try">Спробувати</string>
+    <string name="apptour62__cta_manage">Де це вимкнути</string>
+    <string name="apptour62__art_word">Зоя</string>
+    <string name="apptour62__art_emoji_word">торт</string>
+    <string name="apptour62__art_emoji">🍰</string>
+    <string name="apptour62__intro_eyebrow">Dictate 6.2</string>
+    <string name="apptour62__intro_title">Вона вчить ваші слова й має п\'ять нових образів</string>
+    <string name="apptour62__intro_body">Клавіатура тепер може запам\'ятовувати слова, яких не знає жоден словник, клавіші можуть пропускати крізь себе застосунок, а кожен великий палець може мати свою половину. А ще — жменя маленьких помічників для того, що ви робите щодня.</string>
+    <string name="apptour62__learning_eyebrow">Нове: вчиться, поки ви пишете</string>
+    <string name="apptour62__learning_title">Слова, яких не знає жоден словник</string>
+    <string name="apptour62__learning_body">Наберіть ім\'я, термін чи назву місця достатньо часто — і клавіатура його залишить собі: перестане позначати як помилку й почне пропонувати його та виправляти на нього. Це оновлення вмикає функцію в усіх, зокрема й у тих, хто раніше її вимкнув. У режимі анонімного перегляду, у полях пароля та з усього, чого ви не набрали клавіша за клавішею, не запам\'ятовується нічого; усе лишається на цьому пристрої, а кнопка нижче відкриває список — і перемикач.</string>
+    <string name="apptour62__themes_eyebrow">П\'ять нових образів</string>
+    <string name="apptour62__themes_title">Glass, Sand, Deep і темний E-Ink</string>
+    <string name="apptour62__themes_body">Dictate Glass пропускає застосунок крізь проміжки між клавішами, а самі клавіші лишаються достатньо щільними, щоб на них читалося; Glass Clear іде далі й виглядає краще — ціною того, що в застосунках, які малюють за клавіатурою, крізь неї проступає їхній текст. Sand — тепла світла тема, Deep — спокійна темна, а E-Ink нарешті має нічний варіант, тож автоматичне перемикання більше не подає вам білу клавіатуру після настання темряви.</string>
+    <string name="apptour62__split_eyebrow">Нове: розділена клавіатура</string>
+    <string name="apptour62__split_title">Обидва великі пальці, без дотягування</string>
+    <string name="apptour62__split_body">Нова швидка дія поруч з однорукою та плавучою розсуває ряди, щоб кожен палець лишався на своїй половині. Ділиться будь-яка розкладка, не тільки QWERTY, бо шов обчислюється з ширини клавіш, а не прописаний у кожній розкладці. А в альбомній орієнтації застосунок тепер лишається видимим щоразу, коли місця вистачає обом.</string>
+    <string name="apptour62__emoji_eyebrow">Емодзі</string>
+    <string name="apptour62__emoji_title">Слово знаходить своє емодзі</string>
+    <string name="apptour62__emoji_body">Наберіть слово — і емодзі, яке воно означає, з\'явиться в рядку підказок: приблизно п\'ятдесятьма мовами, з тих самих даних, які використовує сама система. Воно їде поруч із підказками, а не займає місце однієї з них. А ще над клавішами можна ввімкнути необов\'язковий ряд закріплених і нещодавніх емодзі.</string>
+    <string name="apptour62__helpers_eyebrow">Чотири маленькі помічники</string>
+    <string name="apptour62__helpers_title">Анонімний режим, чисті посилання й відповідь на приклад</string>
+    <string name="apptour62__helpers_body">Анонімний режим не дає нічого запам\'ятати, доки він увімкнений: нічого не вчиться, нічого не зберігається. З укладених посилань можна прибирати параметри стеження ще дорогою до поля. Наберіть приклад, що закінчується на =, і відповідь з\'явиться підказкою. А коли ряд цифр увімкнено, літери знову показують свої цифри.</string>
+    <string name="apptour62__selection_eyebrow">Виділення й переходи</string>
+    <string name="apptour62__selection_title">Видно, скільки ви виділили</string>
+    <string name="apptour62__selection_body">Ряд, який під час виділення досі стояв порожній, тепер рахує в ньому слова та знаки. Нові кнопки переносять на самий початок і самий кінець поля, а під час копіювання можна лишити позаду зайві пробіли по краях. Ряд дій відступає вбік, щойно починається виділення, замість говорити поверх нього.</string>
+    <string name="apptour62__clipboard_eyebrow">Буфер обміну</string>
+    <string name="apptour62__clipboard_title">Знайдіть запис за тим, що в ньому написано</string>
+    <string name="apptour62__clipboard_body">Буфер обміну тепер можна шукати — по всьому, що в ньому лежить. Щойно скопійоване пропонується в рядку підказок окремою «пігулкою», яку можна змахнути, а скопіювати той самий текст двічі рахується як двічі, тож він повертається. Видалення запису тепер видаляє й файл за ним, а не лишає зображення в телефоні.</string>
+    <string name="apptour62__gestures_eyebrow">Жести</string>
+    <string name="apptour62__gestures_title">Утримуйте ?123, ведіть, відпускайте</string>
+    <string name="apptour62__gestures_body">Утримуйте клавішу символів, доведіть палець до потрібного знака й відпустіть: його вставлено, а літери вже повернулися — без перемикань туди й назад. Свайп угору по пробілу тепер дістає до рядка вище, а не лише до попереднього слова. А відстань між клавішами налаштовується в діапазоні, який справді видно.</string>
+    <string name="apptour62__export_eyebrow">Нове: диктування як файли</string>
+    <string name="apptour62__export_title">Кожне диктування — у вибрану вами теку</string>
+    <string name="apptour62__export_body">Виберіть теку один раз, і кожне завершене диктування додатково запишеться в неї простим текстовим файлом — тієї миті, коли воно готове. Хай що стежить за цією текою — нотатки, засіб синхронізації, ваша резервна копія — воно отримає ваші тексти, а Dictate не доведеться вчити його мову.</string>
+    <string name="apptour62__more_eyebrow">А ще</string>
+    <string name="apptour62__more_title">Багато дрібниць</string>
+    <string name="apptour62__more_body">Підказки тепер дивляться на два слова перед курсором будь-якою мовою, а не лише англійською. Резервну копію можна зробити без ваших ключів API, щоб її можна було спокійно передати. Власні моделі транскрипції Azure доступні, вибір моделі для роботи офлайн тепер перемикає й на офлайн-рушій, а кожен запит має термін, співмірний з очікуванням. Диктування з\'являються в історії в мить надсилання, імпорт повідомляє, на якому він кроці, і його можна скасувати, а текст надійніше доходить до застосунків, яким це давалося важко.</string>
+    <string name="apptour62__outro_eyebrow">Це 6.2</string>
+    <string name="apptour62__outro_title">Та сама клавіатура, більше в ній вашого</string>
+    <string name="apptour62__outro_body">У тому, як ви диктуєте, нічого не змінюється — власний ключ, власний сервер або модель на пристрої. Усі огляди знову доступні в Налаштування › Про застосунок.</string>
     <string name="changelog__v5_0_0">• НОВЕ: Друк свайпом — проводьте по клавішах, щоб писати слова цілком, зі словниками для окремих мов, що завантажуються за запитом. 👆\n• НОВЕ: Підказки слів і автовиправлення — помилки виправляються автоматично, а набране слово лишається за один дотик. ✨\n• НОВЕ: Транскрипція в реальному часі — дивіться, як слова з’являються, поки ви говорите, з OpenAI, Deepgram, Soniox, AssemblyAI та ElevenLabs. ⚡\n• НОВЕ: Ще три провайдери транскрипції — ElevenLabs Scribe, Deepgram та AssemblyAI. ☁️\n• НОВЕ: Класичний макет диктування — голосовий екран без клавіатури з Dictate 3 повернувся, зафіксований або за один свайп. 🎙️\n• НОВЕ: Бібліотека промптів спільноти — переглядайте та діліться промптами для переформулювання. 📚\n• НОВЕ: Статистика диктування з віхами. 📊\n• НОВЕ: Офлайн-модель NVIDIA Parakeet, а також фільтр тиші, що пропускає порожні записи. 📴\n• Більше: стабільніша плаваюча кнопка, керування зусиллям міркування, тактильний відгук, нова тема E-Reader і десятки виправлень. 🛠️</string>
     <string name="media__tab__gifs">GIFs</string>
     <string name="prefs__media__gif__title">GIFs</string>
@@ -2073,4 +2187,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Тека зі стікерами</string>
+    <string name="scan__take_photo">Зробити фото</string>
+    <string name="scan__pick_image">Вибрати зображення</string>
+    <string name="scan__retake">Спробувати ще раз</string>
+    <string name="scan__empty_hint">Сфотографуйте друкований текст і торкніться потрібної частини.</string>
+    <string name="scan__latin_only">Лише латиниця</string>
+    <string name="scan__reading">Читання фото…</string>
+    <string name="scan__no_text">На фото не знайдено тексту.</string>
+    <string name="scan__failed">Не вдалося прочитати фото.</string>
+    <string name="scan__no_camera">Застосунок камери не знайдено.</string>
+    <string name="scan__select_all">Вибрати все</string>
+    <string name="scan__discard">Відхилити</string>
+    <string name="scan__approve">Прийняти</string>
 </resources>

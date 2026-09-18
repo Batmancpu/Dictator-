@@ -413,6 +413,12 @@ class FlorisImeService : LifecycleInputMethodService() {
         val startedFileTranscription =
             dev.patrickgold.florisboard.dictate.DictateController.consumePendingFileTranscription(this)
 
+        // Scan text (issue #390): the same trampoline shape as the file transcription above. A scan that
+        // belongs to another app is dropped inside consumePendingScan rather than shown here; a session
+        // left over from a previous field is dropped for the same reason.
+        dev.patrickgold.florisboard.dictate.scan.ScanController.clearIfForeign(this)
+        val startedScan = dev.patrickgold.florisboard.dictate.scan.ScanController.consumePendingScan(this)
+
         val instantRecordingOn = prefs.dictate.instantRecording.get()
 
         // "Only after switching to Dictate" (issue #224). The IME API cannot say how the keyboard was
@@ -442,6 +448,7 @@ class FlorisImeService : LifecycleInputMethodService() {
 
         // Instant recording: optionally start dictation as soon as the keyboard opens on a field.
         if (!startedFileTranscription &&
+            !startedScan &&
             !offeredInterrupted &&
             !restarting &&
             instantRecordingAllowedHere &&
@@ -518,6 +525,10 @@ class FlorisImeService : LifecycleInputMethodService() {
         // picker the keyboard may reappear without a fresh onStartInputView, so also check here. The
         // claim mechanism makes this idempotent with the onStartInputView call.
         dev.patrickgold.florisboard.dictate.DictateController.consumePendingFileTranscription(this)
+        // And the same fallback for a scan (issue #390) — returning from a camera app is exactly the
+        // route that brings the window back without a new input view. Claiming is a single directory
+        // rename, so whichever hook runs first wins and the other finds nothing.
+        dev.patrickgold.florisboard.dictate.scan.ScanController.consumePendingScan(this)
     }
 
     override fun onWindowHidden() {
@@ -529,6 +540,9 @@ class FlorisImeService : LifecycleInputMethodService() {
         dev.patrickgold.florisboard.dictate.DictateController.stashRecordingOnHide(this)
         if (windowController.onWindowHidden()) {
             flogInfo(LogTopic.IMS_EVENTS)
+            // The scan session deliberately survives a hidden window: the trip to the camera is itself
+            // one, so clearing here would mean backing out of the camera landed on an empty panel. What
+            // bounds it instead is ScanController.clearIfForeign (issue #390).
             activeState.batchEdit {
                 activeState.imeUiMode = ImeUiMode.TEXT
                 activeState.isActionsOverflowVisible = false

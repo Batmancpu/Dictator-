@@ -315,11 +315,24 @@ private fun HeldMicBubble(keyBounds: IntRect, flying: Boolean, appear: Float, vi
             },
         ) {
             val locked = lockProgress >= 1f
-            // The resting fill used to be a hardcoded 55% black, which sat on a translucent keyboard as a
-            // dark blob that belonged to nothing. A small thing floating above the keys is exactly what
-            // `key-popup-box` describes, so it borrows that and follows every theme by itself.
-            val restingFill = rememberSnyggThemeQuery(FlorisImeUi.KeyPopupBox.elementName)
-                .background(default = Color.Black.copy(alpha = 0.55f))
+            // This badge carries **white** content — the padlock, the arrow, and the white flash as it
+            // catches — so it needs a dark ground, and that is the whole rule here.
+            //
+            // It used to be a flat 55% black. 08bc50bb moved it to `key-popup-box` so it would follow the
+            // theme, which was right for the case that commit was about — a dark blob floating over a
+            // translucent keyboard belongs to nothing — and wrong for every other theme: a key popup is a
+            // light surface meant for dark text, so the badge became `#757575` on the default night theme
+            // and `#ffffff` on Contrast, E-Ink and Sand, where a white padlock is simply not there.
+            //
+            // So: the themed surface only where the theme is **translucent**, which is exactly the glass
+            // themes 08bc50bb was written for and nothing else. Everywhere else the old scrim is back.
+            val popupSurface = rememberSnyggThemeQuery(FlorisImeUi.KeyPopupBox.elementName)
+                .background(default = Color.Transparent)
+            val restingFill = if (popupSurface.alpha < 1f && popupSurface.alpha > 0f) {
+                popupSurface
+            } else {
+                Color.Black.copy(alpha = 0.55f)
+            }
             // A single pop at the instant it catches — the gesture ends there, so without a beat of
             // feedback the only sign that anything happened is a lock icon you are not looking at.
             val catchPop = remember { Animatable(0f) }

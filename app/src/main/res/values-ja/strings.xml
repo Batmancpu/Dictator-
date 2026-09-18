@@ -72,6 +72,7 @@
     <string name="quick_action__clipboard_cut__tooltip">クリップボードに切り取り</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">貼り付け</string>
     <string name="quick_action__clipboard_paste__tooltip">クリップボードから貼り付け</string>
+    <string name="quick_action__clipboard_select">選択</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">すべて選択</string>
     <string name="quick_action__clipboard_select_all__tooltip">すべて選択</string>
     <string name="quick_action__ime_ui_mode_clipboard" comment="Please mind the limited available space for the quick action strings">クリップボード</string>
@@ -100,6 +101,8 @@
     <string name="quick_action__split_layout__tooltip">分割キーボードの切り替え</string>
     <string name="quick_action__toggle_number_row" comment="Quick action that shows or hides the row of digit keys above the letters. Please mind the limited available space for the quick action strings">数字キー行</string>
     <string name="quick_action__toggle_number_row__tooltip">数字キーの行を表示/非表示</string>
+    <string name="quick_action__view_numeric_advanced" comment="Quick action that replaces the whole keyboard with a number pad (digits, arithmetic signs, brackets). Not to be confused with the number row above. Please mind the limited available space for the quick action strings">数字キーパッド</string>
+    <string name="quick_action__view_numeric_advanced__tooltip">数字キーパッドに切り替え</string>
     <string name="quick_action__drag_marker" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">ドラッグマーカー</string>
     <string name="quick_action__drag_marker__tooltip" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">Current drag marker position</string>
     <string name="quick_action__noop" comment="Noop=no operation; this action is only used as a placeholder in the actions editor drag and drop screen">操作なし</string>
@@ -180,6 +183,8 @@
     <string name="settings__localization__subtype_delete_confirmation_title" comment="Title of the subtype delete confirmation dialog">削除の確認</string>
     <string name="settings__localization__subtype_delete_confirmation_warning" comment="Warning message in the confirmation dialog to confirm the user's intent to delete">このサブタイプを削除してもよろしいですか？</string>
     <string name="settings__theme__title" comment="Title of the Theme screen">テーマ</string>
+    <string name="pref__theme__high_contrast__label" comment="Label of the switch that turns on the measured high-contrast theme pair">ハイコントラスト</string>
+    <string name="pref__theme__high_contrast__summary" comment="Summary of the high-contrast switch. 7:1 is the WCAG AAA contrast ratio for body text; keep the ratio as digits.">枠線付きのキー、すべての文字を 7:1 で測定。昼と夜のテーマを設定します。</string>
     <string name="pref__theme__mode__label" comment="Label of the theme mode preference">テーマモード</string>
     <string name="pref__theme__sunrise_time__label" comment="Label of the sunrise time preference">日の出時刻</string>
     <string name="pref__theme__sunset_time__label" comment="Label of the sunset time preference">日の入り時刻</string>
@@ -658,6 +663,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Dictateが繰り返し動作を停止しているようです…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">無限クラッシュループを停止するため、以前のキーボードにフォールバックしています。タップしてエラー詳細を表示</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">キーボードに戻る</string>
     <string name="clipboard__header_title">クリップボード</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">クリップボードを検索</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">その語を含む項目はありません</string>
@@ -1020,6 +1026,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">カーソルをページ先頭に移動</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">カーソルをページ末尾に移動</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">クリップボードマネージャー/履歴を開く</string>
+    <string name="enum__swipe_action__switch_to_editing_context">テキスト編集パネルを開く</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Shift</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">やり直し</string>
     <string name="enum__swipe_action__undo" comment="Enum value label">元に戻す</string>
@@ -1062,6 +1069,10 @@
         <item quantity="other">{v}候補</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">テキスト編集</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">カーソル移動、選択、テキスト編集</string>
+    <string name="quick_action__ime_ui_mode_scan">テキストをスキャン</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">印刷された文字を撮影して挿入します</string>
     <string name="quick_action__ime_ui_mode_dictate">音声入力</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">タップして音声入力、もう一度タップで文字起こし</string>
     <string name="quick_action__dictate_live_prompt">音声指示</string>
@@ -1158,6 +1169,17 @@
     <string name="dictate__floating_button_design_pill_summary">アクティブ時に展開し、タイマーとライブ波形を表示します。</string>
     <string name="dictate__floating_button_design_ring">リング</string>
     <string name="dictate__floating_button_design_ring_summary">録音・文字起こし中にアニメーションするリング付きのコンパクトな円。</string>
+    <string name="dictate__floating_button_apps_title">アプリごとの表示</string>
+    <string name="dictate__floating_button_apps_summary_all">すべてのアプリで表示</string>
+    <string name="dictate__floating_button_apps_summary_only">{n} 個のアプリでのみ表示</string>
+    <string name="dictate__floating_button_apps_summary_except">{n} 個のアプリ以外で表示</string>
+    <string name="dictate__floating_button_apps_scope_all">すべてのアプリ</string>
+    <string name="dictate__floating_button_apps_scope_only">下で選んだアプリのみ</string>
+    <string name="dictate__floating_button_apps_scope_except">下で選んだアプリ以外すべて</string>
+    <string name="dictate__floating_button_apps_note">選ばなかったアプリの上にボタンが描画されることはなく、Dictate がそのアプリのテキスト欄を読むこともありません。ユーザー補助サービス自体を拒むアプリには、サービスが有効であること自体は引き続き分かります。</string>
+    <string name="dictate__floating_button_apps_list_title">アプリ</string>
+    <string name="dictate__floating_button_apps_search">アプリを検索</string>
+    <string name="dictate__floating_button_apps_none">「{search_term}」に一致するアプリはありません</string>
     <string name="dictate__floating_button_design_title">ボタンのスタイル</string>
     <string name="dictate__floating_button_haptic_summary_off">タップ時に振動しません。</string>
     <string name="dictate__floating_button_haptic_summary_on">ボタンをタップすると短く振動します。</string>
@@ -1283,8 +1305,27 @@
     <string name="dictate__providers_field_transcription_model">文字起こしモデル</string>
     <string name="dictate__providers_field_chat_model">言い換えモデル</string>
     <string name="dictate__providers_test">接続をテスト</string>
-    <string name="dictate__providers_test_success">接続済み · {count}モデル</string>
-    <string name="dictate__providers_test_failed">接続に失敗しました</string>
+    <string name="dictate__providers_test_transcribe">文字起こしをテスト</string>
+    <string name="dictate__providers_check_no_key">先にAPIキーを入力してください。</string>
+    <string name="dictate__providers_check_credentials_ok">認証情報を確認 · {count} 個のモデル</string>
+    <string name="dictate__providers_check_credentials_ok_nocount">認証情報を確認</string>
+    <string name="dictate__providers_check_endpoint_ok">サーバーに到達 · {count} 個のモデル</string>
+    <string name="dictate__providers_check_credentials_untested">文字起こしは未テストです。</string>
+    <string name="dictate__providers_check_transcription_ok">文字起こしを確認</string>
+    <string name="dictate__providers_check_transcription_text">返ってきた内容：「{text}」</string>
+    <string name="dictate__providers_check_transcription_empty">リクエストは通りましたが、テキストが返りませんでした。接続はできていますが、このモデルはサンプルを理解できませんでした。</string>
+    <string name="dictate__providers_check_failed_connection">接続テストに失敗しました</string>
+    <string name="dictate__providers_check_failed_transcription">文字起こしテストに失敗しました</string>
+    <string name="dictate__providers_check_err_auth">キーが拒否されました。キーと、アドレスが同じアカウントのものかを確認してください。</string>
+    <string name="dictate__providers_check_err_quota">キーは有効ですが、アカウントの残量がないか上限を超えています。プロバイダーでプランを確認してください。</string>
+    <string name="dictate__providers_check_err_network">サーバーに接続できませんでした。アドレスとインターネット接続を確認してください。</string>
+    <string name="dictate__providers_check_err_timeout">時間内に応答がありませんでした。プロバイダーが混雑している可能性があります。もう一度お試しください。</string>
+    <string name="dictate__providers_check_err_server">プロバイダー側のエラーです。ここで変更できることはありません。しばらくしてからお試しください。</string>
+    <string name="dictate__providers_check_err_format">プロバイダーがサンプル音声を拒否しました。この形式に対応していない可能性があります。</string>
+    <string name="dictate__providers_check_err_unknown">リクエストが失敗しました。</string>
+    <string name="dictate__providers_azure_link_signup">Azureアカウントを作成</string>
+    <string name="dictate__providers_azure_link_portal">Azureポータル</string>
+    <string name="dictate__providers_azure_link_guide">セットアップガイド</string>
     <string name="dictate__providers_network_group">ネットワーク</string>
     <string name="dictate__request_timeout_title">リクエストのタイムアウト</string>
     <string name="dictate__request_timeout_summary">{v} 秒 · 自分のサーバーが遅い場合は長くしてください</string>
@@ -1325,8 +1366,10 @@
     <string name="dictate__recording_animation_static_description">録音中は赤い点のまま変化しません</string>
     <string name="dictate__recording_animation_pulse_label">点滅</string>
     <string name="dictate__recording_animation_pulse_description">一定のリズムで脈打ちます</string>
-    <string name="dictate__recording_animation_level_label">声に反応</string>
+    <string name="dictate__recording_animation_level_label">声に反応（ドット）</string>
     <string name="dictate__recording_animation_level_description">マイクの音量に反応し、音を拾っていることを示します</string>
+    <string name="dictate__recording_animation_wave_label">声に反応（波形）</string>
+    <string name="dictate__recording_animation_wave_description">直近の数秒を波形で表示するので、話し終えたタイミングが一目で分かります</string>
     <string name="dictate__skip_silent_title">無音の録音をスキップ</string>
     <string name="dictate__skip_silent_summary">無音の録音での幻覚テキストや無駄なAPI呼び出しを回避します</string>
     <string name="dictate__trim_silent_gaps_title">長い無音を除去</string>
@@ -1403,6 +1446,26 @@
     <string name="dictate__custom_words_title">カスタム単語</string>
     <string name="dictate__custom_words_summary_empty">正しく表記するために名前や専門用語を追加します</string>
     <string name="dictate__custom_words_placeholder">例: FlorisBoard、Kubernetes、Renée、OAuth、Anthropic</string>
+    <string name="dictate__custom_words_summary">{count} 語 · 約 {tokens} / {budget} トークン</string>
+    <string name="dictate__custom_words_budget_info">ここの単語は口述のたびに毎回送られますが、音声モデルが読むのは約 {budget} トークン分の文脈だけです。このリストはそのうち約 {tokens} を使っています。</string>
+    <string name="dictate__custom_words_budget_over">リストが音声モデルの読み取れる長さを超えています。{count} 語のうち約 {fits} 語だけが届き、残りは毎回送られたうえで無視されます。語彙が多い場合はカスタム置換をお使いください。正確で、オフラインでも動き、費用もかかりません。</string>
+    <string name="dictate__custom_words_import">単語リストを読み込む</string>
+    <string name="dictate__custom_words_export">単語リストを書き出す</string>
+    <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
+    <string name="dictate__custom_words_import_title">単語リストを読み込む</string>
+    <string name="dictate__custom_words_import_fitting">このファイルの新しい単語 {count} 語がリストに収まります。</string>
+    <string name="dictate__custom_words_import_known">{count} 語はすでに登録されていました。</string>
+    <string name="dictate__custom_words_import_nofit">{count} 語は入りませんでした。音声モデルが読む文脈は約 {budget} トークンまでなので、送られても無視されていたはずです。</string>
+    <string name="dictate__custom_words_import_unusable">{count} 行には表記すべき語がなく、読み飛ばしました。</string>
+    <string name="dictate__custom_words_import_truncated">ファイルの先頭 {count} 件のみを読み込みました。</string>
+    <string name="dictate__custom_words_import_also_dictionary">ユーザー辞書にも追加する</string>
+    <string name="dictate__custom_words_import_also_dictionary_summary">このリストは音声モデルに綴りを伝えるだけのものです。ユーザー辞書は入力中にキーボードが使う辞書で、長さの制限がありません。そのため上に収まらなかった語も含め、ファイル内のすべての単語が登録されます。</string>
+    <string name="dictate__custom_words_import_empty">このファイルに単語は見つかりませんでした</string>
+    <string name="dictate__custom_words_import_done">{count} 語を追加しました</string>
+    <string name="dictate__custom_words_import_done_dictionary">{count} 語を追加し、{dict} 語をユーザー辞書にも追加しました</string>
+    <string name="dictate__file_unreadable">このファイルは読み込めませんでした</string>
+    <string name="dictate__file_export_done">ファイルを保存しました</string>
+    <string name="dictate__file_export_failed">このファイルを書き込めませんでした</string>
     <string name="dictate__rewording_group">言い換え（AI編集）</string>
     <string name="dictate__rewording_title">言い換え（AI）</string>
     <string name="dictate__rewording_summary_on">オン – AIで言い換え・翻訳・書式設定</string>
@@ -1582,6 +1645,16 @@
     <string name="dictate__mappings_field_to_placeholder">例: GitHub</string>
     <string name="dictate__mappings_group">置換ルール</string>
     <string name="dictate__mappings_matchcase_summary">大文字と小文字が完全に一致する場合のみ置き換えます。</string>
+    <string name="dictate__mappings_import">ルールを読み込む</string>
+    <string name="dictate__mappings_export">ルールを書き出す</string>
+    <string name="dictate__mappings_export_filename">dictate_mappings.tsv</string>
+    <string name="dictate__mappings_import_title">ルールを読み込む</string>
+    <string name="dictate__mappings_import_message">このファイルに新しいルールが {count} 件あります。リストに追加しますか？</string>
+    <string name="dictate__mappings_import_known">{count} 件はすでに登録されていました。</string>
+    <string name="dictate__mappings_import_unusable">{count} 行は置換先が書かれておらず、読み飛ばしました。</string>
+    <string name="dictate__mappings_import_format">1行に1ルール：聞こえた語、タブ、置き換える語。</string>
+    <string name="dictate__mappings_import_empty">このファイルにルールは見つかりませんでした</string>
+    <string name="dictate__mappings_import_done">{count} 件のルールを追加しました</string>
     <string name="dictate__mappings_matchcase_title">大文字と小文字を区別</string>
     <string name="dictate__mappings_opt_caseinsensitive">大文字と小文字を無視</string>
     <string name="dictate__mappings_opt_casesensitive">大文字と小文字を区別</string>
@@ -1954,6 +2027,47 @@
     <string name="apptour61__outro_eyebrow">以上が 6.1 です</string>
     <string name="apptour61__outro_title">同じキーボード、角の取れた使い心地</string>
     <string name="apptour61__outro_body">これまでの口述のやり方は何も変わりません。自分の鍵でも、自分のサーバーでも、端末上のモデルでも同じです。すべてのツアーは 設定 › このアプリについて から読み直せます。</string>
+    <string name="apptour62__cta_try">試してみる</string>
+    <string name="apptour62__cta_manage">オフにする場所</string>
+    <string name="apptour62__art_word">ゾーヤ</string>
+    <string name="apptour62__art_emoji_word">ケーキ</string>
+    <string name="apptour62__art_emoji">🍰</string>
+    <string name="apptour62__intro_eyebrow">Dictate 6.2</string>
+    <string name="apptour62__intro_title">あなたの言葉を覚え、5つの新しい装いに</string>
+    <string name="apptour62__intro_body">どの辞書も知らない語をキーボードが覚えられるようになり、キーの向こうにアプリを透かせるようになり、左右の親指がそれぞれの半分を持てるようになりました。さらに、毎日の作業を助ける小さな機能をいくつか。</string>
+    <string name="apptour62__learning_eyebrow">新機能: 入力しながら覚える</string>
+    <string name="apptour62__learning_title">どの辞書も知らない言葉</string>
+    <string name="apptour62__learning_body">名前や専門用語を何度か入力すると、キーボードがそれを覚え、誤りとして印を付けるのをやめて候補に出すようになります。この更新で、以前オフにしていた方も含め、全員で有効になります。シークレットモード、パスワード欄、キーを一つずつ打っていないものからは何も覚えません。すべてこの端末の中だけに残り、下のボタンから一覧と切り替えスイッチを開けます。</string>
+    <string name="apptour62__themes_eyebrow">5つの新しいテーマ</string>
+    <string name="apptour62__themes_title">Glass、Sand、Deep、そして暗い E-Ink</string>
+    <string name="apptour62__themes_body">Dictate Glass はキーとキーのすき間からアプリを透かせつつ、キー自体は文字が読める程度の不透明さを保ちます。Glass Clear はさらに透かし、見た目は上ですが、キーボードの背後まで描くアプリではその文字が透けてしまいます。Sand は暖かい明るいテーマ、Deep は落ち着いた暗いテーマ、そして E-Ink にようやく夜版ができました。自動切り替えが暗くなってから白いキーボードを出すことはもうありません。</string>
+    <string name="apptour62__split_eyebrow">新機能: 分割キーボード</string>
+    <string name="apptour62__split_title">手を伸ばさずに、両方の親指で</string>
+    <string name="apptour62__split_body">片手モードやフローティングの隣に加わった新しいクイック操作が、各行を左右に引き離し、それぞれの親指が自分の側だけで済むようにします。QWERTY だけでなくすべての配列が分割されます。継ぎ目はキーの幅から計算されるので、配列ごとに書き込む必要がないからです。横向きでは、両方に余裕があるかぎりアプリが見えたままになります。</string>
+    <string name="apptour62__emoji_eyebrow">絵文字</string>
+    <string name="apptour62__emoji_title">言葉が自分の絵文字を見つける</string>
+    <string name="apptour62__emoji_body">単語を入力すると、その意味の絵文字が候補バーに現れます。システム自身が使うのと同じデータから、約50の言語で。候補の席を奪うのではなく、その隣に並びます。さらに、ピン留めした絵文字と最近使った絵文字を並べる任意の行もキーの上に追加できます。</string>
+    <string name="apptour62__helpers_eyebrow">4つの小さな助け</string>
+    <string name="apptour62__helpers_title">シークレット、きれいなリンク、計算の答え</string>
+    <string name="apptour62__helpers_body">シークレットモードの間は何も覚えません。学習もせず、記録も残しません。貼り付けたリンクからは、入力欄に入る前に追跡用パラメータを取り除けます。= で終わる式を入力すると、答えが候補として出ます。数字行をオンにすると、文字キーがまた自分の数字を表示します。</string>
+    <string name="apptour62__selection_eyebrow">選択と移動</string>
+    <string name="apptour62__selection_title">どれだけ選んだかが見える</string>
+    <string name="apptour62__selection_body">選択中に空いていた行が、選択範囲の単語数と文字数を数えるようになりました。新しいボタンで入力欄の先頭と末尾へ一気に移動でき、コピーのときには両端の余分な空白を置いていけます。選択が始まると操作行は割り込まずに脇へ下がります。</string>
+    <string name="apptour62__clipboard_eyebrow">クリップボード</string>
+    <string name="apptour62__clipboard_title">中身から目当ての一片を探す</string>
+    <string name="apptour62__clipboard_body">クリップボードを、入っているもの全体から検索できるようになりました。いまコピーしたものは候補バーにピル型で提示され、不要なら払いのけられます。同じ文字列を二度コピーすれば二度と数えるので、また戻ってきます。項目を削除すると、背後のファイルも削除されるようになり、画像が端末に残ることはありません。</string>
+    <string name="apptour62__gestures_eyebrow">ジェスチャー</string>
+    <string name="apptour62__gestures_title">\?123 を押したまま、滑らせて、離す</string>
+    <string name="apptour62__gestures_body">記号キーを押したまま目当ての文字へ滑らせて離すと、その文字が入り、文字キーはもう戻っています。行き来の切り替えは要りません。スペースキーの上方向のスワイプは、直前の単語ではなく一つ上の行に届くようになりました。キーどうしの間隔も、違いがはっきり見える幅で調節できます。</string>
+    <string name="apptour62__export_eyebrow">新機能: 口述をファイルに</string>
+    <string name="apptour62__export_title">すべての口述を、選んだフォルダーへ</string>
+    <string name="apptour62__export_body">フォルダーを一度選んでおけば、終わった口述はその瞬間に、プレーンテキストのファイルとしてそこにも書き出されます。そのフォルダーを見ているもの——メモアプリ、同期ツール、バックアップ——が、Dictate がその言葉を覚えなくてもあなたの文章を受け取れます。</string>
+    <string name="apptour62__more_eyebrow">さらに</string>
+    <string name="apptour62__more_title">細かな改善がたくさん</string>
+    <string name="apptour62__more_body">候補は英語だけでなくどの言語でも、カーソルの前の2語を見るようになりました。バックアップは API キーを含めずに作れるので、そのまま渡せます。Azure 自身の文字起こしモデルに届くようになり、オフライン用のモデルを選ぶとオフラインエンジンにも切り替わり、どの要求にも待ち時間に見合った制限時間が付きました。口述は送信した時点で履歴に現れ、取り込みは今どの段階かを示し、途中で中止できます。これまで扱いにくかったアプリにも、文字がより確実に届きます。</string>
+    <string name="apptour62__outro_eyebrow">これが 6.2 です</string>
+    <string name="apptour62__outro_title">同じキーボード、より自分のものに</string>
+    <string name="apptour62__outro_body">口述のやり方は何も変わりません。自分の鍵でも、自分のサーバーでも、端末上のモデルでも同じです。すべてのツアーは 設定 › このアプリについて から読み直せます。</string>
     <string name="changelog__v5_0_0">• 新機能: グライド入力 — キーの上をスワイプして単語をまるごと入力。必要に応じてダウンロードされる言語別辞書付き。 👆\n• 新機能: 単語候補と自動修正 — 入力ミスは自動的に直り、入力した単語はワンタップで戻せます。 ✨\n• 新機能: リアルタイム文字起こし — 話しながら単語が現れる様子を確認。OpenAI、Deepgram、Soniox、AssemblyAI、ElevenLabsに対応。 ⚡\n• 新機能: さらに3つの文字起こしプロバイダー — ElevenLabs Scribe、Deepgram、AssemblyAI。 ☁️\n• 新機能: クラシック音声入力レイアウト — Dictate 3のキーボードなし音声画面が復活。固定またはスワイプ一つで。 🎙️\n• 新機能: コミュニティのプロンプトライブラリ — 言い換えプロンプトを閲覧・共有。 📚\n• 新機能: マイルストーン付きの音声入力統計。 📊\n• 新機能: オフラインモデルNVIDIA Parakeet、加えて空の録音をスキップする無音フィルター。 📴\n• その他: より安定したフローティングボタン、推論の強度の調整、触覚フィードバック、新しいE-Readerテーマ、そして数十件の修正。 🛠️</string>
     <string name="media__tab__gifs">GIF</string>
     <string name="prefs__media__gif__title">GIF</string>
@@ -2160,4 +2274,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">ステッカーのフォルダ</string>
+    <string name="scan__take_photo">写真を撮る</string>
+    <string name="scan__pick_image">画像を選ぶ</string>
+    <string name="scan__retake">もう一度試す</string>
+    <string name="scan__empty_hint">印刷された文字を撮影し、必要な部分をタップしてください。</string>
+    <string name="scan__latin_only">ラテン文字のみ</string>
+    <string name="scan__reading">写真を読み取っています…</string>
+    <string name="scan__no_text">写真から文字が見つかりませんでした。</string>
+    <string name="scan__failed">写真を読み取れませんでした。</string>
+    <string name="scan__no_camera">カメラアプリが見つかりません。</string>
+    <string name="scan__select_all">すべて選択</string>
+    <string name="scan__discard">破棄</string>
+    <string name="scan__approve">確定</string>
 </resources>

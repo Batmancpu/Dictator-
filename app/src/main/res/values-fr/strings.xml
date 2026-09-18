@@ -72,6 +72,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Coupe vers le presse-papier</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Coller</string>
     <string name="quick_action__clipboard_paste__tooltip">Coller depuis le presse-papier</string>
+    <string name="quick_action__clipboard_select">Sélectionner</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Tout sélect.</string>
     <string name="quick_action__clipboard_select_all__tooltip">Tout sélectionner dans le presse-papiers</string>
     <string name="quick_action__ime_ui_mode_clipboard" comment="Please mind the limited available space for the quick action strings">Pressepapier</string>
@@ -99,6 +100,8 @@
     <string name="quick_action__split_layout__tooltip">Active ou désactive le clavier divisé</string>
     <string name="quick_action__toggle_number_row" comment="Quick action that shows or hides the row of digit keys above the letters. Please mind the limited available space for the quick action strings">Chiffres</string>
     <string name="quick_action__toggle_number_row__tooltip">Afficher ou masquer la rangée de chiffres</string>
+    <string name="quick_action__view_numeric_advanced" comment="Quick action that replaces the whole keyboard with a number pad (digits, arithmetic signs, brackets). Not to be confused with the number row above. Please mind the limited available space for the quick action strings">Pavé numérique</string>
+    <string name="quick_action__view_numeric_advanced__tooltip">Passer au pavé numérique</string>
     <string name="quick_action__drag_marker" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">Curseur</string>
     <string name="quick_action__drag_marker__tooltip" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">Position actuelle du curseur</string>
     <string name="quick_action__noop" comment="Noop=no operation; this action is only used as a placeholder in the actions editor drag and drop screen">Aucun</string>
@@ -179,6 +182,8 @@
     <string name="settings__localization__subtype_delete_confirmation_title" comment="Title of the subtype delete confirmation dialog">Confirmer la suppression</string>
     <string name="settings__localization__subtype_delete_confirmation_warning" comment="Warning message in the confirmation dialog to confirm the user's intent to delete">Êtes-vous sûr de vouloir supprimer ce sous-type ?</string>
     <string name="settings__theme__title" comment="Title of the Theme screen">Thème</string>
+    <string name="pref__theme__high_contrast__label" comment="Label of the switch that turns on the measured high-contrast theme pair">Contraste élevé</string>
+    <string name="pref__theme__high_contrast__summary" comment="Summary of the high-contrast switch. 7:1 is the WCAG AAA contrast ratio for body text; keep the ratio as digits.">Touches encadrées, chaque libellé mesuré à 7:1. Définit jour et nuit.</string>
     <string name="pref__theme__mode__label" comment="Label of the theme mode preference">Mode du thème</string>
     <string name="pref__theme__sunrise_time__label" comment="Label of the sunrise time preference">Heure de lever du soleil</string>
     <string name="pref__theme__sunset_time__label" comment="Label of the sunset time preference">Heure de coucher du soleil</string>
@@ -618,6 +623,7 @@
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Dictate semble cesser de fonctionner de façon répétitive…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Retour au clavier précédent pour arrêter la boucle de plantage infinie. Appuyez pour afficher les détails de l\'erreur</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">Retour au clavier</string>
     <string name="clipboard__header_title">Presse-papier</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Rechercher dans le presse-papiers</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">Aucun élément ne contient cela</string>
@@ -959,6 +965,7 @@
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">Déplacer le curseur au début de la page</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">Déplacer le curseur à la fin de la page</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Ouvrir l\'historique du presse-papier</string>
+    <string name="enum__swipe_action__switch_to_editing_context">Ouvrir le panneau d\'édition de texte</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Maj</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Recommencer</string>
     <string name="enum__swipe_action__undo" comment="Enum value label">Annuler</string>
@@ -1008,6 +1015,10 @@
         <item quantity="other">{v} candidats</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">Édition de texte</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">Déplacer le curseur, sélectionner et modifier le texte</string>
+    <string name="quick_action__ime_ui_mode_scan">Scanner un texte</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Photographier un texte imprimé et l\'insérer</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Touchez pour dicter, touchez à nouveau pour transcrire</string>
     <string name="quick_action__dictate_live_prompt">Instruction en direct</string>
@@ -1104,6 +1115,17 @@
     <string name="dictate__floating_button_design_pill_summary">S’agrandit lorsqu’il est actif pour afficher un minuteur et une forme d’onde en direct.</string>
     <string name="dictate__floating_button_design_ring">Anneau</string>
     <string name="dictate__floating_button_design_ring_summary">Cercle compact avec un anneau animé pendant l’enregistrement et la transcription.</string>
+    <string name="dictate__floating_button_apps_title">Visibilité par application</string>
+    <string name="dictate__floating_button_apps_summary_all">Dans toutes les applications</string>
+    <string name="dictate__floating_button_apps_summary_only">Seulement dans {n} applications</string>
+    <string name="dictate__floating_button_apps_summary_except">Partout sauf dans {n} applications</string>
+    <string name="dictate__floating_button_apps_scope_all">Toutes les applications</string>
+    <string name="dictate__floating_button_apps_scope_only">Uniquement les applications ci-dessous</string>
+    <string name="dictate__floating_button_apps_scope_except">Toutes sauf les applications ci-dessous</string>
+    <string name="dictate__floating_button_apps_note">Le bouton n\'est jamais dessiné au-dessus d\'une application que vous excluez, et Dictate n\'y lit aucun champ de texte. Une application qui refuse les services d\'accessibilité en général verra toujours que le service est activé.</string>
+    <string name="dictate__floating_button_apps_list_title">Applications</string>
+    <string name="dictate__floating_button_apps_search">Rechercher une application</string>
+    <string name="dictate__floating_button_apps_none">Aucune application trouvée pour « {search_term} »</string>
     <string name="dictate__floating_button_design_title">Style du bouton</string>
     <string name="dictate__floating_button_haptic_summary_off">Pas de vibration au toucher.</string>
     <string name="dictate__floating_button_haptic_summary_on">Une brève vibration quand vous touchez le bouton.</string>
@@ -1229,8 +1251,27 @@
     <string name="dictate__providers_field_transcription_model">Modèle de transcription</string>
     <string name="dictate__providers_field_chat_model">Modèle de reformulation</string>
     <string name="dictate__providers_test">Tester la connexion</string>
-    <string name="dictate__providers_test_success">Connecté · {count} modèles</string>
-    <string name="dictate__providers_test_failed">Échec de la connexion</string>
+    <string name="dictate__providers_test_transcribe">Tester la transcription</string>
+    <string name="dictate__providers_check_no_key">Saisissez d’abord votre clé API.</string>
+    <string name="dictate__providers_check_credentials_ok">Identifiants vérifiés · {count} modèles</string>
+    <string name="dictate__providers_check_credentials_ok_nocount">Identifiants vérifiés</string>
+    <string name="dictate__providers_check_endpoint_ok">Serveur atteint · {count} modèles</string>
+    <string name="dictate__providers_check_credentials_untested">Transcription non testée.</string>
+    <string name="dictate__providers_check_transcription_ok">Transcription vérifiée</string>
+    <string name="dictate__providers_check_transcription_text">Résultat : « {text} »</string>
+    <string name="dictate__providers_check_transcription_empty">La requête est passée, mais aucun texte n’est revenu : la connexion fonctionne, ce modèle n’a pas compris l’échantillon.</string>
+    <string name="dictate__providers_check_failed_connection">Échec du test de connexion</string>
+    <string name="dictate__providers_check_failed_transcription">Échec du test de transcription</string>
+    <string name="dictate__providers_check_err_auth">La clé a été refusée. Vérifiez-la, ainsi que l’appartenance de l’adresse au même compte.</string>
+    <string name="dictate__providers_check_err_quota">La clé fonctionne, mais le compte n’a plus de quota ou dépasse une limite. Vérifiez votre offre auprès du fournisseur.</string>
+    <string name="dictate__providers_check_err_network">Le serveur est injoignable. Vérifiez l’adresse et votre connexion internet.</string>
+    <string name="dictate__providers_check_err_timeout">Pas de réponse à temps. Le fournisseur est peut-être occupé : réessayez.</string>
+    <string name="dictate__providers_check_err_server">Le fournisseur signale une erreur de son côté. Rien à changer ici ; réessayez plus tard.</string>
+    <string name="dictate__providers_check_err_format">Le fournisseur a refusé l’échantillon audio. Il n’accepte peut-être pas ce format.</string>
+    <string name="dictate__providers_check_err_unknown">La requête a échoué.</string>
+    <string name="dictate__providers_azure_link_signup">Créer un compte Azure</string>
+    <string name="dictate__providers_azure_link_portal">Portail Azure</string>
+    <string name="dictate__providers_azure_link_guide">Guide de configuration</string>
     <string name="dictate__providers_network_group">Réseau</string>
     <string name="dictate__request_timeout_title">Délai d\'attente des requêtes</string>
     <string name="dictate__request_timeout_summary">{v} s · à augmenter pour un serveur lent qui vous appartient</string>
@@ -1271,8 +1312,10 @@
     <string name="dictate__recording_animation_static_description">Reste un point rouge fixe pendant l\'enregistrement</string>
     <string name="dictate__recording_animation_pulse_label">Pulsation</string>
     <string name="dictate__recording_animation_pulse_description">Pulse à un rythme régulier</string>
-    <string name="dictate__recording_animation_level_label">Suit votre voix</string>
+    <string name="dictate__recording_animation_level_label">Suit votre voix (point)</string>
     <string name="dictate__recording_animation_level_description">Réagit au niveau du micro et montre qu\'il vous capte</string>
+    <string name="dictate__recording_animation_wave_label">Suit votre voix (onde)</string>
+    <string name="dictate__recording_animation_wave_description">Dessine les dernières secondes sous forme d\'onde en direct, pour voir quand vous avez fini de parler</string>
     <string name="dictate__skip_silent_title">Ignorer les enregistrements silencieux</string>
     <string name="dictate__skip_silent_summary">Évite le texte halluciné et les appels API inutiles sur un audio silencieux</string>
     <string name="dictate__trim_silent_gaps_title">Rogner les longues pauses</string>
@@ -1349,6 +1392,26 @@
     <string name="dictate__custom_words_title">Mots personnalisés</string>
     <string name="dictate__custom_words_summary_empty">Ajoutez des noms ou des termes techniques à orthographier correctement</string>
     <string name="dictate__custom_words_placeholder">ex. : FlorisBoard, Kubernetes, Renée, OAuth, Anthropic</string>
+    <string name="dictate__custom_words_summary">{count} mots · environ {tokens} sur {budget} jetons</string>
+    <string name="dictate__custom_words_budget_info">Chaque mot ici part avec chaque dictée, et le modèle vocal n\'en lit qu\'environ {budget} jetons de contexte. Votre liste en occupe environ {tokens}.</string>
+    <string name="dictate__custom_words_budget_over">Votre liste est plus longue que ce que le modèle vocal lit. Environ {fits} de vos {count} mots lui parviennent ; le reste part à chaque dictée et est ignoré. Pour un vocabulaire plus vaste, utilisez les correspondances personnalisées — elles sont exactes, fonctionnent hors ligne et ne coûtent rien.</string>
+    <string name="dictate__custom_words_import">Importer une liste de mots</string>
+    <string name="dictate__custom_words_export">Exporter la liste de mots</string>
+    <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
+    <string name="dictate__custom_words_import_title">Importer une liste de mots</string>
+    <string name="dictate__custom_words_import_fitting">{count} nouveaux mots de ce fichier tiennent dans votre liste.</string>
+    <string name="dictate__custom_words_import_known">{count} y figuraient déjà.</string>
+    <string name="dictate__custom_words_import_nofit">{count} ont été laissés de côté — le modèle vocal ne lit qu\'environ {budget} jetons de contexte, ils auraient donc été envoyés à chaque dictée puis ignorés.</string>
+    <string name="dictate__custom_words_import_unusable">{count} lignes ne contenaient rien à orthographier et ont été ignorées.</string>
+    <string name="dictate__custom_words_import_truncated">Seules les {count} premières entrées du fichier ont été lues.</string>
+    <string name="dictate__custom_words_import_also_dictionary">Les ajouter aussi au dictionnaire personnel</string>
+    <string name="dictate__custom_words_import_also_dictionary_summary">Cette liste indique seulement au modèle vocal comment écrire un mot. Le dictionnaire personnel est ce que le clavier utilise pendant la frappe — il n\'a aucune limite de longueur, donc tous les mots du fichier y entrent, pas seulement ceux qui tiennent ci-dessus.</string>
+    <string name="dictate__custom_words_import_empty">Aucun mot trouvé dans ce fichier</string>
+    <string name="dictate__custom_words_import_done">{count} mots ajoutés</string>
+    <string name="dictate__custom_words_import_done_dictionary">{count} mots ajoutés, et {dict} à votre dictionnaire personnel</string>
+    <string name="dictate__file_unreadable">Ce fichier n\'a pas pu être lu</string>
+    <string name="dictate__file_export_done">Fichier enregistré</string>
+    <string name="dictate__file_export_failed">Impossible d\'écrire ce fichier</string>
     <string name="dictate__rewording_group">Reformulation (édition par IA)</string>
     <string name="dictate__rewording_title">Reformulation (IA)</string>
     <string name="dictate__rewording_summary_on">Activé – reformuler, traduire et mettre en forme avec l\'IA</string>
@@ -1528,6 +1591,16 @@
     <string name="dictate__mappings_field_to_placeholder">ex. GitHub</string>
     <string name="dictate__mappings_group">Règles de remplacement</string>
     <string name="dictate__mappings_matchcase_summary">Remplacer uniquement lorsque la casse correspond exactement.</string>
+    <string name="dictate__mappings_import">Importer des règles</string>
+    <string name="dictate__mappings_export">Exporter les règles</string>
+    <string name="dictate__mappings_export_filename">dictate_mappings.tsv</string>
+    <string name="dictate__mappings_import_title">Importer des règles</string>
+    <string name="dictate__mappings_import_message">{count} nouvelles règles dans ce fichier. Les ajouter à votre liste ?</string>
+    <string name="dictate__mappings_import_known">{count} y figuraient déjà.</string>
+    <string name="dictate__mappings_import_unusable">{count} lignes n\'indiquaient aucun remplacement et ont été ignorées.</string>
+    <string name="dictate__mappings_import_format">Une règle par ligne : ce qui est entendu, une tabulation, ce que cela doit devenir.</string>
+    <string name="dictate__mappings_import_empty">Aucune règle trouvée dans ce fichier</string>
+    <string name="dictate__mappings_import_done">{count} règles ajoutées</string>
     <string name="dictate__mappings_matchcase_title">Respecter la casse</string>
     <string name="dictate__mappings_opt_caseinsensitive">Ignore la casse</string>
     <string name="dictate__mappings_opt_casesensitive">Sensible à la casse</string>
@@ -1898,6 +1971,47 @@
     <string name="apptour61__outro_eyebrow">Voilà 6.1</string>
     <string name="apptour61__outro_title">Le même clavier, moins d\'aspérités</string>
     <string name="apptour61__outro_body">Rien ne change à votre façon de dicter — votre propre clé, votre propre serveur ou un modèle sur l\'appareil. Vous retrouverez toutes les visites guidées dans Paramètres › À propos.</string>
+    <string name="apptour62__cta_try">Essayer</string>
+    <string name="apptour62__cta_manage">Où le désactiver</string>
+    <string name="apptour62__art_word">Zoya</string>
+    <string name="apptour62__art_emoji_word">gâteau</string>
+    <string name="apptour62__art_emoji">🍰</string>
+    <string name="apptour62__intro_eyebrow">Dictate 6.2</string>
+    <string name="apptour62__intro_title">Il apprend vos mots et change cinq fois d\'allure</string>
+    <string name="apptour62__intro_body">Le clavier peut retenir les mots qu\'aucun dictionnaire ne connaît, les touches peuvent laisser transparaître l\'application derrière elles, et chaque pouce peut avoir sa moitié. Plus une poignée de petits outils pour ce que vous faites tous les jours.</string>
+    <string name="apptour62__learning_eyebrow">Nouveau : il apprend en écrivant</string>
+    <string name="apptour62__learning_title">Les mots qu\'aucun dictionnaire ne connaît</string>
+    <string name="apptour62__learning_body">Tapez un nom ou un terme assez souvent et le clavier le garde : il cesse de le signaler comme une faute et se met à le proposer. Cette mise à jour l\'active pour tout le monde, y compris ceux qui l\'avaient désactivé. Rien n\'est appris en navigation privée, dans les champs de mot de passe, ni à partir de ce que vous n\'avez pas tapé touche par touche ; tout reste sur cet appareil, et le bouton ci-dessous ouvre la liste — et l\'interrupteur.</string>
+    <string name="apptour62__themes_eyebrow">Cinq nouveaux thèmes</string>
+    <string name="apptour62__themes_title">Glass, Sand, Deep et un E-Ink sombre</string>
+    <string name="apptour62__themes_body">Dictate Glass laisse voir l\'application par les espaces entre les touches, tandis que les touches restent assez opaques pour qu\'on y lise ; Glass Clear va plus loin et rend mieux, au prix du texte des applications qui dessinent derrière le clavier, qui transparaît alors. Sand est un thème clair et chaud, Deep un thème sombre et calme, et E-Ink a enfin une version nuit — la bascule automatique ne vous tend donc plus un clavier blanc à la tombée du jour.</string>
+    <string name="apptour62__split_eyebrow">Nouveau : clavier scindé</string>
+    <string name="apptour62__split_title">Les deux pouces, sans s\'étirer</string>
+    <string name="apptour62__split_body">Une nouvelle action rapide, à côté du mode à une main et du mode flottant, écarte les rangées pour que chaque pouce reste sur sa moitié. Toutes les dispositions se scindent, pas seulement AZERTY, parce que la coupure est calculée à partir de la largeur des touches plutôt qu\'écrite dans chaque disposition. Et en paysage, l\'application reste maintenant visible dès qu\'il y a la place pour les deux.</string>
+    <string name="apptour62__emoji_eyebrow">Émojis</string>
+    <string name="apptour62__emoji_title">Le mot trouve son émoji</string>
+    <string name="apptour62__emoji_body">Tapez un mot et l\'émoji qui le désigne est proposé dans la barre de suggestions — dans une cinquantaine de langues, à partir des mêmes données que celles du système. Il accompagne les suggestions au lieu de prendre la place de l\'une d\'elles. Il y a aussi une rangée facultative de vos émojis épinglés et récents au-dessus des touches.</string>
+    <string name="apptour62__helpers_eyebrow">Quatre petits outils</string>
+    <string name="apptour62__helpers_title">Navigation privée, liens propres et le résultat du calcul</string>
+    <string name="apptour62__helpers_body">La navigation privée empêche que quoi que ce soit soit retenu tant qu\'elle est active : rien d\'appris, rien de conservé. Les liens collés peuvent être débarrassés de leurs paramètres de suivi avant d\'arriver dans le champ. Tapez un calcul terminé par = et le résultat apparaît en suggestion. Et avec la rangée de chiffres activée, les lettres affichent de nouveau leurs chiffres.</string>
+    <string name="apptour62__selection_eyebrow">Sélectionner et se déplacer</string>
+    <string name="apptour62__selection_title">Voyez ce que vous avez sélectionné</string>
+    <string name="apptour62__selection_body">La rangée qui restait vide pendant une sélection en compte désormais les mots et les caractères. De nouveaux boutons sautent tout au début et tout à la fin du champ, et la copie peut laisser derrière elle les espaces superflus des extrémités. La rangée d\'actions s\'efface dès qu\'une sélection commence, au lieu de parler par-dessus.</string>
+    <string name="apptour62__clipboard_eyebrow">Presse-papiers</string>
+    <string name="apptour62__clipboard_title">Retrouvez un extrait par ce qu\'il dit</string>
+    <string name="apptour62__clipboard_body">Le presse-papiers se cherche maintenant, dans tout ce qu\'il contient. Ce que vous venez de copier est proposé dans la barre de suggestions sous forme de pastille que vous pouvez écarter, et copier deux fois le même texte compte pour deux fois : il revient donc. Supprimer un extrait supprime désormais aussi le fichier derrière lui, au lieu de laisser l\'image sur le téléphone.</string>
+    <string name="apptour62__gestures_eyebrow">Gestes</string>
+    <string name="apptour62__gestures_title">Maintenez ?123, glissez, relâchez</string>
+    <string name="apptour62__gestures_body">Maintenez la touche des symboles, glissez jusqu\'au caractère voulu et relâchez : il est inséré et les lettres sont déjà revenues, sans aller-retour. Le balayage vers le haut sur la barre d\'espace atteint maintenant la ligne du dessus, pas seulement le mot précédent. Et l\'écart entre les touches se règle sur une plage qui se voit vraiment.</string>
+    <string name="apptour62__export_eyebrow">Nouveau : les dictées en fichiers</string>
+    <string name="apptour62__export_title">Chaque dictée dans un dossier de votre choix</string>
+    <string name="apptour62__export_body">Choisissez un dossier une fois et chaque dictée terminée y est aussi écrite en fichier texte brut, à l\'instant où elle est prête. Ce qui surveille ce dossier — une application de notes, un outil de synchronisation, votre sauvegarde — reçoit vos textes sans que Dictate ait à en apprendre le langage.</string>
+    <string name="apptour62__more_eyebrow">Et aussi</string>
+    <string name="apptour62__more_title">Beaucoup de petites choses</string>
+    <string name="apptour62__more_body">Les suggestions regardent désormais les deux mots avant le curseur dans toutes les langues, pas seulement en anglais. Une sauvegarde peut être faite sans vos clés API, pour être transmise sans risque. Les modèles de transcription propres à Azure sont accessibles, choisir un modèle pour le hors-ligne bascule maintenant aussi sur le moteur local, et chaque requête a un délai à la mesure de l\'attente. Les dictées apparaissent dans l\'historique dès leur envoi, les imports disent à quelle étape ils en sont et peuvent être annulés, et le texte arrive plus sûrement dans les applications qui y résistaient.</string>
+    <string name="apptour62__outro_eyebrow">Voilà la 6.2</string>
+    <string name="apptour62__outro_title">Le même clavier, davantage le vôtre</string>
+    <string name="apptour62__outro_body">Rien ne change à votre façon de dicter — votre propre clé, votre propre serveur ou un modèle sur l\'appareil. Vous retrouverez toutes les visites guidées dans Paramètres › À propos.</string>
     <string name="changelog__v5_0_0">• NOUVEAU : Saisie gestuelle — glissez sur les touches pour écrire des mots entiers, avec des dictionnaires par langue téléchargés à la demande. 👆\n• NOUVEAU : Suggestions de mots &amp; correction auto — les fautes sont corrigées automatiquement et le mot que vous avez tapé reste à portée d’un toucher. ✨\n• NOUVEAU : Transcription en temps réel — regardez vos mots apparaître pendant que vous parlez, avec OpenAI, Deepgram, Soniox, AssemblyAI et ElevenLabs. ⚡\n• NOUVEAU : Trois fournisseurs de transcription de plus — ElevenLabs Scribe, Deepgram et AssemblyAI. ☁️\n• NOUVEAU : Interface de dictée classique — l’écran vocal sans clavier de Dictate 3 est de retour, figé ou à un simple glissement. 🎙️\n• NOUVEAU : Bibliothèque de prompts communautaire — parcourez et partagez des prompts de reformulation. 📚\n• NOUVEAU : Statistiques de dictée avec des jalons. 📊\n• NOUVEAU : Modèle hors ligne NVIDIA Parakeet, plus un filtre de silence qui ignore les enregistrements vides. 📴\n• Plus : un bouton flottant plus stable, le contrôle de l’effort de raisonnement, un retour haptique, un nouveau thème E-Reader et des dizaines de corrections. 🛠️</string>
     <string name="media__tab__gifs">GIFs</string>
     <string name="prefs__media__gif__title">GIFs</string>
@@ -2104,4 +2218,16 @@
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Dossier d\'autocollants</string>
+    <string name="scan__take_photo">Prendre une photo</string>
+    <string name="scan__pick_image">Choisir une image</string>
+    <string name="scan__retake">Réessayer</string>
+    <string name="scan__empty_hint">Photographiez un texte imprimé, puis touchez la partie voulue.</string>
+    <string name="scan__latin_only">Écriture latine uniquement</string>
+    <string name="scan__reading">Lecture de la photo…</string>
+    <string name="scan__no_text">Aucun texte trouvé sur la photo.</string>
+    <string name="scan__failed">Impossible de lire la photo.</string>
+    <string name="scan__no_camera">Aucune application appareil photo trouvée.</string>
+    <string name="scan__select_all">Tout sélectionner</string>
+    <string name="scan__discard">Abandonner</string>
+    <string name="scan__approve">Valider</string>
 </resources>

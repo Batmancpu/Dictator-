@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Backspace
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.EmojiEmotions
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.KeyboardHide
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.VerticalAlignBottom
 import androidx.compose.material.icons.filled.VerticalAlignTop
 import androidx.compose.material.icons.automirrored.outlined.Assignment
+import androidx.compose.material.icons.outlined.DocumentScanner
 import androidx.compose.material.icons.outlined.Gif
 import org.florisboard.lib.compose.icons.Sticker
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -60,7 +62,13 @@ enum class LegacyEditAction {
     // keyboard: this layout has no arrow keys at all, only the space bar's swipe, which walks the
     // cursor one character at a time.
     HOME,
-    END;
+    END,
+    // The text editing panel (issue #386). For the same reason HOME/END matter here: the classic layout
+    // has no arrow keys at all, so this is the only place in it where a cursor can be steered.
+    EDITING,
+    // Scan text (issue #390). The classic layout is the one people use when they want the keyboard out
+    // of the way, which is exactly the situation where retyping an IBAN off a letter is worst.
+    SCAN;
 
     val icon: ImageVector
         get() = when (this) {
@@ -82,6 +90,8 @@ enum class LegacyEditAction {
             BACKSPACE -> Icons.Default.Backspace
             HOME -> Icons.Default.VerticalAlignTop
             END -> Icons.Default.VerticalAlignBottom
+            EDITING -> Icons.Default.EditNote
+            SCAN -> Icons.Outlined.DocumentScanner
         }
 
     @get:StringRes
@@ -107,6 +117,8 @@ enum class LegacyEditAction {
             // Same buttons as in the Smartbar, so they carry the same names rather than a second set.
             HOME -> R.string.quick_action__move_start_of_page
             END -> R.string.quick_action__move_end_of_page
+            EDITING -> R.string.quick_action__ime_ui_mode_editing
+            SCAN -> R.string.quick_action__ime_ui_mode_scan
         }
 
     companion object {

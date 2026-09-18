@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -58,13 +59,17 @@ fun SnyggIcon(
     modifier: Modifier = Modifier,
     imageVector: ImageVector,
     contentDescription: String? = null,
+    // Optional override, the same one [SnyggText] carries and for the same reason: an icon sitting on a
+    // surface the caller painted — a button filled with the user's accent — cannot use a tint that was
+    // resolved against the panel's background. Null keeps the themed tint.
+    tint: Color? = null,
 ) {
     ProvideSnyggStyle(elementName, attributes, selector) { style ->
         Icon(
             modifier = modifier.snyggIconSize(style),
             imageVector = imageVector,
             contentDescription = contentDescription,
-            tint = style.foreground(),
+            tint = tint ?: style.foreground(),
         )
     }
 }

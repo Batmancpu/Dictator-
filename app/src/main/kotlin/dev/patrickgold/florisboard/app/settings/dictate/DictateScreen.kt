@@ -50,7 +50,6 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Keyboard
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Mic
@@ -313,14 +312,8 @@ fun DictateFormattingScreen() = FlorisScreen {
                 multiline = true,
             )
         }
-        TextInputPreference(
-            pref = prefs.dictate.customWords,
-            icon = Icons.Default.MenuBook,
-            title = stringRes(R.string.dictate__custom_words_title),
-            placeholder = stringRes(R.string.dictate__custom_words_placeholder),
-            multiline = true,
-            notSetSummary = stringRes(R.string.dictate__custom_words_summary_empty),
-        )
+        // The editor, what the list costs on every request, and the file import/export (issue #389).
+        CustomWordsSection(prefs.dictate.customWords)
         Preference(
             icon = Icons.Default.SwapHoriz,
             modifier = Modifier.settingsSearchAnchor("dictate__mappings_title"),
@@ -449,6 +442,11 @@ fun DictateRecordingScreen() = FlorisScreen {
                     key = DictateRecordingAnimation.LEVEL,
                     label = stringRes(R.string.dictate__recording_animation_level_label),
                     description = stringRes(R.string.dictate__recording_animation_level_description),
+                )
+                entry(
+                    key = DictateRecordingAnimation.WAVE,
+                    label = stringRes(R.string.dictate__recording_animation_wave_label),
+                    description = stringRes(R.string.dictate__recording_animation_wave_description),
                 )
             },
         )

@@ -74,6 +74,7 @@
     <string name="quick_action__clipboard_cut__tooltip">Lakukan potongan papan klip</string>
     <string name="quick_action__clipboard_paste" comment="Please mind the limited available space for the quick action strings">Tempelkan</string>
     <string name="quick_action__clipboard_paste__tooltip">Lakukan penempelan papan klip</string>
+    <string name="quick_action__clipboard_select">Pilih</string>
     <string name="quick_action__clipboard_select_all" comment="Please mind the limited available space for the quick action strings">Pilih semua</string>
     <string name="quick_action__clipboard_select_all__tooltip">Lakukan pemilihan semua papan klip</string>
     <string name="quick_action__ime_ui_mode_clipboard" comment="Please mind the limited available space for the quick action strings">Papan klip</string>
@@ -102,6 +103,8 @@
     <string name="quick_action__split_layout__tooltip">Alih papan ketik terbagi</string>
     <string name="quick_action__toggle_number_row" comment="Quick action that shows or hides the row of digit keys above the letters. Please mind the limited available space for the quick action strings">Baris angka</string>
     <string name="quick_action__toggle_number_row__tooltip">Tampilkan atau sembunyikan baris angka</string>
+    <string name="quick_action__view_numeric_advanced" comment="Quick action that replaces the whole keyboard with a number pad (digits, arithmetic signs, brackets). Not to be confused with the number row above. Please mind the limited available space for the quick action strings">Papan angka</string>
+    <string name="quick_action__view_numeric_advanced__tooltip">Beralih ke papan angka</string>
     <string name="quick_action__drag_marker" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">Tarik marker</string>
     <string name="quick_action__drag_marker__tooltip" comment="This action is only used as a placeholder in the actions editor drag and drop screen and only visible in debug mode">Posisi penanda tarikan saat ini</string>
     <string name="quick_action__noop" comment="Noop=no operation; this action is only used as a placeholder in the actions editor drag and drop screen">Tidak ada</string>
@@ -183,6 +186,8 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="settings__localization__subtype_delete_confirmation_title" comment="Title of the subtype delete confirmation dialog">Konfirmasi Hapus</string>
     <string name="settings__localization__subtype_delete_confirmation_warning" comment="Warning message in the confirmation dialog to confirm the user's intent to delete">Yakin, mau hapus tipe ketikan ini?</string>
     <string name="settings__theme__title" comment="Title of the Theme screen">Tema</string>
+    <string name="pref__theme__high_contrast__label" comment="Label of the switch that turns on the measured high-contrast theme pair">Kontras tinggi</string>
+    <string name="pref__theme__high_contrast__summary" comment="Summary of the high-contrast switch. 7:1 is the WCAG AAA contrast ratio for body text; keep the ratio as digits.">Tombol bergaris, setiap label diukur pada 7:1. Mengatur siang dan malam.</string>
     <string name="pref__theme__mode__label" comment="Label of the theme mode preference">Mode tema</string>
     <string name="pref__theme__sunrise_time__label" comment="Label of the sunrise time preference">Waktu matahari terbit</string>
     <string name="pref__theme__sunset_time__label" comment="Label of the sunset time preference">Waktu matahari terbenam</string>
@@ -679,6 +684,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Dictate kelihatannya berhenti bekerja berulang kali…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Mengembalikan ke papan ketik sebelumnya untuk menghentikan pengulangan kesalahan tidak terbatas. Ketuk untuk melihat detail kesalahan</string>
     <!-- Clipboard strings -->
+    <string name="editing__back_to_keyboard">Kembali ke papan ketik</string>
     <string name="clipboard__header_title">Papan klip</string>
     <string name="clipboard__search_placeholder" comment="Hint inside the clipboard search field">Cari di papan klip</string>
     <string name="clipboard__search_no_results" comment="Shown when no clip contains what was typed">Tidak ada klip yang memuat itu</string>
@@ -1043,6 +1049,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="enum__swipe_action__move_cursor_start_of_page" comment="Enum value label">Pindahkan kursor ke awal halaman</string>
     <string name="enum__swipe_action__move_cursor_end_of_page" comment="Enum value label">Pindahkan kursor ke akhir halaman</string>
     <string name="enum__swipe_action__switch_to_clipboard_context" comment="Enum value label">Buka manager/histori papan klip</string>
+    <string name="enum__swipe_action__switch_to_editing_context">Buka panel edit teks</string>
     <string name="enum__swipe_action__shift" comment="Enum value label">Shift</string>
     <string name="enum__swipe_action__redo" comment="Enum value label">Ulangi</string>
     <string name="enum__swipe_action__undo" comment="Enum value label">Urungkan</string>
@@ -1085,6 +1092,10 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
         <item quantity="other">Kandidat {v}</item>
     </plurals>
     <!-- Dictate strings -->
+    <string name="quick_action__ime_ui_mode_editing">Edit teks</string>
+    <string name="quick_action__ime_ui_mode_editing__tooltip">Pindahkan kursor, pilih, dan edit teks</string>
+    <string name="quick_action__ime_ui_mode_scan">Pindai teks</string>
+    <string name="quick_action__ime_ui_mode_scan__tooltip">Foto teks cetak lalu sisipkan</string>
     <string name="quick_action__ime_ui_mode_dictate">Dikte</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Ketuk untuk mendikte, ketuk lagi untuk mentranskripsi</string>
     <string name="quick_action__dictate_live_prompt">Perintah suara</string>
@@ -1181,6 +1192,17 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__floating_button_design_pill_summary">Membesar saat aktif untuk menampilkan pengatur waktu dan gelombang langsung.</string>
     <string name="dictate__floating_button_design_ring">Cincin</string>
     <string name="dictate__floating_button_design_ring_summary">Lingkaran ringkas dengan cincin yang beranimasi saat merekam dan menstranskripsi.</string>
+    <string name="dictate__floating_button_apps_title">Tampil di aplikasi</string>
+    <string name="dictate__floating_button_apps_summary_all">Di semua aplikasi</string>
+    <string name="dictate__floating_button_apps_summary_only">Hanya di {n} aplikasi</string>
+    <string name="dictate__floating_button_apps_summary_except">Di mana saja kecuali {n} aplikasi</string>
+    <string name="dictate__floating_button_apps_scope_all">Semua aplikasi</string>
+    <string name="dictate__floating_button_apps_scope_only">Hanya aplikasi di bawah</string>
+    <string name="dictate__floating_button_apps_scope_except">Semua kecuali aplikasi di bawah</string>
+    <string name="dictate__floating_button_apps_note">Tombol tidak pernah digambar di atas aplikasi yang Anda kecualikan, dan Dictate tidak membaca kolom teks di dalamnya. Aplikasi yang memang menolak layanan aksesibilitas tetap akan melihat bahwa layanan ini aktif.</string>
+    <string name="dictate__floating_button_apps_list_title">Aplikasi</string>
+    <string name="dictate__floating_button_apps_search">Cari aplikasi</string>
+    <string name="dictate__floating_button_apps_none">Tidak ada aplikasi untuk “{search_term}”</string>
     <string name="dictate__floating_button_design_title">Gaya tombol</string>
     <string name="dictate__floating_button_haptic_summary_off">Tanpa getaran saat diketuk.</string>
     <string name="dictate__floating_button_haptic_summary_on">Getaran singkat saat Anda mengetuk tombol.</string>
@@ -1306,8 +1328,27 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__providers_field_transcription_model">Model transkripsi</string>
     <string name="dictate__providers_field_chat_model">Model penyusunan ulang</string>
     <string name="dictate__providers_test">Uji koneksi</string>
-    <string name="dictate__providers_test_success">Terhubung · {count} model</string>
-    <string name="dictate__providers_test_failed">Koneksi gagal</string>
+    <string name="dictate__providers_test_transcribe">Uji transkripsi</string>
+    <string name="dictate__providers_check_no_key">Masukkan kunci API Anda dulu.</string>
+    <string name="dictate__providers_check_credentials_ok">Kredensial terverifikasi · {count} model</string>
+    <string name="dictate__providers_check_credentials_ok_nocount">Kredensial terverifikasi</string>
+    <string name="dictate__providers_check_endpoint_ok">Server terjangkau · {count} model</string>
+    <string name="dictate__providers_check_credentials_untested">Transkripsi belum diuji.</string>
+    <string name="dictate__providers_check_transcription_ok">Transkripsi terverifikasi</string>
+    <string name="dictate__providers_check_transcription_text">Hasilnya: “{text}”</string>
+    <string name="dictate__providers_check_transcription_empty">Permintaan berhasil, tetapi tidak ada teks yang kembali — koneksi berfungsi, model ini tidak memahami sampelnya.</string>
+    <string name="dictate__providers_check_failed_connection">Uji koneksi gagal</string>
+    <string name="dictate__providers_check_failed_transcription">Uji transkripsi gagal</string>
+    <string name="dictate__providers_check_err_auth">Kunci ditolak. Periksa kunci dan pastikan alamatnya milik akun yang sama.</string>
+    <string name="dictate__providers_check_err_quota">Kunci berfungsi, tetapi kuota akun habis atau melebihi batas. Periksa paket Anda di penyedia.</string>
+    <string name="dictate__providers_check_err_network">Server tidak dapat dijangkau. Periksa alamat dan koneksi internet Anda.</string>
+    <string name="dictate__providers_check_err_timeout">Tidak ada jawaban tepat waktu. Penyedia mungkin sibuk — coba lagi.</string>
+    <string name="dictate__providers_check_err_server">Penyedia melaporkan kesalahan dari pihaknya. Tidak ada yang perlu diubah di sini; coba lagi nanti.</string>
+    <string name="dictate__providers_check_err_format">Penyedia menolak sampel audio. Mungkin format ini tidak diterima.</string>
+    <string name="dictate__providers_check_err_unknown">Permintaan gagal.</string>
+    <string name="dictate__providers_azure_link_signup">Buat akun Azure</string>
+    <string name="dictate__providers_azure_link_portal">Portal Azure</string>
+    <string name="dictate__providers_azure_link_guide">Panduan penyiapan</string>
     <string name="dictate__providers_network_group">Jaringan</string>
     <string name="dictate__request_timeout_title">Batas waktu permintaan</string>
     <string name="dictate__request_timeout_summary">{v} dtk · naikkan jika server Anda sendiri lambat</string>
@@ -1348,8 +1389,10 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__recording_animation_static_description">Tetap berupa titik merah solid saat merekam</string>
     <string name="dictate__recording_animation_pulse_label">Berdenyut</string>
     <string name="dictate__recording_animation_pulse_description">Berdenyut dengan laju tetap</string>
-    <string name="dictate__recording_animation_level_label">Mengikuti suara Anda</string>
+    <string name="dictate__recording_animation_level_label">Mengikuti suara Anda (titik)</string>
     <string name="dictate__recording_animation_level_description">Bereaksi terhadap level mikrofon, menandakan suara Anda tertangkap</string>
+    <string name="dictate__recording_animation_wave_label">Mengikuti suara Anda (gelombang)</string>
+    <string name="dictate__recording_animation_wave_description">Menggambar beberapa detik terakhir sebagai gelombang langsung, sehingga terlihat kapan Anda berhenti bicara</string>
     <string name="dictate__skip_silent_title">Lewati rekaman senyap</string>
     <string name="dictate__skip_silent_summary">Hindari teks halusinasi dan panggilan API sia-sia pada audio senyap</string>
     <string name="dictate__trim_silent_gaps_title">Pangkas jeda panjang</string>
@@ -1426,6 +1469,26 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__custom_words_title">Kata kustom</string>
     <string name="dictate__custom_words_summary_empty">Tambahkan nama atau istilah teknis agar dieja dengan benar</string>
     <string name="dictate__custom_words_placeholder">mis. FlorisBoard, Kubernetes, Renée, OAuth, Anthropic</string>
+    <string name="dictate__custom_words_summary">{count} kata · sekitar {tokens} dari {budget} token</string>
+    <string name="dictate__custom_words_budget_info">Setiap kata di sini ikut terkirim pada setiap dikte, dan model suara hanya membaca sekitar {budget} token konteks. Daftarmu memakai sekitar {tokens} di antaranya.</string>
+    <string name="dictate__custom_words_budget_over">Daftarmu lebih panjang daripada yang dibaca model suara. Sekitar {fits} dari {count} katamu sampai ke sana; sisanya dikirim pada setiap dikte lalu diabaikan. Untuk kosakata yang lebih banyak gunakan pemetaan khusus — tepat, bekerja luring, dan tidak memakan biaya.</string>
+    <string name="dictate__custom_words_import">Impor daftar kata</string>
+    <string name="dictate__custom_words_export">Ekspor daftar kata</string>
+    <string name="dictate__custom_words_export_filename">dictate_words.txt</string>
+    <string name="dictate__custom_words_import_title">Impor daftar kata</string>
+    <string name="dictate__custom_words_import_fitting">{count} kata baru dari berkas ini muat di daftarmu.</string>
+    <string name="dictate__custom_words_import_known">{count} sudah ada di dalamnya.</string>
+    <string name="dictate__custom_words_import_nofit">{count} tidak muat — model suara hanya membaca sekitar {budget} token konteks, jadi kata-kata itu akan terkirim pada setiap dikte lalu diabaikan.</string>
+    <string name="dictate__custom_words_import_unusable">{count} baris tidak berisi apa pun untuk dieja dan dilewati.</string>
+    <string name="dictate__custom_words_import_truncated">Hanya {count} entri pertama dari berkas yang dibaca.</string>
+    <string name="dictate__custom_words_import_also_dictionary">Tambahkan juga ke kamus pribadi</string>
+    <string name="dictate__custom_words_import_also_dictionary_summary">Daftar ini hanya memberi tahu model suara cara menulis sebuah kata. Kamus pribadi adalah yang dipakai papan ketik saat kamu mengetik — tanpa batas panjang, jadi setiap kata dalam berkas masuk ke sana, bukan hanya yang muat di atas.</string>
+    <string name="dictate__custom_words_import_empty">Tidak ada kata yang ditemukan dalam berkas itu</string>
+    <string name="dictate__custom_words_import_done">{count} kata ditambahkan</string>
+    <string name="dictate__custom_words_import_done_dictionary">{count} kata ditambahkan, dan {dict} ke kamus pribadimu</string>
+    <string name="dictate__file_unreadable">Berkas itu tidak dapat dibaca</string>
+    <string name="dictate__file_export_done">Berkas disimpan</string>
+    <string name="dictate__file_export_failed">Berkas itu tidak dapat ditulis</string>
     <string name="dictate__rewording_group">Penyusunan ulang (penyuntingan AI)</string>
     <string name="dictate__rewording_title">Penyusunan ulang (AI)</string>
     <string name="dictate__rewording_summary_on">Aktif – susun ulang, terjemahkan, dan format dengan AI</string>
@@ -1605,6 +1668,16 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__mappings_field_to_placeholder">mis. GitHub</string>
     <string name="dictate__mappings_group">Aturan penggantian</string>
     <string name="dictate__mappings_matchcase_summary">Hanya ganti jika kapitalisasinya sama persis.</string>
+    <string name="dictate__mappings_import">Impor aturan</string>
+    <string name="dictate__mappings_export">Ekspor aturan</string>
+    <string name="dictate__mappings_export_filename">dictate_mappings.tsv</string>
+    <string name="dictate__mappings_import_title">Impor aturan</string>
+    <string name="dictate__mappings_import_message">{count} aturan baru dalam berkas ini. Tambahkan ke daftarmu?</string>
+    <string name="dictate__mappings_import_known">{count} sudah ada di dalamnya.</string>
+    <string name="dictate__mappings_import_unusable">{count} baris tidak menyebutkan penggantian apa pun dan dilewati.</string>
+    <string name="dictate__mappings_import_format">Satu aturan per baris: apa yang terdengar, sebuah tab, dan apa yang seharusnya.</string>
+    <string name="dictate__mappings_import_empty">Tidak ada aturan yang ditemukan dalam berkas itu</string>
+    <string name="dictate__mappings_import_done">{count} aturan ditambahkan</string>
     <string name="dictate__mappings_matchcase_title">Cocokkan huruf besar/kecil</string>
     <string name="dictate__mappings_opt_caseinsensitive">Abaikan huruf besar/kecil</string>
     <string name="dictate__mappings_opt_casesensitive">Peka huruf besar/kecil</string>
@@ -1977,6 +2050,47 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="apptour61__outro_eyebrow">Itulah 6.1</string>
     <string name="apptour61__outro_title">Papan ketik yang sama, dengan lebih sedikit sudut tajam</string>
     <string name="apptour61__outro_body">Tidak ada yang berubah dari cara kamu mendikte selama ini — kunci sendiri, server sendiri, atau model di perangkat. Semua panduan bisa kamu buka lagi di Setelan › Tentang.</string>
+    <string name="apptour62__cta_try">Coba</string>
+    <string name="apptour62__cta_manage">Tempat mematikannya</string>
+    <string name="apptour62__art_word">Zoya</string>
+    <string name="apptour62__art_emoji_word">kue</string>
+    <string name="apptour62__art_emoji">🍰</string>
+    <string name="apptour62__intro_eyebrow">Dictate 6.2</string>
+    <string name="apptour62__intro_title">Ia belajar kata-katamu, dan punya lima tampilan baru</string>
+    <string name="apptour62__intro_body">Papan ketik kini bisa mengingat kata yang tak dikenal kamus mana pun, tombolnya bisa membiarkan aplikasi di belakangnya tampak, dan kedua ibu jari bisa punya separuhnya sendiri. Ditambah segenggam penolong kecil untuk hal yang kamu lakukan setiap hari.</string>
+    <string name="apptour62__learning_eyebrow">Baru: belajar sambil kamu mengetik</string>
+    <string name="apptour62__learning_title">Kata yang tak dikenal kamus mana pun</string>
+    <string name="apptour62__learning_body">Ketik sebuah nama atau istilah cukup sering dan papan ketik menyimpannya: ia berhenti menandainya sebagai salah dan mulai menyarankannya. Pembaruan ini menyalakannya untuk semua orang, termasuk kamu jika dulu mematikannya. Tidak ada yang dipelajari dalam mode samaran, di kolom sandi, atau dari apa pun yang tidak kamu ketik tombol demi tombol; semuanya tetap di perangkat ini, dan tombol di bawah membuka daftarnya — berikut sakelarnya.</string>
+    <string name="apptour62__themes_eyebrow">Lima tampilan baru</string>
+    <string name="apptour62__themes_title">Glass, Sand, Deep, dan E-Ink gelap</string>
+    <string name="apptour62__themes_body">Dictate Glass membiarkan aplikasi tampak lewat celah antartombol, sementara tombolnya sendiri tetap cukup pekat untuk dibaca; Glass Clear melangkah lebih jauh dan terlihat lebih bagus, dengan harga teks aplikasi yang menggambar di balik papan ketik ikut menembus. Sand adalah tema terang yang hangat, Deep tema gelap yang tenang, dan E-Ink akhirnya punya versi malam — jadi peralihan otomatis tak lagi menyodorkan papan ketik putih setelah gelap.</string>
+    <string name="apptour62__split_eyebrow">Baru: papan ketik terbelah</string>
+    <string name="apptour62__split_title">Dua ibu jari, tanpa merenggang</string>
+    <string name="apptour62__split_body">Aksi cepat baru, di samping mode satu tangan dan mengambang, menarik baris-barisnya hingga terpisah agar tiap ibu jari tetap di separuhnya. Semua tata letak terbelah, bukan hanya QWERTY, karena garis belahnya dihitung dari lebar tombol alih-alih ditulis di tiap tata letak. Dan dalam mode lanskap, aplikasi kini tetap terlihat selama ada ruang untuk keduanya.</string>
+    <string name="apptour62__emoji_eyebrow">Emoji</string>
+    <string name="apptour62__emoji_title">Kata menemukan emojinya</string>
+    <string name="apptour62__emoji_body">Ketik sebuah kata dan emoji yang memaknainya ditawarkan di bilah saran — dalam sekitar lima puluh bahasa, dari data yang sama yang dipakai sistem. Ia ikut menumpang di samping saran, bukan mengambil tempat salah satunya. Ada pula baris opsional berisi emoji yang kamu sematkan dan yang baru dipakai, di atas tombol.</string>
+    <string name="apptour62__helpers_eyebrow">Empat penolong kecil</string>
+    <string name="apptour62__helpers_title">Mode samaran, tautan bersih, dan jawaban hitungannya</string>
+    <string name="apptour62__helpers_body">Mode samaran mencegah apa pun diingat selama menyala — tak ada yang dipelajari, tak ada yang disimpan. Tautan yang ditempel bisa dibersihkan dari parameter pelacak dalam perjalanannya ke kolom. Ketik hitungan yang diakhiri = dan jawabannya muncul sebagai saran. Dan dengan baris angka menyala, huruf-huruf kembali menampilkan angkanya.</string>
+    <string name="apptour62__selection_eyebrow">Memilih dan berpindah</string>
+    <string name="apptour62__selection_title">Lihat berapa banyak yang kamu pilih</string>
+    <string name="apptour62__selection_body">Baris yang selama ini kosong saat ada pilihan kini menghitung kata dan karakternya. Tombol baru melompat ke awal dan akhir kolom, dan menyalin bisa meninggalkan spasi berlebih di kedua ujungnya. Baris aksi menyingkir begitu pemilihan dimulai, alih-alih berbicara di atasnya.</string>
+    <string name="apptour62__clipboard_eyebrow">Papan klip</string>
+    <string name="apptour62__clipboard_title">Temukan potongan dari isinya</string>
+    <string name="apptour62__clipboard_body">Papan klip kini bisa dicari, ke seluruh isinya. Yang baru saja kamu salin ditawarkan di bilah saran sebagai pil yang bisa kamu singkirkan, dan menyalin teks yang sama dua kali dihitung dua kali, jadi ia kembali. Menghapus sebuah potongan kini juga menghapus berkas di baliknya, bukan meninggalkan gambarnya di ponselmu.</string>
+    <string name="apptour62__gestures_eyebrow">Gestur</string>
+    <string name="apptour62__gestures_title">Tahan ?123, geser, lepas</string>
+    <string name="apptour62__gestures_body">Tahan tombol simbol, geser ke karakter yang kamu mau, lalu lepas: karakternya masuk dan huruf-hurufnya sudah kembali, tanpa berpindah bolak-balik. Mengusap ke atas pada bilah spasi kini mencapai baris di atasnya, bukan cuma kata sebelumnya. Dan jarak antartombol bisa diatur dalam rentang yang benar-benar terlihat.</string>
+    <string name="apptour62__export_eyebrow">Baru: dikte sebagai berkas</string>
+    <string name="apptour62__export_title">Setiap dikte ke folder pilihanmu</string>
+    <string name="apptour62__export_body">Pilih satu folder sekali saja dan setiap dikte yang selesai juga ditulis ke sana sebagai berkas teks biasa, pada saat ia selesai. Apa pun yang mengawasi folder itu — aplikasi catatan, alat sinkronisasi, cadanganmu — mendapat teksmu tanpa Dictate perlu belajar bahasanya.</string>
+    <string name="apptour62__more_eyebrow">Selain itu</string>
+    <string name="apptour62__more_title">Banyak hal kecil</string>
+    <string name="apptour62__more_body">Saran kini melihat dua kata sebelum kursor dalam setiap bahasa, bukan hanya bahasa Inggris. Cadangan bisa dibuat tanpa kunci API-mu, sehingga aman diteruskan. Model transkripsi milik Azure kini terjangkau, memilih model untuk penggunaan luring kini sekaligus beralih ke mesin luring, dan setiap permintaan punya tenggat yang sepadan dengan penantiannya. Dikte muncul di riwayat begitu dikirim, impor menyebutkan sedang di langkah mana dan bisa dibatalkan, dan teks lebih andal mendarat di aplikasi yang dulu rewel soal itu.</string>
+    <string name="apptour62__outro_eyebrow">Itulah 6.2</string>
+    <string name="apptour62__outro_title">Papan ketik yang sama, lebih banyak miliknya jadi milikmu</string>
+    <string name="apptour62__outro_body">Tidak ada yang berubah dari cara kamu mendikte — kunci sendiri, server sendiri, atau model di perangkat. Semua panduan bisa kamu buka lagi di Setelan › Tentang.</string>
     <string name="changelog__v5_0_0">• BARU: Ketik geser — geser di atas tombol untuk mengetik kata utuh, dengan kamus per bahasa yang diunduh sesuai permintaan. 👆\n• BARU: Saran kata &amp; koreksi otomatis — salah ketik diperbaiki otomatis dan kata yang Anda ketik tetap tinggal satu ketukan. ✨\n• BARU: Transkripsi waktu nyata — saksikan kata-kata Anda muncul saat berbicara, dengan OpenAI, Deepgram, Soniox, AssemblyAI, dan ElevenLabs. ⚡\n• BARU: Tiga penyedia transkripsi lagi — ElevenLabs Scribe, Deepgram, dan AssemblyAI. ☁️\n• BARU: Tata letak dikte klasik — layar suara tanpa keyboard dari Dictate 3 kembali, terkunci atau tinggal satu geseran. 🎙️\n• BARU: Pustaka prompt komunitas — jelajahi dan bagikan prompt penyusunan ulang. 📚\n• BARU: Statistik dikte dengan tonggak. 📊\n• BARU: Model luring NVIDIA Parakeet, ditambah filter keheningan yang melewati rekaman kosong. 📴\n• Lainnya: tombol mengambang yang lebih stabil, kontrol upaya penalaran, umpan balik haptik, tema E-Reader baru, dan puluhan perbaikan. 🛠️</string>
     <string name="media__tab__gifs">GIF</string>
     <string name="prefs__media__gif__title">GIF</string>
@@ -2183,4 +2297,16 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="sticker__source_threema">Threema</string>
     <string name="sticker__source_signal">Signal</string>
     <string name="sticker__source_stickers_folder">Folder stiker</string>
+    <string name="scan__take_photo">Ambil foto</string>
+    <string name="scan__pick_image">Pilih gambar</string>
+    <string name="scan__retake">Coba lagi</string>
+    <string name="scan__empty_hint">Foto teks cetak lalu ketuk bagian yang Anda inginkan.</string>
+    <string name="scan__latin_only">Hanya aksara Latin</string>
+    <string name="scan__reading">Membaca foto…</string>
+    <string name="scan__no_text">Tidak ada teks yang ditemukan di foto.</string>
+    <string name="scan__failed">Foto tidak dapat dibaca.</string>
+    <string name="scan__no_camera">Aplikasi kamera tidak ditemukan.</string>
+    <string name="scan__select_all">Pilih semua</string>
+    <string name="scan__discard">Buang</string>
+    <string name="scan__approve">Terima</string>
 </resources>

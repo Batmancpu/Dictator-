@@ -46,6 +46,9 @@ enum class SwipeAction {
     SWITCH_TO_PREV_SUBTYPE,
     SWITCH_TO_NEXT_SUBTYPE,
     SWITCH_TO_CLIPBOARD_CONTEXT,
+    // Opens the text editing panel (issue #386), so the cursor pad can be reached with one gesture
+    // rather than a Smartbar slot.
+    SWITCH_TO_EDITING_CONTEXT,
     SWITCH_TO_MEDIA_CONTEXT,
     SWITCH_TO_PREV_KEYBOARD,
     TOGGLE_COMPACT_LAYOUT,

@@ -13,6 +13,7 @@ package dev.patrickgold.florisboard.dictate.overlay
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -80,6 +81,12 @@ import kotlin.math.hypot
  * dragged, and routes the result through [DictateController] with [DictateController.OutputTarget.OVERLAY]
  * so the text is injected into the focused field.
  *
+ * The bubble is two windows. The visuals sit in an *untouchable* window as big as the largest shape the
+ * design can take, which never changes size or position while it is on screen except to be dragged; the
+ * finger meets a transparent window on top of it, sized to the shape the user sees. See [positionVisual]
+ * for why — in one sentence: a window that is resized on every frame of an animation is not drawn in
+ * step with its own position on this platform.
+ *
  * The visuals are provided by a [BubbleSkin] — [RingSkin], [PillSkin], [OrbSkin], or [CloudSkin] — selected by the
  * `floatingButtonDesign` preference. While recording, a level ticker feeds the chosen skin the shared
  * normalized microphone level.
@@ -94,10 +101,18 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
     private val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
     private val prefs by FlorisPreferenceStore
 
+    /**
+     * The transparent touch window's view, sized to the shape the user sees. Every geometry question —
+     * travel, clamping, where the side buttons go — is asked of this one; the canvas follows it.
+     */
     private var rootView: View? = null
     private var skin: BubbleSkin? = null
     private var params: WindowManager.LayoutParams? = null
     private var added = false
+
+    /** The canvas window the skin draws in — [BubbleSkin.root] under these params; see [positionVisual]. */
+    private var visualParams: WindowManager.LayoutParams? = null
+    private var visualAdded = false
 
     /** Secondary cancel button shown beside the bubble while recording. */
     private var cancelView: View? = null
@@ -167,6 +182,9 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
     private var holding = false
     private var holdJob: Job? = null
 
+    /** The deferred adding of the cancel button; see [manageCancel]. */
+    private var cancelShowJob: Job? = null
+
     /** Polls the mic level while recording to drive the waveform. */
     private var tickerJob: Job? = null
 
@@ -212,6 +230,14 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val accentColor: Int,
     )
 
+    /** An [Emission] and the three signals from outside the bubble that can suppress it. */
+    private data class Surroundings(
+        val emission: Emission,
+        val recognitionActive: Boolean,
+        val screenOn: Boolean,
+        val allowedInApp: Boolean,
+    )
+
     /** Starts observing the feature toggle + focus + design + dictation state to drive the bubble. */
     fun start() {
         scope.launch {
@@ -236,13 +262,24 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
             ) { inputs, design, size, imeVisible, color ->
                 Emission(inputs, design, size, imeVisible, color.toArgb())
             }
+            // Whether this app is one the button may appear over at all (#392). Built from the same
+            // foreground-package flow the per-app anchors already ride on, so nothing new has to watch for
+            // the app changing — a window change updates that flow, and the filter re-decides with it.
+            val allowedInApp = combine(
+                DictateAccessibilityService.foregroundPackage,
+                prefs.dictate.floatingButtonAppScope.asFlow(),
+                prefs.dictate.floatingButtonApps.asFlow(),
+            ) { pkg, scope, apps ->
+                BubbleApps.allows(scope, apps.toSet(), pkg)
+            }
             combine(
                 emissions,
                 RecognitionBridge.active,
                 DictateAccessibilityService.screenOn,
-            ) { emission, recogActive, screenOn ->
-                Triple(emission, recogActive, screenOn)
-            }.collect { (emission, recogActive, screenOn) ->
+                allowedInApp,
+            ) { emission, recogActive, screenOn, appAllowed ->
+                Surroundings(emission, recogActive, screenOn, appAllowed)
+            }.collect { (emission, recogActive, screenOn, appAllowed) ->
                 val (inputs, design, size, imeVisible, accent) = emission
                 val (enabled, showWithKeyboard, focused, dictateKeyboard, state) = inputs
                 if (design != currentDesign || size.scale != sizeScale || accent != accentColor) {
@@ -268,12 +305,15 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
                     hiddenByOwnKeyboard = hiddenByOwnKeyboard,
                     recognitionActive = recogActive,
                     screenOn = screenOn,
+                    allowedInApp = appAllowed,
                 )
                 if (show) ensureShown() else hide()
                 // The rewording menu is a window of its own and does not come down with hide(). Tied to the
                 // screen alone on purpose: taking it away whenever the bubble hides would be a different
-                // change, about focus, not about the screen.
-                if (!screenOn) hidePromptMenu()
+                // change, about focus, not about the screen. The app filter is the exception, and for the
+                // same reason it beats everything else: "nothing over this app" has to mean every window
+                // we own, and a menu left standing would be the one that stayed (#392).
+                if (!screenOn || !appAllowed) hidePromptMenu()
                 recordingState = state as? DictateController.UiState.Recording
                 applyState(state)
                 manageForeground(state)
@@ -321,11 +361,18 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
     private fun ensureShown() {
         if (added) return
         val view = rootView ?: createView().also { rootView = it }
+        val visual = skin?.root ?: return
         val lp = params ?: createParams().also { params = it }
-        // Pin the window height for skins that want it fixed (the pill), so the width-only expand animation
-        // never makes the bubble appear to grow vertically; ring uses content size (a fixed square).
-        lp.height = skin?.fixedHeight ?: WindowManager.LayoutParams.WRAP_CONTENT
+        val vlp = visualParams ?: createVisualParams().also { visualParams = it }
+        syncShapeSize() // sizes the touch window to the shape; nothing is on screen yet, so nothing is pushed
+        positionVisual() // and derives the canvas from it, likewise
         runCatching {
+            // The canvas first, so the touch window lands above it. Input would not care either way — the
+            // canvas is untouchable — but the seam is easier to reason about with the invisible one on top.
+            if (!visualAdded) {
+                windowManager.addView(visual, vlp)
+                visualAdded = true
+            }
             windowManager.addView(view, lp)
             added = true
         }
@@ -335,11 +382,14 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val view = rootView
         if (added && view != null) runCatching { windowManager.removeView(view) }
         added = false
+        val visual = skin?.root
+        if (visualAdded && visual != null) runCatching { windowManager.removeView(visual) }
+        visualAdded = false
         // Reset the dim so a re-shown bubble starts fully visible.
         cancelDim()
         dimmed = false
         idleShownPrev = false
-        view?.apply {
+        visual?.apply {
             alpha = 1f
             scaleX = 1f
             scaleY = 1f
@@ -351,7 +401,20 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
     // --- Cancel button (shown while recording) ---------------------------------------------------
 
     private fun manageCancel(state: DictateController.UiState, shown: Boolean) {
-        if (shown && state is DictateController.UiState.Recording) showCancel() else hideCancel()
+        if (shown && state is DictateController.UiState.Recording) {
+            if (cancelAdded || cancelShowJob?.isActive == true) return
+            // A few frames later: adding a window is a round trip to the window manager, and the pill's
+            // first step is drawn in this very frame. The button fades in over the opening anyway, so
+            // nobody sees the difference — while the first frame no longer carries the cost.
+            cancelShowJob = scope.launch {
+                delay(CANCEL_SHOW_DELAY_MS)
+                if (added && DictateController.state.value is DictateController.UiState.Recording) showCancel()
+            }
+        } else {
+            cancelShowJob?.cancel()
+            cancelShowJob = null
+            hideCancel()
+        }
     }
 
     private fun showCancel() {
@@ -359,15 +422,23 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val v = cancelView ?: createCancelView().also { cancelView = it }
         val lp = cancelParams ?: createCancelParams().also { cancelParams = it }
         runCatching {
+            // It lands at the far end of the *settled* pill straight away (the touch window is sized to
+            // the settled shape), so it fades in over the pill's opening rather than popping up alone.
+            service.noteOwnWindowChange()
+            v.alpha = 0f
             windowManager.addView(v, lp)
             cancelAdded = true
             positionCancel()
+            v.animate().alpha(1f).setDuration(240).start()
         }
     }
 
     private fun hideCancel() {
         val v = cancelView
-        if (cancelAdded && v != null) runCatching { windowManager.removeView(v) }
+        if (cancelAdded && v != null) {
+            service.noteOwnWindowChange()
+            runCatching { windowManager.removeView(v) }
+        }
         cancelAdded = false
     }
 
@@ -410,6 +481,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val v = undoView ?: createUndoView().also { undoView = it }
         val lp = undoParams ?: createUndoParams().also { undoParams = it }
         runCatching {
+            service.noteOwnWindowChange()
             windowManager.addView(v, lp)
             undoAdded = true
             positionUndo()
@@ -418,7 +490,10 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
 
     private fun hideUndo() {
         val v = undoView
-        if (undoAdded && v != null) runCatching { windowManager.removeView(v) }
+        if (undoAdded && v != null) {
+            service.noteOwnWindowChange()
+            runCatching { windowManager.removeView(v) }
+        }
         undoAdded = false
     }
 
@@ -463,11 +538,11 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val uw = undoSize
         val gap = sideButtonGap
         ulp.y = (blp.y + (bubble.height - uw) / 2).coerceIn(0, (screenHeight() - uw).coerceAtLeast(0))
-        // Same inward-side logic as the cancel button so it sits beside the bubble and follows drags, and
+        // Same inward side as the cancel button so it sits beside the bubble and follows drags, and
         // measured to the visible shape the same way so the two never sit at different distances.
-        val onRight = blp.x + bubble.width / 2 >= screenWidth() / 2
         val inset = skin?.visualInset ?: 0
-        val rawX = if (onRight) blp.x + inset - gap - uw else blp.x + bubble.width - inset + gap
+        val left = leftX()
+        val rawX = if (sideIsRight) left + inset - gap - uw else left + bubble.width - inset + gap
         ulp.x = rawX.coerceIn(0, (screenWidth() - uw).coerceAtLeast(0))
         if (undoAdded) runCatching { windowManager.updateViewLayout(undo, ulp) }
     }
@@ -618,14 +693,15 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val gap = sideButtonGap
         // The skin's pinned height when the view has not measured yet: this runs the moment the button is
         // added, and a height of zero would centre the circle half a diameter above the bubble.
-        val bubbleHeight = bubble.height.takeIf { it > 0 } ?: skin?.fixedHeight ?: cw
+        val bubbleHeight = bubble.height.takeIf { it > 0 } ?: skin?.shapeHeight ?: cw
         clp.y = (blp.y + (bubbleHeight - cw) / 2).coerceIn(0, (screenHeight() - cw).coerceAtLeast(0))
-        // Put the cancel button on the side that has more room (the inward side), based on the bubble's
-        // *current* center — so it follows during a drag and flips when crossing the middle of the screen.
-        val onRight = blp.x + bubble.width / 2 >= screenWidth() / 2
+        // Put the cancel button on the side that has more room (the inward side). The side itself is read
+        // from [sideIsRight], which the drag updates from the bubble's current centre as it moves — so the
+        // button still flips on crossing the middle of the screen, in step with the row beside it.
         // Also measured to the visible shape, so the gap looks the same whichever design is on.
         val inset = skin?.visualInset ?: 0
-        val rawX = if (onRight) blp.x + inset - gap - cw else blp.x + bubble.width - inset + gap
+        val left = leftX()
+        val rawX = if (sideIsRight) left + inset - gap - cw else left + bubble.width - inset + gap
         clp.x = rawX.coerceIn(0, (screenWidth() - cw).coerceAtLeast(0))
         if (cancelAdded) runCatching { windowManager.updateViewLayout(cancel, clp) }
     }
@@ -640,12 +716,18 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
             DictateFloatingButtonDesign.LATTICE -> LatticeSkin(context)
         }
         skin = newSkin
-        val root = newSkin.root
+        // Before the first layout pass: a pill built for the right edge has to be mirrored already when it
+        // is measured, or its first frame is the unmirrored one. Pushed straight at the skin rather than
+        // through [setSide], which would find the side unchanged and tell a skin that no longer exists.
+        newSkin.onAnchorSideChanged(sideIsRight)
+        // The window the finger meets: a transparent view sized to the shape the user sees. The visuals
+        // live in a window of their own — see [positionVisual] for why.
+        val root = View(context)
         attachTouch(root)
-        // Reposition only when the view's *width* changes (the pill expanding/collapsing). A plain
-        // position change from dragging/snapping also fires this listener, and repositioning then would
-        // fight the drag — pulling the bubble back to the edge mid-drag (flicker). The width check ignores
-        // those, so dragging is smooth and it only snaps back on release (via snapToEdge).
+        // React only when the view's *width* changes (the pill expanding/collapsing). A plain position
+        // change from dragging/snapping also fires this listener, and re-clamping then would fight the
+        // drag — pulling the bubble back to the edge mid-drag (flicker). The width check ignores those,
+        // so dragging is smooth and it only snaps back on release (via snapToEdge).
         root.addOnLayoutChangeListener { _, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
             if (needsInitialPlacement && right - left > 0) {
                 // First time the bubble has a real size: drop it at the default spot (right edge + margin,
@@ -653,9 +735,10 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
                 needsInitialPlacement = false
                 applyInitialPlacement()
             } else if (kotlin.math.abs((right - left) - (oldRight - oldLeft)) > dp(2)) {
-                // Only react to real size changes. The pill's running timer nudges the width by a fraction
-                // of a pixel every second, and repositioning the window on each of those made the whole
-                // bubble visibly flicker (reported on #231).
+                // Only real size changes. The pill's running timer used to nudge the width by a fraction of
+                // a pixel every second, and repositioning the window on each of those made the whole bubble
+                // visibly flicker (#231). This is the invisible touch window now, sized to the settled
+                // shape in one step per state, so a nudge cannot reach it at all.
                 repositionForSize()
                 if (cancelAdded) positionCancel() // keep the cancel button beside the (resized) pill
                 if (undoAdded) positionUndo()
@@ -698,13 +781,32 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             PixelFormat.TRANSLUCENT,
         ).apply {
-            gravity = Gravity.TOP or Gravity.START
-            // Rough seed for the right edge near mid-height, just to avoid a left-edge flash before the
-            // bubble is measured. The exact default (right edge + margin, vertically centered) is applied
-            // in applyInitialPlacement once we know the bubble's size; the anchor field already points at
-            // the same side, so nothing has to say so twice.
-            x = screenWidth()
+            // Measured from the wall the bubble is on, not from the left of the screen — see [wallGravity].
+            gravity = Gravity.TOP or wallGravity(sideIsRight)
+            // Rough seed: a screen's width past that wall, i.e. off-screen on the side it will appear from,
+            // so nothing flashes at an edge before the bubble is measured. The exact default (the edge
+            // margin, vertically centered) is applied in applyInitialPlacement once we know the bubble's
+            // size; the anchor field already points at the same side, so nothing has to say so twice.
+            x = -screenWidth()
             y = (screenHeight() * 2 / 5 - dp(28)).coerceAtLeast(0)
+        }
+    }
+
+    /** Params for the canvas window; see [positionVisual] for what it is and why it is untouchable. */
+    private fun createVisualParams(): WindowManager.LayoutParams {
+        return WindowManager.LayoutParams(
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            PixelFormat.TRANSLUCENT,
+        ).apply {
+            gravity = Gravity.TOP or wallGravity(sideIsRight)
+            // Seeded off-screen like the touch window; [positionVisual] derives the real place from it.
+            x = -screenWidth()
+            y = 0
         }
     }
 
@@ -715,7 +817,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val longPressTimeout = ViewConfiguration.getLongPressTimeout().toLong()
         var downX = 0f
         var downY = 0f
-        var startX = 0
+        var startLeft = 0
         var startY = 0
         var moved = false
         var longPressFired = false
@@ -731,7 +833,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
                 MotionEvent.ACTION_DOWN -> {
                     downX = e.rawX
                     downY = e.rawY
-                    startX = lp.x
+                    startLeft = leftX()
                     startY = lp.y
                     moved = false
                     longPressFired = false
@@ -751,9 +853,15 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
                     if (moved) {
                         val maxX = (screenWidth() - v.width).coerceAtLeast(0)
                         val maxY = (screenHeight() - v.height).coerceAtLeast(0)
-                        lp.x = (startX + dx.toInt()).coerceIn(0, maxX)
+                        val left = (startLeft + dx.toInt()).coerceIn(0, maxX)
                         lp.y = (startY + dy.toInt()).coerceIn(0, maxY)
-                        runCatching { windowManager.updateViewLayout(v, lp) }
+                        // Turn the row round the instant the bubble's centre crosses the middle, which is
+                        // the same instant the cancel button jumps to the other side (#399). Before the new
+                        // x is written, since the side is also the wall that x is measured from — and before
+                        // the buttons are placed, since mirroring is what decides where their side is.
+                        setSide(left + v.width / 2 >= screenWidth() / 2)
+                        setLeftX(left)
+                        pushBubble()
                         if (cancelAdded) positionCancel() // keep the cancel button following the bubble
                         if (undoAdded) positionUndo()
                     }
@@ -803,14 +911,16 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         // The drag decided which side; read that off the dropped position before animating towards it.
         // After the clamp, so a drop past the bottom edge is anchored where it lands, not where it went.
         captureAnchor()
-        val targetX = if (anchoredToRight) maxX - margin else margin
+        // The window is measured from the wall it is on, so the resting place is the same number on either
+        // side: the margin.
+        val targetX = margin
         snapAnim?.cancel()
         snapAnim = ValueAnimator.ofInt(lp.x, targetX).apply {
             duration = 180
             interpolator = DecelerateInterpolator()
             addUpdateListener {
                 lp.x = it.animatedValue as Int
-                runCatching { windowManager.updateViewLayout(v, lp) }
+                pushBubble()
                 if (cancelAdded) positionCancel() // let the cancel button ride along to the edge
                 if (undoAdded) positionUndo()
             }
@@ -824,10 +934,18 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
     }
 
     /**
-     * Repositions the window after a size change (e.g. the pill expanding/collapsing). When snapping is on,
-     * the bubble stays pinned to its anchored edge with the margin — so the pill grows *inward* from the
-     * right edge instead of off-screen, and returns to the edge when it collapses. When snapping is off it
-     * is just clamped within the screen bounds.
+     * Keeps the window on screen after a size change (the pill opening or closing).
+     *
+     * The end the user is pointing at holds still by construction: the window is measured from the wall
+     * the bubble is on ([wallGravity]), so the window manager pins that edge itself, in the same relayout
+     * that carries the new size. It used to be pinned from here instead, by moving x by the change in
+     * width once the layout had happened — one frame after the window had already grown at the old x. On
+     * the right the far edge therefore poked out and snapped back on every frame of the open animation,
+     * and the small steps at its tail fell under the guard in the layout listener and were never made up
+     * at all; the left never needed moving and never juddered.
+     *
+     * What is left to do is the far end: a snapped bubble is put back at its margin, a free one is kept
+     * from running off the opposite edge of the screen.
      */
     private fun repositionForSize() {
         val lp = params ?: return
@@ -835,17 +953,13 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         if (!added) return
         val maxX = (screenWidth() - v.width).coerceAtLeast(0)
         val maxY = (screenHeight() - v.height).coerceAtLeast(0)
-        val margin = edgeMargin(maxX)
-        val nx = when {
-            !prefs.dictate.floatingButtonSnapToEdge.get() -> lp.x.coerceIn(0, maxX)
-            anchoredToRight -> maxX - margin
-            else -> margin
-        }
+        val snapped = prefs.dictate.floatingButtonSnapToEdge.get()
+        val nx = (if (snapped) edgeMargin(maxX) else lp.x).coerceIn(0, maxX)
         val ny = lp.y.coerceIn(0, maxY)
         if (nx != lp.x || ny != lp.y) {
             lp.x = nx
             lp.y = ny
-            runCatching { windowManager.updateViewLayout(v, lp) }
+            pushBubble()
         }
     }
 
@@ -863,13 +977,13 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val maxX = (screenWidth() - v.width).coerceAtLeast(0)
         val maxY = (screenHeight() - v.height).coerceAtLeast(0)
         val margin = edgeMargin(maxX)
-        lp.x = (maxX - margin).coerceAtLeast(0)
+        setLeftX((maxX - margin).coerceAtLeast(0))
         // Vertically center the bubble at ~60% up from the bottom edge (≈40% down from the top).
         lp.y = (screenHeight() * 2 / 5 - v.height / 2).coerceIn(0, maxY)
         // Read the anchor off the spot we just placed, rather than the other way round: the default keeps
         // its margin to the edge, and the margin is a length that only exists once the bubble is measured.
         captureAnchor()
-        if (added) runCatching { windowManager.updateViewLayout(v, lp) }
+        pushBubble()
     }
 
     /**
@@ -919,8 +1033,151 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
     /** Reads the anchor back out of wherever the window currently sits. */
     private fun captureAnchor() {
         val lp = params ?: return
-        anchor = BubbleAnchor.capture(lp.x, lp.y, travelX(), travelY())
+        anchor = BubbleAnchor.capture(leftX(), lp.y, travelX(), travelY())
         anchorIsPlaced = true
+        syncSkinToAnchor()
+    }
+
+    /**
+     * Which half of the screen the bubble is on, as the single answer everything that has a side takes
+     * its side from: the cancel button, the undo button, the way a growing design lays its row out, and
+     * the wall the window itself is measured from — which is what decides which end of the bubble holds
+     * still when it changes width (#399, [wallGravity]).
+     *
+     * It used to be worked out three times over, and that was survivable only as long as the pieces
+     * involved could not contradict each other. Once the row itself has a side, they can: the cancel
+     * button flips the moment the bubble's centre crosses the middle of the screen, mid-drag, and a row
+     * that waited for the drop would have sat the wrong way round against a button that had already
+     * moved. One value, set in one place, cannot disagree with itself.
+     */
+    private var sideIsRight = true
+
+    /**
+     * The window gravity for the wall the bubble is on.
+     *
+     * The window is measured *from that wall*: its x is the gap to the wall, and the edge against the
+     * wall is the one the window manager keeps still when the window changes size, in the same relayout
+     * that carries the new size. The left side has always worked this way, which is why the pill opened
+     * smoothly there; the right side used to be measured from the left as well and moved by hand a frame
+     * later, and juddered. Measured from its own wall it is the left side's mirror image.
+     *
+     * LEFT and RIGHT rather than START and END on purpose: END is resolved through the layout direction,
+     * and which wall the bubble is parked at has nothing to do with the language.
+     */
+    @SuppressLint("RtlHardcoded")
+    private fun wallGravity(onRight: Boolean): Int = if (onRight) Gravity.RIGHT else Gravity.LEFT
+
+    /**
+     * The window's left edge, whichever wall its params measure from.
+     *
+     * The controller keeps thinking in left edges — the anchor, the drag and the side buttons all do —
+     * and only the params speak in gaps to the wall. [bubbleXFromWall] translates, and is its own inverse,
+     * so [setLeftX] is the same conversion the other way round.
+     */
+    private fun leftX(): Int {
+        val lp = params ?: return 0
+        return bubbleXFromWall(lp.x, rootView?.width ?: 0, screenWidth(), sideIsRight)
+    }
+
+    /** Writes a left edge into the params in the terms of the wall they measure from; not pushed to the window. */
+    private fun setLeftX(left: Int) {
+        val lp = params ?: return
+        lp.x = bubbleXFromWall(left, rootView?.width ?: 0, screenWidth(), sideIsRight)
+    }
+
+    /** Pushes the touch window's params to the window manager, and moves the canvas with it. */
+    private fun pushBubble() {
+        val v = rootView
+        val lp = params
+        if (added && v != null && lp != null) runCatching { windowManager.updateViewLayout(v, lp) }
+        positionVisual()
+    }
+
+    /**
+     * Puts the canvas window where the touch window says the shape is.
+     *
+     * Why two windows at all: the pill grows when a recording starts, and a window that grows with it is
+     * resized on every frame of that animation. The window manager applies each new size and position in
+     * a transaction of its own, the app's buffer for that size arrives in another, and nothing ties the
+     * two together for a client-requested resize — `WindowManagerService.relayoutWindow` hands out a sync
+     * id only inside a sync group (a transition, an IME animation), never for a plain relayout. Measured
+     * on the A55 (2026-09-17, 60 fps screen recording of the open animation): the position advanced on
+     * every frame with the requested width while the buffer caught up only every 7–13 frames, so the
+     * whole pill, stop glyph included, slid inwards on a stale buffer and jumped back out by 20–40 px on
+     * each fresh one, into the shadow margin. Which end the position is measured from (#399) changes
+     * nothing about that; the left side was only ever smooth because its position never changes.
+     *
+     * So the visible window is never resized. It is a canvas as wide as the open pill plus the same again
+     * on the far side, centred on the button, and the pill grows *inside* it — an ordinary in-window
+     * animation with no relayout involved. Its transparent parts must not swallow taps, so it carries
+     * [WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE] (accessibility overlays count as trusted overlays,
+     * so touches pass straight through to the app), and the window the finger meets is a separate,
+     * transparent one sized to the settled shape — resized on a state change, which nobody can see. The
+     * two are moved together and land in the same frame, the window manager placing both in one surface
+     * placement; and the touch window is invisible in any case, so only the canvas is ever seen moving.
+     *
+     * The canvas is centred on the button rather than hung off its inboard side so that changing sides
+     * mid-drag re-expresses the same frame instead of moving the window — see [BubbleSkin.canvasOverhang].
+     */
+    private fun positionVisual() {
+        val lp = params ?: return
+        val vlp = visualParams ?: return
+        val s = skin ?: return
+        vlp.gravity = Gravity.TOP or wallGravity(sideIsRight)
+        // The canvas reaches past the shape on the wall side by its overhang, so it sits that much closer
+        // to the wall — off-screen, for the pill. It is as tall as the shape, so y is simply shared.
+        vlp.x = lp.x - s.canvasOverhang
+        vlp.y = lp.y
+        if (visualAdded) runCatching { windowManager.updateViewLayout(s.root, vlp) }
+    }
+
+    /**
+     * Sizes the touch window to the shape the skin reports for its state. Nobody can see this window, so
+     * a size change here costs nothing — which is the whole point of keeping it apart from the canvas.
+     */
+    private fun syncShapeSize() {
+        val lp = params ?: return
+        val s = skin ?: return
+        if (lp.width == s.shapeWidth && lp.height == s.shapeHeight) return
+        lp.width = s.shapeWidth
+        lp.height = s.shapeHeight
+        val v = rootView
+        if (added && v != null) {
+            service.noteOwnWindowChange()
+            runCatching { windowManager.updateViewLayout(v, lp) }
+        }
+    }
+
+    /**
+     * Moves everything that has a side onto [onRight], if that is not where it already is.
+     *
+     * The window's params are re-expressed from the new wall first, frame unchanged, and pushed at once:
+     * a window still measured from the old wall would grow the wrong way if the pill opened before
+     * anything else had reason to update it. The skin is told before the buttons are placed, because
+     * mirroring the row is what changes where the inward side *is* — placing them first would put them
+     * beside the shape as it was.
+     */
+    private fun setSide(onRight: Boolean) {
+        if (sideIsRight == onRight) return
+        val left = leftX() // read through the old wall, before the side changes hands
+        sideIsRight = onRight
+        params?.let { lp ->
+            lp.gravity = Gravity.TOP or wallGravity(onRight)
+            setLeftX(left)
+            pushBubble()
+        }
+        skin?.onAnchorSideChanged(onRight)
+        if (cancelAdded) positionCancel()
+        if (undoAdded) positionUndo()
+    }
+
+    /**
+     * Tells the skin which wall the bubble is parked at, so a design that grows can grow the right way
+     * (#399). Called from every place the anchor is set — read back off the screen, or restored for an
+     * app — and once for each freshly built skin, which is the whole of it: nothing else assigns [anchor].
+     */
+    private fun syncSkinToAnchor() {
+        setSide(anchoredToRight)
     }
 
     /**
@@ -949,11 +1206,10 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
                 "-> ($nx, $ny) travel ${maxX}x$maxY in frame ${screenWidth()}x${screenHeight()} " +
                 "of display $display"
         }
-        if (nx == lp.x && ny == lp.y) return
-        lp.x = nx
+        if (nx == leftX() && ny == lp.y) return
+        setLeftX(nx)
         lp.y = ny
-        val v = rootView
-        if (added && v != null) runCatching { windowManager.updateViewLayout(v, lp) }
+        pushBubble()
         if (cancelAdded) positionCancel()
         if (undoAdded) positionUndo()
     }
@@ -989,6 +1245,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val saved = pkg?.let { prefs.dictate.floatingButtonPositions.get().toMap()[it] } ?: return
         anchor = saved
         anchorIsPlaced = true
+        syncSkinToAnchor()
         applyAnchor()
     }
 
@@ -1035,11 +1292,13 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
     private fun applyDim(dim: Boolean) {
         if (dimmed == dim) return
         dimmed = dim
-        val view = rootView ?: return
-        // Shrink toward the nearer screen edge based on the *current* position (anchoredToRight can be
-        // stale), so the dimmed dot stays put instead of appearing to drift toward the middle.
-        val onRight = (params?.x ?: 0) + view.width / 2 >= screenWidth() / 2
-        view.pivotX = if (onRight) view.width.toFloat() else 0f
+        val view = skin?.root ?: return
+        // Shrink toward the wall the bubble is on, so the dimmed dot stays put instead of appearing to
+        // drift toward the middle. [sideIsRight] is read off the live position while dragging, so it is
+        // never stale here. The pivot is the button's wall-side edge *inside the canvas*, which reaches
+        // past the button on both sides (see [positionVisual]).
+        val overhang = skin?.canvasOverhang ?: 0
+        view.pivotX = if (sideIsRight) (view.width - overhang).toFloat() else overhang.toFloat()
         view.pivotY = view.height / 2f
         view.animate()
             .alpha(if (dim) 0.45f else 1f)
@@ -1112,6 +1371,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         if (holding) return // a transient error/success flash is currently shown
         if (state == lastAppliedState) return // combine re-emits on focus/window churn; ignore no-op repeats
         skin?.applyState(state)
+        syncShapeSize()
         lastAppliedState = state
     }
 
@@ -1155,6 +1415,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
     private fun holdVisual(durationMs: Long, kind: FlashKind) {
         stopTicker()
         skin?.showFlash(kind)
+        syncShapeSize()
         lastAppliedState = null // the flash overwrote the visuals; force a re-apply when it ends
         holding = true
         holdJob?.cancel()
@@ -1280,10 +1541,31 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
 
     /** Strategy that renders the bubble for a given design; owned by the controller. */
     private interface BubbleSkin {
+        /**
+         * The visuals. Laid out in the untouchable canvas window, which is never resized while it is on
+         * screen, so a design that changes shape has to do so *inside* its root — see [positionVisual].
+         */
         val root: View
-        /** A fixed window height in px, or null to size to the content. Pinning it stops the pill from
-         *  appearing to grow vertically while its width animates. */
-        val fixedHeight: Int?
+
+        /**
+         * The footprint of the shape as it settles in the current state, in px: what the touch window is
+         * sized to, and what every geometry question (travel, clamping, the side buttons) is asked about.
+         * Reported for the settled state as soon as the state is applied, even while an animation is
+         * still on its way there, so the touch window and the cancel button are placed once rather than
+         * dragged along frame by frame. The height must equal the root's.
+         */
+        val shapeWidth: Int
+        val shapeHeight: Int
+
+        /**
+         * How far [root] reaches beyond the shape on the wall side, in px.
+         *
+         * A design that grows inwards needs room to grow into, and the canvas gives it that room on
+         * *both* sides of the button — as much beyond the wall (off-screen, which FLAG_LAYOUT_NO_LIMITS
+         * allows) as inboard — so the canvas is symmetric about the button and changing sides moves
+         * nothing but the direction of growth. This is the width of that room; the fixed designs have none.
+         */
+        val canvasOverhang: Int get() = 0
 
         /**
          * Transparent margin between the window edge and the shape the user actually sees, in px.
@@ -1303,6 +1585,15 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
          */
         fun sideButtonBackground(): GradientDrawable? = null
         val sideButtonForeground: Int? get() = null
+
+        /**
+         * Which side of the screen the bubble is parked at, told to the skin whenever it changes.
+         *
+         * Only a design that *grows* has anything to do with it. A design that stays the same size never
+         * moves its glyph, so the default is to ignore it; see the pill's override for why the side
+         * matters there (#399).
+         */
+        fun onAnchorSideChanged(onRight: Boolean) {}
 
         fun applyState(state: DictateController.UiState)
         fun showFlash(kind: FlashKind)
@@ -1379,7 +1670,8 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         }
         private var ringAnim: ValueAnimator? = null
 
-        override val fixedHeight: Int? = null
+        override val shapeWidth: Int get() = viewSize
+        override val shapeHeight: Int get() = viewSize
 
         override val root: View = FrameLayout(context).apply {
             addView(ring, FrameLayout.LayoutParams(viewSize, viewSize))
@@ -1541,13 +1833,15 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         private val pad = sdp(12)
         private val timerWidth = sdp(48)
         private val waveWidth = sdp(48)
-        private val timerMarginStart = sdp(8)
+        // The row reads icon, waveform, timer outwards from the button (#399): the waveform is what the
+        // button is doing, so it belongs against it, and the elapsed time is the piece you glance at.
         private val waveMarginStart = sdp(8)
-        private val waveMarginEnd = sdp(2)
+        private val waveMarginEnd = sdp(8)
+        private val timerMarginEnd = sdp(2)
         // What the opened pill measures, from the same values the layout below is built with — keep the
         // two in step. Pinning to this is what stops the timer from ever resizing the overlay window.
         private val expandedContentWidth =
-            timerMarginStart + timerWidth + waveMarginStart + waveWidth + waveMarginEnd
+            waveMarginStart + waveWidth + waveMarginEnd + timerWidth + timerMarginEnd
 
         private val bg = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
@@ -1566,6 +1860,10 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
             fontFeatureSettings = "tnum"
             isSingleLine = true
             gravity = Gravity.CENTER
+            // The pill mirrors itself when it is parked at the right edge (see [onAnchorSideChanged]), and
+            // that flips the paragraph direction of everything inside it. An elapsed time is not a
+            // sentence — it reads the same way round wherever the bubble sits.
+            textDirection = View.TEXT_DIRECTION_LTR
         }
         // Thinner bars: more bars across a similar width than the ring's waveform.
         private val wave = WaveformView(context, barCount = 13)
@@ -1577,23 +1875,33 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
             gravity = Gravity.CENTER_VERTICAL
             clipChildren = false
             visibility = View.GONE
-            addView(timer, LinearLayout.LayoutParams(
-                timerWidth,
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-            ).apply { marginStart = timerMarginStart })
             addView(wave, LinearLayout.LayoutParams(waveWidth, sdp(20)).apply {
                 marginStart = waveMarginStart
                 marginEnd = waveMarginEnd
             })
+            addView(timer, LinearLayout.LayoutParams(
+                timerWidth,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+            ).apply { marginEnd = timerMarginEnd })
         }
 
         private var spinAnim: ValueAnimator? = null
         private var expandAnim: ValueAnimator? = null
         private var displayedSecond = -1L
 
-        override val fixedHeight: Int = pillHeight
+        /** Which way the row currently runs, or null before the side has ever been told. */
+        private var mirrored: Boolean? = null
 
-        override val root: View = LinearLayout(context).apply {
+        /** Whether the pill has been told to open: what [shapeWidth] answers for, even mid-animation. */
+        private var settledExpanded = false
+
+        override val shapeWidth: Int
+            get() = if (settledExpanded) pillHeight + expandedContentWidth else pillHeight
+        override val shapeHeight: Int = pillHeight
+        override val canvasOverhang: Int = expandedContentWidth
+
+        /** The pill itself: the button, and the waveform and timer that unfold from it. */
+        private val row: LinearLayout = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             background = bg
@@ -1603,6 +1911,60 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
             setPadding(pad, 0, pad, 0)
             addView(icon, LinearLayout.LayoutParams(iconSize, iconSize))
             addView(expand, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT))
+        }
+
+        /**
+         * The canvas the pill opens inside: the open pill's width and the same again on the far side,
+         * with the button in the middle, so the window never has to change size or position while the
+         * row grows away from the wall (see [positionVisual]). [onAnchorSideChanged] pins the row to one
+         * end of it.
+         */
+        override val root: View = FrameLayout(context).apply {
+            minimumWidth = pillHeight + 2 * expandedContentWidth
+            minimumHeight = pillHeight
+            clipChildren = false
+            clipToPadding = false
+            // The window's surface is padded for the *root's* shadow (ViewRootImpl sizes the surface
+            // insets from the root's Z). The canvas has no outline and casts none; this only keeps the
+            // room the row's shadow needs.
+            elevation = sdpf(6f)
+            addView(row, FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, pillHeight))
+        }
+
+        /**
+         * Keeps the button under the finger that tapped it, whichever side of the screen it is on (#399).
+         *
+         * The pill is the one design that changes size, and it opens to the side. Built one way round, the
+         * button is the first thing in the row: fine at the left wall, where the row grows off to the
+         * right past a button that does not move — and wrong at the right wall, where the pill can only
+         * open inwards, so the window's left edge travels and takes the button with it. You tapped the mic
+         * against the wall and the stop glyph was suddenly a pill's width inboard, with the cancel × the
+         * nearest thing to where you were looking. The tap itself never moved; nothing on screen said so.
+         *
+         * Mirroring the whole row answers it: on the right the button is laid out last and stays at the
+         * wall, with the waveform and then the elapsed time reaching inwards from it, and the cancel ×
+         * beyond them at the far end. On the left it reads outwards from the wall the same way round.
+         * The canvas is centred on the button and the row is pinned to its wall-side end, so the button
+         * is the one thing in it that never moves; the window itself never changes shape at all — see
+         * [positionVisual].
+         *
+         * Set as a layout direction rather than by reordering the children, so the margins inside the row
+         * mirror with it, and pinned explicitly in both directions — an RTL *locale* would otherwise
+         * decide this, and which wall the bubble is parked at has nothing to do with the language. The
+         * row's place in the canvas is absolute LEFT/RIGHT for the same reason.
+         */
+        @SuppressLint("RtlHardcoded")
+        override fun onAnchorSideChanged(onRight: Boolean) {
+            if (mirrored == onRight) return
+            mirrored = onRight
+            row.layoutDirection = if (onRight) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
+            // The button sits in the middle of the canvas whichever way round: the row is pinned to the
+            // wall-side end with the far side's room left as a margin, and grows inwards from there.
+            row.layoutParams = (row.layoutParams as FrameLayout.LayoutParams).apply {
+                gravity = (if (onRight) Gravity.RIGHT else Gravity.LEFT) or Gravity.CENTER_VERTICAL
+                leftMargin = if (onRight) 0 else expandedContentWidth
+                rightMargin = if (onRight) expandedContentWidth else 0
+            }
         }
 
         override fun applyState(state: DictateController.UiState) {
@@ -1680,6 +2042,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
 
         /** Animates the expand container open (pill) or closed (circle). */
         private fun setExpanded(expanded: Boolean) {
+            settledExpanded = expanded
             expandAnim?.cancel()
             if (expanded) {
                 expand.visibility = View.VISIBLE
@@ -1780,7 +2143,8 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         private var breatheAnim: ValueAnimator? = null
         private var smoothed = 0f
 
-        override val fixedHeight: Int? = null
+        override val shapeWidth: Int get() = viewSize
+        override val shapeHeight: Int get() = viewSize
 
         override val root: View = FrameLayout(context).apply {
             addView(glow, FrameLayout.LayoutParams(viewSize, viewSize))
@@ -1936,7 +2300,8 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
             alpha = 0f
         }
 
-        override val fixedHeight: Int? = null
+        override val shapeWidth: Int get() = viewSize
+        override val shapeHeight: Int get() = viewSize
 
         override val root: View = FrameLayout(context).apply {
             addView(orb, FrameLayout.LayoutParams(viewSize, viewSize))
@@ -2002,7 +2367,8 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
             elevation = sdpf(6f)
         }
 
-        override val fixedHeight: Int? = null
+        override val shapeWidth: Int get() = viewSize
+        override val shapeHeight: Int get() = viewSize
 
         override val root: View = FrameLayout(context).apply {
             // The cloud spans the whole button so it has room to grow while recording; a small glyph
@@ -2105,7 +2471,8 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
             alpha = 0f
         }
 
-        override val fixedHeight: Int? = null
+        override val shapeWidth: Int get() = viewSize
+        override val shapeHeight: Int get() = viewSize
 
         override val root: View = FrameLayout(context).apply {
             addView(sphere, FrameLayout.LayoutParams(viewSize, viewSize))
@@ -2191,6 +2558,9 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
          * system had shoved aside rather than something placed there.
          */
         private const val EDGE_MARGIN_DP = 16
+
+        /** How long the cancel button waits before its window is added; see [manageCancel]. */
+        private const val CANCEL_SHOW_DELAY_MS = 40L
 
         /** Aurora orb (#253): three blobs, started apart and orbiting at rates that never quite repeat. */
         private const val FULL_TURN = 6.2831855f

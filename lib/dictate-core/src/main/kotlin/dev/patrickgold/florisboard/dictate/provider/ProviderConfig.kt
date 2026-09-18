@@ -68,7 +68,8 @@ data class ProviderConfig(
     /**
      * Curated model ids for providers without an OpenAI-style `/models` catalog (ElevenLabs, Deepgram,
      * AssemblyAI, issue #143): [OpenAiCompatibleClient.listModels] returns these offline so the model
-     * picker and connection test work without a live `/models` call.
+     * picker fills without a live `/models` call. Not a connection test — that has its own authenticated
+     * request per provider, because a list compiled into the app can never fail (#384).
      */
     val curatedModels: List<String> = emptyList(),
 ) {

@@ -103,6 +103,8 @@ object KeyCode {
     const val IME_UI_MODE_GIF =             -218
     // Opens the local sticker panel (a folder the user picked, issue #280).
     const val IME_UI_MODE_STICKER =         -219
+    // Opens the text editing panel: cursor pad, select toggle, clipboard actions (issue #386).
+    const val IME_UI_MODE_EDITING =         -220
 
     const val SYSTEM_INPUT_METHOD_PICKER =  -221
     const val SYSTEM_PREV_INPUT_METHOD =    -222
@@ -112,6 +114,12 @@ object KeyCode {
     const val IME_NEXT_SUBTYPE =            -226
     const val LANGUAGE_SWITCH =             -227
     const val SHOW_SUBTYPE_PICKER =         -228
+
+    // Opens the scan panel: photograph printed text and tap the part of it to insert (issue #390).
+    // Out of the -211…-220 run of panel openers because that run is full; -229 and -230 were the two
+    // free numbers left in this block. Not -245, which is in QuickActionArrangement.REMOVED_ACTION_CODES
+    // and would be stripped out of every stored arrangement.
+    const val IME_UI_MODE_SCAN =            -229
 
     const val IME_SHOW_UI =                 -231
     const val IME_HIDE_UI =                 -232

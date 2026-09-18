@@ -173,10 +173,9 @@ object DictatePromptDefaults {
      * [base] is null/blank, or `"<base> <words>"` otherwise. Returns null only when both are empty.
      */
     fun appendCustomWords(base: String?, rawWords: String?): String? {
-        val words = rawWords.orEmpty()
-            .split(',', '\n')
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
+        // One splitting rule, in CustomWordList, so the count and the token estimate the settings screen
+        // shows describe the glossary that is actually assembled here (issue #389).
+        val words = CustomWordList.parse(rawWords)
         val baseClean = base?.trim()?.takeIf { it.isNotEmpty() }
         if (words.isEmpty()) return baseClean
         val glossary = words.joinToString(", ")
