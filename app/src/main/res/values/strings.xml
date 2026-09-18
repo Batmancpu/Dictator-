@@ -1987,6 +1987,15 @@
     <string name="dictate__providers_add_custom_summary" comment="Summary under the add-your-own-server button">Self-hosted or any OpenAI-compatible endpoint — for speech-to-text and rewording</string>
     <string name="dictate__providers_azure_endpoint" comment="Note at the top of the Azure provider editor: where the endpoint comes from, and the only regions that host the model">The endpoint is next to the key on the portal’s “Keys and Endpoint” page. MAI-Transcribe runs only in East US, West US, West US 2, North Europe, Southeast Asia and Central India.</string>
     <string name="dictate__providers_ollama_no_stt" comment="Note at the top of the Ollama provider editor; Ollama serves no transcription endpoint">Ollama has no speech-to-text endpoint, so it can only reword. To dictate through a server of your own, run a speech server (such as Speaches, faster-whisper-server or whisper.cpp) and add it under “Add your own server” — or use the on-device engine, which needs no server at all.</string>
+    <!-- Data residency (issue #403). The region is picked from a list because the valid addresses are the
+         provider’s own and short, and a mistyped residency host does not fail — it answers, from the
+         wrong continent. -->
+    <string name="dictate__providers_region_title" comment="Label of the field that picks a provider’s data-residency region">Region</string>
+    <string name="dictate__providers_region_us" comment="Name of the United States data-residency region">United States</string>
+    <string name="dictate__providers_region_eu" comment="Name of the European Union data-residency region">European Union</string>
+    <string name="dictate__providers_region_jp" comment="Name of the Japan data-residency region">Japan</string>
+    <string name="dictate__providers_region_in" comment="Name of the India data-residency region">India</string>
+    <string name="dictate__providers_region_global" comment="Name of the worldwide (non-regional) endpoint">Worldwide</string>
     <string name="dictate__providers_custom_title" comment="Dialog title when editing a custom endpoint">Custom server</string>
     <string name="dictate__providers_field_name" comment="Label for the custom endpoint display name field">Name</string>
     <string name="dictate__providers_field_transcription_model" comment="Label for the transcription model field in the provider editor">Transcription model</string>

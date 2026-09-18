@@ -2268,11 +2268,12 @@ object DictateController {
                 // The model is language-specific, so the input-language pref is irrelevant here.
                 LocalRealtimeSession(localModelDir, callbacks)
             } else {
-                // Self-hosted streaming (#249): a custom endpoint's own base URL decides where the socket
-                // goes; for the cloud providers this is null and each keeps its fixed address.
+                // Where the socket goes when it is not the vendor's default address: a custom endpoint's
+                // own base URL (#249), or the streaming host of the account's data-residency region
+                // (#403). Null for everyone else, and each keeps its fixed address.
                 RealtimeClient.open(
                     api!!, account.apiKey, model, language, callbacks,
-                    baseUrl = baseUrlOverrideFor(account).takeIf { presetFor(account).isCustom },
+                    baseUrl = realtimeEndpointFor(account),
                     // Same as the batch path: the three providers with a list-shaped language field hear
                     // which languages to expect instead of nothing at all (#99).
                     expectedLanguages = expectedLanguages(),
@@ -4143,6 +4144,22 @@ object DictateController {
         } else {
             null
         }
+
+    /**
+     * Where a real-time session should connect, or null for the provider's own fixed address.
+     *
+     * Not the same question as [baseUrlOverrideFor], which is why it is its own function. A server of the
+     * user's own hands over the base URL its batch requests use and the session derives the socket from it
+     * (#249). A data-residency region instead names its streaming host itself, because that host is a
+     * sibling of the REST one rather than a path under it (#403) — deriving it would mean guessing at a
+     * vendor's naming scheme, and guessing wrong here means streaming out of the region the user chose
+     * while every other request honours it.
+     */
+    private fun realtimeEndpointFor(account: ProviderAccount): String? {
+        val preset = presetFor(account)
+        if (preset.isCustom) return baseUrlOverrideFor(account)
+        return ProviderRegistry.regionOf(preset, account.customBaseUrl)?.realtimeUrl
+    }
 
     /**
      * Says no before the microphone opens, when the active provider has no credential to use.

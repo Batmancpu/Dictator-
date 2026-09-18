@@ -11,8 +11,11 @@
 package dev.patrickgold.florisboard.app.settings.dictate
 
 import android.content.Context
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -26,6 +29,7 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.outlined.Info
@@ -39,6 +43,8 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -87,6 +93,7 @@ import dev.patrickgold.florisboard.dictate.provider.OpenAiCompatibleClient
 import dev.patrickgold.florisboard.dictate.provider.ProviderAccount
 import dev.patrickgold.florisboard.dictate.provider.ProviderAccounts
 import dev.patrickgold.florisboard.dictate.provider.ProviderPreset
+import dev.patrickgold.florisboard.dictate.provider.ProviderRegion
 import dev.patrickgold.florisboard.dictate.provider.ProviderRegistry
 import dev.patrickgold.florisboard.dictate.provider.TranscriptionApi
 import dev.patrickgold.florisboard.dictate.provider.singleCallApplies
@@ -600,6 +607,9 @@ private fun ProviderEditorDialog(
     // A base-URL-editable built-in (e.g. Ollama, #136) also shows the base URL field, pre-filled with the
     // preset's default (localhost) so the user can point it at a LAN server.
     val allowsBaseUrl = isCustom || preset?.allowsCustomBaseUrl == true
+    // Data residency (#403): where the provider publishes regional addresses, the base URL is chosen from
+    // that list rather than typed. Empty for everyone who serves the world from one address.
+    val regions = preset?.regions.orEmpty()
     val showTranscription = preset?.capabilities?.transcription ?: true
     val showChat = preset?.capabilities?.chat ?: true
 
@@ -778,7 +788,16 @@ private fun ProviderEditorDialog(
                     onValueChange = { displayName = it },
                 )
             }
-            if (allowsBaseUrl) {
+            // A provider with data-residency regions gets the list instead of the text box (#403). Same
+            // stored field, and deliberately not both: the valid addresses are published and short, and a
+            // typo in one of them does not fail — it quietly sends the audio to another continent.
+            if (allowsBaseUrl && regions.isNotEmpty()) {
+                RegionField(
+                    regions = regions,
+                    baseUrl = baseUrl,
+                    onRegionChange = { baseUrl = it.baseUrl },
+                )
+            } else if (allowsBaseUrl) {
                 EditorField(
                     label = stringRes(R.string.dictate__base_url_title),
                     value = baseUrl,
@@ -1298,3 +1317,89 @@ private fun EditorField(
         },
     )
 }
+
+/**
+ * The data-residency region an account talks to (issue #403).
+ *
+ * A list rather than the base URL box the other editable endpoints get, because these addresses are the
+ * provider's and not the user's: every valid one is published, there are three or four of them, and a
+ * mistyped residency host is the one kind of address error that does not announce itself — it answers,
+ * and it answers from the wrong continent.
+ *
+ * The chosen region is stored as the account's base URL, so nothing downstream had to learn a new field.
+ * A stored URL that matches none of the regions is shown as it stands instead of being snapped onto one:
+ * it was typed deliberately, before this list existed or with something else in mind.
+ */
+@Composable
+private fun RegionField(
+    regions: List<ProviderRegion>,
+    baseUrl: String,
+    onRegionChange: (ProviderRegion) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val wanted = baseUrl.trim().trimEnd('/')
+    val selected = when {
+        wanted.isEmpty() -> regions.first()
+        else -> regions.firstOrNull { it.baseUrl.trimEnd('/').equals(wanted, ignoreCase = true) }
+    }
+    Box {
+        OutlinedTextField(
+            modifier = Modifier.padding(top = 8.dp).fillMaxWidth(),
+            value = selected?.let { stringRes(regionLabelOf(it.id)) } ?: baseUrl,
+            onValueChange = {},
+            readOnly = true,
+            singleLine = true,
+            label = { Text(stringRes(R.string.dictate__providers_region_title)) },
+            // The host stays in the open list and nowhere else: it is what tells two regions apart while
+            // choosing, and clutter once the choice is made and the name already says it.
+            trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null) },
+        )
+        // A read-only text field still consumes the tap that was meant to open the list, so the opener is
+        // a transparent layer of its own over the field. No ripple: the field is what the eye is on.
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) { expanded = true },
+        )
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            regions.forEach { region ->
+                DropdownMenuItem(
+                    text = {
+                        Column {
+                            Text(stringRes(regionLabelOf(region.id)))
+                            Text(
+                                text = hostOf(region.baseUrl),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    },
+                    onClick = {
+                        expanded = false
+                        onRegionChange(region)
+                    },
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Translated name for a [ProviderRegion] id. Only ids from [ProviderRegistry] reach here, and the host
+ * stands under the name in any case — so an id added there without a string of its own reads as the
+ * worldwide entry point rather than as nothing at all.
+ */
+@StringRes
+private fun regionLabelOf(id: String): Int = when (id) {
+    "us" -> R.string.dictate__providers_region_us
+    "eu" -> R.string.dictate__providers_region_eu
+    "jp" -> R.string.dictate__providers_region_jp
+    "in" -> R.string.dictate__providers_region_in
+    else -> R.string.dictate__providers_region_global
+}
+
+/** The host of a base URL, which is the whole of what a region actually changes. */
+private fun hostOf(url: String): String = url.substringAfter("://").substringBefore('/')

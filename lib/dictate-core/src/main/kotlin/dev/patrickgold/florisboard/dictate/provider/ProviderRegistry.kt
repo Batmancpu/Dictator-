@@ -11,6 +11,28 @@
 package dev.patrickgold.florisboard.dictate.provider
 
 /**
+ * One data-residency region of a provider (issue #403).
+ *
+ * A region is not a base URL the user thought up: it is a published address of the same service, and the
+ * provider decides which ones exist. That is why it is a list on the preset rather than a free text box —
+ * a typo in a residency host does not fail loudly, it silently sends the audio to the wrong continent.
+ *
+ * [realtimeUrl] is the point of the whole type. Soniox runs a second host for streaming that is nowhere
+ * derivable from the REST one the user picked, so a region that could only move the batch address would
+ * leave live dictation talking to the default region while everything else moved — which is exactly the
+ * failure this issue asked us not to build. Null where the provider has no streaming (OpenRouter).
+ *
+ * The region is stored as the account's own base URL, so nothing about persistence, the Wear bridge, the
+ * importer or the connection test needed a new field to learn about.
+ */
+data class ProviderRegion(
+    /** Stable key, mapped to a translated name in the settings UI. */
+    val id: String,
+    val baseUrl: String,
+    val realtimeUrl: String? = null,
+)
+
+/**
  * A selectable provider option shown to the user.
  *
  * Base URLs are stable facts. Default model ids are conservative starting points only – the source
@@ -66,8 +88,17 @@ data class ProviderPreset(
      * True for a built-in provider whose base URL is user-editable (issue #136): the editor shows a base
      * URL field pre-filled with [baseUrl], so e.g. Ollama can point at a LAN server instead of localhost.
      * Distinct from [isCustom] (a fully user-defined endpoint with its own name).
+     *
+     * A preset that also lists [regions] keeps this on — the account still carries its own base URL, and
+     * every resolution site already reads it — but the editor offers the region list instead of a text
+     * box, because there the set of valid addresses is known and short (#403).
      */
     val allowsCustomBaseUrl: Boolean = false,
+    /**
+     * The provider's data-residency regions (issue #403), the first being the one [baseUrl] points at.
+     * Empty for everyone who serves the world from one address.
+     */
+    val regions: List<ProviderRegion> = emptyList(),
 )
 
 /**
@@ -258,6 +289,21 @@ object ProviderRegistry {
             "HTTP-Referer" to "https://github.com/DevEmperor/Dictate",
             "X-Title" to "Dictate",
         ),
+        // Data residency (#403): the EU entry point decrypts in the EU and routes only to in-region
+        // provider endpoints, failing a request outright rather than letting it leave the region. Same
+        // key, same model slugs — unlike Soniox, nothing but the address changes. Verified 2026-09-18:
+        // GET https://eu.openrouter.ai/api/v1/models answers 200 with the full catalog. It is a Business
+        // plan feature, which is the account's business and not ours to check for.
+        //
+        // This is a region rather than the "add your own server" workaround because that path speaks plain
+        // OpenAI multipart: it would have cost the documented JSON fallback, the OpenRouter retry handling
+        // and every speech-to-text model in the picker (the catalog needs output_modalities=all, which is
+        // only asked for when the wire format is OPENROUTER_MULTIPART — a custom account never is).
+        allowsCustomBaseUrl = true,
+        regions = listOf(
+            ProviderRegion("global", "https://openrouter.ai/api/v1/"),
+            ProviderRegion("eu", "https://eu.openrouter.ai/api/v1/"),
+        ),
     )
 
     val GEMINI = ProviderPreset(
@@ -392,6 +438,23 @@ object ProviderRegistry {
         realtimeApi = RealtimeApi.SONIOX,
         defaultRealtimeModel = "stt-rt-v5",
         curatedRealtimeModels = listOf("stt-rt-v5"),
+        // Data residency (#403). Soniox sets the region per *project*, and each regional project mints its
+        // own key that is valid against that region's hosts only — which is why the report reads as "the
+        // new key doesn't work" rather than as anything about a region. Hosts from Soniox's data-residency
+        // docs, read 2026-09-18, and the EU pair asked directly: GET https://api.eu.soniox.com/v1/models
+        // answers 401 unauthenticated with the same error body as the US host, and stt-rt.eu.soniox.com
+        // resolves. Same API, another address; nothing here is a port.
+        //
+        // Both hosts move together or neither does. The streaming host is a sibling of the REST one, not a
+        // path under it, so a base URL the user typed could never have carried it — a region that moved
+        // only the async flow would have gone on streaming to the US while claiming to be in the EU.
+        allowsCustomBaseUrl = true,
+        regions = listOf(
+            ProviderRegion("us", "https://api.soniox.com/v1/", "wss://stt-rt.soniox.com/transcribe-websocket"),
+            ProviderRegion("eu", "https://api.eu.soniox.com/v1/", "wss://stt-rt.eu.soniox.com/transcribe-websocket"),
+            ProviderRegion("jp", "https://api.jp.soniox.com/v1/", "wss://stt-rt.jp.soniox.com/transcribe-websocket"),
+            ProviderRegion("in", "https://api.in.soniox.com/v1/", "wss://stt-rt.in.soniox.com/transcribe-websocket"),
+        ),
     )
 
     /**
@@ -634,6 +697,21 @@ object ProviderRegistry {
     )
 
     fun byId(id: String): ProviderPreset? = presets.firstOrNull { it.id == id }
+
+    /**
+     * The data-residency region [customBaseUrl] selects on [preset] (issue #403).
+     *
+     * A blank URL is the default region, because that is what every account stored before regions existed
+     * and what a fresh one still stores. Null for a preset without regions, and for a URL that is none of
+     * them — an account pointed somewhere by hand keeps going where it was pointed instead of being
+     * quietly snapped onto a region it never chose.
+     */
+    fun regionOf(preset: ProviderPreset, customBaseUrl: String): ProviderRegion? {
+        if (preset.regions.isEmpty()) return null
+        if (customBaseUrl.isBlank()) return preset.regions.first()
+        val wanted = customBaseUrl.trim().trimEnd('/')
+        return preset.regions.firstOrNull { it.baseUrl.trimEnd('/').equals(wanted, ignoreCase = true) }
+    }
 
     /**
      * The largest audio upload [providerId] accepts, or 0 when the provider does not document one.

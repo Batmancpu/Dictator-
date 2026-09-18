@@ -66,9 +66,12 @@ object RealtimeClient {
      * is fed PCM at [sampleRateFor] and finished/cancelled by the caller.
      */
     /**
-     * [baseUrl] redirects the OpenAI-shaped session at a server of the user's own (#249) — several
-     * self-hosted transcription servers expose exactly this protocol under `/v1/realtime`. Null, and every
-     * session goes to its vendor's fixed address as before.
+     * [baseUrl] is the address this session should use instead of its vendor's fixed one. Two things ask
+     * for that, and they hand over different shapes: a server of the user's own passes the HTTP base URL
+     * its batch requests already use and the OpenAI-shaped session derives `/realtime` from it (#249),
+     * while a provider that runs one streaming host per data-residency region passes that host's
+     * WebSocket address outright (Soniox, #403) — it is a sibling of the REST host, not a path under it,
+     * so there is nothing to derive. Null, and every session goes where it always went.
      *
      * [expectedLanguages] is read only by the three providers whose language field is a list (OpenAI's
      * gpt-transcribe generation, Soniox, Gemini), and only when no language is pinned: it turns
@@ -88,7 +91,7 @@ object RealtimeClient {
                 .also { it.connect() }
         RealtimeApi.DEEPGRAM -> DeepgramRealtimeSession(wsClient, apiKey, model, language, callbacks).also { it.connect() }
         RealtimeApi.SONIOX ->
-            SonioxRealtimeSession(wsClient, apiKey, model, language, callbacks, expectedLanguages)
+            SonioxRealtimeSession(wsClient, apiKey, model, language, callbacks, baseUrl, expectedLanguages)
                 .also { it.connect() }
         RealtimeApi.ASSEMBLYAI -> AssemblyAiRealtimeSession(wsClient, apiKey, model, language, callbacks).also { it.connect() }
         RealtimeApi.ELEVENLABS -> ElevenLabsRealtimeSession(wsClient, apiKey, model, language, callbacks).also { it.connect() }
@@ -291,6 +294,9 @@ private class OpenAiRealtimeSession(
  * frames. Each `tokens[]` message carries `is_final` tokens (permanent) plus a replaceable tail; the full
  * text (permanent + tail) is emitted as the partial, and the permanent text as the final on flush. An
  * empty frame flushes; the server replies `finished:true` and closes.
+ *
+ * [wsUrl] is the streaming host of the account's data-residency region (#403), taken as given: Soniox
+ * publishes it per region alongside the REST one, and a key is only a credential inside its own region.
  */
 private class SonioxRealtimeSession(
     private val client: OkHttpClient,
@@ -298,6 +304,7 @@ private class SonioxRealtimeSession(
     private val model: String,
     private val language: String?,
     private val callbacks: RealtimeCallbacks,
+    private val wsUrl: String? = null,
     expectedLanguages: List<String> = emptyList(),
 ) : RealtimeSession {
 
@@ -312,7 +319,8 @@ private class SonioxRealtimeSession(
     private companion object { const val URL = "wss://stt-rt.soniox.com/transcribe-websocket" }
 
     fun connect() {
-        ws = client.newWebSocket(Request.Builder().url(URL).build(), listener)
+        val url = wsUrl?.takeIf { it.isNotBlank() } ?: URL
+        ws = client.newWebSocket(Request.Builder().url(url).build(), listener)
     }
 
     private val listener = object : WebSocketListener() {
