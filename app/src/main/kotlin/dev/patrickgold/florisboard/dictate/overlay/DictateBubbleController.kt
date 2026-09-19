@@ -446,8 +446,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val size = cancelSize
         val pad = sdp(7)
         val icon = sideButtonIcon(R.drawable.ic_dictate_overlay_close, pad)
-        return FrameLayout(context).apply {
-            addView(icon, FrameLayout.LayoutParams(size, size))
+        return sideButtonHost(icon, size).apply {
             setOnClickListener {
                 if (prefs.dictate.floatingButtonHaptic.get()) vibrateTap()
                 DictateController.cancelRecording()
@@ -501,8 +500,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val size = undoSize
         val pad = sdp(7)
         val icon = sideButtonIcon(R.drawable.ic_dictate_overlay_undo, pad)
-        return FrameLayout(context).apply {
-            addView(icon, FrameLayout.LayoutParams(size, size))
+        return sideButtonHost(icon, size).apply {
             setOnClickListener {
                 if (prefs.dictate.floatingButtonHaptic.get()) vibrateTap()
                 val ok = DictateController.undoLastDictation(context)
@@ -1492,6 +1490,26 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         background = skin?.sideButtonBackground() ?: circle(R.color.dictate_overlay_cancel)
         imageTintList = ColorStateList.valueOf(skin?.sideButtonForeground ?: Color.WHITE)
         elevation = sdpf(6f)
+    }
+
+    /**
+     * The window root a [sideButtonIcon] hangs in.
+     *
+     * The disc fills its own window exactly, so its round shadow had nowhere to fall: the host clipped
+     * it to the disc's bounds, and the window's surface was that same square again, which left the ×
+     * standing in a hard-edged rectangle of shadow instead of wearing a round one. Every design was
+     * affected, because every skin puts its disc through here.
+     *
+     * The answer is the pill canvas's: stop clipping, and give the host a Z so the surface is padded
+     * for what falls outside it — ViewRootImpl reads the root's Z when the window is added and sizes
+     * the surface insets from it. The host keeps no background and therefore no outline, so it casts
+     * nothing itself, and the window frame that [positionCancel] and [positionUndo] place is unchanged.
+     */
+    private fun sideButtonHost(icon: ImageView, size: Int): FrameLayout = FrameLayout(context).apply {
+        clipChildren = false
+        clipToPadding = false
+        elevation = sdpf(6f)
+        addView(icon, FrameLayout.LayoutParams(size, size))
     }
 
     /**
