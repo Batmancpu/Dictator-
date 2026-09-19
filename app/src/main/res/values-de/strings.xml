@@ -394,6 +394,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Automatisch aus-/einklappen</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">Klappt die geteilte Aktionsleiste abhängig vom aktuellen Status automatisch ein/aus</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Platzierung der Aktionszeile</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">Zweitaktionen</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">Eine Smartbar-Taste halten, um eine zweite Aktion auszuführen</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Tippe eine Taste an, dann die Aktion, die sie beim Halten ausführen soll. Beide behalten ihre eigene Taste — blende eine davon im Aktionen-Editor der Tastatur aus, um den Platz freizugeben.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">Was soll {action} beim Halten ausführen?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Nur als Zweitaktion — diese Tasten wiederholen beim Halten oder haben schon eine eigene Haltefunktion</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Tippen</string>
     <string name="pref__suggestion__title" comment="Preference group title">Vorschläge</string>

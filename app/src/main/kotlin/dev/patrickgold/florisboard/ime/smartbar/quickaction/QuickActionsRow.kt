@@ -66,6 +66,7 @@ fun QuickActionsRow(
     val evaluator by keyboardManager.activeSmartbarEvaluator.collectAsState()
     val smartbarLayout by prefs.smartbar.layout.collectAsState()
     val actionArrangement by prefs.smartbar.actionArrangement.collectAsState()
+    val secondActions by prefs.smartbar.actionSecondActions.collectAsState()
     val sharedActionsExpanded by prefs.smartbar.sharedActionsExpanded.collectAsState()
     val promptsLayout by prefs.dictate.promptsLayout.collectAsState()
 
@@ -109,7 +110,11 @@ fun QuickActionsRow(
                 QuickActionButton(ToggleOverflowPanelAction, evaluator)
             }
             for (action in visibleActions) {
-                QuickActionButton(action, evaluator)
+                QuickActionButton(
+                    action = action,
+                    evaluator = evaluator,
+                    secondAction = secondActions.childOf(action.keyData().code),
+                )
             }
             if (showOverflowAction && !flipToggles) {
                 QuickActionButton(ToggleOverflowPanelAction, evaluator)

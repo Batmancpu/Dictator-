@@ -481,6 +481,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Automatycznie rozwiń/zwiń</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">Automatycznie rozszerza/zwęża współdzielony wiersz akcji na podstawie bieżącego stanu</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Rozmieszczenie wiersza czynności</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">Akcje dodatkowe</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">Przytrzymaj przycisk Smartbara, aby wykonać akcję dodatkową</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Dotknij przycisku, a potem akcji, którą ma wykonać po przytrzymaniu. Oba zachowują własny przycisk — ukryj jeden z nich w edytorze akcji klawiatury, aby zwolnić miejsce.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">Co ma wykonać {action} po przytrzymaniu?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Tylko jako akcja dodatkowa — te przyciski powtarzają się po przytrzymaniu lub mają już własną funkcję przytrzymania</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Wprowadzanie</string>
     <string name="pref__suggestion__title" comment="Preference group title">Sugestie</string>

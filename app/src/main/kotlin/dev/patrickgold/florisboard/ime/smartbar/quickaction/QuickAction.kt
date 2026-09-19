@@ -31,7 +31,12 @@ import org.florisboard.lib.compose.stringRes
 
 @Serializable
 sealed class QuickAction {
-    open fun onPointerDown(context: Context) = Unit
+    /**
+     * [onLongPress] is the button's second action (issue #385): returning true from it runs that
+     * instead of the tap, and — because the dispatcher enters its repeat loop only when a long press
+     * declines — also stops the key repeating. Unpaired buttons pass nothing and behave as before.
+     */
+    open fun onPointerDown(context: Context, onLongPress: () -> Boolean = { false }) = Unit
 
     open fun onPointerUp(context: Context) = Unit
 
@@ -40,9 +45,9 @@ sealed class QuickAction {
     @Serializable
     @SerialName("insert_key")
     data class InsertKey(val data: KeyData) : QuickAction() {
-        override fun onPointerDown(context: Context) {
+        override fun onPointerDown(context: Context, onLongPress: () -> Boolean) {
             val keyboardManager by context.keyboardManager()
-            keyboardManager.inputEventDispatcher.sendDown(data)
+            keyboardManager.inputEventDispatcher.sendDown(data, onLongPress)
         }
 
         override fun onPointerUp(context: Context) {
@@ -72,6 +77,30 @@ sealed class QuickAction {
 
 fun QuickAction.keyData(): KeyData {
     return if (this is QuickAction.InsertKey) data else TextKeyData.UNSPECIFIED
+}
+
+/**
+ * Runs this action as another button's long press (issue #385).
+ *
+ * One complete down-up, the same way the globe key's hold reaches the input method picker: a hold is
+ * a finished errand, so there is no press left over to repeat and nothing to release afterwards.
+ * Going through the dispatcher also keeps `massSelection.begin()`/`end()` balanced for the cursor
+ * actions, which a bare `sendUp` would not.
+ */
+fun QuickAction.performAsSecondAction(context: Context) {
+    val keyboardManager by context.keyboardManager()
+    when (this) {
+        is QuickAction.InsertKey -> keyboardManager.inputEventDispatcher.sendDownUp(data)
+        is QuickAction.InsertText -> {
+            val editorInstance by context.editorInstance()
+            editorInstance.commitText(data)
+        }
+    }
+    // The tap path closes the overflow panel itself, but exempts select-all so the deselect that may
+    // follow is still one tap away. A hold is not that case: it ran something else entirely.
+    if (keyboardManager.activeState.isActionsOverflowVisible) {
+        keyboardManager.activeState.isActionsOverflowVisible = false
+    }
 }
 
 @Composable

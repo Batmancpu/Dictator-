@@ -433,6 +433,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Pašizpildoša izvēršanās/sakļaušanās</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">Pašizpildoši izvērš/sakļauj kopīgo darbību rindu atbilstoši pašreizējam stāvoklim</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Darbību rindas novietojums</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">Otrās darbības</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">Turiet Smartbar pogu, lai izpildītu otro darbību</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Pieskarieties pogai un pēc tam darbībai, kas tai jāizpilda, turot to nospiestu. Abas saglabā savu pogu — vienu no tām paslēpiet tastatūras darbību redaktorā, lai atbrīvotu vietu.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">Ko {action} izpildīt, turot nospiestu?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Tikai kā otrā darbība — šīs pogas turot atkārtojas vai tām jau ir sava turēšanas funkcija</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Rakstīšana</string>
     <string name="pref__suggestion__title" comment="Preference group title">Ieteikumi</string>

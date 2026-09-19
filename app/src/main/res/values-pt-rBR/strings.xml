@@ -370,6 +370,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Auto-expandir/recolher</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">Expande/recolhe automaticamente a linha de ação compartilhada com base no estado atual</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Posicionamento da linha de ação</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">Ações secundárias</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">Mantenha pressionado um botão da Smartbar para executar uma ação secundária</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Toque em um botão e depois na ação que ele deve executar quando for mantido pressionado. Ambos mantêm o próprio botão — oculte um deles no editor de ações do teclado para liberar o espaço.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">O que {action} deve executar quando for mantido pressionado?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Apenas como ação secundária — estes botões se repetem quando mantidos pressionados ou já têm a própria função de manter</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Digitação</string>
     <string name="pref__suggestion__title" comment="Preference group title">Sugestões</string>

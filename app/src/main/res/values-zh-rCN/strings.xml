@@ -481,6 +481,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">自动展开 / 折叠</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">根据当前状态自动展开 / 折叠共用操作行</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">操作行位置</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">第二操作</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">长按 Smartbar 按钮可执行第二操作</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">先点按一个按钮，再点按它长按时要执行的操作。两者都保留各自的按钮——在键盘的操作编辑器中隐藏其中一个即可腾出位置。</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">长按 {action} 时执行什么？</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">仅可作为第二操作——这些按钮长按会重复，或已有自己的长按功能</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">键入</string>
     <string name="pref__suggestion__title" comment="Preference group title">建议</string>

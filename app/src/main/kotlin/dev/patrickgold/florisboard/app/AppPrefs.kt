@@ -65,6 +65,7 @@ import dev.patrickgold.florisboard.ime.smartbar.IncognitoDisplayMode
 import dev.patrickgold.florisboard.ime.smartbar.SmartbarLayout
 import dev.patrickgold.florisboard.ime.smartbar.quickaction.QuickAction
 import dev.patrickgold.florisboard.ime.smartbar.quickaction.QuickActionArrangement
+import dev.patrickgold.florisboard.ime.smartbar.quickaction.QuickActionSecondActions
 import dev.patrickgold.florisboard.ime.smartbar.quickaction.QuickActionJsonConfig
 import dev.patrickgold.florisboard.ime.text.gestures.SwipeAction
 import dev.patrickgold.florisboard.ime.text.key.KeyCode
@@ -1592,6 +1593,14 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "smartbar__action_arrangement",
             default = QuickActionArrangement.Default,
             serializer = QuickActionArrangement.Serializer,
+        )
+        // Which action each Smartbar button runs when it is held (issue #385). Its own preference
+        // rather than a field on the arrangement above: a pairing moves nothing, so the arrangement's
+        // three lists — and everything that migrates them — stay exactly as they were.
+        val actionSecondActions = custom(
+            key = "smartbar__action_second_actions",
+            default = QuickActionSecondActions.Default,
+            serializer = QuickActionSecondActions.Serializer,
         )
         val flipToggles = boolean(
             key = "smartbar__flip_toggles",

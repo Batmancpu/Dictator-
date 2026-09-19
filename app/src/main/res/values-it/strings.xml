@@ -381,6 +381,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Espandi/riduci automaticamente</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">Espande/comprime automaticamente la riga di azione condivisa in base allo stato corrente</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Posizionamento riga d\'azione</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">Azioni secondarie</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">Tieni premuto un pulsante della Smartbar per eseguire un\'azione secondaria</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Tocca un pulsante, poi l\'azione che deve eseguire quando lo tieni premuto. Entrambi mantengono il proprio pulsante — nascondine uno nell\'editor delle azioni della tastiera per liberare lo spazio.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">Cosa deve eseguire {action} quando lo tieni premuto?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Solo come azione secondaria — questi pulsanti si ripetono se tenuti premuti o hanno già una loro pressione prolungata</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Digitazione</string>
     <string name="pref__suggestion__title" comment="Preference group title">Suggerimenti</string>

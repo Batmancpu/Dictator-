@@ -143,6 +143,12 @@ private val BUBBLE_HEADROOM_BOTTOM = 24.dp
 /** Diameter of the swollen mic, relative to the row it grows out of (#235). */
 private const val HELD_MIC_DIAMETER = 1.9f
 
+/** How much larger than the themed hint size the second-action glyph is drawn (#385). */
+private const val SECOND_ACTION_BADGE_SCALE = 1.35f
+
+/** How far the second-action glyph sits in from the key's corner (#385). */
+private val SECOND_ACTION_BADGE_INSET = 5.dp
+
 /**
  * The swollen mic shown while the key is held for push-to-talk (#235), plus the lock target below it.
  *
@@ -401,6 +407,8 @@ fun QuickActionButton(
     evaluator: ComputingEvaluator,
     modifier: Modifier = Modifier,
     type: QuickActionBarType = QuickActionBarType.INTERACTIVE_BUTTON,
+    /** What holding this button runs instead of tapping it (issue #385), or null for a plain tap. */
+    secondAction: QuickAction? = null,
 ) {
     val context = LocalContext.current
     val prefs by FlorisPreferenceStore
@@ -495,7 +503,11 @@ fun QuickActionButton(
     if (bubbleArmed && bounds != null) HeldMicBubble(bounds, flying, appear, visible = gestureActive)
     PlainTooltip(
         action.computeTooltip(evaluator),
-        enabled = type == QuickActionBarType.INTERACTIVE_BUTTON && !dictateLongPressArmed,
+        // A button with a second action has no tooltip: the tooltip owns the same hold, appears on
+        // the system's own (longer) timeout and would pop up after the action it describes has
+        // already run. The mic has answered this question the same way since #228.
+        enabled = type == QuickActionBarType.INTERACTIVE_BUTTON && !dictateLongPressArmed &&
+            secondAction == null,
     ) {
         SnyggBox(
             elementName = elementName,
@@ -516,7 +528,9 @@ fun QuickActionButton(
             clickAndSemanticsModifier = Modifier
                 .aspectRatio(1f)
                 .indication(interactionSource, LocalIndication.current)
-                .pointerInput(action, isEnabled) {
+                // secondAction belongs in the keys: without it a pairing changed in settings would
+                // only take hold once the keyboard is rebuilt, which reads as the feature not working.
+                .pointerInput(action, isEnabled, secondAction) {
                     awaitEachGesture {
                         val down = awaitFirstDown()
                         down.consume()
@@ -524,7 +538,14 @@ fun QuickActionButton(
                             val press = PressInteraction.Press(down.position)
                             inputFeedbackController.keyPress(TextKeyData.UNSPECIFIED)
                             interactionSource.tryEmit(press)
-                            action.onPointerDown(context)
+                            // The hold is timed by the dispatcher's own coroutine, not by this
+                            // gesture — see DictateHoldTouch for why nothing here may outlive a press.
+                            action.onPointerDown(context) onLongPress@{
+                                val second = secondAction ?: return@onLongPress false
+                                inputFeedbackController.keyLongPress(TextKeyData.UNSPECIFIED)
+                                second.performAsSecondAction(context)
+                                true
+                            }
 
                             // The Dictate mic supports two long-press shortcuts:
                             //  • idle: hold to pick an existing audio/video file to transcribe (#88).
@@ -677,6 +698,24 @@ fun QuickActionButton(
                         selector = selector,
                         text = action.computeDisplayName(evaluator = evaluator),
                     )
+                }
+            }
+            // What holding this button runs, small in the corner — the same place and the same element
+            // the typing keyboard puts a key's hint glyph, so it is themed everywhere already and needs
+            // no new Snygg element (which a bundled stylesheet could not name anyway: BundledThemesTest
+            // allows only an element and its "-icon"/"-text" children).
+            secondAction?.let { second ->
+                evaluator.computeImageVector(second.keyData())?.let { secondIcon ->
+                    // The hint rule's own size is meant for a single character and reads as a speck
+                    // next to a 24sp icon, so it is scaled up a little; the inset keeps it off the
+                    // key's edge, where it looked like it had slipped out of the key.
+                    Box(modifier = Modifier.align(Alignment.TopEnd).padding(SECOND_ACTION_BADGE_INSET)) {
+                        SnyggIcon(
+                            elementName = FlorisImeUi.KeyHint.elementName,
+                            modifier = Modifier.scale(SECOND_ACTION_BADGE_SCALE),
+                            imageVector = secondIcon,
+                        )
+                    }
                 }
             }
         }

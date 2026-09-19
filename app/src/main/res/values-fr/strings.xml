@@ -407,6 +407,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Agrandir/réduire automatiquement</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">Extension/réduction automatique de la rangée d\'actions partagées en fonction de l\'état actuel</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Placement des lignes d\'action</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">Actions secondaires</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">Maintenez un bouton de la Smartbar pour lancer une action secondaire</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Touchez un bouton, puis l\'action qu\'il doit lancer quand on le maintient. Les deux gardent leur propre bouton — masquez l\'un d\'eux dans l\'éditeur d\'actions du clavier pour libérer la place.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">Que doit lancer {action} quand on le maintient ?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Uniquement comme action secondaire — ces boutons se répètent quand on les maintient ou ont déjà leur propre maintien</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Saisie</string>
     <string name="pref__suggestion__title" comment="Preference group title">Suggestions</string>

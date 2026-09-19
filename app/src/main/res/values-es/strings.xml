@@ -471,6 +471,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Expandir/contraer automáticamente</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">Expande/contrae automáticamente la fila de acción según el estado actual</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Ubicación de la fila de acción</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">Acciones secundarias</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">Mantén pulsado un botón de la Smartbar para ejecutar una acción secundaria</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Toca un botón y luego la acción que debe ejecutar al mantenerlo pulsado. Ambos conservan su propio botón — oculta uno en el editor de acciones del teclado para liberar el hueco.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">¿Qué debe ejecutar {action} al mantenerlo pulsado?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Solo como acción secundaria — estos botones se repiten al mantenerlos o ya tienen su propia pulsación larga</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Escritura</string>
     <string name="pref__suggestion__title" comment="Preference group title">Sugerencias</string>

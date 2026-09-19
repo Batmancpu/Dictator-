@@ -472,6 +472,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Otomatik genişlet/daralt</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">Paylaşılan eylem satırını mevcut duruma göre otomatik genişletir/daraltır</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Eylem satırı yerleşimi</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">İkincil eylemler</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">İkincil bir eylemi çalıştırmak için bir Smartbar düğmesini basılı tutun</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Bir düğmeye, ardından basılı tutulduğunda çalıştırması gereken eyleme dokunun. İkisi de kendi düğmesini korur — yeri boşaltmak için birini klavyenin eylem düzenleyicisinde gizleyin.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">{action} basılı tutulduğunda ne çalıştırsın?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Yalnızca ikincil eylem olarak — bu düğmeler basılı tutulduğunda yinelenir veya kendi basılı tutma işlevleri vardır</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Yazma</string>
     <string name="pref__suggestion__title" comment="Preference group title">Öneriler</string>

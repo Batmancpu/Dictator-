@@ -363,6 +363,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">توسيع/طي تلقائي</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">توسيع/طي صف الإجراء المشترك تلقائيا استنادا إلى الحالة الحالية</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">مبدل إجراءات المهام</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">الإجراءات الثانية</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">اضغط مطولاً على زر في Smartbar لتنفيذ إجراء ثانٍ</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">انقر على زر، ثم على الإجراء الذي يجب تنفيذه عند الضغط المطول عليه. يحتفظ كلاهما بزره الخاص — أخفِ أحدهما في محرر إجراءات لوحة المفاتيح لتحرير المكان.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">ما الذي ينفذه {action} عند الضغط المطول؟</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">كإجراء ثانٍ فقط — هذه الأزرار تتكرر عند الضغط المطول أو لديها وظيفة ضغط مطول خاصة بها</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">الكتابة</string>
     <string name="pref__suggestion__title" comment="Preference group title">الإقتراحات</string>

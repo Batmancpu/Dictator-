@@ -480,6 +480,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Automatické rozšíření/sbalení</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">Automaticky rozšíří/sbalí řádek sdílených akcí v závislosti na současném stavu</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Umístění akčního řádku</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">Druhé akce</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">Podržením tlačítka na Smartbaru spustíte druhou akci</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Klepněte na tlačítko a pak na akci, kterou má spustit při podržení. Obě si ponechají vlastní tlačítko — jedno z nich skryjte v editoru akcí klávesnice, abyste uvolnili místo.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">Co má {action} spustit při podržení?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Pouze jako druhá akce — tato tlačítka se při podržení opakují nebo už mají vlastní funkci podržení</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Psaní</string>
     <string name="pref__suggestion__title" comment="Preference group title">Návrhy</string>
