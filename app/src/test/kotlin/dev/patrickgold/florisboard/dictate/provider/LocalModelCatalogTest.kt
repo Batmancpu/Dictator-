@@ -140,10 +140,12 @@ class LocalModelCatalogTest {
     fun `the onboarding shortlist prefers the specialized model where one exists`() {
         assertEquals("sense-voice-small", LocalModelCatalog.onboardingPicks("zh").first().id)
         assertEquals("sense-voice-small", LocalModelCatalog.onboardingPicks("ja").first().id)
-        assertEquals("gigaam-v2-ru", LocalModelCatalog.onboardingPicks("ru").first().id)
-        // German gets the specialized one as the bigger alternative, not as the default: it is 670 MB.
+        // v3, not the v2 that is still in the catalog for the people who already installed it (#406).
+        assertEquals("gigaam-v3-ru", LocalModelCatalog.onboardingPicks("ru").first().id)
+        // German is offered its own specialized model first and the 670 MB one as the bigger alternative.
+        assertEquals("fastconformer-de", LocalModelCatalog.onboardingPicks("de").first().id)
         assertEquals("parakeet-primeline-de", LocalModelCatalog.onboardingPicks("de")[1].id)
-        assertEquals("whisper-base.en", LocalModelCatalog.onboardingPicks("en").first().id)
+        assertEquals("parakeet-tdt-110m-en", LocalModelCatalog.onboardingPicks("en").first().id)
         assertEquals("whisper-base", LocalModelCatalog.onboardingPicks("fr").first().id)
         // A region or script suffix must not fall through to the default.
         assertEquals(

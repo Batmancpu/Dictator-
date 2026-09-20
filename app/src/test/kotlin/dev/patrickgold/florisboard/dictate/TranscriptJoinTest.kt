@@ -64,6 +64,42 @@ class TranscriptJoinTest : FunSpec({
         out.toString() shouldBe "Hey"
     }
 
+    test("tighten takes the space out from in front of a mark inside one piece") {
+        // Verbatim from NVIDIA's German FastConformer, whose vocabulary spells `▁,` and `▁.` — "space,
+        // then the mark" — as its two most frequent tokens, so this is what it genuinely predicts.
+        TranscriptJoin.tighten("Alles hat ein Ende , nur die Wurst hat zwei .") shouldBe
+            "Alles hat ein Ende, nur die Wurst hat zwei."
+        TranscriptJoin.tighten("Hast du die Datei schon abgeschickt ?") shouldBe
+            "Hast du die Datei schon abgeschickt?"
+    }
+
+    test("tighten leaves a transcript that was already spaced correctly untouched") {
+        // The English Parakeet and GigaAM write their marks against the word; this must be a no-op there.
+        val clean = "Well, I don't wish to see it any more. It is very like the old portrait."
+        TranscriptJoin.tighten(clean) shouldBe clean
+        TranscriptJoin.tighten("") shouldBe ""
+    }
+
+    test("tighten obeys the same set, so French keeps the space before ? and !") {
+        val french = ".,"
+        TranscriptJoin.tighten("Ça va ?", french) shouldBe "Ça va ?"
+        TranscriptJoin.tighten("Ça va , vraiment .", french) shouldBe "Ça va, vraiment."
+        // An empty set is a caller saying "no mark binds backwards here" and must change nothing.
+        TranscriptJoin.tighten("Ça va ?", "") shouldBe "Ça va ?"
+    }
+
+    test("tighten closes a whole run of spaces in front of a mark, and consecutive marks too") {
+        TranscriptJoin.tighten("Moment   , bitte") shouldBe "Moment, bitte"
+        TranscriptJoin.tighten("Warte .  .  .") shouldBe "Warte..."
+    }
+
+    test("tighten reflows nothing else — only the space in front of a mark is its business") {
+        // Spacing *after* a mark is left exactly as the model wrote it. Collapsing that too would mean
+        // rewriting whitespace nobody complained about, on every transcript, to fix one tokenizer.
+        TranscriptJoin.tighten("Moment   ,  bitte") shouldBe "Moment,  bitte"
+        TranscriptJoin.tighten("zwei  Wörter") shouldBe "zwei  Wörter"
+    }
+
     test("the default set is the conservative rule, not a superset invented here") {
         // Mirrors the "default" punctuation rule in the localization extension; a caller that can reach
         // the active rule passes it instead.

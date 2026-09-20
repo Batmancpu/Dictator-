@@ -119,7 +119,7 @@ Dictate nothing and are not going anywhere.
 - **Push to talk** — hold the mic key and speak, let go and it's sent, like a voice message. Slide left to throw the recording away, drag up to lock it hands-free. A quick tap still works the way it always did.
 - **Use Dictate from any keyboard** — Dictate registers as a system-wide voice input, so the mic key in other keyboards and apps can transcribe through Dictate, with your provider, prompts and on-device models. No accessibility permission needed, so it also works in apps that block it.
 - **Real-time transcription** — watch your words appear live as you speak, streaming from OpenAI, Google Gemini, Deepgram, Soniox, AssemblyAI or ElevenLabs. Deepgram's **Flux** models decide for themselves when a turn has ended instead of waiting out a silence timer.
-- **On-device transcription — now live, too** — dictate completely offline with a downloadable model: no internet needed and nothing ever leaves your phone. Streaming models write as you speak in ten languages, and for one-shot accuracy there is Whisper, NVIDIA Parakeet (25 European languages), Canary (English, German, French and Spanish in a third of the space) and models specialised in German or Russian. Hold the send button to run just one dictation locally without switching providers, and models free their memory again when idle. Models keep downloading in the background even if you leave the app.
+- **On-device transcription — now live, too** — dictate completely offline with a downloadable model: no internet needed and nothing ever leaves your phone. Streaming models write as you speak in ten languages, and for one-shot accuracy there is Whisper, NVIDIA Parakeet (25 European languages), Canary (English, German, French and Spanish in a third of the space) and models specialised in English, German, Russian or Chinese — German and English among them at around 140 MB, with their own punctuation. Hold the send button to run just one dictation locally without switching providers, and models free their memory again when idle. Models keep downloading in the background even if you leave the app.
 - **Share a voice message and read it** — Dictate is in the share sheet for audio and video, so a voice message from any app can be handed straight to it. A screen opens and starts transcribing by itself; the result is searchable, and long files are handled in pieces rather than turned away.
 - **Transcription history** — every dictation is saved to a searchable history you can re-insert, replay, re-transcribe or pin, with full control over how long audio is kept. Point it at a folder and each new dictation is written there as a plain text file the moment it is finished, optionally with its recording — Dictate only writes the files, so whatever already syncs that folder (a cloud client, a script, your own tooling) picks them up without an account or a token ever being handed over.
 - **Long-form dictation** — speak for as long as you like: long recordings are transcribed in the background in segments, so you get your text sooner and never hit a length limit. An optional on-device Smart Turn model cuts at finished thoughts instead of at every pause.
@@ -199,7 +199,7 @@ speech server next to it for dictation — or use the on-device engine below and
 entirely.
 
 **No server at all:** Dictate can also transcribe **fully on your device** with a downloadable
-model (Whisper, Parakeet, Canary, GigaAM, SenseVoice, or a live-typing Kroko model). No account, no
+model (Whisper, Parakeet, FastConformer, Canary, GigaAM, SenseVoice, or a live-typing Kroko model). No account, no
 network, no audio leaving the phone — offered right in the setup wizard, and under
 *Settings → AI providers → On-device (offline)*.
 
@@ -272,9 +272,11 @@ Dictate Keyboard is released under the terms of the
   attribution notices.
 - Speech recognition is powered by [OpenAI Whisper](https://openai.com/index/whisper/).
 - On-device transcription uses [OpenAI Whisper](https://openai.com/index/whisper/) (MIT),
-  NVIDIA's [Parakeet](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3) and
-  [Canary](https://huggingface.co/nvidia/canary-180m-flash) models and the primeline German
-  fine-tune (CC-BY-4.0), [GigaAM](https://github.com/salute-developers/GigaAM) for Russian (MIT),
+  NVIDIA's [Parakeet](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3),
+  [Canary](https://huggingface.co/nvidia/canary-180m-flash) and
+  [FastConformer](https://huggingface.co/nvidia/stt_de_fastconformer_hybrid_large_pc) models and the
+  primeline German fine-tune (CC-BY-4.0),
+  [GigaAM](https://github.com/salute-developers/GigaAM) for Russian (MIT),
   and — for live transcription — the [Kroko ASR](https://huggingface.co/Banafo/Kroko-ASR)
   community models by Banafo (CC-BY-SA). All of them are exported to ONNX by
   [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx).

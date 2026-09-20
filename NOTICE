@@ -40,9 +40,13 @@ distribution. They are mirrored unmodified on the project's GitHub releases.
 
     OpenAI Whisper — https://openai.com/index/whisper/ (MIT)
     NVIDIA Parakeet TDT 0.6B v3 and the primeline German fine-tune (CC-BY-4.0)
+    NVIDIA Parakeet TDT 110M English —
+    https://huggingface.co/nvidia/parakeet-tdt_ctc-110m (CC-BY-4.0)
+    NVIDIA FastConformer German —
+    https://huggingface.co/nvidia/stt_de_fastconformer_hybrid_large_pc (CC-BY-4.0)
     NVIDIA Canary 180M Flash — https://huggingface.co/nvidia/canary-180m-flash
     (CC-BY-4.0)
-    GigaAM v2 Russian — https://github.com/salute-developers/GigaAM (MIT)
+    GigaAM v2 and v3 Russian — https://github.com/salute-developers/GigaAM (MIT)
 
     SenseVoice Small (Chinese, Cantonese, English, Japanese, Korean)
     Copyright Alibaba Group — https://github.com/FunAudioLLM/SenseVoice

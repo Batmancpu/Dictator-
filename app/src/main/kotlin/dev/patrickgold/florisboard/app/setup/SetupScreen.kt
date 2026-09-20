@@ -932,7 +932,7 @@ private fun MoreWayRow(
 }
 
 /**
- * The on-device branch: two models rather than the catalog's twenty-one.
+ * The on-device branch: two models rather than the catalog's two dozen.
  *
  * A first-run screen listing every download is not a choice, it is an obstacle — so the wizard offers
  * the one that fits the phone's language and the bigger one for anyone willing to trade storage for

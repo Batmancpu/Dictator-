@@ -193,6 +193,65 @@ object LocalModelCatalog {
     )
 
     /**
+     * ~137 MB. NVIDIA Parakeet TDT 110M (issue #406) — English in a fifth of [PARAKEET_TDT_V3]'s
+     * footprint, trained on 36 000 h, and the first small English model in this catalog that is not a
+     * Whisper. It writes its own punctuation and capitals, which the English Whispers do far less
+     * reliably at this size.
+     *
+     * A TDT transducer, so the trap from #176 applies: sherpa-onnx decides a NeMo transducer is TDT by
+     * looking for the substring `tdt` in the encoder's `url` metadata, and dies natively at `InitJoiner`
+     * if it is missing. This export carries `url=https://huggingface.co/parakeet-tdt_ctc-110m`, and a
+     * decode against the vendored 1.13.3 logged `TDT model. vocab_size: 1025, num_durations: 5` — which
+     * is also why these files are mirrored byte for byte: rewriting the ONNX metadata would break it.
+     *
+     * Licensing: weights CC-BY-4.0 (NVIDIA), sherpa-onnx ONNX export Apache-2.0.
+     */
+    val PARAKEET_TDT_110M_EN = LocalModelSpec(
+        id = "parakeet-tdt-110m-en",
+        displayName = "Parakeet TDT 110M",
+        description = "English · ~137 MB",
+        kind = LocalModelKind.NEMO_TRANSDUCER,
+        files = listOf(
+            LocalModelFile("$REL/parakeet-tdt-110m-en-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 131_113_202, "0f35509ddeb9b39002fb077d979a9fe74f06eb0bc4dd5c34f512f82e5111d657"),
+            LocalModelFile("$REL/parakeet-tdt-110m-en-decoder.int8.onnx", LocalTranscriptionProvider.DECODER, 3_955_863, "f7c331c5504c2e593c76ed22b728e3f554af6c4a383dde862e719ced08b1da19"),
+            LocalModelFile("$REL/parakeet-tdt-110m-en-joiner.int8.onnx", LocalTranscriptionProvider.JOINER, 1_411_403, "bf7dff69e9f2cdbe9943d70da358f38b361c115ba0105bae7e908e0d6ec782f6"),
+            LocalModelFile("$REL/parakeet-tdt-110m-en-tokens.txt", LocalTranscriptionProvider.TOKENS, 9_953, "450e56bd2f036fe5b6aa821865838cc5aa9d8b0106134ce9a9ba0664abe6cd10"),
+            VAD_FILE,
+        ),
+    )
+
+    /**
+     * ~137 MB. NVIDIA FastConformer German (issue #406) — German with punctuation at a fifth of
+     * [PARAKEET_PRIMELINE_DE]'s 670 MB, which is what makes it the one to offer a German phone first.
+     * The `_pc` in the upstream name is the point: it transcribes "in upper and lower case German
+     * alphabet along with spaces, periods, commas, and question marks" — those four marks and no others.
+     *
+     * A hybrid Transducer/CTC model of which sherpa-onnx publishes *both* branches, and only the
+     * transducer's asset name says so (`…-nemo-transducer-stt_de_…`); the plain `…-nemo-stt_de_…` is the
+     * CTC one and ships a single `model.onnx` that would not fit this kind at all.
+     *
+     * Its vocabulary spells `▁,` and `▁.` — a space and then the mark — as tokens 1 and 2, so it really
+     * does predict `Ende , nur`. That space is taken back out on the way to the text field rather than
+     * here; see [dev.patrickgold.florisboard.dictate.TranscriptJoin.tighten].
+     *
+     * Licensing: weights CC-BY-4.0 (NVIDIA) — note that the same NeMo family also contains CC-BY-NC-4.0
+     * models, so the licence is read per model; sherpa-onnx ONNX export Apache-2.0.
+     */
+    val FASTCONFORMER_DE = LocalModelSpec(
+        id = "fastconformer-de",
+        displayName = "FastConformer German",
+        description = "German · ~137 MB",
+        kind = LocalModelKind.NEMO_TRANSDUCER,
+        files = listOf(
+            LocalModelFile("$REL/fastconformer-de-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 131_114_014, "10fbb959c36c461afb02ea87c109119eb001f30e91a130663bd6d5bbcba74ba9"),
+            LocalModelFile("$REL/fastconformer-de-decoder.int8.onnx", LocalTranscriptionProvider.DECODER, 3_955_863, "4633a4b0a3f21f7ace4df02e772f5b5e63d45f84a71ee1e2660998fc4beb46ad"),
+            LocalModelFile("$REL/fastconformer-de-joiner.int8.onnx", LocalTranscriptionProvider.JOINER, 1_408_183, "bac3af36a9bd66bfcad2ae6a35f17c7853e034e497134a8b0cbe48a8e954bd9f"),
+            LocalModelFile("$REL/fastconformer-de-tokens.txt", LocalTranscriptionProvider.TOKENS, 10_686, "abb1136142604d6d1766ad5060bd4f4b1048d7a096cd094b2d40eec3e666be9f"),
+            VAD_FILE,
+        ),
+    )
+
+    /**
      * ~670 MB. Parakeet German (primeline, issue #176) — a German-specialized fine-tune of NVIDIA
      * Parakeet TDT 0.6B v3, notably more accurate on German (e.g. ~41 % lower WER on Tuda-De than the
      * base) while keeping the same architecture/speed. Exported to sherpa-onnx ONNX (int8) from the
@@ -235,6 +294,40 @@ object LocalModelCatalog {
             LocalModelFile("$REL/canary-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 132_678_643, "7a75b4e2a5857a6dcc0819503bbe3fad66943db4a3ccf21d3f27c633667d303f"),
             LocalModelFile("$REL/canary-decoder.int8.onnx", LocalTranscriptionProvider.DECODER, 74_437_848, "e41a2ab9c0c2fe81a1e8ade5a45fb02a74bc4db7d1f91b89a54a25e2cf79cba2"),
             LocalModelFile("$REL/canary-tokens.txt", LocalTranscriptionProvider.TOKENS, 53_555, "2dae6fc7815f9640645e0c765522b278ee0cef49b482d91f6913e334628d3e77"),
+            VAD_FILE,
+        ),
+    )
+
+    /**
+     * ~232 MB. GigaAM v3 Russian (issue #406) — [GIGAAM_V2_RU]'s successor: slightly smaller, and the
+     * first Russian in this catalog that writes punctuation and normalises numbers (the upstream
+     * `v3_e2e_rnnt` line; the plain v3 without `punct` in its name does neither).
+     *
+     * It stands **beside** v2 rather than replacing it. `LocalModelManager.isInstalled` only checks that
+     * the files exist, so a model that changed under an id already on disk would never be re-downloaded
+     * (#176) — and an id dropped from [all] stops being seen by `installedIds` while its bytes stay,
+     * which would leave anyone who had v2 with an orphaned 241 MB and a recognizer built from the wrong
+     * [LocalModelKind].
+     *
+     * Not a stock NeMo model: its metadata carries `is_giga_am=1`, `subsampling_factor=4` and an empty
+     * `normalize_type`, and sherpa-onnx reads that flag to override the feature dimension to 64 behind
+     * our `featureDim = 80`. Verified by decoding against the vendored 1.13.3 — which is also the reason
+     * nobody should make the feature config model-dependent.
+     *
+     * Licensing: MIT (GigaChat Team) — the licence file travels inside the export itself, not just on
+     * the repo page; the ONNX export is sherpa-onnx's (Apache-2.0). Its decoder and joiner are fp32,
+     * like v2's, so only the encoder carries an `.int8.` name.
+     */
+    val GIGAAM_V3_RU = LocalModelSpec(
+        id = "gigaam-v3-ru",
+        displayName = "GigaAM v3 Russian",
+        description = "Russian · ~232 MB",
+        kind = LocalModelKind.NEMO_TRANSDUCER,
+        files = listOf(
+            LocalModelFile("$REL/gigaam-v3-ru-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 224_570_820, "369f35a71bf288d3b8e0391fabd8dba5f2314088d440bca474056b7b4b6e66bf"),
+            LocalModelFile("$REL/gigaam-v3-ru-decoder.onnx", LocalTranscriptionProvider.DECODER, 4_600_132, "38fc7475443ea2a26f63211ca350f73ac50fff824ab7a3876ee2bd610c53bbc4"),
+            LocalModelFile("$REL/gigaam-v3-ru-joiner.onnx", LocalTranscriptionProvider.JOINER, 2_712_896, "602ff7017a93311aad34df1437c8d7f49911353c13d6eae7a6ee7b041339465c"),
+            LocalModelFile("$REL/gigaam-v3-ru-tokens.txt", LocalTranscriptionProvider.TOKENS, 13_354, "39abae20e692998290c574e606f11a9edef2902a1995463fcff63d1490cf22b7"),
             VAD_FILE,
         ),
     )
@@ -464,7 +557,10 @@ object LocalModelCatalog {
     val all: List<LocalModelSpec> = listOf(
         PARAKEET_TDT_V3,
         CANARY_180M_FLASH,
+        PARAKEET_TDT_110M_EN,
+        FASTCONFORMER_DE,
         PARAKEET_PRIMELINE_DE,
+        GIGAAM_V3_RU,
         GIGAAM_V2_RU,
         SENSE_VOICE_SMALL,
         WHISPER_TINY, WHISPER_BASE, WHISPER_SMALL,
@@ -476,7 +572,7 @@ object LocalModelCatalog {
     /**
      * The two models the setup wizard offers for [language] (issue #273): the one that fits, and the
      * bigger one for anyone willing to trade storage for accuracy. Everything else stays one tap away
-     * behind "show all models" — a first-run screen that lists twenty-one downloads is not a choice, it
+     * behind "show all models" — a first-run screen that lists two dozen downloads is not a choice, it
      * is an obstacle.
      *
      * [language] is a plain ISO code (`de`, `zh`); region and script are ignored.
@@ -493,11 +589,14 @@ object LocalModelCatalog {
             // SenseVoice was trained for these; Whisper only ever treated them as languages number
             // seventy-something. Its fallback is the multilingual Whisper, not the English one.
             "zh", "yue", "ja", "ko" -> listOf(SENSE_VOICE_SMALL, WHISPER_SMALL)
-            "ru" -> listOf(GIGAAM_V2_RU, WHISPER_SMALL)
-            // German is the one language with a specialized model that is also cheap to recommend
-            // against: same architecture, far better German, but 670 MB — an offer, not a default.
-            "de" -> listOf(WHISPER_BASE, PARAKEET_PRIMELINE_DE)
-            "en" -> listOf(WHISPER_BASE_EN, WHISPER_SMALL_EN)
+            // v3 rather than v2: smaller, and the only Russian here that writes punctuation. v2 stays in
+            // the catalog for everyone who already has it, but there is no reason to hand it to anyone new.
+            "ru" -> listOf(GIGAAM_V3_RU, WHISPER_SMALL)
+            // Until #406 the German offer was Whisper Base or 670 MB, and the specialized model was the
+            // expensive one. FastConformer is specialized *and* the cheaper of the two, so the shape of
+            // this pair finally matches every other language: the one that fits, then the bigger one.
+            "de" -> listOf(FASTCONFORMER_DE, PARAKEET_PRIMELINE_DE)
+            "en" -> listOf(PARAKEET_TDT_110M_EN, WHISPER_SMALL_EN)
             else -> listOf(WHISPER_BASE, WHISPER_SMALL)
         }
 

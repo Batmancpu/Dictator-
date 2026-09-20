@@ -129,7 +129,7 @@ class LocalTranscriptionProvider(
             val language = request.language?.substringBefore('-')?.takeIf { it.isNotBlank() }.orEmpty()
 
             if (streaming) {
-                return@withContext TranscriptionResult(transcribeStreaming(samples).trim())
+                return@withContext TranscriptionResult(tightened(transcribeStreaming(samples)))
             }
 
             val text = try {
@@ -158,8 +158,21 @@ class LocalTranscriptionProvider(
                 )
             }
 
-            TranscriptionResult(text.trim())
+            TranscriptionResult(tightened(text))
         }
+
+    /**
+     * The last thing every on-device transcript passes through: trimmed, and with the space taken back
+     * out from in front of a mark that binds backwards.
+     *
+     * A no-op for most of the catalog — Whisper, Parakeet English and GigaAM write their marks against
+     * the word already. It exists for the models whose vocabulary spells a mark as "space plus mark",
+     * which NVIDIA's German FastConformer does, and it is applied here rather than per model so the next
+     * export with the same habit needs no code at all. Which marks bind backwards is the caller's
+     * [tighteningSymbols] to say, so a French keyboard keeps the space it wants before `?` and `!`.
+     */
+    private fun tightened(text: String): String =
+        TranscriptJoin.tighten(text, tighteningSymbols).trim()
 
     /**
      * Batch decode with a *streaming* model (#233): the whole recording is pushed through the online

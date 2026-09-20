@@ -71,6 +71,32 @@ object TranscriptJoin {
         piece: String,
         tighteningSymbols: String = DEFAULT_TIGHTENING_SYMBOLS,
     ): String = appendPiece(StringBuilder(head), piece, tighteningSymbols).toString()
+
+    /**
+     * Takes the space back out from in front of every [tighteningSymbols] mark *inside* one piece.
+     *
+     * [appendPiece] mends the seam between two pieces; this mends the inside of one. Same question,
+     * different cause: there the mark arrived too late to travel with its word, here the model's own
+     * vocabulary carries the space. NVIDIA's German FastConformer has `▁,` and `▁.` — "space, then the
+     * mark" — as tokens 1 and 2 of its vocabulary, so `Alles hat ein Ende , nur die Wurst hat zwei .`
+     * is not a decoding slip but what it genuinely predicts. Its English sibling has only the bare marks
+     * and needs none of this, which is why this belongs on the way out rather than on a model entry:
+     * a tokenizer is not a fact about a language, and the next export may differ from this one.
+     *
+     * The space being taken away is always one a *model* wrote. A space a person typed in front of a
+     * mark is a different question, asked one step later and behind a preference (issue #329).
+     */
+    fun tighten(text: String, tighteningSymbols: String = DEFAULT_TIGHTENING_SYMBOLS): String {
+        if (text.isEmpty() || tighteningSymbols.isEmpty()) return text
+        val out = StringBuilder(text.length)
+        for (ch in text) {
+            if (tighteningSymbols.contains(ch)) {
+                while (out.isNotEmpty() && out.last().isWhitespace()) out.setLength(out.length - 1)
+            }
+            out.append(ch)
+        }
+        return out.toString()
+    }
 }
 
 /**
