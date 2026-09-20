@@ -1702,6 +1702,10 @@
     <string name="dictate__local_model_none_selected">Még nincs letöltött modell</string>
     <string name="dictate__local_model_delete_confirm">Törlöd a(z) „{model}“ modellt? Később újra letöltheted.</string>
     <string name="dictate__local_model_not_installed_error">Nincs letöltött helyi modell</string>
+    <plurals name="dictate__local_model_languages">
+        <item quantity="one">{count} nyelv</item>
+        <item quantity="other">{count} nyelv</item>
+    </plurals>
     <string name="dictate__local_fallback_title">Offline tartalék</string>
     <string name="dictate__local_fallback_summary">Offline állapotban a letöltött modellel írd át helyben, miután a szolgáltató hibázott</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Mentett átfogalmazási utasítások</string>

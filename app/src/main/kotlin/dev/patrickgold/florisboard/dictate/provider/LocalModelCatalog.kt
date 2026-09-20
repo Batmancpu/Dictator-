@@ -73,8 +73,6 @@ enum class LocalModelFamily(val displayName: String) {
 data class LocalModelSpec(
     val id: String,
     val displayName: String,
-    /** Short note for the picker, e.g. languages / accuracy/speed trade-off. */
-    val description: String,
     /**
      * The languages this model transcribes, as bare ISO-639-1 codes — `zh`, never `zh-CN`, because a
      * model speaks a language rather than a region. In the order they should be named, which for a list
@@ -205,7 +203,6 @@ object LocalModelCatalog {
     val WHISPER_TINY = LocalModelSpec(
         id = "whisper-tiny",
         displayName = "Whisper Tiny",
-        description = "Multilingual · ~99 MB",
         languages = Langs.WHISPER,
         punctuates = true,
         family = LocalModelFamily.WHISPER,
@@ -222,7 +219,6 @@ object LocalModelCatalog {
     val WHISPER_BASE = LocalModelSpec(
         id = "whisper-base",
         displayName = "Whisper Base",
-        description = "Multilingual · ~153 MB",
         languages = Langs.WHISPER,
         punctuates = true,
         family = LocalModelFamily.WHISPER,
@@ -239,7 +235,6 @@ object LocalModelCatalog {
     val WHISPER_SMALL = LocalModelSpec(
         id = "whisper-small",
         displayName = "Whisper Small",
-        description = "Multilingual · ~358 MB",
         languages = Langs.WHISPER,
         punctuates = true,
         family = LocalModelFamily.WHISPER,
@@ -256,7 +251,6 @@ object LocalModelCatalog {
     val WHISPER_TINY_EN = LocalModelSpec(
         id = "whisper-tiny.en",
         displayName = "Whisper Tiny (English)",
-        description = "English · ~99 MB",
         languages = listOf("en"),
         punctuates = true,
         family = LocalModelFamily.WHISPER,
@@ -273,7 +267,6 @@ object LocalModelCatalog {
     val WHISPER_BASE_EN = LocalModelSpec(
         id = "whisper-base.en",
         displayName = "Whisper Base (English)",
-        description = "English · ~153 MB",
         languages = listOf("en"),
         punctuates = true,
         family = LocalModelFamily.WHISPER,
@@ -290,7 +283,6 @@ object LocalModelCatalog {
     val WHISPER_SMALL_EN = LocalModelSpec(
         id = "whisper-small.en",
         displayName = "Whisper Small (English)",
-        description = "English · ~358 MB",
         languages = listOf("en"),
         punctuates = true,
         family = LocalModelFamily.WHISPER,
@@ -312,7 +304,6 @@ object LocalModelCatalog {
     val PARAKEET_TDT_V3 = LocalModelSpec(
         id = "parakeet-tdt-0.6b-v3",
         displayName = "Parakeet TDT 0.6B v3",
-        description = "25 European languages · ~670 MB",
         languages = Langs.PARAKEET_V3,
         punctuates = true,
         credit = Credits.nvidia("https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3"),
@@ -343,7 +334,6 @@ object LocalModelCatalog {
     val PARAKEET_TDT_110M_EN = LocalModelSpec(
         id = "parakeet-tdt-110m-en",
         displayName = "Parakeet TDT 110M",
-        description = "English · ~137 MB",
         languages = listOf("en"),
         punctuates = true,
         credit = Credits.nvidia("https://huggingface.co/nvidia/parakeet-tdt_ctc-110m"),
@@ -377,7 +367,6 @@ object LocalModelCatalog {
     val FASTCONFORMER_DE = LocalModelSpec(
         id = "fastconformer-de",
         displayName = "FastConformer German",
-        description = "German · ~137 MB",
         languages = listOf("de"),
         punctuates = true,
         credit = Credits.nvidia("https://huggingface.co/nvidia/stt_de_fastconformer_hybrid_large_pc"),
@@ -401,7 +390,6 @@ object LocalModelCatalog {
     val PARAKEET_PRIMELINE_DE = LocalModelSpec(
         id = "parakeet-primeline-de",
         displayName = "Parakeet German (primeline)",
-        description = "German · ~670 MB",
         languages = listOf("de"),
         punctuates = true,
         credit = Credits.PRIMELINE,
@@ -431,7 +419,6 @@ object LocalModelCatalog {
     val CANARY_180M_FLASH = LocalModelSpec(
         id = "canary-180m-flash",
         displayName = "Canary 180M Flash",
-        description = "English, German, French, Spanish · ~207 MB",
         languages = listOf("en", "de", "fr", "es"),
         // Asked for explicitly by `usePnc = true` where the recognizer is built.
         punctuates = true,
@@ -468,7 +455,6 @@ object LocalModelCatalog {
     val GIGAAM_V3_RU = LocalModelSpec(
         id = "gigaam-v3-ru",
         displayName = "GigaAM v3 Russian",
-        description = "Russian · ~232 MB",
         languages = listOf("ru"),
         punctuates = true,
         credit = Credits.GIGAAM,
@@ -493,7 +479,6 @@ object LocalModelCatalog {
     val GIGAAM_V2_RU = LocalModelSpec(
         id = "gigaam-v2-ru",
         displayName = "GigaAM v2 Russian",
-        description = "Russian · ~241 MB",
         languages = listOf("ru"),
         // Its whole vocabulary is 196 bytes of Cyrillic letters with not one mark in it, which is the
         // difference [GIGAAM_V3_RU] was added for.
@@ -530,7 +515,6 @@ object LocalModelCatalog {
     private fun kroko(
         lang: String,
         displayName: String,
-        languageLabel: String,
         encoderBytes: Long,
         encoderSha: String,
         decoderBytes: Long,
@@ -539,11 +523,9 @@ object LocalModelCatalog {
         tokensBytes: Long,
         tokensSha: String,
     ): LocalModelSpec {
-        val approxMb = (encoderBytes + decoderBytes + JOINER_BYTES + tokensBytes) / 1_000_000
         return LocalModelSpec(
             id = "kroko-$lang",
             displayName = displayName,
-            description = "$languageLabel · ~$approxMb MB",
             languages = listOf(lang),
             // `,` `.` `?` `!` are tokens 6, 7, 134 and 312 of its 652-entry vocabulary — and releasing a
             // sentence-final mark a segment late is exactly what #356 was about.
@@ -566,7 +548,7 @@ object LocalModelCatalog {
 
     /** ~71 MB. German live model — measurably more accurate on German than Whisper Base, and far faster. */
     val KROKO_DE = kroko(
-        "de", "Kroko German", "German",
+        "de", "Kroko German",
         70_091_557, "6e83993d6967ec7a3498b055b7e85ace85b5d64d1b1e8773cb29a43a11f5edb5",
         617_489, "94a29592b403c53fa2231b478637da1ab4abcef7f5e46e432098416a4a3ed562",
         "28356bff070aea51ab1d725a3278e81d19f9300f860d3248a7014292264df15a",
@@ -575,7 +557,7 @@ object LocalModelCatalog {
 
     /** ~71 MB. English live model. */
     val KROKO_EN = kroko(
-        "en", "Kroko English", "English",
+        "en", "Kroko English",
         70_092_599, "d4881c57449d581e0770fd53fa66c2fdc6cd167d92ece7c715e603defc96d9d4",
         617_488, "455ba38466fce8d5a57e7db68a323b684079ca4d9e1dd93a740d9b2429aae3b1",
         "d406f616736350e2a7df3e39398b78eb2fc1a2ca6973a19d3853fa3227e25b52",
@@ -584,7 +566,7 @@ object LocalModelCatalog {
 
     /** ~71 MB. French live model. */
     val KROKO_FR = kroko(
-        "fr", "Kroko French", "French",
+        "fr", "Kroko French",
         70_092_599, "e02facae1daf6f1f13da67ea3ace7c722516d0868d1768d78c0580bc22cc0c5b",
         617_488, "6aed547570e3ab5afc05429a017cedd3a056c16df3baa5703f02461cefa25bac",
         "a51eec759bcdcaae2614686fa2a8b57417b2d420dd55a5a5558b388d35a9b2b6",
@@ -593,7 +575,7 @@ object LocalModelCatalog {
 
     /** ~156 MB. Spanish live model — upstream only publishes the larger encoder for Spanish. */
     val KROKO_ES = kroko(
-        "es", "Kroko Spanish", "Spanish",
+        "es", "Kroko Spanish",
         154_878_102, "2d9f5ef87d1a5257f8a6687e21501c56f3aa2fcbfcfab9364dcc4ce4e06ae81b",
         617_488, "d4ce176b94b25f7acc88717bc3f704fcf5d6e131aaac2e0cabab3885541181ee",
         "dae35df88d676e320fcdb99217328e66dcf722bf11b0f2459e14ddb5b982ded5",
@@ -602,7 +584,7 @@ object LocalModelCatalog {
 
     /** ~156 MB. Italian live model. */
     val KROKO_IT = kroko(
-        "it", "Kroko Italian", "Italian",
+        "it", "Kroko Italian",
         154_878_660, "81c436e4f1cc381276859c858e3e881e382d0e0ca77a21bea1fde74c1275f6b2",
         617_488, "f9c8093a12cb93b14e82f9205f1c4f57cb19143e0cca0079c6770c717611961c",
         "3056ae55986ba4fb6203599baaeebb5f7eeb776798c3146df3bf76a198d172a9",
@@ -611,7 +593,7 @@ object LocalModelCatalog {
 
     /** ~156 MB. Dutch live model. */
     val KROKO_NL = kroko(
-        "nl", "Kroko Dutch", "Dutch",
+        "nl", "Kroko Dutch",
         154_878_660, "200616faee86985fee53f16073f8aa2b745988ef7a1dc7825271c464193d0266",
         617_488, "e5f8003008d4f00b52f0f16fb76544218957115e2b12a6397a89ec6bfe0e21f9",
         "4813be19995e1188b4b144e69ecb23d2e26e47f7d21b263443e647d8d7edc156",
@@ -620,7 +602,7 @@ object LocalModelCatalog {
 
     /** ~156 MB. Portuguese live model. */
     val KROKO_PT = kroko(
-        "pt", "Kroko Portuguese", "Portuguese",
+        "pt", "Kroko Portuguese",
         154_878_660, "336b9a62fd37d8b94855fcbe0414000aa5f1bd75d4cb907e112bd6b7ef97c52e",
         617_488, "2380832dbb1867779a550aea3948776d6a53ffa1cccd075bb7592ebaf21b7638",
         "de7afbc23e7e55af7fed85780690b8f883c62b881fe14d546d9677151581962f",
@@ -629,7 +611,7 @@ object LocalModelCatalog {
 
     /** ~156 MB. Swedish live model. */
     val KROKO_SV = kroko(
-        "sv", "Kroko Swedish", "Swedish",
+        "sv", "Kroko Swedish",
         154_877_618, "60c367201c16f6a8f3fbd7edcf86c2bf59e71455a841fdaacbaf5ea6767273b0",
         617_488, "3424e0908f578d0fd6a1911e73e0d6fc4ef430b8892389d1c49768b5ee75ead1",
         "194e38c970ca06743439b101b7dcb4b45b4e215d7b6dbc9419f4a1c557286413",
@@ -638,7 +620,7 @@ object LocalModelCatalog {
 
     /** ~156 MB. Turkish live model. */
     val KROKO_TR = kroko(
-        "tr", "Kroko Turkish", "Turkish",
+        "tr", "Kroko Turkish",
         154_878_660, "d36d8abbcbd9d87c5446f296b59a9fce26ccd87c7edb278f61631ef3d02803a2",
         617_489, "08f317129a6ffed14f8755e61d50b1df6ac1cc5af3bdd832b7ea93961199217e",
         "aa49f0e96e4ef5ea408cb09f4b2ef5785995513b21fd8f04675d2f5f0ffcd1f3",
@@ -647,7 +629,7 @@ object LocalModelCatalog {
 
     /** ~156 MB. Hebrew live model. */
     val KROKO_HE = kroko(
-        "he", "Kroko Hebrew", "Hebrew",
+        "he", "Kroko Hebrew",
         154_878_660, "6b4a447c2bbb829ec6b58677befd136220d7b1e090fbb66247d150c5066143d7",
         617_488, "8cb83589aa39bb898a2a52dc2fe87155deb9abf9a0e5d86f8c6acece1164330e",
         "77d8566a35eae6f9d45dce1095d2c60b381515470b0755159b23fe6f636fbd32",
@@ -678,7 +660,6 @@ object LocalModelCatalog {
     val SENSE_VOICE_SMALL = LocalModelSpec(
         id = "sense-voice-small",
         displayName = "SenseVoice Small",
-        description = "Chinese, Cantonese, English, Japanese, Korean · ~240 MB",
         languages = listOf("zh", "yue", "en", "ja", "ko"),
         punctuates = true,
         credit = Credits.SENSE_VOICE,
@@ -702,7 +683,6 @@ object LocalModelCatalog {
     val SMART_TURN = LocalModelSpec(
         id = SMART_TURN_ID,
         displayName = "Smart Turn v3",
-        description = "On-device thought-completion model for long-form auto-split.",
         files = listOf(
             LocalModelFile(
                 "$REL/smart-turn-v3.2-cpu.onnx", "smart-turn.onnx", 8_840_701,

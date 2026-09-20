@@ -1720,6 +1720,12 @@
     <string name="dictate__local_model_none_selected">Nie pobrano jeszcze żadnego modelu</string>
     <string name="dictate__local_model_delete_confirm">Usunąć „{model}“? Możesz pobrać go ponownie później.</string>
     <string name="dictate__local_model_not_installed_error">Nie pobrano lokalnego modelu</string>
+    <plurals name="dictate__local_model_languages">
+        <item quantity="one">{count} język</item>
+        <item quantity="few">{count} języki</item>
+        <item quantity="many">{count} języków</item>
+        <item quantity="other">{count} języków</item>
+    </plurals>
     <string name="dictate__local_fallback_title">Tryb offline awaryjny</string>
     <string name="dictate__local_fallback_summary">Offline transkrybuj na urządzeniu pobranym modelem, gdy dostawca zawiedzie</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Zapisane polecenia przeformułowania</string>

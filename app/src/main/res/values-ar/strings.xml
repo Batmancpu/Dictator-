@@ -1561,6 +1561,14 @@
     <string name="dictate__local_model_none_selected">لم يتم تنزيل أي نموذج بعد</string>
     <string name="dictate__local_model_delete_confirm">حذف ”{model}“؟ يمكنك تنزيله مرة أخرى لاحقًا.</string>
     <string name="dictate__local_model_not_installed_error">لا يوجد نموذج محلي مُنزَّل</string>
+    <plurals name="dictate__local_model_languages">
+        <item quantity="zero">{count} لغة</item>
+        <item quantity="one">{count} لغة</item>
+        <item quantity="two">{count} لغتان</item>
+        <item quantity="few">{count} لغات</item>
+        <item quantity="many">{count} لغة</item>
+        <item quantity="other">{count} لغة</item>
+    </plurals>
     <string name="dictate__local_fallback_title">احتياطي دون اتصال</string>
     <string name="dictate__local_fallback_summary">عند عدم الاتصال، فرّغ الصوت محليًا بالنموذج المُنزَّل بعد فشل المزوّد</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">مطالبات إعادة الصياغة المحفوظة</string>

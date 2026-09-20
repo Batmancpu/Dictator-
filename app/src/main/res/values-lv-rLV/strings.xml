@@ -1648,6 +1648,11 @@
     <string name="dictate__local_model_none_selected">Vēl nav lejupielādēts neviens modelis</string>
     <string name="dictate__local_model_delete_confirm">Dzēst “{model}”? Vēlāk to varēsiet lejupielādēt vēlreiz.</string>
     <string name="dictate__local_model_not_installed_error">Nav lejupielādēta lokāla modeļa</string>
+    <plurals name="dictate__local_model_languages">
+        <item quantity="zero">{count} valodu</item>
+        <item quantity="one">{count} valoda</item>
+        <item quantity="other">{count} valodas</item>
+    </plurals>
     <string name="dictate__local_fallback_title">Bezsaistes rezerve</string>
     <string name="dictate__local_fallback_summary">Bezsaistē transkribē ierīcē ar lejupielādēto modeli pēc nodrošinātāja kļūmes</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Saglabātie pārformulēšanas norādījumi</string>

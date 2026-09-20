@@ -1635,6 +1635,9 @@
     <string name="dictate__local_model_none_selected">まだモデルがダウンロードされていません</string>
     <string name="dictate__local_model_delete_confirm">「{model}」を削除しますか？後でもう一度ダウンロードできます。</string>
     <string name="dictate__local_model_not_installed_error">端末内モデルがありません</string>
+    <plurals name="dictate__local_model_languages">
+        <item quantity="other">{count}言語</item>
+    </plurals>
     <string name="dictate__local_fallback_title">オフライン時のフォールバック</string>
     <string name="dictate__local_fallback_summary">オフライン時、プロバイダーが失敗したらダウンロード済みモデルで端末上で文字起こしします</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">保存された言い換えプロンプト</string>

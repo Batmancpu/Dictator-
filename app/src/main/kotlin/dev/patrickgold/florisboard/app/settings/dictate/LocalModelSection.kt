@@ -302,15 +302,20 @@ private fun ModelRow(
             )
             Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                 Text(text = spec.displayName, style = MaterialTheme.typography.titleSmall)
-                val status = when {
+                // What the model is stays on the line; only the second half changes with its state. It
+                // used to be replaced by the state, so an installed model stopped saying what it covers
+                // — exactly when several are installed and one has to be chosen between them. The size
+                // is what the second half says until it is installed, because that is the number the
+                // decision turns on; afterwards it is no longer news and lives in the details instead.
+                val state = when {
                     downloading -> stringRes(R.string.dictate__local_model_downloading)
                         .replace("{percent}", downloadPercent.toString())
                     isActive -> stringRes(R.string.dictate__local_model_status_active)
                     isInstalled -> stringRes(R.string.dictate__local_model_status_installed)
-                    else -> spec.description
+                    else -> modelSizeLabel(spec.totalBytes)
                 }
                 Text(
-                    text = error ?: status,
+                    text = error ?: "${modelLanguagesLabel(spec)} · $state",
                     style = MaterialTheme.typography.bodySmall,
                     color = if (error != null) MaterialTheme.colorScheme.error
                     else MaterialTheme.colorScheme.onSurfaceVariant,

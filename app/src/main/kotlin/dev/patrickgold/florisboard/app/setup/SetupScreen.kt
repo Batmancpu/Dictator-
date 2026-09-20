@@ -88,6 +88,7 @@ import dev.patrickgold.florisboard.app.LocalNavController
 import dev.patrickgold.florisboard.dictate.cloud.DictateCloud
 import dev.patrickgold.florisboard.dictate.ui.DictateWaveform
 import dev.patrickgold.florisboard.app.settings.dictate.ProviderSetupHandoff
+import dev.patrickgold.florisboard.app.settings.dictate.modelLanguagesAndSize
 import dev.patrickgold.florisboard.app.settings.dictate.providerIcon
 import dev.patrickgold.florisboard.app.Routes
 import dev.patrickgold.florisboard.dictate.provider.LocalModelCatalog
@@ -1051,9 +1052,10 @@ private fun SetupModelCard(
                 fontWeight = FontWeight.SemiBold,
             )
             Text(
-                // The catalog's own one-liner, e.g. "Multilingual · ~153 MB" — the size is the number
-                // that decides this, so it is on screen before the button is.
-                text = spec.description,
+                // Languages and size, e.g. "German · 137 MB" — the size is the number that decides
+                // this, so it is on screen before the button is. Built from the catalog's own fields
+                // rather than a written sentence, so it arrives in the reader's language.
+                text = modelLanguagesAndSize(spec),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

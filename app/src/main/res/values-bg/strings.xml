@@ -1703,6 +1703,10 @@
     <string name="dictate__local_model_none_selected">Все още няма изтеглен модел</string>
     <string name="dictate__local_model_delete_confirm">Да се изтрие ли „{model}“? Можете да го изтеглите отново по-късно.</string>
     <string name="dictate__local_model_not_installed_error">Няма изтеглен локален модел</string>
+    <plurals name="dictate__local_model_languages">
+        <item quantity="one">{count} език</item>
+        <item quantity="other">{count} езика</item>
+    </plurals>
     <string name="dictate__local_fallback_title">Офлайн резервен режим</string>
     <string name="dictate__local_fallback_summary">Когато сте офлайн, транскрибирайте локално с изтегления модел след неуспех на доставчика</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Запазени промптове за преформулиране</string>
