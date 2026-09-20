@@ -10,6 +10,7 @@
 
 package dev.patrickgold.florisboard.dictate.provider
 
+import dev.patrickgold.florisboard.dictate.DictateLanguages
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -152,6 +153,106 @@ class LocalModelCatalogTest {
             LocalModelCatalog.onboardingPicks("zh"),
             LocalModelCatalog.onboardingPicks("zh-Hans-CN"),
         )
+    }
+
+    /**
+     * The invariant the picker's "Live" heading has always relied on and nothing ever checked: it is
+     * placed in front of the first streaming entry, so a non-streaming model appended after the Kroko
+     * block would silently end up under it.
+     */
+    @Test
+    fun `the streaming models are a contiguous tail of the catalog`() {
+        val fromFirstStreaming = LocalModelCatalog.all.dropWhile { !it.isStreaming }
+        assertTrue(
+            fromFirstStreaming.all { it.isStreaming },
+            "a one-shot model sits after the first streaming one: " +
+                fromFirstStreaming.filter { !it.isStreaming }.joinToString { it.id },
+        )
+    }
+
+    @Test
+    fun `a family is contiguous, and is either all streaming or none of it`() {
+        for (family in LocalModelFamily.entries) {
+            val positions = LocalModelCatalog.all.withIndex()
+                .filter { it.value.family == family }
+                .map { it.index }
+            assertTrue(positions.isNotEmpty(), "$family has no members")
+            assertEquals(
+                positions.last() - positions.first() + 1, positions.size,
+                "$family's members are not next to each other in the catalog",
+            )
+            val members = positions.map { LocalModelCatalog.all[it] }
+            assertEquals(
+                1, members.map { it.isStreaming }.distinct().size,
+                "$family mixes live and one-shot models, so one heading cannot describe it",
+            )
+        }
+    }
+
+    @Test
+    fun `every model says which languages it covers, in codes that resolve to a name`() {
+        for (spec in LocalModelCatalog.all) {
+            assertTrue(spec.languages.isNotEmpty(), "${spec.id} does not say what it transcribes")
+            for (code in spec.languages) {
+                assertEquals(code, code.substringBefore('-'), "${spec.id} carries a region in '$code'")
+                val name = DictateLanguages.displayNameOf(code)
+                assertTrue(
+                    !name.equals(code, ignoreCase = true),
+                    "${spec.id}: '$code' has no language name — a typo, or a code Android cannot place",
+                )
+                assertTrue(
+                    name != DictateLanguages.of(DictateLanguages.DETECT).englishName,
+                    "${spec.id}: '$code' resolved to the auto-detect entry",
+                )
+            }
+        }
+    }
+
+    /**
+     * Pinned against how the model actually behaves, not against its marketing. Canary is settled by
+     * `usePnc = true` where the recognizer is built; the rest were read from a decode against the
+     * vendored sherpa-onnx or from the marks present in the model's own `tokens.txt`.
+     */
+    @Test
+    fun `the punctuation flag matches what the model really writes`() {
+        assertTrue(LocalModelCatalog.CANARY_180M_FLASH.punctuates)
+        assertTrue(LocalModelCatalog.PARAKEET_TDT_110M_EN.punctuates)
+        assertTrue(LocalModelCatalog.FASTCONFORMER_DE.punctuates)
+        assertTrue(LocalModelCatalog.GIGAAM_V3_RU.punctuates)
+        assertTrue(LocalModelCatalog.KROKO_EN.punctuates)
+        // The one model in the catalog that writes none — and the reason v3 was added beside it.
+        assertTrue(!LocalModelCatalog.GIGAAM_V2_RU.punctuates)
+    }
+
+    @Test
+    fun `splitting long audio is derived from the VAD file rather than declared`() {
+        for (spec in LocalModelCatalog.all) {
+            assertEquals(
+                vad in names(spec), spec.splitsLongAudio,
+                "${spec.id} disagrees with the file the provider actually branches on",
+            )
+        }
+    }
+
+    @Test
+    fun `only Canary has to be told its language`() {
+        val told = LocalModelCatalog.all.filter { !it.detectsLanguage }
+        assertEquals(listOf(LocalModelCatalog.CANARY_180M_FLASH.id), told.map { it.id })
+    }
+
+    /**
+     * The credits on the specs and the file the attributions screen renders are two copies of the same
+     * obligation, so they are kept in step here rather than by remembering to edit both.
+     */
+    @Test
+    fun `every credit also stands in the attributions the app shows`() {
+        val attributions = java.io.File("src/main/assets/license/data_attributions.txt")
+        assertTrue(attributions.isFile, "attributions file not found at ${attributions.absolutePath}")
+        val text = attributions.readText()
+        for (spec in LocalModelCatalog.all) {
+            val credit = assertNotNull(spec.credit, "${spec.id} names nobody")
+            assertTrue(text.contains(credit.url), "${spec.id}: ${credit.url} is not in the attributions")
+        }
     }
 
     @Test

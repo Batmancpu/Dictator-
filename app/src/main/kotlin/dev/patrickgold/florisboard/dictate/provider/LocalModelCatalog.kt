@@ -45,6 +45,28 @@ enum class LocalModelKind {
 }
 
 /**
+ * Who made a model's weights and under what terms. All three are proper nouns, identifiers and a URL,
+ * so none of them is ever translated. Restates what `assets/license/data_attributions.txt` says, and a
+ * test holds the two in step — the file is what the attributions screen renders, this is what the
+ * picker can show next to the model it belongs to.
+ */
+data class ModelCredit(val author: String, val license: String, val url: String)
+
+/**
+ * A group of variants that share a name and differ only in size or in language, shown as one row at
+ * the top level of the picker. Sixteen of the catalog's entries are two such groups.
+ *
+ * Presentation only. **Never fold a family's members into a single [LocalModelSpec].**
+ * `LocalModelManager.installedIds` filters against [LocalModelCatalog.all] and
+ * [LocalModelCatalog.kindOf] falls back to `WHISPER` for an id it does not know, so a member that
+ * left `all` would orphan its bytes on disk *and* build the wrong recognizer for anyone who had it.
+ */
+enum class LocalModelFamily(val displayName: String) {
+    WHISPER("Whisper"),
+    KROKO("Kroko"),
+}
+
+/**
  * A selectable on-device model (issue #104). [id] doubles as the install directory name and the value
  * stored in [ProviderAccount.transcriptionModel] for the local provider.
  */
@@ -53,6 +75,22 @@ data class LocalModelSpec(
     val displayName: String,
     /** Short note for the picker, e.g. languages / accuracy/speed trade-off. */
     val description: String,
+    /**
+     * The languages this model transcribes, as bare ISO-639-1 codes — `zh`, never `zh-CN`, because a
+     * model speaks a language rather than a region. In the order they should be named, which for a list
+     * short enough to read out means the best-supported first and for the long ones is just
+     * alphabetical, since those are summarised by count. Empty only for [SMART_TURN], which is not a
+     * recognizer; a test holds every entry in [LocalModelCatalog.all] to at least one.
+     */
+    val languages: List<String> = emptyList(),
+    /**
+     * Whether the model writes its own punctuation and capitals, rather than a flat run of words.
+     *
+     * Every value in the catalog is read off the model instead of its marketing: either from a decode
+     * against the vendored runtime, or from the presence of `.` `,` `?` `!` in its own `tokens.txt`.
+     * That is what separates GigaAM v2, whose 196-byte vocabulary has no mark in it at all, from v3.
+     */
+    val punctuates: Boolean = false,
     val files: List<LocalModelFile>,
     /** Which recognizer to build for it; see [LocalModelKind]. */
     val kind: LocalModelKind = LocalModelKind.WHISPER,
@@ -65,8 +103,30 @@ data class LocalModelSpec(
      * streaming transducer and an offline NeMo transducer both ship a joiner.
      */
     val isStreaming: Boolean = false,
+    /** The top-level row this hides behind, or null when it stands on its own. See [LocalModelFamily]. */
+    val family: LocalModelFamily? = null,
+    /** Author, licence and upstream page; see [ModelCredit]. Null only for entries outside [LocalModelCatalog.all]. */
+    val credit: ModelCredit? = null,
 ) {
     val totalBytes: Long get() = files.sumOf { it.sizeBytes }
+
+    /**
+     * Whether a long recording is cut into pieces at speech pauses before decoding.
+     *
+     * Derived from the VAD file rather than declared, because that file is the only thing
+     * `LocalTranscriptionProvider` actually branches on: a declared flag could disagree with what the
+     * runtime does, a derived one cannot. Note what this does *not* say — a model that could swallow an
+     * hour in one pass is still cut at 28 s here, because the segmentation is the provider's, not the
+     * model's.
+     */
+    val splitsLongAudio: Boolean
+        get() = files.any { it.destName == LocalTranscriptionProvider.VAD }
+
+    /**
+     * False for a model that has to be *told* which language it is hearing. Only Canary, which is why
+     * it is the one model kept out of [LocalModelCatalog.onboardingPicks].
+     */
+    val detectsLanguage: Boolean get() = kind != LocalModelKind.CANARY
 }
 
 /**
@@ -86,6 +146,53 @@ object LocalModelCatalog {
     private const val REL = "https://github.com/DevEmperor/DictateKeyboard/releases/download/whisper-models-v1"
 
     /**
+     * The language lists the entries below share. Kept here rather than inline because two of them are
+     * long enough to bury the entry that carries them.
+     */
+    private object Langs {
+        /**
+         * Whisper's 99, read out of the `all_language_codes` metadata of the very `base-encoder` file
+         * this catalog ships (2026-09-20) rather than from a model card — the runtime takes the list
+         * from there, so that is the only place it is a fact. Alphabetical; the picker summarises them
+         * by count. Note `yue` is absent: Cantonese arrived with large-v3, and these are tiny/base/small.
+         */
+        val WHISPER = listOf(
+            "af", "am", "ar", "as", "az", "ba", "be", "bg", "bn", "bo", "br", "bs", "ca", "cs", "cy",
+            "da", "de", "el", "en", "es", "et", "eu", "fa", "fi", "fo", "fr", "gl", "gu", "ha", "haw",
+            "he", "hi", "hr", "ht", "hu", "hy", "id", "is", "it", "ja", "jw", "ka", "kk", "km", "kn",
+            "ko", "la", "lb", "ln", "lo", "lt", "lv", "mg", "mi", "mk", "ml", "mn", "mr", "ms", "mt",
+            "my", "ne", "nl", "nn", "no", "oc", "pa", "pl", "ps", "pt", "ro", "ru", "sa", "sd", "si",
+            "sk", "sl", "sn", "so", "sq", "sr", "su", "sv", "sw", "ta", "te", "tg", "th", "tk", "tl",
+            "tr", "tt", "uk", "ur", "uz", "vi", "yi", "yo", "zh",
+        )
+
+        /** The 25 European languages NVIDIA documents for Parakeet TDT 0.6B v3 (read 2026-09-20). */
+        val PARAKEET_V3 = listOf(
+            "bg", "cs", "da", "de", "el", "en", "es", "et", "fi", "fr", "hr", "hu", "it", "lt", "lv",
+            "mt", "nl", "pl", "pt", "ro", "ru", "sk", "sl", "sv", "uk",
+        )
+    }
+
+    /** The credits the entries below share, and the shape of the ones they do not. */
+    private object Credits {
+        val WHISPER = ModelCredit("OpenAI", "MIT", "https://github.com/openai/whisper")
+        val KROKO = ModelCredit("Banafo", "CC-BY-SA", "https://huggingface.co/Banafo/Kroko-ASR")
+        val GIGAAM = ModelCredit(
+            "Salute Devices / GigaChat Team", "MIT", "https://github.com/salute-developers/GigaAM",
+        )
+        val SENSE_VOICE = ModelCredit(
+            "Alibaba Group", "FunASR Model Open Source License v1.1",
+            "https://github.com/FunAudioLLM/SenseVoice",
+        )
+        val PRIMELINE = ModelCredit(
+            "primeline", "CC-BY-4.0", "https://huggingface.co/primeline/parakeet-primeline",
+        )
+
+        /** NVIDIA publishes under CC-BY-4.0 per model, never per family — hence the URL per entry. */
+        fun nvidia(url: String) = ModelCredit("NVIDIA", "CC-BY-4.0", url)
+    }
+
+    /**
      * Silero VAD model, downloaded into every model dir so [LocalTranscriptionProvider] can segment
      * long audio at speech pauses (Whisper itself only handles ~30 s per pass). Same file for all models.
      */
@@ -99,6 +206,10 @@ object LocalModelCatalog {
         id = "whisper-tiny",
         displayName = "Whisper Tiny",
         description = "Multilingual · ~99 MB",
+        languages = Langs.WHISPER,
+        punctuates = true,
+        family = LocalModelFamily.WHISPER,
+        credit = Credits.WHISPER,
         files = listOf(
             LocalModelFile("$REL/tiny-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 12_937_772, "d24fb083ae3b1041fc24e97971d60e280c9342201fbb67b0ab428a8b4a51a434"),
             LocalModelFile("$REL/tiny-decoder.int8.onnx", LocalTranscriptionProvider.DECODER, 89_855_401, "d2fece8dd42771f1df975c6c0445770d0c292bf7547c2cae04a6c0cc57540925"),
@@ -112,6 +223,10 @@ object LocalModelCatalog {
         id = "whisper-base",
         displayName = "Whisper Base",
         description = "Multilingual · ~153 MB",
+        languages = Langs.WHISPER,
+        punctuates = true,
+        family = LocalModelFamily.WHISPER,
+        credit = Credits.WHISPER,
         files = listOf(
             LocalModelFile("$REL/base-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 29_120_534, "0b8fb1304b6109976038efff5ace81720e00386f3ff6b54ee8c75291ca0a1e11"),
             LocalModelFile("$REL/base-decoder.int8.onnx", LocalTranscriptionProvider.DECODER, 130_672_026, "9759d217388a01b3a4c7c15533201067b48ae819c4daafc8624e64b9409dc02d"),
@@ -125,6 +240,10 @@ object LocalModelCatalog {
         id = "whisper-small",
         displayName = "Whisper Small",
         description = "Multilingual · ~358 MB",
+        languages = Langs.WHISPER,
+        punctuates = true,
+        family = LocalModelFamily.WHISPER,
+        credit = Credits.WHISPER,
         files = listOf(
             LocalModelFile("$REL/small-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 112_442_483, "4cbe7b22fa9026b843b60a68640c747de05bafb1a11b57edc0e66c232d9f33a9"),
             LocalModelFile("$REL/small-decoder.int8.onnx", LocalTranscriptionProvider.DECODER, 262_226_114, "acad50b5c782696e91b55914cc5ab4f756f1532f76e22aa6fc615f39fb69a8ee"),
@@ -138,6 +257,10 @@ object LocalModelCatalog {
         id = "whisper-tiny.en",
         displayName = "Whisper Tiny (English)",
         description = "English · ~99 MB",
+        languages = listOf("en"),
+        punctuates = true,
+        family = LocalModelFamily.WHISPER,
+        credit = Credits.WHISPER,
         files = listOf(
             LocalModelFile("$REL/tiny.en-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 12_937_772, "0ce578b827c94a961aacb8fa14b02f096504b337e5c94be37c36238cbe3e8bc6"),
             LocalModelFile("$REL/tiny.en-decoder.int8.onnx", LocalTranscriptionProvider.DECODER, 89_853_865, "06c0e6ff6348d427e51839219d1c886c18cfdf411e629e33f5e1679bff9c1527"),
@@ -151,6 +274,10 @@ object LocalModelCatalog {
         id = "whisper-base.en",
         displayName = "Whisper Base (English)",
         description = "English · ~153 MB",
+        languages = listOf("en"),
+        punctuates = true,
+        family = LocalModelFamily.WHISPER,
+        credit = Credits.WHISPER,
         files = listOf(
             LocalModelFile("$REL/base.en-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 29_120_534, "ef6b936f4c9b1d90a3b68634b60c4ed8576b26172b33c2535ec0e933c9edb823"),
             LocalModelFile("$REL/base.en-decoder.int8.onnx", LocalTranscriptionProvider.DECODER, 130_669_978, "f7162ad6db2dbef16cfaeaa7f945b9d7dd9c1b8d472f6aca82f2273d185e4d41"),
@@ -164,6 +291,10 @@ object LocalModelCatalog {
         id = "whisper-small.en",
         displayName = "Whisper Small (English)",
         description = "English · ~358 MB",
+        languages = listOf("en"),
+        punctuates = true,
+        family = LocalModelFamily.WHISPER,
+        credit = Credits.WHISPER,
         files = listOf(
             LocalModelFile("$REL/small.en-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 112_442_483, "8bdac288f369aa94ee2194059238c465ed82ea9d47ee8fa4a8c0a891873e462f"),
             LocalModelFile("$REL/small.en-decoder.int8.onnx", LocalTranscriptionProvider.DECODER, 262_223_042, "710ccf890e10f3faa15f51ec346081a2723c9f3adb6e4da81c6573a5a6f877fb"),
@@ -182,6 +313,9 @@ object LocalModelCatalog {
         id = "parakeet-tdt-0.6b-v3",
         displayName = "Parakeet TDT 0.6B v3",
         description = "25 European languages · ~670 MB",
+        languages = Langs.PARAKEET_V3,
+        punctuates = true,
+        credit = Credits.nvidia("https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3"),
         kind = LocalModelKind.NEMO_TRANSDUCER,
         files = listOf(
             LocalModelFile("$REL/parakeet-tdt-0.6b-v3-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 652_184_281, "acfc2b4456377e15d04f0243af540b7fe7c992f8d898d751cf134c3a55fd2247"),
@@ -210,6 +344,9 @@ object LocalModelCatalog {
         id = "parakeet-tdt-110m-en",
         displayName = "Parakeet TDT 110M",
         description = "English · ~137 MB",
+        languages = listOf("en"),
+        punctuates = true,
+        credit = Credits.nvidia("https://huggingface.co/nvidia/parakeet-tdt_ctc-110m"),
         kind = LocalModelKind.NEMO_TRANSDUCER,
         files = listOf(
             LocalModelFile("$REL/parakeet-tdt-110m-en-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 131_113_202, "0f35509ddeb9b39002fb077d979a9fe74f06eb0bc4dd5c34f512f82e5111d657"),
@@ -241,6 +378,9 @@ object LocalModelCatalog {
         id = "fastconformer-de",
         displayName = "FastConformer German",
         description = "German · ~137 MB",
+        languages = listOf("de"),
+        punctuates = true,
+        credit = Credits.nvidia("https://huggingface.co/nvidia/stt_de_fastconformer_hybrid_large_pc"),
         kind = LocalModelKind.NEMO_TRANSDUCER,
         files = listOf(
             LocalModelFile("$REL/fastconformer-de-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 131_114_014, "10fbb959c36c461afb02ea87c109119eb001f30e91a130663bd6d5bbcba74ba9"),
@@ -262,6 +402,9 @@ object LocalModelCatalog {
         id = "parakeet-primeline-de",
         displayName = "Parakeet German (primeline)",
         description = "German · ~670 MB",
+        languages = listOf("de"),
+        punctuates = true,
+        credit = Credits.PRIMELINE,
         kind = LocalModelKind.NEMO_TRANSDUCER,
         files = listOf(
             LocalModelFile("$REL/parakeet-primeline-de-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 652_282_409, "4ce2447d5d996f1ea369c68cd8c1a8372c5e2b4c5784c9dc9c706b5e42ddc85e"),
@@ -289,6 +432,10 @@ object LocalModelCatalog {
         id = "canary-180m-flash",
         displayName = "Canary 180M Flash",
         description = "English, German, French, Spanish · ~207 MB",
+        languages = listOf("en", "de", "fr", "es"),
+        // Asked for explicitly by `usePnc = true` where the recognizer is built.
+        punctuates = true,
+        credit = Credits.nvidia("https://huggingface.co/nvidia/canary-180m-flash"),
         kind = LocalModelKind.CANARY,
         files = listOf(
             LocalModelFile("$REL/canary-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 132_678_643, "7a75b4e2a5857a6dcc0819503bbe3fad66943db4a3ccf21d3f27c633667d303f"),
@@ -322,6 +469,9 @@ object LocalModelCatalog {
         id = "gigaam-v3-ru",
         displayName = "GigaAM v3 Russian",
         description = "Russian · ~232 MB",
+        languages = listOf("ru"),
+        punctuates = true,
+        credit = Credits.GIGAAM,
         kind = LocalModelKind.NEMO_TRANSDUCER,
         files = listOf(
             LocalModelFile("$REL/gigaam-v3-ru-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 224_570_820, "369f35a71bf288d3b8e0391fabd8dba5f2314088d440bca474056b7b4b6e66bf"),
@@ -344,6 +494,11 @@ object LocalModelCatalog {
         id = "gigaam-v2-ru",
         displayName = "GigaAM v2 Russian",
         description = "Russian · ~241 MB",
+        languages = listOf("ru"),
+        // Its whole vocabulary is 196 bytes of Cyrillic letters with not one mark in it, which is the
+        // difference [GIGAAM_V3_RU] was added for.
+        punctuates = false,
+        credit = Credits.GIGAAM,
         kind = LocalModelKind.NEMO_TRANSDUCER,
         files = listOf(
             LocalModelFile("$REL/gigaam-v2-ru-encoder.int8.onnx", LocalTranscriptionProvider.ENCODER, 236_314_144, "b51efc61e3c0037ad1cb804079975468de3d175324fe8323aef5be4f5c6a38a1"),
@@ -389,6 +544,12 @@ object LocalModelCatalog {
             id = "kroko-$lang",
             displayName = displayName,
             description = "$languageLabel · ~$approxMb MB",
+            languages = listOf(lang),
+            // `,` `.` `?` `!` are tokens 6, 7, 134 and 312 of its 652-entry vocabulary — and releasing a
+            // sentence-final mark a segment late is exactly what #356 was about.
+            punctuates = true,
+            credit = Credits.KROKO,
+            family = LocalModelFamily.KROKO,
             kind = LocalModelKind.NEMO_TRANSDUCER,
             isStreaming = true,
             files = listOf(
@@ -518,6 +679,9 @@ object LocalModelCatalog {
         id = "sense-voice-small",
         displayName = "SenseVoice Small",
         description = "Chinese, Cantonese, English, Japanese, Korean · ~240 MB",
+        languages = listOf("zh", "yue", "en", "ja", "ko"),
+        punctuates = true,
+        credit = Credits.SENSE_VOICE,
         kind = LocalModelKind.SENSE_VOICE,
         files = listOf(
             LocalModelFile("$REL/sense-voice-small-model.int8.onnx", LocalTranscriptionProvider.MODEL, 239_233_841, "c71f0ce00bec95b07744e116345e33d8cbbe08cef896382cf907bf4b51a2cd51"),

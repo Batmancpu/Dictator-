@@ -174,6 +174,28 @@ object DictateLanguages {
     }
 
     /**
+     * The user's own name for a bare language [code], for a place that names a *model's* coverage
+     * rather than a dictation pick — "Deutsch", "Chinesisch", "Hawaiianisch".
+     *
+     * Deliberately not `of(code).displayName()`. [of] answers with "Detect automatically" for anything
+     * it does not know, and a model's language list carries bare codes (`zh`, `yue`) where this catalog
+     * carries regional tags (`zh-CN`, `yue-HK`), so half of them would come back as the globe. It also
+     * asks Android for the *language* name rather than the locale's, so `zh` reads "Chinese" instead of
+     * "Chinese (China)" — a model speaks a language, not a region.
+     */
+    fun displayNameOf(code: String): String {
+        val localized = Locale.forLanguageTag(code).getDisplayLanguage(Locale.getDefault())
+        // Android hands back the tag itself for a code it has no name for, which would put "Jw" or "Haw"
+        // in front of the user. The bundled English names cover several of those.
+        localized.takeIf { it.isNotBlank() && !it.equals(code, ignoreCase = true) }?.let { name ->
+            return name.replaceFirstChar { it.uppercase(Locale.getDefault()) }
+        }
+        val bundled = byCode[code]?.englishName
+            ?: all.firstOrNull { it.code != DETECT && it.code.substringBefore('-') == code }?.englishName
+        return bundled ?: code.uppercase(Locale.ROOT)
+    }
+
+    /**
      * English language name for [code] (e.g. `"German"`), used as the auto-formatting *language hint*.
      * Returns `null` for [DETECT], blank, or unknown codes so the caller can substitute "unknown" – a
      * readable name guides the model far better than the bare ISO code.
