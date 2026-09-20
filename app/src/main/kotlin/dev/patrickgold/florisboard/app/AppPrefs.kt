@@ -627,6 +627,22 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "dictate__floating_button_copy_to_clipboard",
             default = false,
         )
+        // Extra entries in the menu the hold opens (issue #408), below the prompts. All off by default:
+        // for a Gboard + bubble user that menu is the only route to their prompts, so nothing joins it
+        // unasked. The hold is also the only free gesture the button has — #357 is why these are menu
+        // entries and not a second gesture.
+        val floatingButtonMenuTranscribeFile = boolean(
+            key = "dictate__floating_button_menu_transcribe_file",
+            default = false,
+        )
+        val floatingButtonMenuHistory = boolean(
+            key = "dictate__floating_button_menu_history",
+            default = false,
+        )
+        val floatingButtonMenuSettings = boolean(
+            key = "dictate__floating_button_menu_settings",
+            default = false,
+        )
         // Whether the user has opened the floating-button screen at least once (clears the "New" badge).
         val floatingButtonHintSeen = boolean(
             key = "dictate__floating_button_hint_seen",

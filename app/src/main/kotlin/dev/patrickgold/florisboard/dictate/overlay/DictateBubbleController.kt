@@ -15,6 +15,8 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PixelFormat
@@ -49,14 +51,18 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.widget.TextViewCompat
 import dev.patrickgold.florisboard.R
+import dev.patrickgold.florisboard.app.FlorisAppActivity
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.dictate.DictateController
+import dev.patrickgold.florisboard.dictate.importer.TranscribeShareActivity
 import dev.patrickgold.florisboard.dictate.recognition.RecognitionBridge
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonDesign
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonSize
 import dev.patrickgold.florisboard.dictate.data.prompts.PromptModel
 import dev.patrickgold.florisboard.dictate.data.prompts.PromptsDatabaseHelper
+import dev.patrickgold.florisboard.dictate.data.prompts.snippetBody
 import dev.patrickgold.florisboard.dictate.ui.AudioReactiveCloudOrbView
 import dev.patrickgold.florisboard.dictate.ui.DictateAuroraOrbView
 import dev.patrickgold.florisboard.dictate.ui.DictateLatticeSphereView
@@ -589,66 +595,133 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
     }
 
     private fun addPromptMenu(prompts: List<PromptModel>) {
-        val card = LinearLayout(context).apply {
-            orientation = LinearLayout.VERTICAL
-            background = roundedRect(color(R.color.dictate_overlay_menu_surface), dpf(16f))
-            val p = dp(8)
-            setPadding(p, p, p, p)
-            isClickable = true // swallow taps so they don't dismiss via the scrim
-            elevation = dpf(8f)
-        }
-        fun menuItem(label: String, bold: Boolean, onClick: () -> Unit): TextView = TextView(context).apply {
-            text = label
-            setTextColor(color(R.color.dictate_overlay_icon))
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-            if (bold) setTypeface(typeface, Typeface.BOLD)
-            val hz = dp(20)
-            val vt = dp(12)
-            setPadding(hz, vt, hz, vt)
-            setOnClickListener { onClick() }
-        }
-        val wrapParams = LinearLayout.LayoutParams(
+        // The rows, and nothing else: the card they sit on is built further down and stays put while
+        // these scroll inside it.
+        val list = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
+        fun menuItem(label: String, iconRes: Int, bold: Boolean, onClick: () -> Unit): TextView =
+            TextView(context).apply {
+                text = label
+                setTextColor(color(R.color.dictate_overlay_icon))
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+                if (bold) setTypeface(typeface, Typeface.BOLD)
+                val hz = dp(18)
+                val vt = dp(12)
+                setPadding(hz, vt, hz, vt)
+                // Every row carries an icon, the prompts included: one with and one without would read as
+                // a row whose icon failed to load, and the labels would no longer start at one edge.
+                setCompoundDrawablesRelativeWithIntrinsicBounds(iconRes, 0, 0, 0)
+                compoundDrawablePadding = dp(14)
+                TextViewCompat.setCompoundDrawableTintList(
+                    this,
+                    ColorStateList.valueOf(color(R.color.dictate_overlay_icon)),
+                )
+                setOnClickListener { onClick() }
+            }
+        fun rowParams() = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT,
         )
-        // Live Prompt on top (freeform voice command, #230): records a spoken instruction via the floating
-        // button, then rewords it — with the selected text as context, or generating from scratch — and
-        // injects the result. Mirrors the live-prompt chip on the keyboard's prompt bar.
-        card.addView(
-            menuItem(context.getString(R.string.quick_action__dictate_live_prompt), bold = true) {
+        // The actions the user has put in this menu (#408) come first, above the rewording prompts and
+        // separated from them by a rule: they open a screen instead of dictating, and a row reading
+        // "Transcribe a file" in among the saved prompts would read as a third prompt. The hold is the
+        // only free gesture this button has (#357), so this menu is where anything new has to go.
+        val actions = BubbleMenuAction.entries.filter { it.pref(prefs).get() }
+        actions.forEach { action ->
+            list.addView(
+                menuItem(context.getString(action.labelRes), action.iconRes, bold = false) {
+                    hidePromptMenu()
+                    runMenuAction(action)
+                },
+                rowParams(),
+            )
+        }
+        if (actions.isNotEmpty()) {
+            list.addView(menuDivider(), LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(1).coerceAtLeast(1),
+            ).apply {
+                val m = dp(8)
+                topMargin = m
+                bottomMargin = m
+            })
+        }
+        // Live Prompt heads the prompts (freeform voice command, #230): records a spoken instruction via
+        // the floating button, then rewords it — with the selected text as context, or generating from
+        // scratch — and injects the result. The icon is the chip's own on the prompt strip,
+        // `Icons.Default.RecordVoiceOver` — the **filled** one: its outlined twin is a different icon and
+        // reads as a different thing beside the filled rows around it.
+        list.addView(
+            menuItem(
+                context.getString(R.string.quick_action__dictate_live_prompt),
+                R.drawable.ic_dictate_live_prompt,
+                bold = true,
+            ) {
                 hidePromptMenu()
                 startingDictation {
                     DictateController.startLivePrompt(context, DictateController.OutputTarget.OVERLAY)
                 }
             },
-            wrapParams,
+            rowParams(),
         )
         prompts.forEach { prompt ->
-            card.addView(
-                menuItem(prompt.name.orEmpty(), bold = false) {
+            list.addView(
+                menuItem(prompt.name.orEmpty(), promptIcon(prompt), bold = false) {
                     hidePromptMenu()
                     DictateController.applyPrompt(
                         context, prompt, target = DictateController.OutputTarget.OVERLAY,
                     )
                 },
-                LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                ),
+                rowParams(),
             )
         }
-        val scroll = ScrollView(context).apply {
-            addView(card)
-            val m = dp(24)
-            setPadding(m, m, m, m)
-            clipToPadding = false
+        // The card is as wide as its widest row and no wider — it used to stretch across the whole screen
+        // because a ScrollView gives an unparameterised child MATCH_PARENT — and no taller than a share of
+        // the screen. Past that only the rows move: the scrolling view sits *inside* the card rather than
+        // carrying it, so the rounded shape stays where it is instead of sliding with the list and
+        // overscrolling past its own corners.
+        val maxWidth = (screenWidth() * MENU_MAX_WIDTH).toInt() - dp(2 * MENU_PADDING_DP)
+        val maxHeight = (screenHeight() * MENU_MAX_HEIGHT).toInt() - dp(2 * MENU_PADDING_DP)
+        val scroll = object : ScrollView(context) {
+            override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+                super.onMeasure(
+                    MeasureSpec.makeMeasureSpec(maxWidth, MeasureSpec.AT_MOST),
+                    MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.AT_MOST),
+                )
+            }
+        }.apply {
+            addView(
+                list,
+                FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                ),
+            )
+            isVerticalScrollBarEnabled = true
+            scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY
+        }
+        val card = FrameLayout(context).apply {
+            background = roundedRect(color(R.color.dictate_overlay_menu_surface), dpf(16f))
+            val p = dp(MENU_PADDING_DP)
+            setPadding(p, p, p, p)
+            // Clip to the background's own outline, so a row scrolling past the top or bottom is cut off
+            // by the rounded corner instead of drawing over it.
+            clipToOutline = true
+            isClickable = true // swallow taps so they don't dismiss via the scrim
+            elevation = dpf(8f)
+            addView(
+                scroll,
+                FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                ),
+            )
         }
         val scrim = FrameLayout(context).apply {
             // Transparent, not a dark full-screen dim: the menu floats over the app without covering the
             // whole screen; the invisible full-screen layer only catches an outside tap to dismiss.
             setBackgroundColor(Color.TRANSPARENT)
             setOnClickListener { hidePromptMenu() }
-            addView(scroll, FrameLayout.LayoutParams(
+            addView(card, FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT,
                 Gravity.CENTER,
@@ -674,6 +747,74 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         menuAdded = false
         menuView = null
     }
+
+    /**
+     * The icon this prompt wears on the keyboard's prompt strip, as a drawable the menu can use.
+     *
+     * Deliberately the same three-way split as `dictatePromptIcon` — snippet, needs-a-selection,
+     * everything else — so a prompt looks the same wherever the user meets it. If that split ever
+     * changes, both places change together.
+     */
+    private fun promptIcon(prompt: PromptModel): Int = when {
+        prompt.snippetBody() != null -> R.drawable.ic_dictate_prompt_snippet
+        prompt.requiresSelection -> R.drawable.ic_dictate_prompt_selection
+        else -> R.drawable.ic_dictate_prompt_auto
+    }
+
+    /** Runs one of the menu's actions (#408). The menu is already closed by the time this is called. */
+    private fun runMenuAction(action: BubbleMenuAction) = when (action) {
+        BubbleMenuAction.TRANSCRIBE_FILE -> launchFromBubble(TranscribeShareActivity.pickIntent(context))
+        BubbleMenuAction.HISTORY -> openSettingsScreen("settings/dictate/history")
+        BubbleMenuAction.SETTINGS -> openSettingsScreen("settings/dictate")
+    }
+
+    /**
+     * The hairline that separates the menu's actions (#408) from the prompts below them.
+     *
+     * It measures itself at **no** width until it is given an exact one. A bare [View] takes the whole
+     * width it is offered under an AT_MOST spec, so an ordinary divider made the menu as wide as its cap
+     * instead of as wide as its longest row — a line has nothing to say about how wide the card should
+     * be. The row above it decides that, and the vertical [LinearLayout] then stretches every
+     * MATCH_PARENT child, this one included, to the width it settled on.
+     */
+    private fun menuDivider(): View = object : View(context) {
+        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+            val exact = MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.EXACTLY
+            setMeasuredDimension(
+                if (exact) MeasureSpec.getSize(widthMeasureSpec) else 0,
+                MeasureSpec.getSize(heightMeasureSpec),
+            )
+        }
+    }.apply {
+        setBackgroundColor(ColorUtils.setAlphaComponent(color(R.color.dictate_overlay_icon), 40))
+    }
+
+    /**
+     * Opens one of our own screens from the bubble, which is the first thing this overlay starts that is
+     * not a dictation.
+     *
+     * A new task because an accessibility service has no activity of its own to grow a back stack on —
+     * the same launch the keyboard's error chips already use ([DictateController.openProviderSettings]).
+     * Activity starts are allowed from here: a service the system itself binds, which an accessibility
+     * service is, is exempt from the background-start restriction.
+     */
+    private fun launchFromBubble(intent: Intent) {
+        runCatching { context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+    }
+
+    /**
+     * Opens a settings screen by its deep link. The component is named explicitly rather than left to
+     * resolution, and CATEGORY_BROWSABLE is required — without it [FlorisAppActivity] reads a VIEW
+     * intent as an extension import and lands somewhere else entirely.
+     */
+    private fun openSettingsScreen(path: String) = launchFromBubble(
+        Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("ui://florisboard/$path"),
+            context,
+            FlorisAppActivity::class.java,
+        ).addCategory(Intent.CATEGORY_BROWSABLE),
+    )
 
     private fun roundedRect(colorInt: Int, radius: Float): GradientDrawable = GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
@@ -2576,6 +2717,13 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
          * system had shoved aside rather than something placed there.
          */
         private const val EDGE_MARGIN_DP = 16
+
+        /** How much of the screen the hold menu may take before its rows wrap / it scrolls (#408). */
+        private const val MENU_MAX_WIDTH = 0.8f
+        private const val MENU_MAX_HEIGHT = 0.6f
+
+        /** The card's own padding, subtracted from the caps so the shares above measure the card. */
+        private const val MENU_PADDING_DP = 8
 
         /** How long the cancel button waits before its window is added; see [manageCancel]. */
         private const val CANCEL_SHOW_DELAY_MS = 40L

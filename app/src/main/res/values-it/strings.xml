@@ -1493,6 +1493,8 @@
     <string name="dictate__floating_button_copy_to_clipboard_title">Copia ogni dettatura negli appunti</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Ogni dettatura viene anche copiata negli appunti, così puoi incollarla manualmente se l\'inserimento non riesce. Su alcuni telefoni può mostrare un avviso degli appunti.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Le dettature vengono solo inserite, non copiate negli appunti.</string>
+    <string name="dictate__floating_button_menu_group">Menu a pressione prolungata</string>
+    <string name="dictate__floating_button_menu_settings_title">Impostazioni di Dictate</string>
     <string name="dictate__floating_button_undo_summary_off">Nessun pulsante di annullamento mostrato.</string>
     <string name="dictate__floating_button_undo_summary_on">Dopo una dettatura, accanto al pulsante compare un pulsante di annullamento per rimuovere il testo inserito con un solo tocco.</string>
     <string name="dictate__floating_button_undo_title">Pulsante di annullamento</string>

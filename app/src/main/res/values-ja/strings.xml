@@ -1642,6 +1642,8 @@
     <string name="dictate__floating_button_copy_to_clipboard_title">口述をすべてクリップボードにコピー</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">各口述はクリップボードにもコピーされ、挿入が失敗しても手動で貼り付けられます。一部の端末ではクリップボードの通知が表示される場合があります。</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">口述は挿入されるだけで、クリップボードにはコピーされません。</string>
+    <string name="dictate__floating_button_menu_group">長押しメニュー</string>
+    <string name="dictate__floating_button_menu_settings_title">Dictate の設定</string>
     <string name="dictate__floating_button_undo_summary_off">元に戻すボタンを表示しません。</string>
     <string name="dictate__floating_button_undo_summary_on">音声入力後、ボタンの横に元に戻すボタンが表示され、ワンタップで挿入したテキストを削除できます。</string>
     <string name="dictate__floating_button_undo_title">元に戻すボタン</string>

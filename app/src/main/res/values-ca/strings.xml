@@ -1580,6 +1580,8 @@
     <string name="dictate__floating_button_copy_to_clipboard_title">Copia cada dictat al porta-retalls</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Cada dictat també es copia al porta-retalls, perquè el puguis enganxar manualment si la inserció falla. Pot mostrar un avís del porta-retalls en alguns telèfons.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Els dictats només s\'insereixen, no es copien al porta-retalls.</string>
+    <string name="dictate__floating_button_menu_group">Menú en mantenir premut</string>
+    <string name="dictate__floating_button_menu_settings_title">Configuració de Dictate</string>
     <string name="dictate__floating_button_undo_summary_off">No es mostra cap botó per desfer.</string>
     <string name="dictate__floating_button_undo_summary_on">Després d\'un dictat, apareix un botó per desfer al costat del botó per eliminar el text inserit amb un sol toc.</string>
     <string name="dictate__floating_button_undo_title">Botó per desfer</string>

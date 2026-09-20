@@ -1726,6 +1726,8 @@
     <string name="dictate__floating_button_copy_to_clipboard_title">Kopírovat každé diktování do schránky</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Každé diktování se také zkopíruje do schránky, takže je můžeš vložit ručně, pokud vložení selže. Na některých telefonech může zobrazit upozornění schránky.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Diktování se pouze vkládají, nekopírují se do schránky.</string>
+    <string name="dictate__floating_button_menu_group">Nabídka při podržení</string>
+    <string name="dictate__floating_button_menu_settings_title">Nastavení Dictate</string>
     <string name="dictate__floating_button_undo_summary_off">Tlačítko zpět se nezobrazuje.</string>
     <string name="dictate__floating_button_undo_summary_on">Po diktování se vedle tlačítka zobrazí tlačítko zpět, kterým jedním klepnutím odstraníte vložený text.</string>
     <string name="dictate__floating_button_undo_title">Tlačítko zpět</string>

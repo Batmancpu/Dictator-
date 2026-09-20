@@ -1692,6 +1692,8 @@
     <string name="dictate__floating_button_copy_to_clipboard_title">Copiar cada dictado al portapapeles</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Cada dictado también se copia al portapapeles, para que puedas pegarlo manualmente si la inserción falla. Puede mostrar un aviso del portapapeles en algunos teléfonos.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Los dictados solo se insertan, no se copian al portapapeles.</string>
+    <string name="dictate__floating_button_menu_group">Menú al mantener pulsado</string>
+    <string name="dictate__floating_button_menu_settings_title">Ajustes de Dictate</string>
     <string name="dictate__floating_button_undo_summary_off">No se muestra ningún botón para deshacer.</string>
     <string name="dictate__floating_button_undo_summary_on">Tras un dictado, aparece un botón para deshacer junto al botón que permite eliminar el texto insertado con un solo toque.</string>
     <string name="dictate__floating_button_undo_title">Botón para deshacer</string>

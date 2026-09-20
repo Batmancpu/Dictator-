@@ -1665,6 +1665,8 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Salin setiap dikte ke papan klip</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Setiap dikte juga disalin ke papan klip, sehingga kamu bisa menempelkannya secara manual jika penyisipan gagal. Dapat menampilkan pemberitahuan papan klip di beberapa ponsel.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Dikte hanya disisipkan, tidak disalin ke papan klip.</string>
+    <string name="dictate__floating_button_menu_group">Menu saat ditahan</string>
+    <string name="dictate__floating_button_menu_settings_title">Pengaturan Dictate</string>
     <string name="dictate__floating_button_undo_summary_off">Tidak ada tombol urungkan yang ditampilkan.</string>
     <string name="dictate__floating_button_undo_summary_on">Setelah dikte, tombol urungkan muncul di samping tombol untuk menghapus teks yang disisipkan dengan satu ketukan.</string>
     <string name="dictate__floating_button_undo_title">Tombol urungkan</string>

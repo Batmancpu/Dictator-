@@ -1610,6 +1610,8 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__floating_button_copy_to_clipboard_title">Elk dictaat naar klembord kopiëren</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Elk dictaat wordt ook naar het klembord gekopieerd, zodat je het handmatig kunt plakken als invoegen mislukt. Kan op sommige telefoons een klembordmelding tonen.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Dictaten worden alleen ingevoegd, niet naar het klembord gekopieerd.</string>
+    <string name="dictate__floating_button_menu_group">Menu bij ingedrukt houden</string>
+    <string name="dictate__floating_button_menu_settings_title">Dictate-instellingen</string>
     <string name="dictate__floating_button_undo_summary_off">Geen knop voor ongedaan maken weergegeven.</string>
     <string name="dictate__floating_button_undo_summary_on">Na een dictaat verschijnt er een knop voor ongedaan maken naast de knop om de ingevoegde tekst met één tik te verwijderen.</string>
     <string name="dictate__floating_button_undo_title">Knop voor ongedaan maken</string>

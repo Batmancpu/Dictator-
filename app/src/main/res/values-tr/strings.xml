@@ -1689,6 +1689,8 @@
     <string name="dictate__floating_button_copy_to_clipboard_title">Her dikteyi panoya kopyala</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Her dikte panoya da kopyalanır; böylece ekleme başarısız olursa metni elle yapıştırabilirsin. Bazı telefonlarda pano bildirimi gösterebilir.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Dikteler yalnızca eklenir, panoya kopyalanmaz.</string>
+    <string name="dictate__floating_button_menu_group">Basılı tutma menüsü</string>
+    <string name="dictate__floating_button_menu_settings_title">Dictate ayarları</string>
     <string name="dictate__floating_button_undo_summary_off">Geri alma düğmesi gösterilmiyor.</string>
     <string name="dictate__floating_button_undo_summary_on">Bir dikteden sonra, eklenen metni tek dokunuşla kaldırmak için düğmenin yanında bir geri alma düğmesi belirir.</string>
     <string name="dictate__floating_button_undo_title">Geri alma düğmesi</string>

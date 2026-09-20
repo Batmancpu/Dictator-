@@ -1727,6 +1727,8 @@
     <string name="dictate__floating_button_copy_to_clipboard_title">Kopiuj każde dyktowanie do schowka</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Każde dyktowanie jest też kopiowane do schowka, więc możesz wkleić je ręcznie, jeśli wstawianie się nie powiedzie. Na niektórych telefonach może pokazać powiadomienie schowka.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Dyktowania są tylko wstawiane, nie kopiowane do schowka.</string>
+    <string name="dictate__floating_button_menu_group">Menu po przytrzymaniu</string>
+    <string name="dictate__floating_button_menu_settings_title">Ustawienia Dictate</string>
     <string name="dictate__floating_button_undo_summary_off">Nie wyświetlono przycisku cofania.</string>
     <string name="dictate__floating_button_undo_summary_on">Po dyktowaniu obok przycisku pojawia się przycisk cofania, który jednym dotknięciem usuwa wstawiony tekst.</string>
     <string name="dictate__floating_button_undo_title">Przycisk cofania</string>

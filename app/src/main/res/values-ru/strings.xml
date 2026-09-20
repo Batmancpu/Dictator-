@@ -1716,6 +1716,8 @@
     <string name="dictate__floating_button_copy_to_clipboard_title">Копировать каждую диктовку в буфер обмена</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Каждая диктовка также копируется в буфер обмена, чтобы вы могли вставить её вручную, если вставка не удалась. На некоторых телефонах может показываться уведомление буфера обмена.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Диктовки только вставляются, но не копируются в буфер обмена.</string>
+    <string name="dictate__floating_button_menu_group">Меню при удержании</string>
+    <string name="dictate__floating_button_menu_settings_title">Настройки Dictate</string>
     <string name="dictate__floating_button_undo_summary_off">Кнопка отмены не показывается.</string>
     <string name="dictate__floating_button_undo_summary_on">После диктовки рядом с кнопкой появляется кнопка отмены, позволяющая удалить вставленный текст одним нажатием.</string>
     <string name="dictate__floating_button_undo_title">Кнопка отмены</string>

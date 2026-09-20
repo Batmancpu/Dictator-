@@ -23,6 +23,7 @@ import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.BlurOn
 import androidx.compose.material.icons.filled.ColorLens
@@ -33,7 +34,14 @@ import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PhotoSizeSelectSmall
 import androidx.compose.material.icons.filled.PushPin
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -42,9 +50,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -55,11 +68,15 @@ import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.app.LocalNavController
 import dev.patrickgold.florisboard.app.Routes
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonAppScope
+import dev.patrickgold.florisboard.dictate.overlay.BubbleMenuAction
 import dev.patrickgold.florisboard.dictate.overlay.DictateAccessibilityService
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
 import dev.patrickgold.jetpref.datastore.model.collectAsState
+import dev.patrickgold.jetpref.material.ui.JetPrefAlertDialog
+import org.florisboard.lib.compose.rippleClickable
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonDesign
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonSize
+import kotlinx.coroutines.launch
 import org.florisboard.lib.color.ColorMappings
 import dev.patrickgold.jetpref.datastore.ui.ColorPickerPreference
 import dev.patrickgold.jetpref.datastore.ui.ListPreference
@@ -114,6 +131,7 @@ fun DictateFloatingButtonScreen() = FlorisScreen {
         ) { granted -> micGranted = granted }
 
         var showDisclosure by remember { mutableStateOf(false) }
+        var showMenuDialog by remember { mutableStateOf(false) }
 
         SwitchPreference(
             prefs.dictate.floatingButtonEnabled,
@@ -311,6 +329,65 @@ fun DictateFloatingButtonScreen() = FlorisScreen {
                 summaryOn = stringRes(R.string.dictate__floating_button_copy_to_clipboard_summary_on),
                 summaryOff = stringRes(R.string.dictate__floating_button_copy_to_clipboard_summary_off),
             )
+
+            // What holding the button offers besides the prompts (issue #408). The hold is the only free
+            // gesture the bubble has (#357), so this menu is where anything that is not the microphone
+            // lives — each entry off by default, since for a Gboard + bubble user this menu is their only
+            // route to the prompts and nothing should join it unasked. One row rather than a switch each:
+            // these are the contents of a single list, and the summary is the list as it stands.
+            val menuActions = BubbleMenuAction.entries.filter { it.pref(prefs).collectAsState().value }
+            Preference(
+                icon = Icons.Default.TouchApp,
+                modifier = Modifier.settingsSearchAnchor("dictate__floating_button_menu_group"),
+                title = stringRes(R.string.dictate__floating_button_menu_group),
+                summary = if (menuActions.isEmpty()) {
+                    stringRes(R.string.quick_action__noop)
+                } else {
+                    menuActions.map { stringRes(it.labelRes) }.joinToString()
+                },
+                onClick = { showMenuDialog = true },
+            )
+        }
+
+        if (showMenuDialog) {
+            JetPrefAlertDialog(
+                title = stringRes(R.string.dictate__floating_button_menu_group),
+                confirmLabel = stringRes(R.string.action__ok),
+                onConfirm = { showMenuDialog = false },
+                onDismiss = { showMenuDialog = false },
+            ) {
+                val scope = rememberCoroutineScope()
+                Column {
+                    // Rows of our own rather than JetPrefListItem: that one paints itself in the theme's
+                    // `surface`, which inside a dialog (a lighter container) shows up as a black block
+                    // behind the list. Ticking takes effect at once, as it does in the app-visibility
+                    // list — there is nothing here that a second confirmation could protect.
+                    BubbleMenuAction.entries.forEach { action ->
+                        val pref = action.pref(prefs)
+                        val checked by pref.collectAsState()
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .rippleClickable { scope.launch { pref.set(!checked) } }
+                                .padding(horizontal = 8.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(action.iconRes),
+                                contentDescription = null,
+                            )
+                            Text(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = 16.dp),
+                                text = stringRes(action.labelRes),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                            Checkbox(checked = checked, onCheckedChange = null)
+                        }
+                    }
+                }
+            }
         }
 
         if (showDisclosure) {
