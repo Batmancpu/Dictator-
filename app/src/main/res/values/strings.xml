@@ -2004,6 +2004,7 @@
     <string name="dictate__providers_region_in" comment="Name of the India data-residency region">India</string>
     <string name="dictate__providers_region_global" comment="Name of the worldwide (non-regional) endpoint">Worldwide</string>
     <string name="dictate__providers_custom_title" comment="Dialog title when editing a custom endpoint">Custom server</string>
+    <string name="dictate__providers_get_key" comment="Accessibility label for the key icon beside the provider dialog title; it opens the provider's own page for creating an API key">Get an API key</string>
     <string name="dictate__providers_field_name" comment="Label for the custom endpoint display name field">Name</string>
     <string name="dictate__providers_field_transcription_model" comment="Label for the transcription model field in the provider editor">Transcription model</string>
     <string name="dictate__providers_field_transcription_rewording_model" comment="Label for the model field when single-call is on, where one model does transcription and rewording">Transcription &amp; rewording model</string>

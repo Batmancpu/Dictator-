@@ -1184,6 +1184,7 @@
     <string name="dictate__providers_region_in">Índia</string>
     <string name="dictate__providers_region_global">Mundo inteiro</string>
     <string name="dictate__providers_custom_title">Servidor personalizado</string>
+    <string name="dictate__providers_get_key">Obter uma chave de API</string>
     <string name="dictate__providers_field_name">Nome</string>
     <string name="dictate__providers_field_transcription_model">Modelo de transcrição</string>
     <string name="dictate__providers_field_chat_model">Modelo de reformulação</string>

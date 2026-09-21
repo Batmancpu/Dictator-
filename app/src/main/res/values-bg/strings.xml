@@ -1380,6 +1380,7 @@
     <string name="dictate__providers_region_in">Индия</string>
     <string name="dictate__providers_region_global">Целият свят</string>
     <string name="dictate__providers_custom_title">Персонализиран сървър</string>
+    <string name="dictate__providers_get_key">Вземете API ключ</string>
     <string name="dictate__providers_field_name">Име</string>
     <string name="dictate__providers_field_transcription_model">Модел за транскрибиране</string>
     <string name="dictate__providers_field_chat_model">Модел за преформулиране</string>

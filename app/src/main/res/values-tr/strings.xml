@@ -1359,6 +1359,7 @@
     <string name="dictate__providers_region_in">Hindistan</string>
     <string name="dictate__providers_region_global">Dünya geneli</string>
     <string name="dictate__providers_custom_title">Özel sunucu</string>
+    <string name="dictate__providers_get_key">API anahtarı al</string>
     <string name="dictate__providers_field_name">Ad</string>
     <string name="dictate__providers_field_transcription_model">Yazıya dökme modeli</string>
     <string name="dictate__providers_field_chat_model">Yeniden ifade etme modeli</string>

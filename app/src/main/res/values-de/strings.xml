@@ -1309,6 +1309,7 @@
     <string name="dictate__providers_region_in">Indien</string>
     <string name="dictate__providers_region_global">Weltweit</string>
     <string name="dictate__providers_custom_title">Benutzerdefinierter Server</string>
+    <string name="dictate__providers_get_key">API-Schlüssel holen</string>
     <string name="dictate__providers_field_name">Name</string>
     <string name="dictate__providers_field_transcription_model">Transkriptionsmodell</string>
     <string name="dictate__providers_field_chat_model">Umformulierungsmodell</string>

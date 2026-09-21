@@ -1280,6 +1280,7 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__providers_region_in">India</string>
     <string name="dictate__providers_region_global">Wereldwijd</string>
     <string name="dictate__providers_custom_title">Aangepaste server</string>
+    <string name="dictate__providers_get_key">API-sleutel ophalen</string>
     <string name="dictate__providers_field_name">Naam</string>
     <string name="dictate__providers_field_transcription_model">Transcriptiemodel</string>
     <string name="dictate__providers_field_chat_model">Herformuleringsmodel</string>

@@ -47,6 +47,18 @@ data class ProviderPreset(
     val baseUrl: String,
     val capabilities: ProviderCapabilities,
     val supportsDynamicModels: Boolean,
+    /**
+     * The provider's own page for creating an API key — the deepest link that survives a sign-in, not
+     * the dashboard root, because the last step is exactly the one someone without a key cannot guess.
+     *
+     * **Null means "this provider has no key page", never "we did not look it up"** (#410). Both places
+     * that offer the page — the setup wizard's button and the key icon in the provider dialog's title
+     * row — key off null alone, so a missing URL silently removes the way out of a dialog whose key
+     * field is the thing being stared at. Null is right for Dictate Cloud, Ollama, the on-device
+     * provider and custom endpoints: there is nowhere to send anyone.
+     *
+     * Checked against the live host, with the date, like every other fact in here.
+     */
     val apiKeyUrl: String? = null,
     val defaultChatModel: String? = null,
     val defaultTranscriptionModel: String? = null,
@@ -375,7 +387,8 @@ object ProviderRegistry {
         baseUrl = "https://api.anthropic.com/v1/",
         capabilities = CHAT_ONLY,
         supportsDynamicModels = true,
-        apiKeyUrl = "https://console.anthropic.com/settings/keys",
+        // The console moved hosts: console.anthropic.com/settings/keys 301s to this one (2026-09-21).
+        apiKeyUrl = "https://platform.claude.com/settings/keys",
         defaultChatModel = "claude-haiku-4-5-20251001",
         curatedChatModels = listOf(
             "claude-haiku-4-5-20251001", "claude-sonnet-5", "claude-opus-5",
@@ -429,7 +442,9 @@ object ProviderRegistry {
         transcriptionApi = TranscriptionApi.SONIOX_ASYNC,
         // /v1/models is supported and returns transcription_mode per model; the client filters to async.
         supportsDynamicModels = true,
-        apiKeyUrl = "https://console.soniox.com",
+        // Not the console root: /api-keys is a real route rather than a client-side guess — /apikeys
+        // answers 404, so the server itself distinguishes them (2026-09-21).
+        apiKeyUrl = "https://console.soniox.com/api-keys",
         defaultTranscriptionModel = "stt-async-v5",
         // Verified against Soniox's model catalog; the live picker adds any newer async models.
         curatedTranscriptionModels = listOf("stt-async-v5"),
@@ -470,7 +485,8 @@ object ProviderRegistry {
         // /v1/models mixes TTS + STT models, so no clean STT filter — curated instead. scribe_v1 was
         // retired on 2026-07-09, leaving scribe_v2.
         supportsDynamicModels = false,
-        apiKeyUrl = "https://elevenlabs.io/app/settings/api-keys",
+        // The keys page left settings for the developers section; the old path redirects (2026-09-21).
+        apiKeyUrl = "https://elevenlabs.io/app/developers/api-keys",
         defaultTranscriptionModel = "scribe_v2",
         curatedTranscriptionModels = listOf("scribe_v2"),
         // Read 2026-09-04: aac, aiff, ogg, mpeg/mp3, opus, wav, webm, flac, mp4/m4a — the most generous
@@ -498,7 +514,11 @@ object ProviderRegistry {
         transcriptionApi = TranscriptionApi.DEEPGRAM,
         // GET /v1/models returns the live STT catalog (canonical_name); curated ids are the offline fallback.
         supportsDynamicModels = true,
-        apiKeyUrl = "https://console.deepgram.com/",
+        // Deepgram's console answers 200 for any path, so a status code proves nothing about a deep link
+        // and their own docs decide instead: `?jump=keys` is the parameter Deepgram publishes for landing
+        // on the keys page, and it survives the account step someone without a key has to take first
+        // (docs.deepgram.com, create-additional-api-keys, read 2026-09-21).
+        apiKeyUrl = "https://console.deepgram.com/signup?jump=keys",
         defaultTranscriptionModel = "nova-3",
         curatedTranscriptionModels = listOf("nova-3", "nova-2"),
         // Realtime (#128): wss /v1/listen?encoding=linear16&sample_rate=16000&interim_results=true.
@@ -521,7 +541,10 @@ object ProviderRegistry {
         capabilities = STT_ONLY,
         transcriptionApi = TranscriptionApi.ASSEMBLYAI_ASYNC,
         supportsDynamicModels = false,
-        apiKeyUrl = "https://www.assemblyai.com/app/api-keys",
+        // `/app/api-keys` was the old dashboard and now lands on a bare login. Same 200-for-anything
+        // problem as Deepgram, so again their own words: AssemblyAI's support article on getting a key
+        // names this URL (support.assemblyai.com, read 2026-09-21).
+        apiKeyUrl = "https://www.assemblyai.com/dashboard/api-keys",
         defaultTranscriptionModel = "universal-3-pro",
         curatedTranscriptionModels = listOf("universal-3-pro", "universal-2"),
         // Realtime (#128): Universal-Streaming wss streaming.assemblyai.com/v3/ws (~300ms). Model ids
@@ -601,7 +624,9 @@ object ProviderRegistry {
         baseUrl = "https://api.x.ai/v1/",
         capabilities = CHAT_ONLY,
         supportsDynamicModels = true,
-        apiKeyUrl = "https://console.x.ai",
+        // Not the console root: the login carries `return_to`, so the deep link is still there once the
+        // sign-in is done, and `default` is the team slug xAI's own quickstart uses (2026-09-21).
+        apiKeyUrl = "https://console.x.ai/team/default/api-keys",
     )
 
     val DEEPSEEK = ProviderPreset(

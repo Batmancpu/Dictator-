@@ -1335,6 +1335,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__providers_region_in">India</string>
     <string name="dictate__providers_region_global">Seluruh dunia</string>
     <string name="dictate__providers_custom_title">Server kustom</string>
+    <string name="dictate__providers_get_key">Dapatkan kunci API</string>
     <string name="dictate__providers_field_name">Nama</string>
     <string name="dictate__providers_field_transcription_model">Model transkripsi</string>
     <string name="dictate__providers_field_chat_model">Model penyusunan ulang</string>

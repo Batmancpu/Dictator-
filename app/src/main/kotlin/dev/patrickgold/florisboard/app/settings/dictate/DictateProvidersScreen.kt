@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -34,6 +35,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material.icons.filled.Lan
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Mic
@@ -100,6 +102,7 @@ import dev.patrickgold.florisboard.dictate.provider.TranscriptionApi
 import dev.patrickgold.florisboard.dictate.provider.singleCallApplies
 import dev.patrickgold.florisboard.lib.compose.FlorisHyperlinkText
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
+import dev.patrickgold.florisboard.lib.util.launchUrl
 import dev.patrickgold.jetpref.datastore.model.collectAsState
 import dev.patrickgold.jetpref.datastore.ui.DialogSliderPreference
 import dev.patrickgold.jetpref.datastore.ui.Preference
@@ -605,6 +608,7 @@ private fun ProviderEditorDialog(
     onDelete: (() -> Unit)?,
 ) {
     val prefs by FlorisPreferenceStore
+    val context = LocalContext.current
     val isCustom = preset == null
     // A base-URL-editable built-in (e.g. Ollama, #136) also shows the base URL field, pre-filled with the
     // preset's default (localhost) so the user can point it at a LAN server.
@@ -699,6 +703,32 @@ private fun ProviderEditorDialog(
             PaddingValues(horizontal = 20.dp)
         } else {
             JetPrefAlertDialogDefaults.ContentPadding
+        },
+        // The way to the provider's key page, next to the provider's name (#410). The key field below is
+        // where someone with no key gets stuck, and until now the only place in the app that said where a
+        // key comes from was the setup wizard — so anyone who changed provider later, added a second one
+        // for rewording, or skipped the wizard was left to guess. A reporter read OpenAI's verbatim
+        // "Missing bearer authentication in header" as a broken app and asked for a refund.
+        //
+        // Shown on `apiKeyUrl` alone: not gated on the field being empty, because replacing an expired key
+        // is the same errand, and a control that appears and disappears with the text is worse than one
+        // that is simply there. Absent for Dictate Cloud, Ollama, on-device and custom endpoints, which
+        // have no key page at all — that absence is the honest answer, not a gap.
+        //
+        // No tooltip: PlainTooltip consumes the release on the Initial pass (#257/#261), and this sits in
+        // the title row of a dialog. The content description carries the label.
+        trailingIconTitle = {
+            preset?.apiKeyUrl?.let { url ->
+                IconButton(
+                    onClick = { context.launchUrl(url) },
+                    modifier = Modifier.offset(x = 12.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Key,
+                        contentDescription = stringRes(R.string.dictate__providers_get_key),
+                    )
+                }
+            }
         },
         confirmLabel = stringRes(R.string.action__ok),
         dismissLabel = stringRes(R.string.action__cancel),

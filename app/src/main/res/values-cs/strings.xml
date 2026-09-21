@@ -1396,6 +1396,7 @@
     <string name="dictate__providers_region_in">Indie</string>
     <string name="dictate__providers_region_global">Celosvětově</string>
     <string name="dictate__providers_custom_title">Vlastní server</string>
+    <string name="dictate__providers_get_key">Získat API klíč</string>
     <string name="dictate__providers_field_name">Název</string>
     <string name="dictate__providers_field_transcription_model">Model přepisu</string>
     <string name="dictate__providers_field_chat_model">Model přeformulování</string>

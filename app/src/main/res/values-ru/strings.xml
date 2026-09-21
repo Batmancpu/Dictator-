@@ -1386,6 +1386,7 @@
     <string name="dictate__providers_region_in">Индия</string>
     <string name="dictate__providers_region_global">Весь мир</string>
     <string name="dictate__providers_custom_title">Пользовательский сервер</string>
+    <string name="dictate__providers_get_key">Получить API-ключ</string>
     <string name="dictate__providers_field_name">Имя</string>
     <string name="dictate__providers_field_transcription_model">Модель транскрибирования</string>
     <string name="dictate__providers_field_chat_model">Модель переформулирования</string>

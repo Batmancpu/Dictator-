@@ -1379,6 +1379,7 @@
     <string name="dictate__providers_region_in">India</string>
     <string name="dictate__providers_region_global">Világszerte</string>
     <string name="dictate__providers_custom_title">Egyéni szerver</string>
+    <string name="dictate__providers_get_key">API-kulcs beszerzése</string>
     <string name="dictate__providers_field_name">Név</string>
     <string name="dictate__providers_field_transcription_model">Átírási modell</string>
     <string name="dictate__providers_field_chat_model">Átfogalmazási modell</string>
