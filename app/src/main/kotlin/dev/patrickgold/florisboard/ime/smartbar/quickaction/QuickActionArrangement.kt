@@ -68,73 +68,99 @@ data class QuickActionArrangement(
         val Default = QuickActionArrangement(
             // Dictate's flagship action: the AI voice panel is always one tap away in the Smartbar.
             stickyAction = QuickAction.InsertKey(TextKeyData.IME_UI_MODE_DICTATE),
+            // Four bands (issue #402): the dictation loop, then the other panels that insert something,
+            // then the shape of the keyboard, then the single text actions. What this replaced was not a
+            // considered order but the order the features shipped in — which is how the transcription
+            // history, the second half of what this keyboard is for, ended up at position 32 of 34.
+            //
+            // Only the first five or six entries are ever on screen: QuickActionsRow shows
+            // (width / height) - 1 buttons, which is six on a 411dp phone and five on a 360dp one, so the
+            // band boundary that matters sits after SETTINGS. Everything below that is the
+            // overflow grid, one tap away — and that grid, not hiddenActions, is where the rest belongs:
+            // a hidden action is invisible until someone opens the actions editor, which is the opposite
+            // of what a default is for.
             dynamicActions = listOf(
-                // Default visible order requested by the user. The live prompt is no longer a Smartbar
-                // button – it lives as a chip inside the prompt panel/row – so only the panel opener
-                // (DICTATE_PROMPTS) remains here.
+                // --- The dictation loop -------------------------------------------------------------
+                // The prompt panel opener. The live prompt is no longer a Smartbar button – it lives as a
+                // chip inside the prompt panel/row – so only the opener remains here. It costs a fresh
+                // install nothing either way: the always-on prompt ROW is the default layout, and
+                // filterDictateHidden drops this action from bar and grid alike while that row is up, so
+                // the slot only exists for the users who went back to the PANEL layout.
                 QuickAction.InsertKey(TextKeyData.DICTATE_PROMPTS),
-                // The text editing panel (issue #386) — cursor pad, select, clipboard — high in the
-                // default order because it is the one surface that replaces a dozen of the actions
-                // further down this list, and because a panel nobody finds is a panel nobody has.
-                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_EDITING),
-                QuickAction.InsertKey(TextKeyData.CLIPBOARD_SELECT_ALL),
+                // The transcription history (issue #140). Despite what the key code is called, this has
+                // not re-inserted the last dictation since #140 — it opens the browsable panel: read back,
+                // re-insert, re-transcribe. First of the visible actions, because it is the one surface
+                // that answers "what did I just dictate?", and because the moment to ask that is the
+                // moment the actions row is on screen: the bar shows the actions when the field is idle
+                // and during a selection, not mid-word.
+                QuickAction.InsertKey(TextKeyData.DICTATE_REINSERT),
+                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_CLIPBOARD),
+                // GIF search panel (KLIPY). In the bar by default rather than waiting to be dragged there:
+                // it is one of the few actions people go looking for, and unlike the split or language
+                // actions it is never greyed out — without an API key the panel itself says so.
+                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_GIF),
+                // Scan text (issue #390): camera → recognised lines → the one you tap. High for discovery
+                // rather than frequency — it is the feature nobody guesses a keyboard has, and the issue's
+                // "not a Smartbar default" was written before this list was a considered order.
+                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_SCAN),
                 QuickAction.InsertKey(TextKeyData.UNDO),
-                QuickAction.InsertKey(TextKeyData.REDO),
-                QuickAction.InsertKey(TextKeyData.CLIPBOARD_CUT),
-                QuickAction.InsertKey(TextKeyData.CLIPBOARD_COPY),
-                QuickAction.InsertKey(TextKeyData.CLIPBOARD_PASTE),
+                // The last of the visible actions. A keyboard with this much behind it — the provider,
+                // the key, the prompts, the languages — needs a door of its own; without one the way in
+                // is hunting for the app icon in the launcher, which is a long walk from the field the
+                // user is standing in.
                 QuickAction.InsertKey(TextKeyData.SETTINGS),
+                // --- Everything else that inserts something -----------------------------------------
+                // The text editing panel (issue #386) — cursor pad, select, clipboard. First tile of the
+                // overflow grid rather than a slot in the bar: it is the umbrella over fourteen of the
+                // actions below, so whoever needs any of them finds all of them here in one tap.
+                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_EDITING),
+                // Emoji has the utility key next to the space bar by default, so it does not need a
+                // Smartbar slot — but it is the first grid tile for the users who gave that key to the
+                // language switch instead.
+                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_MEDIA),
+                // Local sticker panel (issue #280): the folder the user picked, no network involved.
+                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_STICKER),
+                // --- The shape of the keyboard ------------------------------------------------------
+                // Fold the digit row away and back without a trip through settings (issue #333), and the
+                // number pad (issue #388) that had no way of being asked for at all. Together, because
+                // they are the two digit answers.
+                QuickAction.InsertKey(TextKeyData.TOGGLE_NUMBER_ROW),
+                QuickAction.InsertKey(TextKeyData.VIEW_NUMERIC_ADVANCED),
+                QuickAction.InsertKey(TextKeyData.TOGGLE_COMPACT_LAYOUT),
                 QuickAction.InsertKey(TextKeyData.TOGGLE_FLOATING_WINDOW),
                 QuickAction.InsertKey(TextKeyData.TOGGLE_RESIZE_MODE),
-                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_CLIPBOARD),
-                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_MEDIA),
-                // GIF search panel (KLIPY). Present in the action list so users can drag it into the bar
-                // for one-tap GIF access; it does nothing until a free KLIPY API key is added in settings.
-                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_GIF),
-                // Local sticker panel (issue #280): the folder the user picked, no network involved.
-                // Like the GIF action it sits in the list until dragged into the bar.
-                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_STICKER),
-                // Scan text (issue #390): camera → recognised lines → the one you tap. Here and not
-                // higher up, because it is answering a question most fields never ask; the issue itself
-                // says it is not a Smartbar default.
-                QuickAction.InsertKey(TextKeyData.IME_UI_MODE_SCAN),
-                QuickAction.InsertKey(TextKeyData.TOGGLE_COMPACT_LAYOUT),
                 // Split keyboard for two thumbs on a wide window (issue #362). Next to one-handed
                 // because they are the same kind of answer: greyed out below 600dp, where two halves
                 // would be two rows of slivers.
                 QuickAction.InsertKey(TextKeyData.SPLIT_LAYOUT),
                 QuickAction.InsertKey(TextKeyData.TOGGLE_INCOGNITO_MODE),
-                QuickAction.InsertKey(TextKeyData.ARROW_UP),
-                QuickAction.InsertKey(TextKeyData.ARROW_DOWN),
-                QuickAction.InsertKey(TextKeyData.ARROW_LEFT),
-                QuickAction.InsertKey(TextKeyData.ARROW_RIGHT),
+                // --- The text actions the editing panel already holds -------------------------------
+                // Every one of these is a tile in the editing panel above, so they are here for the
+                // people who want a specific one as its own button, not for everyone.
+                QuickAction.InsertKey(TextKeyData.REDO),
+                QuickAction.InsertKey(TextKeyData.CLIPBOARD_SELECT_ALL),
+                QuickAction.InsertKey(TextKeyData.CLIPBOARD_CUT),
+                QuickAction.InsertKey(TextKeyData.CLIPBOARD_COPY),
+                QuickAction.InsertKey(TextKeyData.CLIPBOARD_PASTE),
+                QuickAction.InsertKey(TextKeyData.FORWARD_DELETE),
+                QuickAction.InsertKey(TextKeyData.CLIPBOARD_CLEAR_PRIMARY_CLIP),
                 // Jump to the very start or end of the field (issue #335). The key codes and their
                 // handler have been here all along, but only a swipe gesture could reach them — next to
                 // the arrows, because that is what they are: the same journey, in one step.
                 QuickAction.InsertKey(TextKeyData.MOVE_START_OF_PAGE),
                 QuickAction.InsertKey(TextKeyData.MOVE_END_OF_PAGE),
-                QuickAction.InsertKey(TextKeyData.CLIPBOARD_CLEAR_PRIMARY_CLIP),
+                QuickAction.InsertKey(TextKeyData.ARROW_LEFT),
+                QuickAction.InsertKey(TextKeyData.ARROW_RIGHT),
+                QuickAction.InsertKey(TextKeyData.ARROW_UP),
+                QuickAction.InsertKey(TextKeyData.ARROW_DOWN),
+                // --- The way out --------------------------------------------------------------------
                 QuickAction.InsertKey(TextKeyData.LANGUAGE_SWITCH),
                 // IME-switch actions (issue #122): one-tap return to the previously used keyboard, plus the
                 // system keyboard picker. Useful when pairing Dictate with another IME (e.g. a Japanese
-                // Kana–Kanji keyboard). Visible in the Smartbar by default; users can hide them in the editor.
+                // Kana–Kanji keyboard).
                 QuickAction.InsertKey(TextKeyData.SYSTEM_PREV_INPUT_METHOD),
                 QuickAction.InsertKey(TextKeyData.SYSTEM_INPUT_METHOD_PICKER),
-                QuickAction.InsertKey(TextKeyData.FORWARD_DELETE),
                 QuickAction.InsertKey(TextKeyData.IME_HIDE_UI),
-                // Re-insert / re-send the last transcription safety net (issue #111). Placed at the end
-                // so it is present in the action list without taking a prominent spot at the top of the bar.
-                QuickAction.InsertKey(TextKeyData.DICTATE_REINSERT),
-                // Fold the digit row away and back without a trip through settings (issue #333). At the
-                // end for the same reason: worth having in the list, not worth a Smartbar slot for
-                // everyone who never turned the row on in the first place.
-                QuickAction.InsertKey(TextKeyData.TOGGLE_NUMBER_ROW),
-                // The number pad (issue #388). It has always been built and styled, but the only ways to
-                // ask for it were a numeric field deciding for you and a keyboard-mode cycle nobody binds
-                // to a gesture. Next to the number-row toggle because that is the other digit answer, and
-                // at the end for the same reason as the GIF and sticker panels: an IBAN or a serial number
-                // is a real errand, but not one often enough to spend a Smartbar slot on for everyone.
-                QuickAction.InsertKey(TextKeyData.VIEW_NUMERIC_ADVANCED),
             ),
             hiddenActions = listOf(
             ),
