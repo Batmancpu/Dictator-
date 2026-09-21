@@ -1573,6 +1573,17 @@
     <string name="dictate__local_model_none_selected">Encara no s’ha baixat cap model</string>
     <string name="dictate__local_model_delete_confirm">Vols eliminar «{model}»? El pots tornar a baixar més tard.</string>
     <string name="dictate__local_model_not_installed_error">Cap model local baixat</string>
+    <string name="dictate__local_model_action_info">Detalls</string>
+    <string name="dictate__local_model_info_languages">Idiomes</string>
+    <string name="dictate__local_model_info_size">Mida de la baixada</string>
+    <string name="dictate__local_model_info_punctuation">Puntuació</string>
+    <string name="dictate__local_model_info_punctuation_yes">La escriu ell mateix</string>
+    <string name="dictate__local_model_info_punctuation_no">Cap — només paraules</string>
+    <string name="dictate__local_model_info_language_fixed">A aquest model se li ha de dir quina llengua parles: tria una en lloc de la detecció automàtica.</string>
+    <string name="dictate__local_model_info_credit">Model de {author}, amb llicència {license}</string>
+    <string name="dictate__local_models_for_language">Per a {language}</string>
+    <string name="dictate__local_models_for_languages">Per als teus idiomes</string>
+    <string name="dictate__local_models_more">Més models</string>
     <string name="dictate__local_model_family_installed">{count} de {total} instal·lats</string>
     <string name="dictate__local_model_family_open">Mostra les variants</string>
     <plurals name="dictate__local_model_languages">

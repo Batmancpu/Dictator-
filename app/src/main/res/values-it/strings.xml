@@ -1486,6 +1486,17 @@
     <string name="dictate__local_model_none_selected">Nessun modello ancora scaricato</string>
     <string name="dictate__local_model_delete_confirm">Eliminare «{model}»? Potrai scaricarlo di nuovo più tardi.</string>
     <string name="dictate__local_model_not_installed_error">Nessun modello locale scaricato</string>
+    <string name="dictate__local_model_action_info">Dettagli</string>
+    <string name="dictate__local_model_info_languages">Lingue</string>
+    <string name="dictate__local_model_info_size">Dimensione del download</string>
+    <string name="dictate__local_model_info_punctuation">Punteggiatura</string>
+    <string name="dictate__local_model_info_punctuation_yes">La scrive da sé</string>
+    <string name="dictate__local_model_info_punctuation_no">Nessuna — solo parole</string>
+    <string name="dictate__local_model_info_language_fixed">A questo modello va indicata la lingua parlata: sceglierne una invece di lasciare il rilevamento automatico.</string>
+    <string name="dictate__local_model_info_credit">Modello di {author}, con licenza {license}</string>
+    <string name="dictate__local_models_for_language">Per {language}</string>
+    <string name="dictate__local_models_for_languages">Per le tue lingue</string>
+    <string name="dictate__local_models_more">Altri modelli</string>
     <string name="dictate__local_model_family_installed">{count} di {total} installati</string>
     <string name="dictate__local_model_family_open">Mostra le varianti</string>
     <plurals name="dictate__local_model_languages">

@@ -1675,6 +1675,17 @@
     <string name="dictate__local_model_none_selected">Noch kein Modell heruntergeladen</string>
     <string name="dictate__local_model_delete_confirm">„{model}“ löschen? Du kannst es später erneut herunterladen.</string>
     <string name="dictate__local_model_not_installed_error">Kein lokales Modell heruntergeladen</string>
+    <string name="dictate__local_model_action_info">Details</string>
+    <string name="dictate__local_model_info_languages">Sprachen</string>
+    <string name="dictate__local_model_info_size">Downloadgröße</string>
+    <string name="dictate__local_model_info_punctuation">Satzzeichen</string>
+    <string name="dictate__local_model_info_punctuation_yes">Schreibt eigene</string>
+    <string name="dictate__local_model_info_punctuation_no">Keine — nur Wörter</string>
+    <string name="dictate__local_model_info_language_fixed">Diesem Modell muss gesagt werden, welche Sprache du sprichst; wähle deshalb eine aus, statt die Eingabesprache auf automatische Erkennung zu lassen.</string>
+    <string name="dictate__local_model_info_credit">Modell von {author}, lizenziert unter {license}</string>
+    <string name="dictate__local_models_for_language">Für {language}</string>
+    <string name="dictate__local_models_for_languages">Für deine Sprachen</string>
+    <string name="dictate__local_models_more">Weitere Modelle</string>
     <string name="dictate__local_model_family_installed">{count} von {total} installiert</string>
     <string name="dictate__local_model_family_open">Varianten anzeigen</string>
     <plurals name="dictate__local_model_languages">

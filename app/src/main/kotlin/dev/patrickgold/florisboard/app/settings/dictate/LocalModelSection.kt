@@ -34,10 +34,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import kotlinx.coroutines.launch
+import dev.patrickgold.florisboard.dictate.DictateLanguages
 import dev.patrickgold.florisboard.dictate.provider.LocalModelCatalog
 import dev.patrickgold.florisboard.dictate.provider.LocalModelDownloads
 import dev.patrickgold.florisboard.dictate.provider.LocalModelEntry
@@ -81,8 +83,25 @@ fun LocalModelSection(
 
     val backgroundHint = stringRes(R.string.dictate__local_model_download_background)
 
+    val prefs by FlorisPreferenceStore
+
     /** The family whose variants are open over this dialog, or null while the first level is showing. */
     var openFamily by remember { mutableStateOf<LocalModelEntry.Family?>(null) }
+
+    /** The model whose details are open, on top of whichever level was showing. */
+    var infoSpec by remember { mutableStateOf<LocalModelSpec?>(null) }
+
+    // The languages actually dictated in, not the phone's locale: someone on a German phone who dictates
+    // English should be offered English models. DictateLegacyMigrator seeds this pref from the device
+    // language at first run anyway, so this is the device language *plus* every later decision.
+    // Read once — the selection cannot change while this dialog is open.
+    val userLanguages = remember {
+        DictateLanguages.parseSelection(prefs.dictate.inputLanguages.get())
+            .map { it.code }
+            .filter { it != DictateLanguages.DETECT }
+            .map { it.substringBefore('-') }
+            .toSet()
+    }
 
     val rowState = LocalModelState(
         installed = installed,
@@ -110,6 +129,7 @@ fun LocalModelSection(
         },
         onCancel = { spec -> LocalModelDownloads.cancel(spec.id) },
         onDelete = { spec -> pendingDelete = spec },
+        onInfo = { spec -> infoSpec = spec },
     )
 
     // A model the user just downloaded is what they want to use, so it is selected the moment it lands —
@@ -149,7 +169,6 @@ fun LocalModelSection(
         // Long-press "send with local model" shortcut (issue #228): a short explainer + checkbox below the
         // general on-device intro. When on, holding the send button while recording transcribes with the
         // selected on-device model instead of the cloud provider (plain recording only).
-        val prefs by FlorisPreferenceStore
         val scope = rememberCoroutineScope()
         // Local state (persisted immediately) — avoids importing the jetpref collectAsState, which would
         // clash by name with the runtime collectAsState already used for the download flows above.
@@ -202,27 +221,29 @@ fun LocalModelSection(
         )
         HorizontalDivider(modifier = Modifier.padding(top = 4.dp, bottom = 12.dp))
 
-        // Streaming models (#233) behave differently enough to deserve their own group: they type while
-        // you speak, but only if real-time transcription is switched on. The catalog orders the one-shot
-        // entries first, so the header simply goes in front of the first streaming one. It stays a
-        // statement about the capability rather than about Kroko: a future live model under another name
-        // would otherwise be swallowed by a brand's family row. Its explainer has moved into that
-        // dialog, where the choice is actually made.
-        var liveHeaderShown = false
-        LocalModelCatalog.topLevel.forEach { entry ->
-            if (entry.isStreaming && !liveHeaderShown) {
-                liveHeaderShown = true
-                HorizontalDivider(modifier = Modifier.padding(top = 8.dp, bottom = 12.dp))
-                Text(
-                    text = stringRes(R.string.dictate__local_models_live_header),
-                    style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.padding(bottom = 4.dp),
-                )
-            }
-            when (entry) {
-                is LocalModelEntry.Single -> ModelRow(entry.spec, rowState, rowActions)
-                is LocalModelEntry.Family -> FamilyRow(entry, rowState) { openFamily = entry }
-            }
+        // What fits the languages this person dictates in comes first, the rest underneath. Split only
+        // when both halves have something in them — with everything matching, or nothing, two headings
+        // over one list would be noise.
+        val (forYou, rest) = LocalModelCatalog.partitionForLanguage(
+            LocalModelCatalog.topLevel,
+            userLanguages,
+        )
+        if (forYou.isNotEmpty() && rest.isNotEmpty()) {
+            val named = userLanguages.singleOrNull()
+            GroupHeading(
+                if (named != null) {
+                    stringRes(R.string.dictate__local_models_for_language)
+                        .replace("{language}", DictateLanguages.displayNameOf(named))
+                } else {
+                    stringRes(R.string.dictate__local_models_for_languages)
+                },
+                topPadding = 8.dp,
+            )
+            ModelRows(forYou, rowState, rowActions) { openFamily = it }
+            GroupHeading(stringRes(R.string.dictate__local_models_more))
+            ModelRows(rest, rowState, rowActions) { openFamily = it }
+        } else {
+            ModelRows(LocalModelCatalog.topLevel, rowState, rowActions) { openFamily = it }
         }
     }
 
@@ -233,6 +254,13 @@ fun LocalModelSection(
             actions = rowActions,
             onDismiss = { openFamily = null },
         )
+    }
+
+    // Held here rather than inside either level, so one dialog serves both and a family stays open
+    // underneath while its variant's details are read. Three stacked dialogs is not new: the delete
+    // confirmation below has always been a third one over a family's.
+    infoSpec?.let { spec ->
+        LocalModelInfoDialog(spec = spec, onDismiss = { infoSpec = null })
     }
 
     pendingDelete?.let { spec ->
@@ -263,4 +291,46 @@ fun LocalModelSection(
             },
         )
     }
+}
+
+/**
+ * One group of the first level, with the "Live" heading injected where the streaming rows begin.
+ *
+ * The heading belongs to the capability rather than to Kroko — a future live model under another name
+ * would otherwise be swallowed by a brand's family row — and it lands correctly because the streaming
+ * entries are a contiguous tail of the catalog, which a test holds them to.
+ */
+@Composable
+private fun ModelRows(
+    entries: List<LocalModelEntry>,
+    state: LocalModelState,
+    actions: LocalModelActions,
+    onOpenFamily: (LocalModelEntry.Family) -> Unit,
+) {
+    var liveHeaderShown = false
+    entries.forEach { entry ->
+        if (entry.isStreaming && !liveHeaderShown) {
+            liveHeaderShown = true
+            HorizontalDivider(modifier = Modifier.padding(top = 8.dp, bottom = 12.dp))
+            Text(
+                text = stringRes(R.string.dictate__local_models_live_header),
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(bottom = 4.dp),
+            )
+        }
+        when (entry) {
+            is LocalModelEntry.Single -> ModelRow(entry.spec, state, actions)
+            is LocalModelEntry.Family -> FamilyRow(entry, state) { onOpenFamily(entry) }
+        }
+    }
+}
+
+/** A section heading in the model list, in the same weight as the "Live" one. */
+@Composable
+private fun GroupHeading(text: String, topPadding: Dp = 16.dp) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleSmall,
+        modifier = Modifier.padding(top = topPadding, bottom = 4.dp),
+    )
 }

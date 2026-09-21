@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -57,6 +58,7 @@ internal class LocalModelActions(
     val onInstall: (LocalModelSpec) -> Unit,
     val onCancel: (LocalModelSpec) -> Unit,
     val onDelete: (LocalModelSpec) -> Unit,
+    val onInfo: (LocalModelSpec) -> Unit,
 )
 
 /** Everything the rows read to work out what state a model is in. */
@@ -148,6 +150,12 @@ internal fun ModelRow(
         // Icon-only actions (keep the row compact); labels live on as the accessibility descriptions.
         // Deliberately outside the selectable wrapper above — inside it, a screen reader would announce
         // a radio button with a button inside it.
+        IconButton(onClick = { actions.onInfo(spec) }) {
+            Icon(
+                imageVector = Icons.Outlined.Info,
+                contentDescription = stringRes(R.string.dictate__local_model_action_info),
+            )
+        }
         when {
             downloading -> IconButton(onClick = { actions.onCancel(spec) }) {
                 Icon(

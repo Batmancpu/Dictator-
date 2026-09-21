@@ -2168,6 +2168,17 @@
     </plurals>
     <string name="dictate__local_model_family_installed" comment="Shown under a model family (Whisper, Kroko) in the on-device picker when some of its variants are downloaded. Both {count} and {total} are numbers.">{count} of {total} installed</string>
     <string name="dictate__local_model_family_open" comment="Spoken action label for the row that opens a model family (Whisper, Kroko) and shows the variants inside it">Show variants</string>
+    <string name="dictate__local_model_action_info" comment="Accessibility label of the ⓘ button that opens a model’s details (issue #406)">Details</string>
+    <string name="dictate__local_model_info_languages" comment="Label above the full list of languages in a model’s details dialog">Languages</string>
+    <string name="dictate__local_model_info_size" comment="Label above how much a model costs to download, in its details dialog">Download size</string>
+    <string name="dictate__local_model_info_punctuation" comment="Label above whether a model writes punctuation, in its details dialog">Punctuation</string>
+    <string name="dictate__local_model_info_punctuation_yes" comment="Value under the Punctuation label: the model writes punctuation and capitals by itself">Writes its own</string>
+    <string name="dictate__local_model_info_punctuation_no" comment="Value under the Punctuation label: the model returns words with no punctuation or capitals">None — plain words only</string>
+    <string name="dictate__local_model_info_language_fixed" comment="Warning in the details dialog of a model that cannot detect the spoken language (Canary): it transcribes in whatever language it was told, rather than failing">This model has to be told which language you speak, so pick one instead of leaving the input language on auto-detect.</string>
+    <string name="dictate__local_model_info_credit" comment="Attribution line in a model’s details dialog. {author} is a name, {license} a licence such as MIT or CC-BY-4.0.">Model by {author}, licensed {license}</string>
+    <string name="dictate__local_models_for_language" comment="Heading above the on-device models that cover the one language the user dictates in. {language} is a language name.">For {language}</string>
+    <string name="dictate__local_models_for_languages" comment="Heading above the on-device models covering the user’s dictation languages, when several are selected">For your languages</string>
+    <string name="dictate__local_models_more" comment="Heading above the remaining on-device models, the ones that do not cover the user’s dictation languages">More models</string>
     <string name="dictate__local_fallback_title" comment="Title of the toggle that enables on-device transcription as an offline fallback">Offline fallback</string>
     <string name="dictate__local_fallback_summary" comment="Explains the offline fallback toggle">When offline, transcribe on-device with the downloaded model after the provider fails</string>
 

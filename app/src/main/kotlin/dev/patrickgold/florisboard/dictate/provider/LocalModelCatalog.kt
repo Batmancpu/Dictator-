@@ -769,7 +769,8 @@ object LocalModelCatalog {
 
     /**
      * [all] folded into the rows the picker's first level shows: a family appears once, in the place of
-     * its first member, and everything else stands for itself. Twenty-four entries become nine.
+     * its first member, and everything else stands for itself. Twenty-four entries become ten: eight
+     * models that are their own choice, plus Whisper and Kroko.
      *
      * Order is [all]'s, which is what keeps the streaming rows a contiguous tail and the "Live" heading
      * where it belongs. Relies on a family's members sitting next to each other — asserted by a test,
@@ -787,6 +788,42 @@ object LocalModelCatalog {
             }
         }
         out
+    }
+
+    /**
+     * [entries] split into the ones worth offering someone who dictates in [userLanguages] and the
+     * rest, each keeping catalog order within its half.
+     *
+     * The matching half is sorted by how *specialized* a model is — fewest languages first — because
+     * that is the useful ranking here: for a German user the German-only model is a better answer than
+     * the one that also speaks ninety-eight others. A family matches when any of its variants does, and
+     * is ranked by its narrowest matching one.
+     *
+     * **Streaming models never enter the matching half.** A live model is not an alternative to a
+     * one-shot one — it only works with real-time transcription switched on — so it cannot compete for
+     * the same slot, and keeping it out is also what preserves the contiguous streaming tail the "Live"
+     * heading depends on.
+     *
+     * An empty [userLanguages] (auto-detect only) puts everything in the second half, which is the
+     * caller's cue to render one flat list with no headings at all.
+     */
+    fun partitionForLanguage(
+        entries: List<LocalModelEntry>,
+        userLanguages: Set<String>,
+    ): Pair<List<LocalModelEntry>, List<LocalModelEntry>> {
+        if (userLanguages.isEmpty()) return emptyList<LocalModelEntry>() to entries
+
+        fun specsOf(entry: LocalModelEntry) = when (entry) {
+            is LocalModelEntry.Single -> listOf(entry.spec)
+            is LocalModelEntry.Family -> entry.members
+        }
+
+        fun narrowestMatch(entry: LocalModelEntry): Int? = specsOf(entry)
+            .filter { spec -> spec.languages.any { it in userLanguages } }
+            .minOfOrNull { it.languages.size }
+
+        val (matching, rest) = entries.partition { !it.isStreaming && narrowestMatch(it) != null }
+        return matching.sortedBy { narrowestMatch(it) } to rest
     }
 
     /** Which recognizer [id] needs; unknown ids (a leftover pref) fall back to the Whisper shape. */

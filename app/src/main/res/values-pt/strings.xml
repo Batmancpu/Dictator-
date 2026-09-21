@@ -1683,6 +1683,17 @@
     <string name="dictate__local_model_none_selected">Ainda não foi transferido nenhum modelo</string>
     <string name="dictate__local_model_delete_confirm">Eliminar «{model}»? Pode transferi-lo novamente mais tarde.</string>
     <string name="dictate__local_model_not_installed_error">Nenhum modelo local transferido</string>
+    <string name="dictate__local_model_action_info">Detalhes</string>
+    <string name="dictate__local_model_info_languages">Idiomas</string>
+    <string name="dictate__local_model_info_size">Tamanho da transferência</string>
+    <string name="dictate__local_model_info_punctuation">Pontuação</string>
+    <string name="dictate__local_model_info_punctuation_yes">Escreve a sua própria</string>
+    <string name="dictate__local_model_info_punctuation_no">Nenhuma — apenas palavras</string>
+    <string name="dictate__local_model_info_language_fixed">É preciso indicar a este modelo que idioma fala: escolha um em vez de deixar a deteção automática.</string>
+    <string name="dictate__local_model_info_credit">Modelo de {author}, licenciado sob {license}</string>
+    <string name="dictate__local_models_for_language">Para {language}</string>
+    <string name="dictate__local_models_for_languages">Para os seus idiomas</string>
+    <string name="dictate__local_models_more">Mais modelos</string>
     <string name="dictate__local_model_family_installed">{count} de {total} instalados</string>
     <string name="dictate__local_model_family_open">Mostrar variantes</string>
     <plurals name="dictate__local_model_languages">

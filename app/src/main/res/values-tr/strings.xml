@@ -1682,6 +1682,17 @@
     <string name="dictate__local_model_none_selected">Henüz model indirilmedi</string>
     <string name="dictate__local_model_delete_confirm">“{model}” silinsin mi? Daha sonra tekrar indirebilirsiniz.</string>
     <string name="dictate__local_model_not_installed_error">İndirilen yerel model yok</string>
+    <string name="dictate__local_model_action_info">Ayrıntılar</string>
+    <string name="dictate__local_model_info_languages">Diller</string>
+    <string name="dictate__local_model_info_size">İndirme boyutu</string>
+    <string name="dictate__local_model_info_punctuation">Noktalama</string>
+    <string name="dictate__local_model_info_punctuation_yes">Kendi noktalamasını yazar</string>
+    <string name="dictate__local_model_info_punctuation_no">Yok — yalnızca sözcükler</string>
+    <string name="dictate__local_model_info_language_fixed">Bu modele hangi dili konuştuğunuz söylenmelidir: otomatik algılama yerine bir dil seçin.</string>
+    <string name="dictate__local_model_info_credit">Model: {author}, lisans: {license}</string>
+    <string name="dictate__local_models_for_language">{language} için</string>
+    <string name="dictate__local_models_for_languages">Dilleriniz için</string>
+    <string name="dictate__local_models_more">Diğer modeller</string>
     <string name="dictate__local_model_family_installed">{total} modelden {count} tanesi yüklü</string>
     <string name="dictate__local_model_family_open">Varyantları göster</string>
     <plurals name="dictate__local_model_languages">
