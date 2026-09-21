@@ -31,6 +31,7 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerEventPass
@@ -45,6 +46,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -57,13 +59,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -94,10 +100,12 @@ import dev.patrickgold.florisboard.ime.keyboard.computeLabel
 import dev.patrickgold.florisboard.ime.text.key.KeyCode
 import dev.patrickgold.florisboard.ime.text.keyboard.TextKeyData
 import dev.patrickgold.florisboard.ime.theme.FlorisImeUi
+import org.florisboard.lib.snygg.SnyggQueryAttributes
 import org.florisboard.lib.snygg.SnyggSelector
 import org.florisboard.lib.snygg.ui.SnyggBox
 import org.florisboard.lib.snygg.ui.SnyggIcon
 import org.florisboard.lib.snygg.ui.rememberSnyggThemeQuery
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
@@ -106,7 +114,9 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.unit.roundToIntRect
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.florisboard.lib.snygg.ui.SnyggText
 
 /** How long the mic must be held before it becomes push-to-talk rather than a tap (#235). */
@@ -143,11 +153,101 @@ private val BUBBLE_HEADROOM_BOTTOM = 24.dp
 /** Diameter of the swollen mic, relative to the row it grows out of (#235). */
 private const val HELD_MIC_DIAMETER = 1.9f
 
-/** How much larger than the themed hint size the second-action glyph is drawn (#385). */
-private const val SECOND_ACTION_BADGE_SCALE = 1.35f
+/**
+ * How big the second-action badge is next to the action's own icon (#385).
+ *
+ * Measured against the key's icon rather than against the hint element the badge borrows its colour
+ * from: `key-hint` is `12sp` in all 20 bundled stylesheets, and the old 1.35 factor on top of that came
+ * out at 16.2 dp beside an 18 dp Smartbar icon — 90 % of it. That is not a badge, it is a second icon,
+ * and in a 40 dp key the two boxes overlapped by 10 × 10 dp, straight across the main glyph. At 0.6 the
+ * badge is unmistakably the subordinate of the pair while still being recognisable.
+ */
+private const val SECOND_ACTION_BADGE_FRACTION = 0.6f
 
-/** How far the second-action glyph sits in from the key's corner (#385). */
-private val SECOND_ACTION_BADGE_INSET = 5.dp
+/**
+ * How far the badge sits in from the key's corner, again as a fraction of the key's icon so it follows
+ * the theme. The old fixed 5 dp was meant to keep the glyph off the key's edge, but in a key that is
+ * only twice as wide as its icon it did the opposite: it pushed the badge *into* the icon.
+ */
+private const val SECOND_ACTION_BADGE_INSET_FRACTION = 0.10f
+
+/**
+ * The gap kept clear around the badge, punched out of the key's content by [secondActionGap].
+ *
+ * A corner badge on a centred icon always overlaps the icon's *bounding box* — what may not happen is
+ * the two inks touching, because two line drawings that run into each other read as one
+ * unrecognisable third shape. Most glyphs have empty corners and never come close; a box-filling one
+ * (select-all, the GIF lettering) does, and loses a hair of its outline here instead.
+ */
+private const val SECOND_ACTION_BADGE_RING_FRACTION = 0.09f
+
+/** Badge size for a theme that sizes the key's icon nowhere up the chain (18sp × 0.6, the stock value). */
+private val SECOND_ACTION_BADGE_FALLBACK = 11.dp
+
+/** The badge's glyph, plus how big it is and how much room it claims — all from the key's icon (#385). */
+private data class SecondActionBadge(val icon: ImageVector, val size: Dp, val inset: Dp, val ring: Dp)
+
+/**
+ * The badge's geometry for the key currently being drawn.
+ *
+ * The size is read from the resolved style of the key's *icon* element, because that is the glyph the
+ * badge has to stay subordinate to, and `font-size` is what Snygg sizes an icon from. It is asked for
+ * here rather than at the call site so the query inherits from the key's own style — the same chain the
+ * icon itself resolves through, which for every bundled theme ends at `smartbar`'s 18sp.
+ */
+@Composable
+private fun rememberSecondActionBadge(
+    icon: ImageVector,
+    elementName: String,
+    attributes: SnyggQueryAttributes,
+    selector: SnyggSelector?,
+): SecondActionBadge {
+    val style = rememberSnyggThemeQuery("$elementName-icon", attributes, selector)
+    val fontSize = style.fontSize(default = TextUnit.Unspecified)
+    val iconSize = with(LocalDensity.current) {
+        if (fontSize.isSp && fontSize >= 1.sp) fontSize.toDp() else null
+    }
+    val reference = iconSize ?: (SECOND_ACTION_BADGE_FALLBACK / SECOND_ACTION_BADGE_FRACTION)
+    return SecondActionBadge(
+        icon = icon,
+        size = reference * SECOND_ACTION_BADGE_FRACTION,
+        inset = reference * SECOND_ACTION_BADGE_INSET_FRACTION,
+        ring = reference * SECOND_ACTION_BADGE_RING_FRACTION,
+    )
+}
+
+/**
+ * Clears a disc around the second-action badge out of everything drawn inside, so the key's own glyph
+ * can never run into the badge and fuse with it into one unreadable shape.
+ *
+ * `BlendMode.Clear` rather than the disc in the container's colour that the settings tiles use, because
+ * on the keyboard there is no colour to draw: `smartbar-action-key` is `transparent` in 16 of the 20
+ * bundled stylesheets and `smartbar` never sets a background at all, so a key sits on the keyboard's own
+ * background — a blurred image in the glass themes. Clearing needs no colour and is therefore right on
+ * every theme.
+ *
+ * It belongs on a node that holds the action's own content and **nothing else**. The key's background
+ * is painted by [SnyggBox] further out and is not in this layer, so the gap shows the key rather than a
+ * hole in it — and the badge is drawn by a sibling, because the clear happens after everything in this
+ * layer and would otherwise take the badge with it.
+ */
+private fun Modifier.secondActionGap(badge: SecondActionBadge): Modifier = this
+    .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+    .drawWithContent {
+        drawContent()
+        val half = badge.size.toPx() / 2f
+        val fromEdge = badge.inset.toPx() + half
+        drawCircle(
+            color = Color.Black,
+            radius = half + badge.ring.toPx(),
+            // TopEnd, so which side that is depends on the layout direction.
+            center = Offset(
+                x = if (layoutDirection == LayoutDirection.Ltr) size.width - fromEdge else fromEdge,
+                y = fromEdge,
+            ),
+            blendMode = BlendMode.Clear,
+        )
+    }
 
 /**
  * The swollen mic shown while the key is held for push-to-talk (#235), plus the lock target below it.
@@ -616,106 +716,122 @@ fun QuickActionButton(
                 },
             contentAlignment = Alignment.Center,
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                // Render foreground
-                when (action) {
-                    is QuickAction.InsertKey -> {
-                        // Uses the hoisted [dictateState] above (dynamic mic → send → hourglass icon).
-                        // Select-all is a toggle (issue #152): reflect the field's selection live so the
-                        // icon shows "deselect" when text is selected. distinctUntilChanged keeps this
-                        // cheap for every action button — it only recomposes when selection presence flips.
-                        val editorInstance by context.editorInstance()
-                        val hasSelection by remember(editorInstance) {
-                            editorInstance.activeContentFlow
-                                .map { it.selection.isSelectionMode }
-                                .distinctUntilChanged()
-                        }.collectAsState(initial = editorInstance.activeContent.selection.isSelectionMode)
-                        val (imageVector, label) = remember(action, evaluator, dictateState, hasSelection) {
-                            val icon = if (action.data.code == KeyCode.CLIPBOARD_SELECT_ALL && hasSelection) {
-                                Icons.Default.Deselect
-                            } else {
-                                evaluator.computeImageVector(action.data)
+            // Asked before anything is drawn: a pairing whose child has no icon shows no badge, and
+            // then nothing needs to make room for one either.
+            val badge = secondAction
+                ?.let { evaluator.computeImageVector(it.keyData()) }
+                ?.let { rememberSecondActionBadge(it, elementName, attributes, selector) }
+            // The action's own content, in a node of its own so the badge's gap can be cleared out of
+            // it. It takes the key's whole content area — the key is sized by its own `aspectRatio`,
+            // never by this content — which is also the area the badge is aligned in, so the two agree
+            // on where the corner is without either having to measure the other.
+            Box(
+                modifier = badge?.let { Modifier.fillMaxSize().secondActionGap(it) } ?: Modifier,
+                contentAlignment = Alignment.Center,
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    // Render foreground
+                    when (action) {
+                        is QuickAction.InsertKey -> {
+                            // Uses the hoisted [dictateState] above (dynamic mic → send → hourglass icon).
+                            // Select-all is a toggle (issue #152): reflect the field's selection live so the
+                            // icon shows "deselect" when text is selected. distinctUntilChanged keeps this
+                            // cheap for every action button — it only recomposes when selection presence flips.
+                            val editorInstance by context.editorInstance()
+                            val hasSelection by remember(editorInstance) {
+                                editorInstance.activeContentFlow
+                                    .map { it.selection.isSelectionMode }
+                                    .distinctUntilChanged()
+                            }.collectAsState(initial = editorInstance.activeContent.selection.isSelectionMode)
+                            val (imageVector, label) = remember(action, evaluator, dictateState, hasSelection) {
+                                val icon = if (action.data.code == KeyCode.CLIPBOARD_SELECT_ALL && hasSelection) {
+                                    Icons.Default.Deselect
+                                } else {
+                                    evaluator.computeImageVector(action.data)
+                                }
+                                icon to evaluator.computeLabel(action.data)
                             }
-                            icon to evaluator.computeLabel(action.data)
-                        }
-                        if (imageVector != null) {
-                            SnyggBox(
-                                elementName = "$elementName-icon",
-                                attributes = attributes,
-                                selector = selector,
-                            ) {
-                                // Latching happens under the finger, on a target below the key, and then
-                                // the gesture simply ends. Showing the lock on the key itself for a beat
-                                // before it dissolves into the stop icon is the confirmation that the
-                                // recording is now running on its own.
-                                if (lockFlash > 0.01f) {
-                                    // SnyggIcon, so it is exactly the size of the icon it replaces —
-                                    // a fixed dp value made it noticeably larger than the mic.
+                            if (imageVector != null) {
+                                SnyggBox(
+                                    elementName = "$elementName-icon",
+                                    attributes = attributes,
+                                    selector = selector,
+                                ) {
+                                    // Latching happens under the finger, on a target below the key, and then
+                                    // the gesture simply ends. Showing the lock on the key itself for a beat
+                                    // before it dissolves into the stop icon is the confirmation that the
+                                    // recording is now running on its own.
+                                    if (lockFlash > 0.01f) {
+                                        // SnyggIcon, so it is exactly the size of the icon it replaces —
+                                        // a fixed dp value made it noticeably larger than the mic.
+                                        SnyggIcon(
+                                            imageVector = Icons.Default.Lock,
+                                            modifier = Modifier.alpha(lockFlash),
+                                        )
+                                    }
+                                    // The Material "GIF" glyph draws small lettering inside a lot of padding;
+                                    // scale it up so the "GIF" text is legible at the Smartbar icon size.
+                                    val iconModifier = if (action.data.code == KeyCode.IME_UI_MODE_GIF) {
+                                        Modifier.scale(1.45f)
+                                    } else {
+                                        Modifier
+                                    }
                                     SnyggIcon(
-                                        imageVector = Icons.Default.Lock,
-                                        modifier = Modifier.alpha(lockFlash),
+                                        imageVector = imageVector,
+                                        // Fades in underneath the lock as it fades out, so the two read as
+                                        // one icon turning into the other.
+                                        modifier = iconModifier.alpha(1f - lockFlash),
                                     )
                                 }
-                                // The Material "GIF" glyph draws small lettering inside a lot of padding;
-                                // scale it up so the "GIF" text is legible at the Smartbar icon size.
-                                val iconModifier = if (action.data.code == KeyCode.IME_UI_MODE_GIF) {
-                                    Modifier.scale(1.45f)
-                                } else {
-                                    Modifier
-                                }
-                                SnyggIcon(
-                                    imageVector = imageVector,
-                                    // Fades in underneath the lock as it fades out, so the two read as
-                                    // one icon turning into the other.
-                                    modifier = iconModifier.alpha(1f - lockFlash),
+                            } else if (label != null) {
+                                SnyggText(
+                                    elementName = "$elementName-text",
+                                    attributes = attributes,
+                                    selector = selector,
+                                    text = label,
                                 )
                             }
-                        } else if (label != null) {
+                        }
+
+                        is QuickAction.InsertText -> {
                             SnyggText(
                                 elementName = "$elementName-text",
                                 attributes = attributes,
                                 selector = selector,
-                                text = label,
+                                text = action.data.firstOrNull().toString().ifBlank { "?" },
                             )
                         }
                     }
 
-                    is QuickAction.InsertText -> {
+                    // Render additional info if this is a tile
+                    if (type != QuickActionBarType.INTERACTIVE_BUTTON) {
                         SnyggText(
                             elementName = "$elementName-text",
                             attributes = attributes,
                             selector = selector,
-                            text = action.data.firstOrNull().toString().ifBlank { "?" },
+                            text = action.computeDisplayName(evaluator = evaluator),
                         )
                     }
-                }
-
-                // Render additional info if this is a tile
-                if (type != QuickActionBarType.INTERACTIVE_BUTTON) {
-                    SnyggText(
-                        elementName = "$elementName-text",
-                        attributes = attributes,
-                        selector = selector,
-                        text = action.computeDisplayName(evaluator = evaluator),
-                    )
                 }
             }
             // What holding this button runs, small in the corner — the same place and the same element
             // the typing keyboard puts a key's hint glyph, so it is themed everywhere already and needs
             // no new Snygg element (which a bundled stylesheet could not name anyway: BundledThemesTest
-            // allows only an element and its "-icon"/"-text" children).
-            secondAction?.let { second ->
-                evaluator.computeImageVector(second.keyData())?.let { secondIcon ->
-                    // The hint rule's own size is meant for a single character and reads as a speck
-                    // next to a 24sp icon, so it is scaled up a little; the inset keeps it off the
-                    // key's edge, where it looked like it had slipped out of the key.
-                    Box(modifier = Modifier.align(Alignment.TopEnd).padding(SECOND_ACTION_BADGE_INSET)) {
-                        SnyggIcon(
-                            elementName = FlorisImeUi.KeyHint.elementName,
-                            modifier = Modifier.scale(SECOND_ACTION_BADGE_SCALE),
-                            imageVector = secondIcon,
-                        )
-                    }
+            // allows only an element and its "-icon"/"-text" children). The hint rule is borrowed for
+            // its *colour*; its size is meant for one character and says nothing about the icon this
+            // badge has to stay smaller than, so the size is given here instead — an explicit size on
+            // a SnyggIcon wins over the themed one.
+            //
+            // A sibling of the node above, never a child of it: [secondActionGap] clears its disc after
+            // everything in that node has been drawn, so a badge inside it was wiped out together with
+            // the overlap it was supposed to survive — the pairing simply stopped being visible.
+            if (badge != null) {
+                Box(modifier = Modifier.align(Alignment.TopEnd).padding(badge.inset)) {
+                    SnyggIcon(
+                        elementName = FlorisImeUi.KeyHint.elementName,
+                        modifier = Modifier.size(badge.size),
+                        imageVector = badge.icon,
+                    )
                 }
             }
         }
