@@ -1658,8 +1658,6 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__local_model_none_selected">Belum ada model yang diunduh</string>
     <string name="dictate__local_model_delete_confirm">Hapus “{model}”? Anda dapat mengunduhnya lagi nanti.</string>
     <string name="dictate__local_model_not_installed_error">Tidak ada model lokal yang diunduh</string>
-    <string name="dictate__local_model_language_fixed">Harus diberi tahu bahasa yang diucapkan — pilih satu alih-alih deteksi otomatis</string>
-    <string name="dictate__local_model_no_punctuation">Tidak menulis tanda baca</string>
     <string name="dictate__local_models_for_language">Untuk {language}</string>
     <string name="dictate__local_models_for_languages">Untuk bahasa Anda</string>
     <string name="dictate__local_models_more">Model lainnya</string>

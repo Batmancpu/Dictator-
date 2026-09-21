@@ -128,6 +128,16 @@ data class LocalModelSpec(
     val family: LocalModelFamily? = null,
     /** Author, licence and upstream page; see [ModelCredit]. Null only for entries outside [LocalModelCatalog.all]. */
     val credit: ModelCredit? = null,
+    /**
+     * The id of the model that replaced this one, or null while it is still worth offering.
+     *
+     * A superseded entry stays in [LocalModelCatalog.all] and simply stops being offered to anyone who
+     * does not already have it — see [LocalModelCatalog.visibleTopLevel]. It must **not** be deleted
+     * outright: `LocalModelManager.installedIds` filters against `all` and [LocalModelCatalog.kindOf]
+     * falls back to `WHISPER` for an unknown id, so removing it would leave whoever installed it with
+     * hundreds of megabytes they can no longer delete *and* a recognizer built from the wrong kind.
+     */
+    val supersededBy: String? = null,
 ) {
     val totalBytes: Long get() = files.sumOf { it.sizeBytes }
 
@@ -504,8 +514,9 @@ object LocalModelCatalog {
         displayName = "GigaAM v2 Russian",
         languages = listOf("ru"),
         // Its whole vocabulary is 196 bytes of Cyrillic letters with not one mark in it, which is the
-        // difference [GIGAAM_V3_RU] was added for.
+        // difference [GIGAAM_V3_RU] was added for — and the reason nobody new is offered this one.
         punctuates = false,
+        supersededBy = "gigaam-v3-ru",
         credit = Credits.GIGAAM,
         kind = LocalModelKind.NEMO_TRANSDUCER,
         files = listOf(
@@ -789,6 +800,29 @@ object LocalModelCatalog {
         }
         out
     }
+
+    /**
+     * [topLevel] without the models a newer one has replaced — unless they are still on disk, because
+     * a model somebody is using cannot be hidden from them: they would have no way left to switch away
+     * from it or to get its bytes back.
+     *
+     * This is how a model is retired. Dropping it from [all] instead would make
+     * `LocalModelManager.installedIds` blind to it while its directory stays, and [kindOf] would build
+     * the wrong recognizer for anyone whose pick still names it.
+     */
+    fun visibleTopLevel(installed: Set<String>): List<LocalModelEntry> = topLevel.filter { entry ->
+        when (entry) {
+            is LocalModelEntry.Single ->
+                entry.spec.supersededBy == null || entry.spec.id in installed
+            // No family has a superseded member today; when one does, the family row stays and the
+            // variant is filtered inside its own dialog instead.
+            is LocalModelEntry.Family -> true
+        }
+    }
+
+    /** A family's variants, minus the retired ones nobody has installed. See [visibleTopLevel]. */
+    fun visibleMembers(family: LocalModelEntry.Family, installed: Set<String>): List<LocalModelSpec> =
+        family.members.filter { it.supersededBy == null || it.id in installed }
 
     /**
      * [entries] split into the ones worth offering someone who dictates in [userLanguages] and the

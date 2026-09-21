@@ -137,16 +137,6 @@ internal fun ModelRow(
                     color = if (error != null) MaterialTheme.colorScheme.error
                     else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                // The two things that can surprise someone after the download, each on its own line
-                // and each true of exactly one model in the catalog today. They are not on the line
-                // above because that line has to stay short — the dialog is narrow enough that a third
-                // control per row already cost the model names their space.
-                if (!spec.punctuates) {
-                    RowNote(stringRes(R.string.dictate__local_model_no_punctuation))
-                }
-                if (!spec.detectsLanguage) {
-                    RowNote(stringRes(R.string.dictate__local_model_language_fixed))
-                }
                 if (downloading) {
                     LinearProgressIndicator(
                         progress = { (downloadPercent ?: 0) / 100f },
@@ -183,17 +173,6 @@ internal fun ModelRow(
             }
         }
     }
-}
-
-/** A short caveat under a model's line, in the same weight as the line itself. */
-@Composable
-private fun RowNote(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(top = 2.dp),
-    )
 }
 
 /**

@@ -1573,8 +1573,6 @@
     <string name="dictate__local_model_none_selected">Encara no s’ha baixat cap model</string>
     <string name="dictate__local_model_delete_confirm">Vols eliminar «{model}»? El pots tornar a baixar més tard.</string>
     <string name="dictate__local_model_not_installed_error">Cap model local baixat</string>
-    <string name="dictate__local_model_language_fixed">Se li ha de dir quina llengua parles — tria una en lloc de la detecció automàtica</string>
-    <string name="dictate__local_model_no_punctuation">No escriu puntuació</string>
     <string name="dictate__local_models_for_language">Per a {language}</string>
     <string name="dictate__local_models_for_languages">Per als teus idiomes</string>
     <string name="dictate__local_models_more">Més models</string>

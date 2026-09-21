@@ -220,10 +220,8 @@ fun LocalModelSection(
         // What fits the languages this person dictates in comes first, the rest underneath. Split only
         // when both halves have something in them — with everything matching, or nothing, two headings
         // over one list would be noise.
-        val (forYou, rest) = LocalModelCatalog.partitionForLanguage(
-            LocalModelCatalog.topLevel,
-            userLanguages,
-        )
+        val visible = LocalModelCatalog.visibleTopLevel(installed)
+        val (forYou, rest) = LocalModelCatalog.partitionForLanguage(visible, userLanguages)
         if (forYou.isNotEmpty() && rest.isNotEmpty()) {
             val named = userLanguages.singleOrNull()
             GroupHeading(
@@ -239,7 +237,7 @@ fun LocalModelSection(
             GroupHeading(stringRes(R.string.dictate__local_models_more))
             ModelRows(rest, rowState, rowActions) { openFamily = it }
         } else {
-            ModelRows(LocalModelCatalog.topLevel, rowState, rowActions) { openFamily = it }
+            ModelRows(visible, rowState, rowActions) { openFamily = it }
         }
     }
 

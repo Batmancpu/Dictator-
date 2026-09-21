@@ -1703,8 +1703,6 @@
     <string name="dictate__local_model_none_selected">Все още няма изтеглен модел</string>
     <string name="dictate__local_model_delete_confirm">Да се изтрие ли „{model}“? Можете да го изтеглите отново по-късно.</string>
     <string name="dictate__local_model_not_installed_error">Няма изтеглен локален модел</string>
-    <string name="dictate__local_model_language_fixed">Трябва да му посочите езика — изберете го вместо автоматично разпознаване</string>
-    <string name="dictate__local_model_no_punctuation">Не поставя пунктуация</string>
     <string name="dictate__local_models_for_language">За {language}</string>
     <string name="dictate__local_models_for_languages">За вашите езици</string>
     <string name="dictate__local_models_more">Още модели</string>

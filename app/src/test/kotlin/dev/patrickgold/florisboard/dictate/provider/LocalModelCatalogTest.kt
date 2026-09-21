@@ -205,6 +205,37 @@ class LocalModelCatalogTest {
         )
     }
 
+    /**
+     * A retired model is hidden from everyone who does not already have it, and shown to everyone who
+     * does — hiding it from them would strand its bytes and leave them no way to switch away.
+     */
+    @Test
+    fun `a superseded model is offered to nobody new and taken from nobody who has it`() {
+        val superseded = LocalModelCatalog.all.filter { it.supersededBy != null }
+        assertTrue(superseded.isNotEmpty(), "this test is about retiring models; none is retired")
+        for (spec in superseded) {
+            assertNotNull(
+                LocalModelCatalog.byId(spec.supersededBy!!),
+                "${spec.id} points at a replacement that is not in the catalog",
+            )
+            val withoutIt = LocalModelCatalog.visibleTopLevel(emptySet())
+            assertTrue(
+                withoutIt.none { it is LocalModelEntry.Single && it.spec.id == spec.id },
+                "${spec.id} is still offered to someone who does not have it",
+            )
+            val withIt = LocalModelCatalog.visibleTopLevel(setOf(spec.id))
+            assertTrue(
+                withIt.any { it is LocalModelEntry.Single && it.spec.id == spec.id },
+                "${spec.id} vanished for someone who has it installed, stranding its files",
+            )
+        }
+        // Everything else is unaffected either way.
+        assertEquals(
+            LocalModelCatalog.topLevel.size - superseded.size,
+            LocalModelCatalog.visibleTopLevel(emptySet()).size,
+        )
+    }
+
     /** The "Live" heading is placed in front of the first streaming *row*, so the tail has to hold here too. */
     @Test
     fun `the top level keeps the streaming rows as a contiguous tail`() {

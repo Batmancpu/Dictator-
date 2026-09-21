@@ -1561,8 +1561,6 @@
     <string name="dictate__local_model_none_selected">لم يتم تنزيل أي نموذج بعد</string>
     <string name="dictate__local_model_delete_confirm">حذف ”{model}“؟ يمكنك تنزيله مرة أخرى لاحقًا.</string>
     <string name="dictate__local_model_not_installed_error">لا يوجد نموذج محلي مُنزَّل</string>
-    <string name="dictate__local_model_language_fixed">يجب إخباره باللغة المنطوقة — اختر لغة بدلاً من الاكتشاف التلقائي</string>
-    <string name="dictate__local_model_no_punctuation">لا يكتب علامات ترقيم</string>
     <string name="dictate__local_models_for_language">من أجل {language}</string>
     <string name="dictate__local_models_for_languages">من أجل لغاتك</string>
     <string name="dictate__local_models_more">نماذج أخرى</string>

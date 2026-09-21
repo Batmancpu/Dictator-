@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.patrickgold.florisboard.R
+import dev.patrickgold.florisboard.dictate.provider.LocalModelCatalog
 import dev.patrickgold.florisboard.dictate.provider.LocalModelEntry
 import dev.patrickgold.jetpref.material.ui.JetPrefAlertDialog
 import org.florisboard.lib.compose.florisDialogScroll
@@ -59,7 +60,7 @@ internal fun LocalModelFamilyDialog(
                     modifier = Modifier.padding(bottom = 8.dp),
                 )
             }
-            entry.members.forEach { spec ->
+            LocalModelCatalog.visibleMembers(entry, state.installed).forEach { spec ->
                 ModelRow(spec = spec, state = state, actions = actions)
             }
         }
