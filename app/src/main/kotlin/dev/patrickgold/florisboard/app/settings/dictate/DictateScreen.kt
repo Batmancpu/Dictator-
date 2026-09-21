@@ -171,19 +171,12 @@ fun DictateScreen() = FlorisScreen {
             onClick = { importPicker.launch(TranscribeShareActivity.MIME_TYPES) },
         )
 
-        // Dictation layout: its own category (issue #199) — the classic keyboard-less layout toggle
-        // today, with more layout options to follow. Kept out of Output (it changes the whole keyboard,
-        // not how text is inserted) and given top-level prominence here.
-        Preference(
-            icon = Icons.Default.Dialpad,
-            modifier = Modifier.settingsSearchAnchor("dictate__layout_title"),
-            title = stringRes(R.string.dictate__layout_title),
-            summary = stringRes(R.string.dictate__layout_menu_summary),
-            onClick = { navController.navigate(Routes.Settings.DictateLayout) },
-        )
-
         // Hub: each row opens a dedicated sub-screen (issue #153), keeping this landing page short and
         // scannable instead of one long list of every setting.
+        //
+        // Who dictates and in which language comes first: those two are what somebody sets up once and
+        // then changes when something is wrong, while the layout is a matter of taste that most people
+        // never touch.
         Preference(
             icon = Icons.Default.Cloud,
             modifier = Modifier.settingsSearchAnchor("dictate__providers_title"),
@@ -213,6 +206,17 @@ fun DictateScreen() = FlorisScreen {
             title = stringRes(R.string.dictate__languages_title),
             summary = languagesSummary,
             onClick = { navController.navigate(Routes.Settings.DictateLanguages) },
+        )
+
+        // Dictation layout: its own category (issue #199) — the classic keyboard-less layout toggle
+        // today, with more layout options to follow. Kept out of Output, because it changes the whole
+        // keyboard rather than how text is inserted.
+        Preference(
+            icon = Icons.Default.Dialpad,
+            modifier = Modifier.settingsSearchAnchor("dictate__layout_title"),
+            title = stringRes(R.string.dictate__layout_title),
+            summary = stringRes(R.string.dictate__layout_menu_summary),
+            onClick = { navController.navigate(Routes.Settings.DictateLayout) },
         )
 
         Preference(
