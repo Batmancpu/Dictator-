@@ -1702,14 +1702,8 @@
     <string name="dictate__local_model_none_selected">Még nincs letöltött modell</string>
     <string name="dictate__local_model_delete_confirm">Törlöd a(z) „{model}“ modellt? Később újra letöltheted.</string>
     <string name="dictate__local_model_not_installed_error">Nincs letöltött helyi modell</string>
-    <string name="dictate__local_model_action_info">Részletek</string>
-    <string name="dictate__local_model_info_languages">Nyelvek</string>
-    <string name="dictate__local_model_info_size">Letöltés mérete</string>
-    <string name="dictate__local_model_info_punctuation">Központozás</string>
-    <string name="dictate__local_model_info_punctuation_yes">Magától írja</string>
-    <string name="dictate__local_model_info_punctuation_no">Nincs — csak szavak</string>
-    <string name="dictate__local_model_info_language_fixed">Ennek a modellnek meg kell adni a beszélt nyelvet: válassz egyet az automatikus felismerés helyett.</string>
-    <string name="dictate__local_model_info_credit">Modell: {author}, licenc: {license}</string>
+    <string name="dictate__local_model_language_fixed">Meg kell adni a beszélt nyelvet — válassz egyet az automatikus felismerés helyett</string>
+    <string name="dictate__local_model_no_punctuation">Nem ír központozást</string>
     <string name="dictate__local_models_for_language">{language} nyelvhez</string>
     <string name="dictate__local_models_for_languages">A te nyelveidhez</string>
     <string name="dictate__local_models_more">További modellek</string>

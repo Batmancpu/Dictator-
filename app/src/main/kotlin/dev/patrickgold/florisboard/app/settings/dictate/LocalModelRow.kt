@@ -21,7 +21,6 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -58,7 +57,6 @@ internal class LocalModelActions(
     val onInstall: (LocalModelSpec) -> Unit,
     val onCancel: (LocalModelSpec) -> Unit,
     val onDelete: (LocalModelSpec) -> Unit,
-    val onInfo: (LocalModelSpec) -> Unit,
 )
 
 /** Everything the rows read to work out what state a model is in. */
@@ -125,7 +123,7 @@ internal fun ModelRow(
                 // used to be replaced by the state, so an installed model stopped saying what it covers
                 // — exactly when several are installed and one has to be chosen between them. The size
                 // is what the second half says until it is installed, because that is the number the
-                // decision turns on; afterwards it is no longer news and lives in the details instead.
+                // decision turns on; afterwards it is no longer news.
                 val status = when {
                     downloading -> stringRes(R.string.dictate__local_model_downloading)
                         .replace("{percent}", downloadPercent.toString())
@@ -139,6 +137,16 @@ internal fun ModelRow(
                     color = if (error != null) MaterialTheme.colorScheme.error
                     else MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                // The two things that can surprise someone after the download, each on its own line
+                // and each true of exactly one model in the catalog today. They are not on the line
+                // above because that line has to stay short — the dialog is narrow enough that a third
+                // control per row already cost the model names their space.
+                if (!spec.punctuates) {
+                    RowNote(stringRes(R.string.dictate__local_model_no_punctuation))
+                }
+                if (!spec.detectsLanguage) {
+                    RowNote(stringRes(R.string.dictate__local_model_language_fixed))
+                }
                 if (downloading) {
                     LinearProgressIndicator(
                         progress = { (downloadPercent ?: 0) / 100f },
@@ -150,12 +158,10 @@ internal fun ModelRow(
         // Icon-only actions (keep the row compact); labels live on as the accessibility descriptions.
         // Deliberately outside the selectable wrapper above — inside it, a screen reader would announce
         // a radio button with a button inside it.
-        IconButton(onClick = { actions.onInfo(spec) }) {
-            Icon(
-                imageVector = Icons.Outlined.Info,
-                contentDescription = stringRes(R.string.dictate__local_model_action_info),
-            )
-        }
+        //
+        // One action button, not two. A details button next to it left the text about 130 dp inside a
+        // dialog roughly 280 dp wide, which broke "SenseVoice Small" across two lines and its languages
+        // across four. What that dialog held now lives on the rows above and on the attributions screen.
         when {
             downloading -> IconButton(onClick = { actions.onCancel(spec) }) {
                 Icon(
@@ -177,6 +183,17 @@ internal fun ModelRow(
             }
         }
     }
+}
+
+/** A short caveat under a model's line, in the same weight as the line itself. */
+@Composable
+private fun RowNote(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(top = 2.dp),
+    )
 }
 
 /**

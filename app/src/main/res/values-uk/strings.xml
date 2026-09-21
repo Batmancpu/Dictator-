@@ -1548,14 +1548,8 @@
     <string name="dictate__local_model_none_selected">Модель ще не завантажено</string>
     <string name="dictate__local_model_delete_confirm">Видалити «{model}»? Пізніше можна завантажити знову.</string>
     <string name="dictate__local_model_not_installed_error">Локальну модель не завантажено</string>
-    <string name="dictate__local_model_action_info">Подробиці</string>
-    <string name="dictate__local_model_info_languages">Мови</string>
-    <string name="dictate__local_model_info_size">Розмір завантаження</string>
-    <string name="dictate__local_model_info_punctuation">Пунктуація</string>
-    <string name="dictate__local_model_info_punctuation_yes">Розставляє сама</string>
-    <string name="dictate__local_model_info_punctuation_no">Немає — лише слова</string>
-    <string name="dictate__local_model_info_language_fixed">Цій моделі потрібно вказати мову: виберіть її замість автоматичного визначення.</string>
-    <string name="dictate__local_model_info_credit">Модель: {author}, ліцензія {license}</string>
+    <string name="dictate__local_model_language_fixed">Потрібно вказати мову — виберіть її замість автоматичного визначення</string>
+    <string name="dictate__local_model_no_punctuation">Не розставляє розділові знаки</string>
     <string name="dictate__local_models_for_language">Для мови {language}</string>
     <string name="dictate__local_models_for_languages">Для ваших мов</string>
     <string name="dictate__local_models_more">Інші моделі</string>

@@ -88,9 +88,6 @@ fun LocalModelSection(
     /** The family whose variants are open over this dialog, or null while the first level is showing. */
     var openFamily by remember { mutableStateOf<LocalModelEntry.Family?>(null) }
 
-    /** The model whose details are open, on top of whichever level was showing. */
-    var infoSpec by remember { mutableStateOf<LocalModelSpec?>(null) }
-
     // The languages actually dictated in, not the phone's locale: someone on a German phone who dictates
     // English should be offered English models. DictateLegacyMigrator seeds this pref from the device
     // language at first run anyway, so this is the device language *plus* every later decision.
@@ -129,7 +126,6 @@ fun LocalModelSection(
         },
         onCancel = { spec -> LocalModelDownloads.cancel(spec.id) },
         onDelete = { spec -> pendingDelete = spec },
-        onInfo = { spec -> infoSpec = spec },
     )
 
     // A model the user just downloaded is what they want to use, so it is selected the moment it lands —
@@ -256,12 +252,6 @@ fun LocalModelSection(
         )
     }
 
-    // Held here rather than inside either level, so one dialog serves both and a family stays open
-    // underneath while its variant's details are read. Three stacked dialogs is not new: the delete
-    // confirmation below has always been a third one over a family's.
-    infoSpec?.let { spec ->
-        LocalModelInfoDialog(spec = spec, onDismiss = { infoSpec = null })
-    }
 
     pendingDelete?.let { spec ->
         AlertDialog(

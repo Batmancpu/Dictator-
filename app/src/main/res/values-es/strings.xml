@@ -1685,14 +1685,8 @@
     <string name="dictate__local_model_none_selected">Aún no se ha descargado ningún modelo</string>
     <string name="dictate__local_model_delete_confirm">¿Eliminar «{model}»? Puedes descargarlo de nuevo más tarde.</string>
     <string name="dictate__local_model_not_installed_error">No hay ningún modelo local descargado</string>
-    <string name="dictate__local_model_action_info">Detalles</string>
-    <string name="dictate__local_model_info_languages">Idiomas</string>
-    <string name="dictate__local_model_info_size">Tamaño de la descarga</string>
-    <string name="dictate__local_model_info_punctuation">Puntuación</string>
-    <string name="dictate__local_model_info_punctuation_yes">La escribe por su cuenta</string>
-    <string name="dictate__local_model_info_punctuation_no">Ninguna — solo palabras</string>
-    <string name="dictate__local_model_info_language_fixed">A este modelo hay que indicarle qué idioma hablas: elige uno en lugar de dejar la detección automática.</string>
-    <string name="dictate__local_model_info_credit">Modelo de {author}, con licencia {license}</string>
+    <string name="dictate__local_model_language_fixed">Hay que indicarle qué idioma hablas — elige uno en lugar de la detección automática</string>
+    <string name="dictate__local_model_no_punctuation">No escribe puntuación</string>
     <string name="dictate__local_models_for_language">Para {language}</string>
     <string name="dictate__local_models_for_languages">Para tus idiomas</string>
     <string name="dictate__local_models_more">Más modelos</string>

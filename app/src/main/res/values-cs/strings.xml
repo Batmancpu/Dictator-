@@ -1719,14 +1719,8 @@
     <string name="dictate__local_model_none_selected">Zatím nestažen žádný model</string>
     <string name="dictate__local_model_delete_confirm">Smazat „{model}“? Později jej můžete stáhnout znovu.</string>
     <string name="dictate__local_model_not_installed_error">Není stažen žádný místní model</string>
-    <string name="dictate__local_model_action_info">Podrobnosti</string>
-    <string name="dictate__local_model_info_languages">Jazyky</string>
-    <string name="dictate__local_model_info_size">Velikost stahování</string>
-    <string name="dictate__local_model_info_punctuation">Interpunkce</string>
-    <string name="dictate__local_model_info_punctuation_yes">Píše vlastní</string>
-    <string name="dictate__local_model_info_punctuation_no">Žádná — jen slova</string>
-    <string name="dictate__local_model_info_language_fixed">Tomuto modelu je třeba sdělit, jakým jazykem mluvíte: vyberte jeden místo automatického rozpoznávání.</string>
-    <string name="dictate__local_model_info_credit">Model: {author}, licence {license}</string>
+    <string name="dictate__local_model_language_fixed">Je třeba sdělit, jakým jazykem mluvíte — vyberte jeden místo automatického rozpoznávání</string>
+    <string name="dictate__local_model_no_punctuation">Nepíše interpunkci</string>
     <string name="dictate__local_models_for_language">Pro jazyk {language}</string>
     <string name="dictate__local_models_for_languages">Pro vaše jazyky</string>
     <string name="dictate__local_models_more">Další modely</string>

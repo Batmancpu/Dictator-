@@ -1635,14 +1635,8 @@
     <string name="dictate__local_model_none_selected">まだモデルがダウンロードされていません</string>
     <string name="dictate__local_model_delete_confirm">「{model}」を削除しますか？後でもう一度ダウンロードできます。</string>
     <string name="dictate__local_model_not_installed_error">端末内モデルがありません</string>
-    <string name="dictate__local_model_action_info">詳細</string>
-    <string name="dictate__local_model_info_languages">言語</string>
-    <string name="dictate__local_model_info_size">ダウンロードサイズ</string>
-    <string name="dictate__local_model_info_punctuation">句読点</string>
-    <string name="dictate__local_model_info_punctuation_yes">自動で付きます</string>
-    <string name="dictate__local_model_info_punctuation_no">なし — 単語のみ</string>
-    <string name="dictate__local_model_info_language_fixed">このモデルには話す言語を指定する必要があります。自動検出のままにせず、言語を選んでください。</string>
-    <string name="dictate__local_model_info_credit">モデル: {author}、ライセンス: {license}</string>
+    <string name="dictate__local_model_language_fixed">話す言語を指定する必要があります — 自動検出ではなく言語を選んでください</string>
+    <string name="dictate__local_model_no_punctuation">句読点は付きません</string>
     <string name="dictate__local_models_for_language">{language}向け</string>
     <string name="dictate__local_models_for_languages">あなたの言語向け</string>
     <string name="dictate__local_models_more">その他のモデル</string>

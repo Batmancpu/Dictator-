@@ -1698,14 +1698,8 @@
     <string name="dictate__local_model_none_selected">尚未下载模型</string>
     <string name="dictate__local_model_delete_confirm">删除“{model}”？以后可以重新下载。</string>
     <string name="dictate__local_model_not_installed_error">未下载本地模型</string>
-    <string name="dictate__local_model_action_info">详细信息</string>
-    <string name="dictate__local_model_info_languages">语言</string>
-    <string name="dictate__local_model_info_size">下载大小</string>
-    <string name="dictate__local_model_info_punctuation">标点</string>
-    <string name="dictate__local_model_info_punctuation_yes">自动添加</string>
-    <string name="dictate__local_model_info_punctuation_no">无 — 仅有文字</string>
-    <string name="dictate__local_model_info_language_fixed">此模型需要指定所说的语言：请选择一种语言，而不是保留自动检测。</string>
-    <string name="dictate__local_model_info_credit">模型来自 {author}，许可协议 {license}</string>
+    <string name="dictate__local_model_language_fixed">需要指定所说的语言 — 请选择语言，而不是自动检测</string>
+    <string name="dictate__local_model_no_punctuation">不添加标点</string>
     <string name="dictate__local_models_for_language">适用于{language}</string>
     <string name="dictate__local_models_for_languages">适用于你的语言</string>
     <string name="dictate__local_models_more">更多模型</string>
