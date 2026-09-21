@@ -691,17 +691,12 @@ private fun ProviderEditorDialog(
         // app, and pinning the intro/checkbox/slider while only the list moved read as two panes.
         scrollModifier = florisDialogScroll(),
         // The on-device list is the one body in this dialog made of *rows* rather than full-width
-        // fields: a radio, two lines of text and an action button, inside roughly 280 dp. The default
-        // side padding was costing it enough width to wrap model names across two lines, so this branch
-        // gets tighter sides. The vertical halves are taken from the default rather than retyped, so
-        // only the thing that needed changing changes.
+        // fields — a radio, two lines of text and an action button inside roughly 280 dp — so it gets
+        // four dp back at each side. A small nudge on purpose: the rows won their room from the radio
+        // slot, and taking much more from here would push them out of line with every other dialog.
+        // Vertical stays untouched; the default is 0 either way.
         contentPadding = if (preset?.transcriptionApi == TranscriptionApi.LOCAL_ONDEVICE) {
-            PaddingValues(
-                start = 12.dp,
-                end = 12.dp,
-                top = JetPrefAlertDialogDefaults.ContentPadding.calculateTopPadding(),
-                bottom = JetPrefAlertDialogDefaults.ContentPadding.calculateBottomPadding(),
-            )
+            PaddingValues(horizontal = 20.dp)
         } else {
             JetPrefAlertDialogDefaults.ContentPadding
         },

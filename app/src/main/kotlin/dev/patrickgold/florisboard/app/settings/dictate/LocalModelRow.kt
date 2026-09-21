@@ -49,11 +49,21 @@ import org.florisboard.lib.compose.stringRes
  */
 
 /**
- * Width of the leading slot, shared by a model's radio and a family's spacer so both kinds of row start
- * their text on the same line. Narrower than Material's 48 dp touch target on purpose — neither of them
- * is the thing being tapped; the row is.
+ * Gap between the radio and the text, kept at what the 48 dp box used to give it: Material's radio is
+ * 24 dp, so centring it in 48 left exactly 12 dp on each side.
  */
-private val RADIO_WIDTH = 32.dp
+private val RADIO_TEXT_GAP = 12.dp
+
+/**
+ * The leading slot: the radio's own 24 dp plus that gap, shared with a family's spacer so both kinds of
+ * row start their text on the same line.
+ *
+ * It is not Material's 48 dp touch target, and does not need to be — neither the radio nor the spacer is
+ * what gets tapped, the row is. That box was margin, and in a dialog this narrow it was being paid for
+ * out of the model names. What it cost on the *left* is reclaimed; what it gave between the radio and
+ * the text is not.
+ */
+private val LEADING_SLOT = 24.dp + RADIO_TEXT_GAP
 
 /**
  * What a row can do to the model it shows. One bundle instead of four parameters per call site, because
@@ -119,13 +129,11 @@ internal fun ModelRow(
                 selected = isActive,
                 enabled = isInstalled && !downloading,
                 onClick = null,
-                // Sized rather than given Material's 48 dp touch target: the row is what gets tapped, so
-                // the box around the dial is spacing and nothing else, and in a dialog this narrow that
-                // spacing was coming out of the model names. A 20 dp dial in 32 dp keeps a clear gap to
-                // the text and makes the rows a little shorter too.
-                modifier = Modifier.size(RADIO_WIDTH),
+                // Left at its own size with the gap spelled out, instead of centred in a 48 dp box: the
+                // gap to the text is the half that was doing something, the leading half was not.
+                modifier = Modifier.padding(end = RADIO_TEXT_GAP),
             )
-            Column(modifier = Modifier.weight(1f).padding(end = 4.dp)) {
+            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                 Text(text = spec.displayName, style = MaterialTheme.typography.titleSmall)
                 // What the model is stays on the line; only the second half changes with its state. It
                 // used to be replaced by the state, so an installed model stopped saying what it covers
@@ -235,8 +243,8 @@ internal fun FamilyRow(
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(modifier = Modifier.size(RADIO_WIDTH)) {}
-        Column(modifier = Modifier.weight(1f).padding(end = 4.dp)) {
+        Column(modifier = Modifier.size(LEADING_SLOT)) {}
+        Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
             Text(text = entry.family.displayName, style = MaterialTheme.typography.titleSmall)
             Text(
                 text = subtitle,
