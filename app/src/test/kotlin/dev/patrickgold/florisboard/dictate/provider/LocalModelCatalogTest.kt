@@ -304,6 +304,39 @@ class LocalModelCatalogTest {
         assertTrue(!LocalModelCatalog.GIGAAM_V2_RU.punctuates)
     }
 
+    /**
+     * Each of these is a number somebody documented, and the cost of getting one wrong is silent: too
+     * high and the model drops or garbles the tail, too low and every long dictation loses punctuation
+     * at seams it never needed.
+     */
+    @Test
+    fun `no model is handed more audio in one pass than it says it can take`() {
+        for (spec in LocalModelCatalog.all) {
+            assertTrue(spec.maxSegmentSeconds > 0, "${spec.id} would be cut into nothing")
+        }
+        // sherpa-onnx crops a Whisper decode at 30 s and logs that it discarded the rest.
+        for (spec in LocalModelCatalog.all.filter { it.kind == LocalModelKind.WHISPER }) {
+            assertTrue(spec.maxSegmentSeconds <= 28, "${spec.id} would run into Whisper's 30 s window")
+        }
+        // GigaAM: "applicable for audio only up to 25 seconds". The app used to feed it 29.
+        assertTrue(LocalModelCatalog.GIGAAM_V3_RU.maxSegmentSeconds <= 23)
+        assertTrue(LocalModelCatalog.GIGAAM_V2_RU.maxSegmentSeconds <= 23)
+        // Canary: "designed to handle input audio smaller than 40 seconds".
+        assertTrue(LocalModelCatalog.CANARY_180M_FLASH.maxSegmentSeconds <= 35)
+        // And the other direction: the models that document minutes must not quietly fall back to
+        // Whisper's ceiling, which is the whole point of the field.
+        for (spec in listOf(
+            LocalModelCatalog.PARAKEET_TDT_V3,
+            LocalModelCatalog.PARAKEET_TDT_110M_EN,
+            LocalModelCatalog.FASTCONFORMER_DE,
+        )) {
+            assertTrue(
+                spec.maxSegmentSeconds >= 60,
+                "${spec.id} handles minutes in one pass and is being cut at ${spec.maxSegmentSeconds} s",
+            )
+        }
+    }
+
     @Test
     fun `splitting long audio is derived from the VAD file rather than declared`() {
         for (spec in LocalModelCatalog.all) {

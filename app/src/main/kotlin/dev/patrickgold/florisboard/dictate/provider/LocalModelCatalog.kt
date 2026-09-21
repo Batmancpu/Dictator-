@@ -118,6 +118,19 @@ data class LocalModelSpec(
      * That is what separates GigaAM v2, whose 196-byte vocabulary has no mark in it at all, from v3.
      */
     val punctuates: Boolean = false,
+    /**
+     * The longest stretch of audio this model may be handed in one decode, in seconds.
+     *
+     * Everything shorter goes through in a single pass; past it the recording is split at speech pauses
+     * and the pieces decoded separately, which costs punctuation and capitals at every seam — the model
+     * starts each piece without the sentence it was in the middle of.
+     *
+     * The default is Whisper's, and for years it was every model's: sherpa-onnx crops a Whisper decode
+     * at 30 s and logs that it "discarded the remaining data", so 28 leaves a margin. Nothing else in
+     * the catalog has that ceiling, and several have one far higher — each entry says what its own is
+     * and where the number comes from.
+     */
+    val maxSegmentSeconds: Int = 28,
     val files: List<LocalModelFile>,
     /** Which recognizer to build for it; see [LocalModelKind]. */
     val kind: LocalModelKind = LocalModelKind.WHISPER,
@@ -343,6 +356,10 @@ object LocalModelCatalog {
     val PARAKEET_TDT_V3 = LocalModelSpec(
         id = "parakeet-tdt-0.6b-v3",
         displayName = "Parakeet TDT 0.6B v3",
+        // NVIDIA: "up to 24 minutes long with full attention" — on an A100 80 GB. Two minutes is
+        // what a phone is offered instead: attention memory grows with the square of the length,
+        // and a pause every few seconds means the VAD rarely builds a piece this long anyway.
+        maxSegmentSeconds = 120,
         languages = Langs.PARAKEET_V3,
         punctuates = true,
         credit = Credits.nvidia("https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3"),
@@ -373,6 +390,9 @@ object LocalModelCatalog {
     val PARAKEET_TDT_110M_EN = LocalModelSpec(
         id = "parakeet-tdt-110m-en",
         displayName = "Parakeet TDT 110M",
+        // NVIDIA: "can transcribe up to 20 minutes of audio in one single pass". Same reasoning as
+        // the 0.6B above for why the app stops well short of that.
+        maxSegmentSeconds = 120,
         languages = listOf("en"),
         punctuates = true,
         credit = Credits.nvidia("https://huggingface.co/nvidia/parakeet-tdt_ctc-110m"),
@@ -406,6 +426,10 @@ object LocalModelCatalog {
     val FASTCONFORMER_DE = LocalModelSpec(
         id = "fastconformer-de",
         displayName = "FastConformer German",
+        // Not stated on its card, but it is the same FastConformer encoder with full attention as
+        // the Parakeets, which do document minutes. Inference from the architecture rather than a
+        // quoted number — if a long German dictation ever misbehaves, this is the line to suspect.
+        maxSegmentSeconds = 120,
         languages = listOf("de"),
         punctuates = true,
         credit = Credits.nvidia("https://huggingface.co/nvidia/stt_de_fastconformer_hybrid_large_pc"),
@@ -458,6 +482,8 @@ object LocalModelCatalog {
     val CANARY_180M_FLASH = LocalModelSpec(
         id = "canary-180m-flash",
         displayName = "Canary 180M Flash",
+        // NVIDIA: "designed to handle input audio smaller than 40 seconds". Under it with room.
+        maxSegmentSeconds = 35,
         languages = listOf("en", "de", "fr", "es"),
         // Asked for explicitly by `usePnc = true` where the recognizer is built.
         punctuates = true,
@@ -497,6 +523,9 @@ object LocalModelCatalog {
     val DOLPHIN_BASE = LocalModelSpec(
         id = "dolphin-base",
         displayName = "Dolphin Base",
+        // Left at the conservative default: Dolphin states no limit, and sherpa-onnx does not crop
+        // it either, so there is nothing to raise this to that would not be a guess.
+        maxSegmentSeconds = 28,
         languages = listOf(
             "ar", "az", "ba", "bn", "fa", "fil", "gu", "hi", "id", "ja", "jv", "kab", "kk", "km", "ko",
             "ks", "ky", "lo", "mn", "mr", "ms", "my", "ne", "or", "pa", "ps", "ru", "si", "su", "ta",
@@ -538,6 +567,9 @@ object LocalModelCatalog {
     val GIGAAM_V3_RU = LocalModelSpec(
         id = "gigaam-v3-ru",
         displayName = "GigaAM v3 Russian",
+        // GigaAM's own README: transcription "is applicable for audio only up to 25 seconds";
+        // anything longer wants their external-VAD long-form path. The app was feeding it 29.
+        maxSegmentSeconds = 23,
         languages = listOf("ru"),
         punctuates = true,
         credit = Credits.GIGAAM,
@@ -562,6 +594,8 @@ object LocalModelCatalog {
     val GIGAAM_V2_RU = LocalModelSpec(
         id = "gigaam-v2-ru",
         displayName = "GigaAM v2 Russian",
+        // Same 25 s ceiling as v3.
+        maxSegmentSeconds = 23,
         languages = listOf("ru"),
         // Its whole vocabulary is 196 bytes of Cyrillic letters with not one mark in it, which is the
         // difference [GIGAAM_V3_RU] was added for — and the reason nobody new is offered this one.
@@ -744,6 +778,9 @@ object LocalModelCatalog {
     val SENSE_VOICE_SMALL = LocalModelSpec(
         id = "sense-voice-small",
         displayName = "SenseVoice Small",
+        // Upstream claims "input of audio ... of any duration", but its own pipeline chunks at 30 s,
+        // so this doubles what it used to get rather than trusting the unlimited claim.
+        maxSegmentSeconds = 60,
         languages = listOf("zh", "yue", "en", "ja", "ko"),
         punctuates = true,
         credit = Credits.SENSE_VOICE,

@@ -82,9 +82,33 @@ class LocalTranscriptionProvider(
     private var startedNanos: Long = 0L
 
     /**
+     * How long a stretch this model may be given in one decode — see [LocalModelSpec.maxSegmentSeconds].
+     *
+     * This used to be 28 s for everything, which is Whisper's ceiling and nobody else's: Parakeet
+     * documents twenty minutes in a single pass, Canary forty seconds, GigaAM twenty-five. Cutting them
+     * all at Whisper's number cost punctuation at every seam for no reason, and in GigaAM's case was
+     * *above* what it says it handles.
+     *
+     * Unknown id (a leftover pref) falls back to the conservative default, like [kindOf] does.
+     */
+    private val maxSegmentSeconds: Int by lazy {
+        LocalModelCatalog.byId(modelDir.name)?.maxSegmentSeconds ?: DEFAULT_MAX_SEGMENT_SECONDS
+    }
+
+    /** Audio below this goes through in one piece, with no VAD and no seams. */
+    private val singlePassSamples: Int get() = maxSegmentSeconds * AudioDecode.TARGET_SAMPLE_RATE
+
+    /**
+     * Hard ceiling per decode. One second above [maxSegmentSeconds] so a segment the VAD cut at its
+     * limit still passes whole, and only gap-less speech past that gets chopped mid-sentence.
+     */
+    private val maxSegmentSamples: Int
+        get() = (maxSegmentSeconds + 1) * AudioDecode.TARGET_SAMPLE_RATE
+
+    /**
      * Throws once the budget is spent. Called between decode passes — never inside one, because a native
      * pass cannot be interrupted — so the effective granularity is a single piece of at most
-     * [MAX_SEGMENT_SAMPLES] (~29 s of audio), which is the unit this engine works in regardless.
+     * [maxSegmentSamples], which is the unit this engine works in regardless.
      *
      * Compares elapsed time rather than a precomputed deadline: `nanoTime`'s origin is arbitrary, so
      * adding to it is the one form of this that can overflow.
@@ -139,9 +163,10 @@ class LocalTranscriptionProvider(
                 // it safely (never mid-decode) — see [RecognizerCache].
                 try {
                     val vadFile = File(modelDir, VAD)
-                    // Whisper handles ~30 s per pass; segment longer audio at speech pauses (VAD) so the
-                    // tail isn't dropped. Short clips take the simple single-pass path (no VAD overhead).
-                    if (vadFile.exists() && samples.size > VAD_MIN_SAMPLES) {
+                    // Past what this model takes in one go, segment at speech pauses (VAD) so the tail
+                    // isn't dropped. Anything shorter takes the single-pass path — no VAD overhead, and
+                    // no seam for punctuation to fall through. See [maxSegmentSeconds].
+                    if (vadFile.exists() && samples.size > singlePassSamples) {
                         transcribeSegmented(recognizer, vadFile, samples)
                     } else {
                         decodeOnce(recognizer, samples)
@@ -247,7 +272,8 @@ class LocalTranscriptionProvider(
                     minSilenceDuration = 0.25f,
                     minSpeechDuration = 0.25f,
                     windowSize = VAD_WINDOW,
-                    maxSpeechDuration = 28f, // keep every segment safely inside Whisper's 30 s window
+                    // Keep every segment inside what this model actually takes, not inside Whisper's.
+                    maxSpeechDuration = maxSegmentSeconds.toFloat(),
                 )
                 sampleRate = AudioDecode.TARGET_SAMPLE_RATE
                 numThreads = 1
@@ -286,15 +312,15 @@ class LocalTranscriptionProvider(
     }
 
     /**
-     * Decodes [samples], hard-capping each piece below Whisper's 30 s window. VAD normally keeps segments
-     * short, but on gap-less continuous speech a segment can still exceed 30 s — without this cap Whisper
-     * would silently drop everything past 30 s (the original bug).
+     * Decodes [samples], hard-capping each piece at [maxSegmentSamples]. The VAD normally keeps segments
+     * short, but gap-less continuous speech can still produce one past the limit — and without this cap
+     * sherpa-onnx silently drops everything beyond a Whisper decode's 30 s (the original bug).
      */
     private fun appendDecoded(recognizer: OfflineRecognizer, samples: FloatArray, out: StringBuilder) {
         var offset = 0
         while (offset < samples.size) {
             checkDeadline()
-            val end = minOf(offset + MAX_SEGMENT_SAMPLES, samples.size)
+            val end = minOf(offset + maxSegmentSamples, samples.size)
             val piece = if (offset == 0 && end == samples.size) samples else samples.copyOfRange(offset, end)
             TranscriptJoin.appendPiece(out, decodeOnce(recognizer, piece), tighteningSymbols)
             offset = end
@@ -303,11 +329,10 @@ class LocalTranscriptionProvider(
 
     companion object {
         /** Audio longer than this (~28 s at 16 kHz) is VAD-segmented; shorter takes the single pass. */
-        private const val VAD_MIN_SAMPLES = 28 * AudioDecode.TARGET_SAMPLE_RATE
+        /** Whisper's ceiling, and the fallback for an id the catalog no longer knows. */
+        private const val DEFAULT_MAX_SEGMENT_SECONDS = 28
         private const val VAD_WINDOW = 512
 
-        /** Hard ceiling per Whisper pass (~29 s) — above VAD's 28 s cut so normal segments pass whole. */
-        private const val MAX_SEGMENT_SAMPLES = 29 * AudioDecode.TARGET_SAMPLE_RATE
 
         /** Feed size for the streaming batch path (~100 ms), matching what the live session sees. */
         private const val STREAM_CHUNK = AudioDecode.TARGET_SAMPLE_RATE / 10
