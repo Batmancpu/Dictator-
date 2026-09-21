@@ -218,7 +218,7 @@ object LocalModelCatalog {
             "Salute Devices / GigaChat Team", "MIT", "https://github.com/salute-developers/GigaAM",
         )
         val SENSE_VOICE = ModelCredit(
-            "Alibaba Group", "FunASR Model Open Source License v1.1",
+            "Alibaba Group", "FunASR Model Open Source License Agreement v1.1",
             "https://github.com/FunAudioLLM/SenseVoice",
         )
         val PRIMELINE = ModelCredit(
@@ -504,7 +504,8 @@ object LocalModelCatalog {
         ),
         punctuates = true,
         credit = ModelCredit(
-            "DataoceanAI / Tsinghua University", "Apache-2.0", "https://github.com/DataoceanAI/Dolphin",
+            "DataoceanAI and Tsinghua University", "Apache-2.0",
+            "https://github.com/DataoceanAI/Dolphin",
         ),
         kind = LocalModelKind.DOLPHIN,
         files = listOf(

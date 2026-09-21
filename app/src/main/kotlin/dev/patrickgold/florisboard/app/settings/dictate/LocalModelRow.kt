@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -27,7 +28,6 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +47,13 @@ import org.florisboard.lib.compose.stringRes
  * whether it is reached directly or through its family — including which slot it lands in and what the
  * delete dialog then repairs.
  */
+
+/**
+ * Width of the leading slot, shared by a model's radio and a family's spacer so both kinds of row start
+ * their text on the same line. Narrower than Material's 48 dp touch target on purpose — neither of them
+ * is the thing being tapped; the row is.
+ */
+private val RADIO_WIDTH = 32.dp
 
 /**
  * What a row can do to the model it shows. One bundle instead of four parameters per call site, because
@@ -112,12 +119,13 @@ internal fun ModelRow(
                 selected = isActive,
                 enabled = isInstalled && !downloading,
                 onClick = null,
-                // Handing the click to the row costs the radio the touch-target padding Material puts
-                // around a clickable one, which is what set the spacing to the text and the height of the
-                // row. Asked for explicitly, both stay exactly as they were.
-                modifier = Modifier.minimumInteractiveComponentSize(),
+                // Sized rather than given Material's 48 dp touch target: the row is what gets tapped, so
+                // the box around the dial is spacing and nothing else, and in a dialog this narrow that
+                // spacing was coming out of the model names. A 20 dp dial in 32 dp keeps a clear gap to
+                // the text and makes the rows a little shorter too.
+                modifier = Modifier.size(RADIO_WIDTH),
             )
-            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+            Column(modifier = Modifier.weight(1f).padding(end = 4.dp)) {
                 Text(text = spec.displayName, style = MaterialTheme.typography.titleSmall)
                 // What the model is stays on the line; only the second half changes with its state. It
                 // used to be replaced by the state, so an installed model stopped saying what it covers
@@ -227,8 +235,8 @@ internal fun FamilyRow(
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(modifier = Modifier.minimumInteractiveComponentSize()) {}
-        Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+        Column(modifier = Modifier.size(RADIO_WIDTH)) {}
+        Column(modifier = Modifier.weight(1f).padding(end = 4.dp)) {
             Text(text = entry.family.displayName, style = MaterialTheme.typography.titleSmall)
             Text(
                 text = subtitle,

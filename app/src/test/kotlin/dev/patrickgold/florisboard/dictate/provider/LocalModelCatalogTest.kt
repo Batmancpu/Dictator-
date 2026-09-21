@@ -329,9 +329,21 @@ class LocalModelCatalogTest {
         val attributions = java.io.File("src/main/assets/license/data_attributions.txt")
         assertTrue(attributions.isFile, "attributions file not found at ${attributions.absolutePath}")
         val text = attributions.readText()
+        // Compared with punctuation and spacing removed, so "CC-BY-4.0" here matches "CC BY 4.0" there
+        // and neither file has to adopt the other's house style. What must agree is the substance.
+        fun flatten(s: String) = s.lowercase().filter { it.isLetterOrDigit() }
+        val flatText = flatten(text)
         for (spec in LocalModelCatalog.all) {
             val credit = assertNotNull(spec.credit, "${spec.id} names nobody")
             assertTrue(text.contains(credit.url), "${spec.id}: ${credit.url} is not in the attributions")
+            assertTrue(
+                flatText.contains(flatten(credit.author)),
+                "${spec.id}: the attributions do not credit '${credit.author}'",
+            )
+            assertTrue(
+                flatText.contains(flatten(credit.license)),
+                "${spec.id}: the attributions do not state the licence '${credit.license}'",
+            )
         }
     }
 

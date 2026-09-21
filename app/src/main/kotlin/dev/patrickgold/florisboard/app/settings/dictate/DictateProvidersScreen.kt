@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -105,6 +106,7 @@ import dev.patrickgold.jetpref.datastore.ui.Preference
 import dev.patrickgold.jetpref.datastore.ui.PreferenceGroup
 import dev.patrickgold.jetpref.datastore.ui.SwitchPreference
 import dev.patrickgold.jetpref.material.ui.JetPrefAlertDialog
+import dev.patrickgold.jetpref.material.ui.JetPrefAlertDialogDefaults
 import kotlinx.coroutines.launch
 import org.florisboard.lib.android.stringRes
 import org.florisboard.lib.compose.florisDialogScroll
@@ -688,6 +690,21 @@ private fun ProviderEditorDialog(
         // The whole body scrolls as one — the on-device model list makes this dialog the tallest in the
         // app, and pinning the intro/checkbox/slider while only the list moved read as two panes.
         scrollModifier = florisDialogScroll(),
+        // The on-device list is the one body in this dialog made of *rows* rather than full-width
+        // fields: a radio, two lines of text and an action button, inside roughly 280 dp. The default
+        // side padding was costing it enough width to wrap model names across two lines, so this branch
+        // gets tighter sides. The vertical halves are taken from the default rather than retyped, so
+        // only the thing that needed changing changes.
+        contentPadding = if (preset?.transcriptionApi == TranscriptionApi.LOCAL_ONDEVICE) {
+            PaddingValues(
+                start = 12.dp,
+                end = 12.dp,
+                top = JetPrefAlertDialogDefaults.ContentPadding.calculateTopPadding(),
+                bottom = JetPrefAlertDialogDefaults.ContentPadding.calculateBottomPadding(),
+            )
+        } else {
+            JetPrefAlertDialogDefaults.ContentPadding
+        },
         confirmLabel = stringRes(R.string.action__ok),
         dismissLabel = stringRes(R.string.action__cancel),
         neutralLabel = if (onDelete != null) stringRes(R.string.action__delete) else null,
