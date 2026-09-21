@@ -1486,9 +1486,6 @@
     <string name="dictate__local_model_none_selected">Nessun modello ancora scaricato</string>
     <string name="dictate__local_model_delete_confirm">Eliminare «{model}»? Potrai scaricarlo di nuovo più tardi.</string>
     <string name="dictate__local_model_not_installed_error">Nessun modello locale scaricato</string>
-    <string name="dictate__local_models_for_language">Per {language}</string>
-    <string name="dictate__local_models_for_languages">Per le tue lingue</string>
-    <string name="dictate__local_models_more">Altri modelli</string>
     <string name="dictate__local_model_family_installed">{count} di {total} installati</string>
     <string name="dictate__local_model_family_open">Mostra le varianti</string>
     <plurals name="dictate__local_model_languages">

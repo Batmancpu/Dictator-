@@ -1648,9 +1648,6 @@
     <string name="dictate__local_model_none_selected">Vēl nav lejupielādēts neviens modelis</string>
     <string name="dictate__local_model_delete_confirm">Dzēst “{model}”? Vēlāk to varēsiet lejupielādēt vēlreiz.</string>
     <string name="dictate__local_model_not_installed_error">Nav lejupielādēta lokāla modeļa</string>
-    <string name="dictate__local_models_for_language">Valodai {language}</string>
-    <string name="dictate__local_models_for_languages">Jūsu valodām</string>
-    <string name="dictate__local_models_more">Citi modeļi</string>
     <string name="dictate__local_model_family_installed">Instalēti {count} no {total}</string>
     <string name="dictate__local_model_family_open">Rādīt variantus</string>
     <plurals name="dictate__local_model_languages">

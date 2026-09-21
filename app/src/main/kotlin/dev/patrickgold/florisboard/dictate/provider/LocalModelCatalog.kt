@@ -726,21 +726,31 @@ object LocalModelCatalog {
     )
 
     /**
-     * All catalog models in display order: Parakeet first (broadest), then Canary — which beats it on
-     * size for the four languages it does speak — then the language-specialized ones, then Whisper
-     * multilingual and its English-only variants. Finally the streaming models, which the picker renders
-     * under their own "Live" heading. Keep the streaming entries last: [LocalModelSection] relies on this
-     * order to know where that heading goes.
+     * All catalog models in display order — **this list is the picker's order**, so it is arranged by
+     * what most people will end up downloading rather than by architecture or by when a model was added.
+     *
+     * Broad coverage and a small download come first: the English Parakeet at 137 MB, then Canary with
+     * the four biggest European languages at 208 MB, then Parakeet v3, which speaks twenty-five but
+     * costs 670 MB. The language specialists follow, and the two 670 MB entries sink towards the bottom.
+     *
+     * **Whisper last**, before the live models. It is the one everybody recognises, which is exactly why
+     * it should not be the first thing offered: for almost every language in this catalog there is now
+     * something here that beats it at its size, and a name people already trust would otherwise collect
+     * the downloads by default.
+     *
+     * Two ordering rules the code depends on: family members must sit next to each other, and the
+     * streaming entries must stay a contiguous tail — [LocalModelSection] puts the "Live" heading in
+     * front of the first of them. Both are covered by tests rather than by hope.
      */
     val all: List<LocalModelSpec> = listOf(
-        PARAKEET_TDT_V3,
-        CANARY_180M_FLASH,
         PARAKEET_TDT_110M_EN,
+        CANARY_180M_FLASH,
+        PARAKEET_TDT_V3,
         FASTCONFORMER_DE,
-        PARAKEET_PRIMELINE_DE,
+        SENSE_VOICE_SMALL,
         GIGAAM_V3_RU,
         GIGAAM_V2_RU,
-        SENSE_VOICE_SMALL,
+        PARAKEET_PRIMELINE_DE,
         WHISPER_TINY, WHISPER_BASE, WHISPER_SMALL,
         WHISPER_TINY_EN, WHISPER_BASE_EN, WHISPER_SMALL_EN,
         KROKO_EN, KROKO_DE, KROKO_ES, KROKO_FR,
@@ -823,42 +833,6 @@ object LocalModelCatalog {
     /** A family's variants, minus the retired ones nobody has installed. See [visibleTopLevel]. */
     fun visibleMembers(family: LocalModelEntry.Family, installed: Set<String>): List<LocalModelSpec> =
         family.members.filter { it.supersededBy == null || it.id in installed }
-
-    /**
-     * [entries] split into the ones worth offering someone who dictates in [userLanguages] and the
-     * rest, each keeping catalog order within its half.
-     *
-     * The matching half is sorted by how *specialized* a model is — fewest languages first — because
-     * that is the useful ranking here: for a German user the German-only model is a better answer than
-     * the one that also speaks ninety-eight others. A family matches when any of its variants does, and
-     * is ranked by its narrowest matching one.
-     *
-     * **Streaming models never enter the matching half.** A live model is not an alternative to a
-     * one-shot one — it only works with real-time transcription switched on — so it cannot compete for
-     * the same slot, and keeping it out is also what preserves the contiguous streaming tail the "Live"
-     * heading depends on.
-     *
-     * An empty [userLanguages] (auto-detect only) puts everything in the second half, which is the
-     * caller's cue to render one flat list with no headings at all.
-     */
-    fun partitionForLanguage(
-        entries: List<LocalModelEntry>,
-        userLanguages: Set<String>,
-    ): Pair<List<LocalModelEntry>, List<LocalModelEntry>> {
-        if (userLanguages.isEmpty()) return emptyList<LocalModelEntry>() to entries
-
-        fun specsOf(entry: LocalModelEntry) = when (entry) {
-            is LocalModelEntry.Single -> listOf(entry.spec)
-            is LocalModelEntry.Family -> entry.members
-        }
-
-        fun narrowestMatch(entry: LocalModelEntry): Int? = specsOf(entry)
-            .filter { spec -> spec.languages.any { it in userLanguages } }
-            .minOfOrNull { it.languages.size }
-
-        val (matching, rest) = entries.partition { !it.isStreaming && narrowestMatch(it) != null }
-        return matching.sortedBy { narrowestMatch(it) } to rest
-    }
 
     /** Which recognizer [id] needs; unknown ids (a leftover pref) fall back to the Whisper shape. */
     fun kindOf(id: String): LocalModelKind = byId(id)?.kind ?: LocalModelKind.WHISPER

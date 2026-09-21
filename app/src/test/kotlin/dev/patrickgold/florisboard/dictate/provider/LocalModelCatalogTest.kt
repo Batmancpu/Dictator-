@@ -206,6 +206,25 @@ class LocalModelCatalogTest {
     }
 
     /**
+     * The catalog's order *is* the picker's order, so the decision about what people meet first lives
+     * in a list literal and would otherwise be undone by the next person appending an entry.
+     */
+    @Test
+    fun `the picker leads with the small broadly useful models and ends with Whisper`() {
+        val rows = LocalModelCatalog.topLevel
+        val first = assertNotNull(rows.first() as? LocalModelEntry.Single)
+        assertEquals("parakeet-tdt-110m-en", first.spec.id, "the cheapest good English model is not first")
+
+        val oneShot = rows.filter { !it.isStreaming }
+        val last = assertNotNull(oneShot.last() as? LocalModelEntry.Family, "Whisper is not the last row")
+        assertEquals(
+            LocalModelFamily.WHISPER, last.family,
+            "Whisper must stay at the bottom: it is the name people recognise, and for nearly every " +
+                "language here something else now beats it at the same size",
+        )
+    }
+
+    /**
      * A retired model is hidden from everyone who does not already have it, and shown to everyone who
      * does — hiding it from them would strand its bytes and leave them no way to switch away.
      */
@@ -241,51 +260,6 @@ class LocalModelCatalogTest {
     fun `the top level keeps the streaming rows as a contiguous tail`() {
         val fromFirstStreaming = LocalModelCatalog.topLevel.dropWhile { !it.isStreaming }
         assertTrue(fromFirstStreaming.all { it.isStreaming }, "a one-shot row sits under the Live heading")
-    }
-
-    @Test
-    fun `the language split loses nothing and never offers a live model as an alternative`() {
-        val top = LocalModelCatalog.topLevel
-        for (languages in listOf(setOf("de"), setOf("en"), setOf("zh"), setOf("de", "en"), emptySet())) {
-            val (forYou, rest) = LocalModelCatalog.partitionForLanguage(top, languages)
-            assertEquals(
-                top.toSet(), (forYou + rest).toSet(),
-                "$languages: a row went missing or was shown twice",
-            )
-            assertEquals(top.size, forYou.size + rest.size, "$languages: a row ended up in both halves")
-            assertTrue(
-                forYou.none { it.isStreaming },
-                "$languages: a live model is offered as if it replaced a one-shot one",
-            )
-            // Order inside each half is still the catalog's, apart from the specificity sort above.
-            assertEquals(top.filter { it in rest }, rest, "$languages: the remainder was reordered")
-        }
-    }
-
-    @Test
-    fun `auto-detect alone means one flat list`() {
-        val (forYou, rest) = LocalModelCatalog.partitionForLanguage(LocalModelCatalog.topLevel, emptySet())
-        assertTrue(forYou.isEmpty(), "nothing can be 'for your language' when no language is chosen")
-        assertEquals(LocalModelCatalog.topLevel, rest)
-    }
-
-    @Test
-    fun `the most specialized model for a language is offered first`() {
-        fun firstIdFor(language: String): String {
-            val (forYou, _) = LocalModelCatalog.partitionForLanguage(
-                LocalModelCatalog.topLevel, setOf(language),
-            )
-            return when (val entry = forYou.first()) {
-                is LocalModelEntry.Single -> entry.spec.id
-                is LocalModelEntry.Family -> entry.family.name
-            }
-        }
-        // A German-only model beats Canary's four and Whisper's ninety-nine.
-        assertEquals("fastconformer-de", firstIdFor("de"))
-        assertEquals("parakeet-tdt-110m-en", firstIdFor("en"))
-        assertEquals("gigaam-v3-ru", firstIdFor("ru"))
-        // Nobody else in the catalog speaks Chinese, so the one that was trained for it leads.
-        assertEquals("sense-voice-small", firstIdFor("zh"))
     }
 
     @Test

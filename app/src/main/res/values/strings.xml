@@ -2168,9 +2168,6 @@
     </plurals>
     <string name="dictate__local_model_family_installed" comment="Shown under a model family (Whisper, Kroko) in the on-device picker when some of its variants are downloaded. Both {count} and {total} are numbers.">{count} of {total} installed</string>
     <string name="dictate__local_model_family_open" comment="Spoken action label for the row that opens a model family (Whisper, Kroko) and shows the variants inside it">Show variants</string>
-    <string name="dictate__local_models_for_language" comment="Heading above the on-device models that cover the one language the user dictates in. {language} is a language name.">For {language}</string>
-    <string name="dictate__local_models_for_languages" comment="Heading above the on-device models covering the user’s dictation languages, when several are selected">For your languages</string>
-    <string name="dictate__local_models_more" comment="Heading above the remaining on-device models, the ones that do not cover the user’s dictation languages">More models</string>
     <string name="dictate__local_fallback_title" comment="Title of the toggle that enables on-device transcription as an offline fallback">Offline fallback</string>
     <string name="dictate__local_fallback_summary" comment="Explains the offline fallback toggle">When offline, transcribe on-device with the downloaded model after the provider fails</string>
 

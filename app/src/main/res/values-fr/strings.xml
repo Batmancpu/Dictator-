@@ -1581,9 +1581,6 @@
     <string name="dictate__local_model_none_selected">Aucun modèle téléchargé pour l’instant</string>
     <string name="dictate__local_model_delete_confirm">Supprimer « {model} » ? Vous pourrez le retélécharger plus tard.</string>
     <string name="dictate__local_model_not_installed_error">Aucun modèle local téléchargé</string>
-    <string name="dictate__local_models_for_language">Pour {language}</string>
-    <string name="dictate__local_models_for_languages">Pour vos langues</string>
-    <string name="dictate__local_models_more">Autres modèles</string>
     <string name="dictate__local_model_family_installed">{count} sur {total} installés</string>
     <string name="dictate__local_model_family_open">Afficher les variantes</string>
     <plurals name="dictate__local_model_languages">

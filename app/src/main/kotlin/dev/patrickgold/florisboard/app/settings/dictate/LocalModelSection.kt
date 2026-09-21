@@ -34,12 +34,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import kotlinx.coroutines.launch
-import dev.patrickgold.florisboard.dictate.DictateLanguages
 import dev.patrickgold.florisboard.dictate.provider.LocalModelCatalog
 import dev.patrickgold.florisboard.dictate.provider.LocalModelDownloads
 import dev.patrickgold.florisboard.dictate.provider.LocalModelEntry
@@ -87,18 +85,6 @@ fun LocalModelSection(
 
     /** The family whose variants are open over this dialog, or null while the first level is showing. */
     var openFamily by remember { mutableStateOf<LocalModelEntry.Family?>(null) }
-
-    // The languages actually dictated in, not the phone's locale: someone on a German phone who dictates
-    // English should be offered English models. DictateLegacyMigrator seeds this pref from the device
-    // language at first run anyway, so this is the device language *plus* every later decision.
-    // Read once — the selection cannot change while this dialog is open.
-    val userLanguages = remember {
-        DictateLanguages.parseSelection(prefs.dictate.inputLanguages.get())
-            .map { it.code }
-            .filter { it != DictateLanguages.DETECT }
-            .map { it.substringBefore('-') }
-            .toSet()
-    }
 
     val rowState = LocalModelState(
         installed = installed,
@@ -217,28 +203,10 @@ fun LocalModelSection(
         )
         HorizontalDivider(modifier = Modifier.padding(top = 4.dp, bottom = 12.dp))
 
-        // What fits the languages this person dictates in comes first, the rest underneath. Split only
-        // when both halves have something in them — with everything matching, or nothing, two headings
-        // over one list would be noise.
-        val visible = LocalModelCatalog.visibleTopLevel(installed)
-        val (forYou, rest) = LocalModelCatalog.partitionForLanguage(visible, userLanguages)
-        if (forYou.isNotEmpty() && rest.isNotEmpty()) {
-            val named = userLanguages.singleOrNull()
-            GroupHeading(
-                if (named != null) {
-                    stringRes(R.string.dictate__local_models_for_language)
-                        .replace("{language}", DictateLanguages.displayNameOf(named))
-                } else {
-                    stringRes(R.string.dictate__local_models_for_languages)
-                },
-                topPadding = 8.dp,
-            )
-            ModelRows(forYou, rowState, rowActions) { openFamily = it }
-            GroupHeading(stringRes(R.string.dictate__local_models_more))
-            ModelRows(rest, rowState, rowActions) { openFamily = it }
-        } else {
-            ModelRows(visible, rowState, rowActions) { openFamily = it }
-        }
+        // One list, in catalog order, with only the live models set apart. Ordered there by what most
+        // people will want rather than by architecture, so the small broadly-useful models come first
+        // and Whisper sits at the bottom.
+        ModelRows(LocalModelCatalog.visibleTopLevel(installed), rowState, rowActions) { openFamily = it }
     }
 
     openFamily?.let { entry ->
@@ -313,12 +281,3 @@ private fun ModelRows(
     }
 }
 
-/** A section heading in the model list, in the same weight as the "Live" one. */
-@Composable
-private fun GroupHeading(text: String, topPadding: Dp = 16.dp) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.titleSmall,
-        modifier = Modifier.padding(top = topPadding, bottom = 4.dp),
-    )
-}
