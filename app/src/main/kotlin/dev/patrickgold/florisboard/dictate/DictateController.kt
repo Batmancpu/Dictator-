@@ -1109,8 +1109,29 @@ object DictateController {
 
     /** Aborts a recognition recording without transcribing (the caller cancelled). */
     fun cancelRecognition() {
+        // A resend (#409) has no recording left to stop — what is in flight is the request itself, and
+        // leaving the voice-input view has to take it with it rather than pay for an answer nobody is
+        // registered to receive any more (issue #192's rule). Both calls no-op outside their own state.
+        cancelTranscription()
         cancelRecording()
     }
+
+    /**
+     * Re-sends the audio kept from a failed voice-input dictation (issue #409), so the minimal voice-input
+     * view can offer the same one-tap retry the keyboard's error chip has. The output latch is re-claimed
+     * first: the failure left it on [OutputTarget.RECOGNITION_SERVICE], but a keyboard action in between
+     * may have moved it, and the retried transcript has to reach the caller through the bridge like the
+     * first attempt did. Returns whether a resend was started.
+     */
+    fun resendRecognition(context: Context): Boolean {
+        if (!hasRetainedAudio()) return false
+        outputTarget = OutputTarget.RECOGNITION_SERVICE
+        sendRetainedAudio(context)
+        return true
+    }
+
+    /** Whether a usable recording is being kept for a one-tap resend (drives the retry affordances). */
+    fun hasRetainedAudio(): Boolean = retained?.file?.let { it.exists() && it.length() > 0L } == true
 
     /** Aborts an in-progress recording and returns to idle (cancel button / leaving the keyboard). */
     fun cancelRecording(keepBarForMs: Long = 0L) {
@@ -1527,6 +1548,8 @@ object DictateController {
         }
         pendingTranscriptionDir(context).deleteRecursively()
         if (!claimed.exists() || claimed.length() == 0L) return false
+        // The keyboard is the one picking this file up, on its own field (issue #409).
+        claimKeyboardOutput()
         // A deliberately picked file is transcribed as-is (no silence gate — see issue #93).
         transcribe(context, claimed, gate = false, source = DictateHistorySource.IMPORT)
         return true
@@ -3032,6 +3055,27 @@ object DictateController {
             )
 
     /**
+     * Claims the output latch for the keyboard, for an action the *keyboard* started.
+     *
+     * [outputTarget] is set by every start and never reset (see [foreignDictationInFlight]), so after a
+     * single floating-button or system-voice-input dictation it keeps pointing at the accessibility sink
+     * or the recognition bridge for the rest of the process's life. A later keyboard action that reads
+     * and writes the field through [sink] then works on a surface that is no longer there, and does it
+     * silently: [RecognitionSink] reports an empty selection and an empty field, so a prompt sees nothing
+     * to rewrite and returns, and a re-insert hands its text to a bridge with no receiver left. Both look
+     * exactly like a dead button (issue #409) — the report this fixes described it as "takes no action
+     * unless audio was transcribed in that session", which is precisely the moment the latch is IME again.
+     *
+     * A foreign dictation that is genuinely in flight keeps the latch: it owns the output it is about to
+     * produce, and taking it away mid-flight would deliver that text into the keyboard's field instead
+     * (the ownership rule from issue #293).
+     */
+    private fun claimKeyboardOutput() {
+        if (foreignDictationInFlight()) return
+        outputTarget = OutputTarget.IME
+    }
+
+    /**
      * The floating button's service is going away (switched off in the system settings, unbound by the
      * system) while it owns a dictation. Nobody is left to show or inject it, so it is finalized and kept
      * here — the duty the keyboard used to discharge by accident, now carried by the owner (#293). No-op
@@ -3211,6 +3255,7 @@ object DictateController {
         if (!prefs.dictate.rememberLastDictation.get()) return
         val text = prefs.dictate.lastDictation.get()
         if (text.isEmpty()) return
+        claimKeyboardOutput()
         sink(context).commitText(text)
         clearError()
     }
@@ -3378,7 +3423,7 @@ object DictateController {
             _state.value is UiState.Rewording
         ) return
         if (text.isEmpty()) return
-        outputTarget = OutputTarget.IME
+        claimKeyboardOutput()
         sink(context).commitText(text)
         clearError()
     }
@@ -3401,7 +3446,7 @@ object DictateController {
         if (!src.exists() || src.length() == 0L) return
         val temp = File(context.cacheDir, "dictate_history_replay.${src.extension.ifEmpty { "wav" }}")
         runCatching { src.copyTo(temp, overwrite = true) }.getOrElse { return }
-        outputTarget = OutputTarget.IME
+        claimKeyboardOutput()
         clearError()
         // A failed entry's first successful re-transcribe SHOULD count stats (it was never counted); an
         // already-successful entry's re-transcribe must not double-count → isReplay only when not failed.
@@ -3632,8 +3677,10 @@ object DictateController {
         // machine that is already coming up instead of one that has not been told yet.
         warmUpRewordingServer()
         // The floating overlay passes OVERLAY so the result is injected into the focused field via the
-        // accessibility sink rather than the keyboard's editor.
-        if (target != null) outputTarget = target
+        // accessibility sink rather than the keyboard's editor. Every other caller is a keyboard surface
+        // (the Smartbar strip, the always-on row, the prompt panel) and says so, rather than inheriting
+        // whichever surface dictated last — see [claimKeyboardOutput].
+        if (target != null) outputTarget = target else claimKeyboardOutput()
         val appContext = context.applicationContext
         val sink = sink(appContext)
         val raw = prompt.prompt.orEmpty()

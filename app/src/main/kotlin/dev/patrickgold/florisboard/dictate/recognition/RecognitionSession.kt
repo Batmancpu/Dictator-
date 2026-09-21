@@ -94,6 +94,23 @@ class RecognitionSession(
         }
     }
 
+    /**
+     * Re-sends the audio kept from a failed attempt instead of capturing a new one (issue #409), so the
+     * voice-input surfaces can offer the retry the keyboard's error chip already has. No endpointing
+     * watchdog runs — nothing is being recorded — and the outcome still arrives through [onOutcome], so
+     * the host sees the same callbacks a spoken attempt produces. Returns false when nothing is kept.
+     */
+    fun resend(): Boolean {
+        RecognitionBridge.register(this)
+        if (!DictateController.resendRecognition(appContext)) {
+            RecognitionBridge.unregister(this)
+            return false
+        }
+        // The recording is already over; a host drawing a level meter must not be left waiting for speech.
+        host.onEndOfSpeech()
+        return true
+    }
+
     /** Stop capturing and transcribe; the outcome arrives asynchronously via [onOutcome]. */
     fun stop() {
         if (stopping || completed) return
