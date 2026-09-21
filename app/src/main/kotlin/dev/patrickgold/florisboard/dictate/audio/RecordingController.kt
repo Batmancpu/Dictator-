@@ -15,6 +15,9 @@ import android.content.Context
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import android.os.SystemClock
+import android.util.Log
+import kotlinx.coroutines.delay
 import java.io.File
 import java.io.RandomAccessFile
 
@@ -32,13 +35,24 @@ import java.io.RandomAccessFile
  */
 class RecordingController(private val context: Context) {
 
-    private var record: AudioRecord? = null
+    // Read by the capture thread on every pass rather than captured once, so [swapSource] can put a
+    // different microphone underneath a running recording (#411). Null means a swap is in flight.
+    @Volatile private var record: AudioRecord? = null
     private var thread: Thread? = null
     private var raf: RandomAccessFile? = null
     // Serializes access to [raf]/[pcmBytes] between the capture thread's per-frame write and a caller's
     // [rotate]/[stop], so a mid-recording segment cut can never race with a frame write.
     private val fileLock = Any()
+    // Serializes handing [record] over — between a [swapSource] installing a new recorder and a [stop]
+    // taking the current one away — so a swap that finishes after a stop can never leak a live mic.
+    private val sourceLock = Any()
     private var segmentSeq = 0
+    /** The source the running capture was acquired with; the fallback when a swap cannot be routed. */
+    @Volatile private var activeSource = MediaRecorder.AudioSource.MIC
+    private var bufferSize = 0
+    private var captureLost: ((reason: String) -> Unit)? = null
+    /** Longest unbroken stretch of all-zero frames in this recording; see the capture loop. */
+    @Volatile private var longestSilentMs = 0L
     @Volatile private var recording = false
     @Volatile private var paused = false
     @Volatile private var pcmBytes = 0L
@@ -53,8 +67,9 @@ class RecordingController(private val context: Context) {
         get() = recording
 
     /**
-     * Starts a new recording. Throws if the microphone cannot be acquired (e.g. permission missing or
-     * another app holds it). On failure everything is released so the controller stays usable.
+     * Starts a new recording. A microphone that is momentarily busy is waited out (see [acquire]); this
+     * throws only once it stays unavailable, and on failure everything is released so the controller
+     * stays usable.
      *
      * [audioSource] defaults to the local mic; pass [MediaRecorder.AudioSource.VOICE_COMMUNICATION]
      * when recording is routed through a Bluetooth SCO headset.
@@ -64,21 +79,22 @@ class RecordingController(private val context: Context) {
      * (so the batch path / fallback / resend flows are intact). The buffer is reused after the callback
      * returns, so consumers must synchronously copy/encode/queue the first [len] bytes if they need to keep
      * them. Called on the capture thread; keep it non-blocking (hand the bytes to a queue/socket and return).
+     *
+     * [onCaptureLost] is invoked (on the capture thread) when the microphone has stopped delivering real
+     * audio, with the reason as `"readError"` or `"silence"` — see the capture loop for what each one
+     * means and why both are needed. The owner's job is then to re-route and [swapSource], or to end the
+     * dictation; see #411.
      */
-    @SuppressLint("MissingPermission") // caller holds RECORD_AUDIO; an init failure is handled below.
-    fun start(
+    suspend fun start(
         audioSource: Int = MediaRecorder.AudioSource.MIC,
         pcmSink: ((pcm16: ByteArray, len: Int) -> Unit)? = null,
+        onCaptureLost: ((reason: String) -> Unit)? = null,
     ) {
         if (recording) return
         val minBuf = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL, ENCODING)
         require(minBuf > 0) { "AudioRecord unavailable on this device" }
         val bufferSize = minBuf * 2
-        val rec = AudioRecord(audioSource, SAMPLE_RATE, CHANNEL, ENCODING, bufferSize)
-        if (rec.state != AudioRecord.STATE_INITIALIZED) {
-            runCatching { rec.release() }
-            error("AudioRecord failed to initialize")
-        }
+        val rec = acquire(audioSource, bufferSize) ?: error("AudioRecord failed to initialize")
         val file = File(context.cacheDir, AUDIO_FILE_NAME)
         val out = try {
             RandomAccessFile(file, "rw").apply {
@@ -96,11 +112,45 @@ class RecordingController(private val context: Context) {
         peak = 0
         paused = false
         recording = true
+        activeSource = audioSource
+        this.bufferSize = bufferSize
+        captureLost = onCaptureLost
+        longestSilentMs = 0L
         rec.startRecording()
         thread = Thread {
             val buf = ByteArray(bufferSize)
+            // When the first of an unbroken run of failed reads happened, or 0 while frames are arriving.
+            var failingSince = 0L
+            // The same, for frames that arrive but contain nothing but zeros.
+            var silentSince = 0L
+            // Start of the current run of all-zero frames, for [longestSilentMs]. Unlike [silentSince]
+            // this is only cleared by real audio, never by the trigger firing.
+            var silentRunStart = 0L
             while (recording) {
-                val n = rec.read(buf, 0, buf.size)
+                val current = record
+                if (current == null) {
+                    // A source swap is in flight. The loop parks instead of exiting, so the WAV, the peak
+                    // meter and the PCM sink all stay attached across the handover.
+                    runCatching { Thread.sleep(SWAP_PARK_MS) }
+                    continue
+                }
+                val n = runCatching { current.read(buf, 0, buf.size) }
+                    .getOrDefault(AudioRecord.ERROR_INVALID_OPERATION)
+                if (n < 0) {
+                    // A microphone that is going away does not block, it fails — so a loop that only looks
+                    // at `n > 0` spins at full speed while the recording fills with nothing. Judge it by
+                    // how long the failures have lasted, never by how many there were: their rate is a
+                    // property of the error path, not of the problem.
+                    val now = SystemClock.elapsedRealtime()
+                    if (failingSince == 0L) failingSince = now
+                    runCatching { Thread.sleep(READ_ERROR_BACKOFF_MS) }
+                    if (now - failingSince >= READ_ERROR_GRACE_MS) {
+                        failingSince = 0L // re-arm, so a handover that also fails is reported again
+                        captureLost?.let { lost -> runCatching { lost("readError") } }
+                    }
+                    continue
+                }
+                failingSince = 0L
                 // Keep reading while paused (so the mic buffer never overflows) but drop the samples.
                 if (n > 0 && !paused) {
                     // Write under the lock so a concurrent rotate() sees a consistent raf/pcmBytes and the
@@ -109,12 +159,131 @@ class RecordingController(private val context: Context) {
                         runCatching { raf?.write(buf, 0, n) }
                         pcmBytes += n
                     }
-                    updatePeak(buf, n)
+                    val framePeak = framePeak(buf, n)
+                    if (framePeak > peak) peak = framePeak
                     if (pcmSink != null) runCatching { pcmSink(buf, n) }
+                    // The failure mode a Bluetooth headset actually has (#411, measured on an A55): the
+                    // route does not error and does not stop, it keeps handing over frames of **exact
+                    // zeros** for as long as it takes the platform to re-route on its own — eight seconds
+                    // in the case that prompted this. Nothing upstream can tell that from a quiet room,
+                    // which is why the recording used to run on and the dictation lost its middle.
+                    //
+                    // Exact zeros are the tell. A microphone that is actually listening delivers its own
+                    // noise floor: even in silence some sample is non-zero within a frame. A whole frame
+                    // of zeros is a route that is not connected to a microphone at all.
+                    if (framePeak == 0) {
+                        val now = SystemClock.elapsedRealtime()
+                        if (silentRunStart == 0L) silentRunStart = now
+                        // Measured separately from the trigger below, which restarts its window each time
+                        // it fires: this one only ends when real audio comes back, so it can answer
+                        // "was that one dead stretch or several ordinary pauses" even when nothing fired.
+                        val runMs = now - silentRunStart
+                        if (runMs > longestSilentMs) longestSilentMs = runMs
+                        if (silentSince == 0L) silentSince = now
+                        if (now - silentSince >= DEAD_ROUTE_SILENCE_MS) {
+                            silentSince = 0L
+                            captureLost?.let { lost -> runCatching { lost("silence") } }
+                        }
+                    } else {
+                        silentSince = 0L
+                        silentRunStart = 0L
+                    }
+                } else if (paused) {
+                    // A pause is not a dead route, and the samples it drops must not age the window
+                    // either — without this, resuming after a long pause reports silence immediately.
+                    silentSince = 0L
                 }
             }
         }.also { it.start() }
     }
+
+    /**
+     * Acquires an [AudioRecord], retrying a busy microphone instead of failing the dictation on the first
+     * refusal (#411).
+     *
+     * The audio service hands the microphone over rather than sharing it, so for a few hundred milliseconds
+     * after something else lets go — another app, a call that just ended, our own previous recorder — the
+     * constructor returns an object that is simply not initialized. A single attempt turns that window into
+     * a failed dictation whose only remedy is tapping again, which is exactly what this does, faster and
+     * without the user having to notice. Returns null once the window has clearly not been the problem.
+     *
+     * The uninitialized object is released before every retry: it still holds the native record, and
+     * leaving it to the garbage collector is what makes the *next* attempt fail too.
+     */
+    @SuppressLint("MissingPermission") // caller holds RECORD_AUDIO; a null return is handled by the caller.
+    private suspend fun acquire(audioSource: Int, bufferSize: Int): AudioRecord? {
+        repeat(ACQUIRE_ATTEMPTS) { attempt ->
+            val rec = runCatching {
+                AudioRecord(audioSource, SAMPLE_RATE, CHANNEL, ENCODING, bufferSize)
+            }.getOrNull()
+            if (rec != null && rec.state == AudioRecord.STATE_INITIALIZED) return rec
+            runCatching { rec?.release() }
+            if (attempt < ACQUIRE_ATTEMPTS - 1) delay(ACQUIRE_RETRY_MS)
+        }
+        return null
+    }
+
+    /**
+     * Puts a different microphone underneath the running recording, without stopping it (#411).
+     *
+     * This works because the capture format never depends on the source: every route is read as 16 kHz
+     * mono PCM16, so the frames after the handover belong in the same WAV as the ones before it, and a
+     * realtime session that is being fed from [start]'s `pcmSink` keeps receiving exactly what it expects.
+     * No segment cut, no join, no new stream — the only cost is the fraction of a second of speech that
+     * falls between the old recorder stopping and the new one starting.
+     *
+     * Falls back to the source the recording is currently on when [newSource] cannot be acquired, because
+     * a route that still works is better than none. Returns false only when no microphone could be
+     * acquired at all; everything captured so far is intact in the WAV, and the caller is expected to end
+     * the dictation rather than let it run on silence.
+     */
+    suspend fun swapSource(newSource: Int): Boolean {
+        if (!recording) return false
+        val size = bufferSize
+        val previous = activeSource
+        // Park the capture loop first, then take the old recorder down: a read still in flight returns as
+        // soon as the native recorder stops, and the loop will not touch a released object afterwards.
+        val old = synchronized(sourceLock) { record.also { record = null } }
+        runCatching { old?.stop() }
+        runCatching { old?.release() }
+        var source = newSource
+        var rec = acquire(newSource, size)
+        if (rec == null && newSource != previous) {
+            source = previous
+            rec = acquire(previous, size)
+        }
+        val installed = rec ?: return false
+        // Cheap pre-check before the microphone is actually opened: a stop that landed while we were
+        // acquiring makes this recorder pointless, and starting it first would open the mic for the
+        // moment it takes to notice. The check under the lock below is the authoritative one.
+        if (!recording) {
+            runCatching { installed.release() }
+            return false
+        }
+        if (runCatching { installed.startRecording() }.isFailure) {
+            runCatching { installed.release() }
+            return false
+        }
+        return synchronized(sourceLock) {
+            // A stop that landed while we were acquiring wins: install nothing and release, or the
+            // microphone stays open past the end of the dictation.
+            if (!recording) {
+                runCatching { installed.stop() }
+                runCatching { installed.release() }
+                false
+            } else {
+                activeSource = source
+                record = installed
+                true
+            }
+        }
+    }
+
+    /**
+     * The id of the input device the running capture is actually routed to, or null if the platform has
+     * not settled on one yet. Used to tell a removal that concerns this recording from one that does not.
+     */
+    fun routedInputDeviceId(): Int? = runCatching { record?.routedDevice?.id }.getOrNull()
 
     /**
      * Cuts the current segment WITHOUT stopping the microphone (long-form segmented dictation, issue
@@ -161,11 +330,17 @@ class RecordingController(private val context: Context) {
     fun stop(): File? {
         if (!recording) return null
         recording = false
+        captureLost = null // nothing to rescue any more; a failing read must not reach the owner now
+        // Logged here rather than by the owner because every stop path goes through this one method.
+        // The tag is DictateController's, deliberately: this belongs in the same stream as the rest of a
+        // dictation's diagnostics, and a second tag would mean grepping two logs to reconstruct one run.
+        Log.i("DictateLatency", "phase=captureSummary longestSilentMs=$longestSilentMs source=$activeSource")
         // AudioRecord.read(byte[], …) is blocking. Stop the native recorder first so a read waiting for
         // microphone frames returns before we join the capture thread. On the normal path, release only
         // after the reader exits; if stop fails, release early so the microphone still cannot leak.
-        val rec = record
-        record = null
+        // Under the lock, and after `recording` is already false, so a [swapSource] racing this stop
+        // either hands its recorder over here or finds the recording finished and releases it itself.
+        val rec = synchronized(sourceLock) { record.also { record = null } }
         val stopped = rec != null && runCatching { rec.stop() }.isSuccess
         if (!stopped) runCatching { rec?.release() }
         runCatching { thread?.join() }
@@ -212,8 +387,13 @@ class RecordingController(private val context: Context) {
         outputFile?.delete()
     }
 
-    private fun updatePeak(buf: ByteArray, length: Int) {
-        var max = peak
+    /**
+     * Peak |sample| of this frame alone (0..32767). Per frame rather than accumulated into [peak],
+     * because a frame's own peak of exactly 0 is what identifies a route that has stopped carrying
+     * audio, and an accumulated maximum would hide it behind the last frame that still had speech.
+     */
+    private fun framePeak(buf: ByteArray, length: Int): Int {
+        var max = 0
         var i = 0
         while (i + 1 < length) {
             val sample = (buf[i].toInt() and 0xff) or (buf[i + 1].toInt() shl 8) // little-endian PCM16
@@ -221,7 +401,7 @@ class RecordingController(private val context: Context) {
             if (abs > max) max = abs
             i += 2
         }
-        peak = max.coerceAtMost(32767)
+        return max.coerceAtMost(32767)
     }
 
     private fun wavHeader(dataLen: Long): ByteArray =
@@ -235,5 +415,20 @@ class RecordingController(private val context: Context) {
         private const val CHANNELS = 1
         private const val BITS_PER_SAMPLE = 16
         private const val WAV_HEADER_SIZE = AudioWav.HEADER_SIZE
+        /** Roughly half a second of patience for a busy microphone, then the start genuinely failed. */
+        private const val ACQUIRE_ATTEMPTS = 5
+        private const val ACQUIRE_RETRY_MS = 120L
+        /** How long the capture loop sleeps while a source swap installs the next recorder. */
+        private const val SWAP_PARK_MS = 5L
+        /** Failing reads return instantly, so the loop has to slow itself down rather than spin. */
+        private const val READ_ERROR_BACKOFF_MS = 20L
+        /** Long enough that a hiccup between two frames is not mistaken for a microphone that is gone. */
+        private const val READ_ERROR_GRACE_MS = 400L
+        /**
+         * How long a route may deliver nothing but exact zeros before it is treated as disconnected.
+         * Generous on purpose: the cost of being wrong is a sub-second gap in the recording, but the
+         * cost of being trigger-happy would be a handover in the middle of a deliberate pause.
+         */
+        private const val DEAD_ROUTE_SILENCE_MS = 1_500L
     }
 }
