@@ -13,6 +13,7 @@ package dev.patrickgold.florisboard.dictate.provider
 import android.content.Context
 import com.k2fsa.sherpa.onnx.FeatureConfig
 import com.k2fsa.sherpa.onnx.OfflineCanaryModelConfig
+import com.k2fsa.sherpa.onnx.OfflineDolphinModelConfig
 import com.k2fsa.sherpa.onnx.OfflineModelConfig
 import com.k2fsa.sherpa.onnx.OfflineRecognizer
 import com.k2fsa.sherpa.onnx.OfflineRecognizerConfig
@@ -423,9 +424,10 @@ private object RecognizerCache {
 
         // Language is baked into the Whisper and Canary configs at build time, so it is part of the cache
         // key (switching the input language rebuilds the recognizer; ~1s). A transducer decodes the audio
-        // as-is and ignores the language, so it stays out of the key for those.
-        val cacheKey = modelDir.absolutePath + "|" +
-            (if (kind == LocalModelKind.NEMO_TRANSDUCER) "" else language)
+        // as-is and ignores the language, and Dolphin's config has no language field at all, so it stays
+        // out of the key for those — otherwise switching languages would throw the model away for nothing.
+        val languageless = kind == LocalModelKind.NEMO_TRANSDUCER || kind == LocalModelKind.DOLPHIN
+        val cacheKey = modelDir.absolutePath + "|" + (if (languageless) "" else language)
         val existing = recognizer
         val rec = if (existing != null && cacheKey == key) {
             existing
@@ -536,6 +538,15 @@ private object RecognizerCache {
                     // keyboard should paste into a text field.
                     useInverseTextNormalization = true,
                 ),
+                tokens = tokens.absolutePath,
+                numThreads = numThreads,
+            )
+            // Dolphin (issue #406): the same single-file shape as SenseVoice, but its config has no
+            // language field at all — it neither detects on request nor can be told, it simply decodes.
+            // So unlike Canary there is no way to hand it the wrong language, and unlike SenseVoice
+            // there is nothing to pass through; the input language is irrelevant here.
+            LocalModelKind.DOLPHIN -> OfflineModelConfig(
+                dolphin = OfflineDolphinModelConfig(model = model.absolutePath),
                 tokens = tokens.absolutePath,
                 numThreads = numThreads,
             )

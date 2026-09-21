@@ -42,6 +42,12 @@ enum class LocalModelKind {
      * encoder/decoder pair at all — just one model file next to the tokens.
      */
     SENSE_VOICE,
+
+    /**
+     * Dolphin's CTC branch: the same single-file shape as [SENSE_VOICE], but its config has no language
+     * field at all — it is neither told a language nor offered "auto", it simply decodes.
+     */
+    DOLPHIN,
 }
 
 /**
@@ -466,6 +472,49 @@ object LocalModelCatalog {
     )
 
     /**
+     * ~105 MB. Dolphin base (issue #406) — the languages this catalog had no answer for: Hindi, Arabic,
+     * Persian, Thai, Vietnamese, Indonesian, Bengali, Tamil, Urdu, Burmese, Khmer, Lao and the rest of
+     * DataoceanAI and Tsinghua's 40 Eastern languages, trained on 210 000 h, for less than a Whisper Base.
+     *
+     * The gap was not theoretical. Handed natural Hindi, the Whisper Base most people install answers in
+     * **Urdu script** and stops halfway; Dolphin returns correct Devanagari with the question mark in
+     * place. It punctuates in Arabic and CJK too.
+     *
+     * **English is deliberately absent from [languages], and that is not an oversight.** `<en>` exists
+     * in the export's vocabulary but not in Dolphin's documented list, and on real English speech it
+     * answers in Urdu script — so this is a specialist like [FASTCONFORMER_DE] or [GIGAAM_V3_RU], just
+     * one with thirty-nine languages instead of one. Naming them is what keeps someone from picking it
+     * for a language it was never trained on. `ct` in Dolphin's own table is Yue Chinese, carried here
+     * under the ISO code `yue` that the rest of the catalog already uses.
+     *
+     * Its config has only a model path — no language field, not even "auto" — so unlike Canary it can
+     * neither be told a language nor be told wrong. That is also why it fits [LocalModelKind.DOLPHIN]
+     * rather than needing anything from the input-language setting.
+     *
+     * Licensing: Apache-2.0, stated in the export's own README rather than only on a web page; the
+     * sherpa-onnx export is Apache-2.0 as well. Only the CTC branch is exported.
+     */
+    val DOLPHIN_BASE = LocalModelSpec(
+        id = "dolphin-base",
+        displayName = "Dolphin Base",
+        languages = listOf(
+            "ar", "az", "ba", "bn", "fa", "fil", "gu", "hi", "id", "ja", "jv", "kab", "kk", "km", "ko",
+            "ks", "ky", "lo", "mn", "mr", "ms", "my", "ne", "or", "pa", "ps", "ru", "si", "su", "ta",
+            "te", "tg", "th", "tl", "ug", "ur", "uz", "vi", "yue", "zh",
+        ),
+        punctuates = true,
+        credit = ModelCredit(
+            "DataoceanAI / Tsinghua University", "Apache-2.0", "https://github.com/DataoceanAI/Dolphin",
+        ),
+        kind = LocalModelKind.DOLPHIN,
+        files = listOf(
+            LocalModelFile("$REL/dolphin-base-model.int8.onnx", LocalTranscriptionProvider.MODEL, 103_729_802, "a3aa46c97f3f60f135ff949793cb05fabe7a0b3c484dc2e3cc699d354ee11b76"),
+            LocalModelFile("$REL/dolphin-base-tokens.txt", LocalTranscriptionProvider.TOKENS, 504_662, "c3788261a51df1899ea4b210b552cd42139204de72c0ad60f6cebb199078872e"),
+            VAD_FILE,
+        ),
+    )
+
+    /**
      * ~232 MB. GigaAM v3 Russian (issue #406) — [GIGAAM_V2_RU]'s successor: slightly smaller, and the
      * first Russian in this catalog that writes punctuation and normalises numbers (the upstream
      * `v3_e2e_rnnt` line; the plain v3 without `punct` in its name does neither).
@@ -748,6 +797,7 @@ object LocalModelCatalog {
         PARAKEET_TDT_V3,
         FASTCONFORMER_DE,
         SENSE_VOICE_SMALL,
+        DOLPHIN_BASE,
         GIGAAM_V3_RU,
         GIGAAM_V2_RU,
         PARAKEET_PRIMELINE_DE,

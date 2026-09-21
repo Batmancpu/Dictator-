@@ -72,8 +72,8 @@ class LocalModelCatalogTest {
                         "${spec.id} is a transducer and needs encoder, decoder and joiner",
                     )
                 }
-                // SenseVoice (#262): one non-autoregressive file, no encoder/decoder pair at all.
-                LocalModelKind.SENSE_VOICE -> {
+                // SenseVoice (#262) and Dolphin (#406): one file, no encoder/decoder pair at all.
+                LocalModelKind.SENSE_VOICE, LocalModelKind.DOLPHIN -> {
                     assertTrue(model in files, "${spec.id} needs its single model file")
                     assertTrue(
                         encoder !in files && decoder !in files && joiner !in files,
@@ -293,6 +293,13 @@ class LocalModelCatalogTest {
         assertTrue(LocalModelCatalog.FASTCONFORMER_DE.punctuates)
         assertTrue(LocalModelCatalog.GIGAAM_V3_RU.punctuates)
         assertTrue(LocalModelCatalog.KROKO_EN.punctuates)
+        assertTrue(LocalModelCatalog.DOLPHIN_BASE.punctuates)
+        // Dolphin's export carries an <en> token but Dolphin does not claim English, and on real English
+        // speech it answers in Urdu script. Naming it here would send people to a model that cannot.
+        assertTrue(
+            "en" !in LocalModelCatalog.DOLPHIN_BASE.languages,
+            "Dolphin must not be offered for English",
+        )
         // The one model in the catalog that writes none — and the reason v3 was added beside it.
         assertTrue(!LocalModelCatalog.GIGAAM_V2_RU.punctuates)
     }

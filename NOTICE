@@ -47,6 +47,9 @@ distribution. They are mirrored unmodified on the project's GitHub releases.
     NVIDIA Canary 180M Flash — https://huggingface.co/nvidia/canary-180m-flash
     (CC-BY-4.0)
     GigaAM v2 and v3 Russian — https://github.com/salute-developers/GigaAM (MIT)
+    Dolphin base (40 Eastern languages) — Copyright DataoceanAI and Tsinghua
+    University — https://github.com/DataoceanAI/Dolphin (Apache-2.0). Only the
+    CTC branch is exported.
 
     SenseVoice Small (Chinese, Cantonese, English, Japanese, Korean)
     Copyright Alibaba Group — https://github.com/FunAudioLLM/SenseVoice
