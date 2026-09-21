@@ -1573,6 +1573,8 @@
     <string name="dictate__local_model_none_selected">Encara no s’ha baixat cap model</string>
     <string name="dictate__local_model_delete_confirm">Vols eliminar «{model}»? El pots tornar a baixar més tard.</string>
     <string name="dictate__local_model_not_installed_error">Cap model local baixat</string>
+    <string name="dictate__local_model_family_installed">{count} de {total} instal·lats</string>
+    <string name="dictate__local_model_family_open">Mostra les variants</string>
     <plurals name="dictate__local_model_languages">
         <item quantity="one">{count} idioma</item>
         <item quantity="other">{count} idiomes</item>

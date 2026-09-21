@@ -1635,6 +1635,8 @@
     <string name="dictate__local_model_none_selected">まだモデルがダウンロードされていません</string>
     <string name="dictate__local_model_delete_confirm">「{model}」を削除しますか？後でもう一度ダウンロードできます。</string>
     <string name="dictate__local_model_not_installed_error">端末内モデルがありません</string>
+    <string name="dictate__local_model_family_installed">{total} 件中 {count} 件インストール済み</string>
+    <string name="dictate__local_model_family_open">バリエーションを表示</string>
     <plurals name="dictate__local_model_languages">
         <item quantity="other">{count}言語</item>
     </plurals>

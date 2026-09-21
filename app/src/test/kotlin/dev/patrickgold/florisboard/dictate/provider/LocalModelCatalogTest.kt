@@ -190,6 +190,29 @@ class LocalModelCatalogTest {
     }
 
     @Test
+    fun `the top level covers every model exactly once, in catalog order`() {
+        val flattened = LocalModelCatalog.topLevel.flatMap { entry ->
+            when (entry) {
+                is LocalModelEntry.Single -> listOf(entry.spec)
+                is LocalModelEntry.Family -> entry.members
+            }
+        }
+        assertEquals(LocalModelCatalog.all, flattened, "the picker would show a model twice or not at all")
+        assertEquals(
+            LocalModelCatalog.all.count { it.family == null } + LocalModelFamily.entries.size,
+            LocalModelCatalog.topLevel.size,
+            "a family is not being folded into exactly one row",
+        )
+    }
+
+    /** The "Live" heading is placed in front of the first streaming *row*, so the tail has to hold here too. */
+    @Test
+    fun `the top level keeps the streaming rows as a contiguous tail`() {
+        val fromFirstStreaming = LocalModelCatalog.topLevel.dropWhile { !it.isStreaming }
+        assertTrue(fromFirstStreaming.all { it.isStreaming }, "a one-shot row sits under the Live heading")
+    }
+
+    @Test
     fun `every model says which languages it covers, in codes that resolve to a name`() {
         for (spec in LocalModelCatalog.all) {
             assertTrue(spec.languages.isNotEmpty(), "${spec.id} does not say what it transcribes")

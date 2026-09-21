@@ -67,6 +67,29 @@ enum class LocalModelFamily(val displayName: String) {
 }
 
 /**
+ * One row of the picker's first level: a model that stands on its own, or a family standing in for the
+ * variants behind it.
+ *
+ * A view over [LocalModelCatalog.all], never a replacement for it — `all` stays the authority on what
+ * is installed and which recognizer to build.
+ */
+sealed interface LocalModelEntry {
+    val isStreaming: Boolean
+
+    data class Single(val spec: LocalModelSpec) : LocalModelEntry {
+        override val isStreaming: Boolean get() = spec.isStreaming
+    }
+
+    data class Family(
+        val family: LocalModelFamily,
+        val members: List<LocalModelSpec>,
+    ) : LocalModelEntry {
+        /** A family is all live or none of it, which a test holds it to, so the first member decides. */
+        override val isStreaming: Boolean get() = members.first().isStreaming
+    }
+}
+
+/**
  * A selectable on-device model (issue #104). [id] doubles as the install directory name and the value
  * stored in [ProviderAccount.transcriptionModel] for the local provider.
  */
@@ -743,6 +766,28 @@ object LocalModelCatalog {
             "en" -> listOf(PARAKEET_TDT_110M_EN, WHISPER_SMALL_EN)
             else -> listOf(WHISPER_BASE, WHISPER_SMALL)
         }
+
+    /**
+     * [all] folded into the rows the picker's first level shows: a family appears once, in the place of
+     * its first member, and everything else stands for itself. Twenty-four entries become nine.
+     *
+     * Order is [all]'s, which is what keeps the streaming rows a contiguous tail and the "Live" heading
+     * where it belongs. Relies on a family's members sitting next to each other — asserted by a test,
+     * because getting it wrong here would scatter a family across the list rather than fail loudly.
+     */
+    val topLevel: List<LocalModelEntry> by lazy {
+        val out = mutableListOf<LocalModelEntry>()
+        val seen = mutableSetOf<LocalModelFamily>()
+        for (spec in all) {
+            val family = spec.family
+            if (family == null) {
+                out += LocalModelEntry.Single(spec)
+            } else if (seen.add(family)) {
+                out += LocalModelEntry.Family(family, all.filter { it.family == family })
+            }
+        }
+        out
+    }
 
     /** Which recognizer [id] needs; unknown ids (a leftover pref) fall back to the Whisper shape. */
     fun kindOf(id: String): LocalModelKind = byId(id)?.kind ?: LocalModelKind.WHISPER

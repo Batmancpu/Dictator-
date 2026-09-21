@@ -1603,6 +1603,8 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__local_model_none_selected">Nog geen model gedownload</string>
     <string name="dictate__local_model_delete_confirm">“{model}” verwijderen? Je kunt het later opnieuw downloaden.</string>
     <string name="dictate__local_model_not_installed_error">Geen lokaal model gedownload</string>
+    <string name="dictate__local_model_family_installed">{count} van {total} geïnstalleerd</string>
+    <string name="dictate__local_model_family_open">Varianten tonen</string>
     <plurals name="dictate__local_model_languages">
         <item quantity="one">{count} taal</item>
         <item quantity="other">{count} talen</item>

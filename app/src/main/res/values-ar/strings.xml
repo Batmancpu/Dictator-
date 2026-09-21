@@ -1561,6 +1561,8 @@
     <string name="dictate__local_model_none_selected">لم يتم تنزيل أي نموذج بعد</string>
     <string name="dictate__local_model_delete_confirm">حذف ”{model}“؟ يمكنك تنزيله مرة أخرى لاحقًا.</string>
     <string name="dictate__local_model_not_installed_error">لا يوجد نموذج محلي مُنزَّل</string>
+    <string name="dictate__local_model_family_installed">{count} من {total} مثبت</string>
+    <string name="dictate__local_model_family_open">عرض الإصدارات</string>
     <plurals name="dictate__local_model_languages">
         <item quantity="zero">{count} لغة</item>
         <item quantity="one">{count} لغة</item>

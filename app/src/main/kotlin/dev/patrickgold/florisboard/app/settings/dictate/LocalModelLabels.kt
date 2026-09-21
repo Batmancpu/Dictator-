@@ -38,16 +38,28 @@ private const val NAMED_LANGUAGE_LIMIT = 5
 
 /** "German", "English, German, French, Spanish", "99 languages". */
 @Composable
-fun modelLanguagesLabel(spec: LocalModelSpec): String =
-    if (spec.languages.size <= NAMED_LANGUAGE_LIMIT) {
-        spec.languages.joinToString(", ") { DictateLanguages.displayNameOf(it) }
+fun languagesLabel(codes: List<String>): String =
+    if (codes.size <= NAMED_LANGUAGE_LIMIT) {
+        codes.joinToString(", ") { DictateLanguages.displayNameOf(it) }
     } else {
-        pluralsRes(
-            R.plurals.dictate__local_model_languages,
-            spec.languages.size,
-            "count" to spec.languages.size,
-        )
+        pluralsRes(R.plurals.dictate__local_model_languages, codes.size, "count" to codes.size)
     }
+
+/** [languagesLabel] for one model. */
+@Composable
+fun modelLanguagesLabel(spec: LocalModelSpec): String = languagesLabel(spec.languages)
+
+/**
+ * The size of a family's variants as a range — "99–358 MB". Collapses to a single figure when every
+ * member is the same size, which no family is today but a two-member one easily could be.
+ */
+fun sizeRangeLabel(specs: List<LocalModelSpec>): String {
+    val min = specs.minOf { it.totalBytes }
+    val max = specs.maxOf { it.totalBytes }
+    if (min == max) return modelSizeLabel(min)
+    // An en dash, and no space around it: this is a range, not a subtraction.
+    return "${(min / 1_000_000.0).roundToInt()}–${modelSizeLabel(max)}"
+}
 
 /**
  * "137 MB" — whole megabytes of a million bytes each, the way a mobile plan is written, matching

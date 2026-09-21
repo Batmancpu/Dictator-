@@ -1658,6 +1658,8 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__local_model_none_selected">Belum ada model yang diunduh</string>
     <string name="dictate__local_model_delete_confirm">Hapus “{model}”? Anda dapat mengunduhnya lagi nanti.</string>
     <string name="dictate__local_model_not_installed_error">Tidak ada model lokal yang diunduh</string>
+    <string name="dictate__local_model_family_installed">{count} dari {total} terpasang</string>
+    <string name="dictate__local_model_family_open">Tampilkan varian</string>
     <plurals name="dictate__local_model_languages">
         <item quantity="other">{count} bahasa</item>
     </plurals>

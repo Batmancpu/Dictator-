@@ -15,21 +15,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.minimumInteractiveComponentSize
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.material3.RadioButton
-import androidx.compose.ui.semantics.Role
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -51,6 +40,7 @@ import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import kotlinx.coroutines.launch
 import dev.patrickgold.florisboard.dictate.provider.LocalModelCatalog
 import dev.patrickgold.florisboard.dictate.provider.LocalModelDownloads
+import dev.patrickgold.florisboard.dictate.provider.LocalModelEntry
 import dev.patrickgold.florisboard.dictate.provider.LocalModelManager
 import dev.patrickgold.florisboard.dictate.provider.LocalModelSpec
 import kotlin.math.roundToInt
@@ -89,8 +79,38 @@ fun LocalModelSection(
     val downloads by LocalModelDownloads.state.collectAsState()
     var pendingDelete by remember { mutableStateOf<LocalModelSpec?>(null) }
 
-    val downloadFailed = stringRes(R.string.dictate__local_model_download_failed)
     val backgroundHint = stringRes(R.string.dictate__local_model_download_background)
+
+    /** The family whose variants are open over this dialog, or null while the first level is showing. */
+    var openFamily by remember { mutableStateOf<LocalModelEntry.Family?>(null) }
+
+    val rowState = LocalModelState(
+        installed = installed,
+        downloads = downloads,
+        activeModelId = activeModelId,
+        activeStreamingModelId = activeStreamingModelId,
+    )
+    // Built once and handed to both levels, so a Kroko variant behaves identically whether it is tapped
+    // in the list or inside its family's dialog — including which of the two slots it lands in and what
+    // the delete dialog afterwards has to repair.
+    val rowActions = LocalModelActions(
+        onSelect = { spec ->
+            if (spec.id in installed) {
+                if (spec.isStreaming) onActiveStreamingModelChange(spec.id)
+                else onActiveModelChange(spec.id)
+                // The row says "tap to use", so it had better be the thing that transcribes.
+                onModelChosen()
+            }
+        },
+        onInstall = { spec ->
+            LocalModelDownloads.clearError(spec.id)
+            LocalModelDownloads.start(context, spec)
+            // Tell the user right away that they can leave — it keeps going in the background.
+            Toast.makeText(context, backgroundHint, Toast.LENGTH_SHORT).show()
+        },
+        onCancel = { spec -> LocalModelDownloads.cancel(spec.id) },
+        onDelete = { spec -> pendingDelete = spec },
+    )
 
     // A model the user just downloaded is what they want to use, so it is selected the moment it lands —
     // into its own slot, since a streaming and a one-shot model are active side by side and must not
@@ -183,49 +203,36 @@ fun LocalModelSection(
         HorizontalDivider(modifier = Modifier.padding(top = 4.dp, bottom = 12.dp))
 
         // Streaming models (#233) behave differently enough to deserve their own group: they type while
-        // you speak, but only if real-time transcription is switched on. The catalog already orders the
-        // one-shot models first, so the header simply goes in front of the first streaming entry.
+        // you speak, but only if real-time transcription is switched on. The catalog orders the one-shot
+        // entries first, so the header simply goes in front of the first streaming one. It stays a
+        // statement about the capability rather than about Kroko: a future live model under another name
+        // would otherwise be swallowed by a brand's family row. Its explainer has moved into that
+        // dialog, where the choice is actually made.
         var liveHeaderShown = false
-        LocalModelCatalog.all.forEach { spec ->
-            if (spec.isStreaming && !liveHeaderShown) {
+        LocalModelCatalog.topLevel.forEach { entry ->
+            if (entry.isStreaming && !liveHeaderShown) {
                 liveHeaderShown = true
                 HorizontalDivider(modifier = Modifier.padding(top = 8.dp, bottom = 12.dp))
                 Text(
                     text = stringRes(R.string.dictate__local_models_live_header),
                     style = MaterialTheme.typography.titleSmall,
-                )
-                Text(
-                    text = stringRes(R.string.dictate__local_models_live_summary),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 2.dp, bottom = 4.dp),
+                    modifier = Modifier.padding(bottom = 4.dp),
                 )
             }
-            val dl = downloads[spec.id]
-            ModelRow(
-                spec = spec,
-                isInstalled = spec.id in installed,
-                isActive = spec.id == if (spec.isStreaming) activeStreamingModelId else activeModelId,
-                downloadPercent = dl?.takeIf { it.error == null }?.percent,
-                error = if (dl?.error != null) downloadFailed else null,
-                onSelect = {
-                    if (spec.id in installed) {
-                        if (spec.isStreaming) onActiveStreamingModelChange(spec.id)
-                        else onActiveModelChange(spec.id)
-                        // The row says "tap to use", so it had better be the thing that transcribes.
-                        onModelChosen()
-                    }
-                },
-                onInstall = {
-                    LocalModelDownloads.clearError(spec.id)
-                    LocalModelDownloads.start(context, spec)
-                    // Tell the user right away that they can leave — it keeps going in the background.
-                    Toast.makeText(context, backgroundHint, Toast.LENGTH_SHORT).show()
-                },
-                onCancel = { LocalModelDownloads.cancel(spec.id) },
-                onDelete = { pendingDelete = spec },
-            )
+            when (entry) {
+                is LocalModelEntry.Single -> ModelRow(entry.spec, rowState, rowActions)
+                is LocalModelEntry.Family -> FamilyRow(entry, rowState) { openFamily = entry }
+            }
         }
+    }
+
+    openFamily?.let { entry ->
+        LocalModelFamilyDialog(
+            entry = entry,
+            state = rowState,
+            actions = rowActions,
+            onDismiss = { openFamily = null },
+        )
     }
 
     pendingDelete?.let { spec ->
@@ -255,99 +262,5 @@ fun LocalModelSection(
                 }
             },
         )
-    }
-}
-
-@Composable
-private fun ModelRow(
-    spec: LocalModelSpec,
-    isInstalled: Boolean,
-    isActive: Boolean,
-    downloadPercent: Int?,
-    error: String?,
-    onSelect: () -> Unit,
-    onInstall: () -> Unit,
-    onCancel: () -> Unit,
-    onDelete: () -> Unit,
-) {
-    val downloading = downloadPercent != null
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        // The name is the obvious thing to aim at, so the whole of it selects the model — the radio is a
-        // small target to have to hit. It reports the click to the row rather than handling its own, which
-        // is what keeps this one control to a screen reader instead of two.
-        Row(
-            modifier = Modifier
-                .weight(1f)
-                .selectable(
-                    selected = isActive,
-                    enabled = isInstalled && !downloading,
-                    role = Role.RadioButton,
-                    onClick = onSelect,
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            RadioButton(
-                selected = isActive,
-                enabled = isInstalled && !downloading,
-                onClick = null,
-                // Handing the click to the row costs the radio the touch-target padding Material puts
-                // around a clickable one, which is what set the spacing to the text and the height of the
-                // row. Asked for explicitly, both stay exactly as they were.
-                modifier = Modifier.minimumInteractiveComponentSize(),
-            )
-            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                Text(text = spec.displayName, style = MaterialTheme.typography.titleSmall)
-                // What the model is stays on the line; only the second half changes with its state. It
-                // used to be replaced by the state, so an installed model stopped saying what it covers
-                // — exactly when several are installed and one has to be chosen between them. The size
-                // is what the second half says until it is installed, because that is the number the
-                // decision turns on; afterwards it is no longer news and lives in the details instead.
-                val state = when {
-                    downloading -> stringRes(R.string.dictate__local_model_downloading)
-                        .replace("{percent}", downloadPercent.toString())
-                    isActive -> stringRes(R.string.dictate__local_model_status_active)
-                    isInstalled -> stringRes(R.string.dictate__local_model_status_installed)
-                    else -> modelSizeLabel(spec.totalBytes)
-                }
-                Text(
-                    text = error ?: "${modelLanguagesLabel(spec)} · $state",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (error != null) MaterialTheme.colorScheme.error
-                    else MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                if (downloading) {
-                    LinearProgressIndicator(
-                        progress = { (downloadPercent ?: 0) / 100f },
-                        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-                    )
-                }
-            }
-        }
-        // Icon-only actions (keep the row compact); labels live on as the accessibility descriptions.
-        when {
-            downloading -> IconButton(onClick = onCancel) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringRes(R.string.dictate__local_model_action_cancel),
-                )
-            }
-            isInstalled -> IconButton(onClick = onDelete) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringRes(R.string.dictate__local_model_action_delete),
-                )
-            }
-            else -> IconButton(onClick = onInstall) {
-                Icon(
-                    imageVector = Icons.Default.Download,
-                    contentDescription = stringRes(R.string.dictate__local_model_action_install),
-                )
-            }
-        }
     }
 }

@@ -1709,6 +1709,8 @@
     <string name="dictate__local_model_none_selected">Модель ещё не скачана</string>
     <string name="dictate__local_model_delete_confirm">Удалить «{model}»? Позже можно скачать снова.</string>
     <string name="dictate__local_model_not_installed_error">Локальная модель не скачана</string>
+    <string name="dictate__local_model_family_installed">Установлено {count} из {total}</string>
+    <string name="dictate__local_model_family_open">Показать варианты</string>
     <plurals name="dictate__local_model_languages">
         <item quantity="one">{count} язык</item>
         <item quantity="few">{count} языка</item>

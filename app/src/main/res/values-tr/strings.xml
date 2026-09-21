@@ -1682,6 +1682,8 @@
     <string name="dictate__local_model_none_selected">Henüz model indirilmedi</string>
     <string name="dictate__local_model_delete_confirm">“{model}” silinsin mi? Daha sonra tekrar indirebilirsiniz.</string>
     <string name="dictate__local_model_not_installed_error">İndirilen yerel model yok</string>
+    <string name="dictate__local_model_family_installed">{total} modelden {count} tanesi yüklü</string>
+    <string name="dictate__local_model_family_open">Varyantları göster</string>
     <plurals name="dictate__local_model_languages">
         <item quantity="one">{count} dil</item>
         <item quantity="other">{count} dil</item>

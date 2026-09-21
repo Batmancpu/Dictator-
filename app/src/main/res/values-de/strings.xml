@@ -1675,6 +1675,8 @@
     <string name="dictate__local_model_none_selected">Noch kein Modell heruntergeladen</string>
     <string name="dictate__local_model_delete_confirm">„{model}“ löschen? Du kannst es später erneut herunterladen.</string>
     <string name="dictate__local_model_not_installed_error">Kein lokales Modell heruntergeladen</string>
+    <string name="dictate__local_model_family_installed">{count} von {total} installiert</string>
+    <string name="dictate__local_model_family_open">Varianten anzeigen</string>
     <plurals name="dictate__local_model_languages">
         <item quantity="one">{count} Sprache</item>
         <item quantity="other">{count} Sprachen</item>

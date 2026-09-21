@@ -1548,6 +1548,8 @@
     <string name="dictate__local_model_none_selected">Модель ще не завантажено</string>
     <string name="dictate__local_model_delete_confirm">Видалити «{model}»? Пізніше можна завантажити знову.</string>
     <string name="dictate__local_model_not_installed_error">Локальну модель не завантажено</string>
+    <string name="dictate__local_model_family_installed">Встановлено {count} з {total}</string>
+    <string name="dictate__local_model_family_open">Показати варіанти</string>
     <plurals name="dictate__local_model_languages">
         <item quantity="one">{count} мова</item>
         <item quantity="few">{count} мови</item>
