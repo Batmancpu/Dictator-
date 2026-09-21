@@ -424,6 +424,11 @@ async function slowUpstream(env: Env, ctx: ExecutionContext, thresholdMs: number
  *
  * Two weeks after a month ends, not one day: Cloudflare does not invoice on the first, and an alarm
  * that fires before the thing it asks for exists teaches you to ignore it.
+ *
+ * What it asks for is an *entry*, not a payment. A month spent entirely inside the free allowance
+ * is invoiced at nothing, and the answer to this reminder is then a zero-euro expense — see
+ * `addExpense`. Without that the reminder would have no reachable end state, which is the one thing
+ * a recurring alarm must never have.
  */
 async function invoiceMissing(env: Env, ctx: ExecutionContext): Promise<number> {
   const now = new Date();
@@ -453,7 +458,8 @@ async function invoiceMissing(env: Env, ctx: ExecutionContext): Promise<number> 
       `Der Monat ist abgeschlossen und hat Verkehr, aber unter Steuer → Ausgaben steht keine Rechnung ` +
       `dafür. Das ist die einzige Prüfung gegen echtes Geld, die es seit dem Umzug noch gibt: Alles ` +
       `andere auf dem Dashboard ist die eigene Rechnung. Eintragen, dann steht die Differenz im ` +
-      `Abgleich.`,
+      `Abgleich. Lag der Monat ganz im Freikontingent, gibt es nichts zu berechnen — dann gehört er ` +
+      `mit 0 erfasst. Das ist keine Formsache: Nur so ist der Monat geprüft statt vergessen.`,
     // Einmal je Monat, nicht einmal je Viertelstunde bis zum Eintrag.
     dedupeKey: `invoice_missing:${previous}`,
   }, ctx)) ? 1 : 0;

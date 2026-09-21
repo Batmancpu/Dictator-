@@ -66,15 +66,25 @@ export async function handleAdmin(request: Request, env: Env, ctx: ExecutionCont
             url.searchParams.get('deleted') === '1',
           ),
         });
-      case '/admin/api/requests':
-        return json(await recentRequests(env, {
-          limit: clamp(url.searchParams.get('limit'), 50, 200),
-          offset: Math.max(0, Number(url.searchParams.get('offset') ?? 0) || 0),
-          kind: url.searchParams.get('kind') ?? '',
-          failuresOnly: url.searchParams.get('failures') === '1',
-          walletId: url.searchParams.get('wallet') ?? '',
-          includeTest: url.searchParams.get('test') !== '0',
-        }));
+      case '/admin/api/requests': {
+        // Die Schwelle für „Kurze Diktate langsam ab" reist mit den Zeilen, damit die Liste die
+        // langsamen markieren kann, ohne dafür eine zweite Anfrage zu stellen — und damit sie
+        // dieselbe Zahl benutzt, die auch die Regel benutzt, statt einer im Browser gemerkten
+        // Kopie, die nach einer Änderung noch eine Weile eine andere Wahrheit anzeigt.
+        // `alertSettings` ist je Isolat eine Minute lang gemerkt und kostet hier nichts.
+        const [list, settings] = await Promise.all([
+          recentRequests(env, {
+            limit: clamp(url.searchParams.get('limit'), 50, 200),
+            offset: Math.max(0, Number(url.searchParams.get('offset') ?? 0) || 0),
+            kind: url.searchParams.get('kind') ?? '',
+            failuresOnly: url.searchParams.get('failures') === '1',
+            walletId: url.searchParams.get('wallet') ?? '',
+            includeTest: url.searchParams.get('test') !== '0',
+          }),
+          alertSettings(env),
+        ]);
+        return json({ ...list, slowShortMs: settings.slowShortMs });
+      }
       case '/admin/api/log':
         return json(await adminLog(env, {
           limit: clamp(url.searchParams.get('limit'), 50, 200),

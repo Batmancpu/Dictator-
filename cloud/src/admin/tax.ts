@@ -49,14 +49,21 @@ export interface Expense {
  * `amountHome` is what your bank or card statement says was debited, including any currency
  * surcharge — that is the figure a tax office recognises, not a converted one. Left empty it is
  * filled in with the day's ECB rate as an approximation, and marked as such.
+ *
+ * **Zero is a valid amount, and it is not the same as no entry at all.** A month that stayed inside
+ * the free allowance produces no Cloudflare invoice — there is nothing to file and nothing to book.
+ * The reconciliation and the `invoice_missing` rule both ask whether a month *has* an entry, so
+ * without a way to record a nil month the only honest state was an open reminder asking for an
+ * invoice that does not exist. Rejecting zero made the operator's answer unsayable; the guard is
+ * therefore against a negative amount, which would be a refund and belongs in the other direction.
  */
 export async function addExpense(
   env: Env,
   admin: AdminIdentity,
   input: { paidAt: number; kind: string; amount: number; currency: string; amountHome?: number | null; reference?: string; note?: string },
 ): Promise<{ ok: boolean; message: string }> {
-  if (!Number.isFinite(input.amount) || input.amount <= 0) {
-    return { ok: false, message: 'Bitte einen Betrag größer als null angeben.' };
+  if (!Number.isFinite(input.amount) || input.amount < 0) {
+    return { ok: false, message: 'Bitte einen Betrag von null oder mehr angeben.' };
   }
   if (!Number.isFinite(input.paidAt) || input.paidAt <= 0) {
     return { ok: false, message: 'Bitte ein gültiges Zahlungsdatum angeben.' };
@@ -67,7 +74,12 @@ export async function addExpense(
   let amountHome = input.amountHome ?? null;
 
   if (amountHome === null) {
-    if (currency === home) {
+    // Nothing converts to nothing at every rate there has ever been, so a nil month needs no
+    // exchange rate and must not be left waiting for one — otherwise the entry that says "this
+    // month cost nothing" arrives with a missing-amount warning against it.
+    if (input.amount === 0) {
+      amountHome = 0;
+    } else if (currency === home) {
       amountHome = input.amount;
     } else {
       const day = new Date(input.paidAt).toISOString().slice(0, 10);
@@ -203,12 +215,16 @@ export async function taxReport(env: Env, ctx?: ExecutionContext) {
     };
   }
 
-  const spendByYear: Record<string, { total: number; unconverted: number; byKind: Record<string, number> }> = {};
+  // `entries` is counted separately from `total` because a nil month is worth exactly as much as an
+  // invoiced one: it is an answer. A year whose only entries are zeroes has a total of nothing and
+  // must still not read as a year nobody has looked at.
+  const spendByYear: Record<string, { total: number; entries: number; unconverted: number; byKind: Record<string, number> }> = {};
   for (const r of (expenseYears.results ?? []) as Array<Record<string, unknown>>) {
     const year = String(r.year);
-    const entry = spendByYear[year] ?? (spendByYear[year] = { total: 0, unconverted: 0, byKind: {} });
+    const entry = spendByYear[year] ?? (spendByYear[year] = { total: 0, entries: 0, unconverted: 0, byKind: {} });
     const amount = num(r.homeMicros) / MICROS;
     entry.total += amount;
+    entry.entries += num(r.n);
     entry.unconverted += num(r.unconverted);
     entry.byKind[String(r.kind)] = (entry.byKind[String(r.kind)] ?? 0) + amount;
   }
@@ -217,7 +233,7 @@ export async function taxReport(env: Env, ctx?: ExecutionContext) {
     const year = String(r.year);
     const revenue = num(r.revenueHomeMicros) / MICROS;
     const refunded = refundsByYear[year]?.revenue ?? 0;
-    const spend = spendByYear[year] ?? { total: 0, unconverted: 0, byKind: {} };
+    const spend = spendByYear[year] ?? { total: 0, entries: 0, unconverted: 0, byKind: {} };
     return {
       year,
       orders: num(r.orders),
@@ -238,6 +254,8 @@ export async function taxReport(env: Env, ctx?: ExecutionContext) {
       revenueNet: revenue - refunded,
       /** What you actually paid out, from the entries below. */
       spend: spend.total,
+      /** How many entries that total is made of — zero-euro months included. */
+      spendEntries: spend.entries,
       spendUnconverted: spend.unconverted,
       spendByKind: spend.byKind,
       profit: revenue - refunded - spend.total,
@@ -251,7 +269,8 @@ export async function taxReport(env: Env, ctx?: ExecutionContext) {
     rows.push({
       year, orders: 0, foreignOrders: 0, unconverted: 0, unreported: 0, paidGross: 0, taxCollected: 0,
       revenue: 0, refundedOrders: 0, refunded: 0, revenueNet: 0,
-      spend: spend.total, spendUnconverted: spend.unconverted, spendByKind: spend.byKind,
+      spend: spend.total, spendEntries: spend.entries, spendUnconverted: spend.unconverted,
+      spendByKind: spend.byKind,
       profit: -spend.total,
     });
   }
