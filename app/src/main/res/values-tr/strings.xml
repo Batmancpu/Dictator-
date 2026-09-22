@@ -472,6 +472,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Otomatik genişlet/daralt</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">Paylaşılan eylem satırını mevcut duruma göre otomatik genişletir/daraltır</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Eylem satırı yerleşimi</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">İkincil eylemler</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">İkincil bir eylemi çalıştırmak için bir Smartbar düğmesini basılı tutun</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Bir düğmeye, ardından basılı tutulduğunda çalıştırması gereken eyleme dokunun. İkisi de kendi düğmesini korur — yeri boşaltmak için birini klavyenin eylem düzenleyicisinde gizleyin.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">{action} basılı tutulduğunda ne çalıştırsın?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Yalnızca ikincil eylem olarak — bu düğmeler basılı tutulduğunda yinelenir veya kendi basılı tutma işlevleri vardır</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Yazma</string>
     <string name="pref__suggestion__title" comment="Preference group title">Öneriler</string>
@@ -1347,7 +1352,14 @@
     <string name="dictate__providers_add_custom_summary">Kendi barındırdığınız ya da OpenAI uyumlu herhangi bir uç nokta — konuşma tanıma ve yeniden yazma için</string>
     <string name="dictate__providers_azure_endpoint">Endpoint, portaldaki “Keys and Endpoint” sayfasında anahtarın yanında durur. MAI-Transcribe yalnızca East US, West US, West US 2, North Europe, Southeast Asia ve Central India bölgelerinde çalışır.</string>
     <string name="dictate__providers_ollama_no_stt">Ollama\'nın konuşma tanıma uç noktası yoktur, bu yüzden yalnızca yeniden yazabilir. Kendi sunucunuzla dikte etmek için bir konuşma sunucusu çalıştırın (örneğin Speaches, faster-whisper-server veya whisper.cpp) ve “Kendi sunucunuzu ekleyin” altından ekleyin — ya da hiç sunucu gerektirmeyen cihaz üzerindeki motoru kullanın.</string>
+    <string name="dictate__providers_region_title">Bölge</string>
+    <string name="dictate__providers_region_us">Amerika Birleşik Devletleri</string>
+    <string name="dictate__providers_region_eu">Avrupa Birliği</string>
+    <string name="dictate__providers_region_jp">Japonya</string>
+    <string name="dictate__providers_region_in">Hindistan</string>
+    <string name="dictate__providers_region_global">Dünya geneli</string>
     <string name="dictate__providers_custom_title">Özel sunucu</string>
+    <string name="dictate__providers_get_key">API anahtarı al</string>
     <string name="dictate__providers_field_name">Ad</string>
     <string name="dictate__providers_field_transcription_model">Yazıya dökme modeli</string>
     <string name="dictate__providers_field_chat_model">Yeniden ifade etme modeli</string>
@@ -1671,6 +1683,12 @@
     <string name="dictate__local_model_none_selected">Henüz model indirilmedi</string>
     <string name="dictate__local_model_delete_confirm">“{model}” silinsin mi? Daha sonra tekrar indirebilirsiniz.</string>
     <string name="dictate__local_model_not_installed_error">İndirilen yerel model yok</string>
+    <string name="dictate__local_model_family_installed">{total} modelden {count} tanesi yüklü</string>
+    <string name="dictate__local_model_family_open">Varyantları göster</string>
+    <plurals name="dictate__local_model_languages">
+        <item quantity="one">{count} dil</item>
+        <item quantity="other">{count} dil</item>
+    </plurals>
     <string name="dictate__local_fallback_title">Çevrimdışı yedek</string>
     <string name="dictate__local_fallback_summary">Çevrimdışıyken, sağlayıcı başarısız olduktan sonra indirilen modelle cihazda yazıya dök</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Kaydedilen yeniden ifade istemleri</string>
@@ -1678,6 +1696,8 @@
     <string name="dictate__floating_button_copy_to_clipboard_title">Her dikteyi panoya kopyala</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Her dikte panoya da kopyalanır; böylece ekleme başarısız olursa metni elle yapıştırabilirsin. Bazı telefonlarda pano bildirimi gösterebilir.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Dikteler yalnızca eklenir, panoya kopyalanmaz.</string>
+    <string name="dictate__floating_button_menu_group">Basılı tutma menüsü</string>
+    <string name="dictate__floating_button_menu_settings_title">Dictate ayarları</string>
     <string name="dictate__floating_button_undo_summary_off">Geri alma düğmesi gösterilmiyor.</string>
     <string name="dictate__floating_button_undo_summary_on">Bir dikteden sonra, eklenen metni tek dokunuşla kaldırmak için düğmenin yanında bir geri alma düğmesi belirir.</string>
     <string name="dictate__floating_button_undo_title">Geri alma düğmesi</string>
@@ -2115,6 +2135,31 @@
     <string name="apptour62__outro_eyebrow">İşte 6.2</string>
     <string name="apptour62__outro_title">Aynı klavye, daha çoğu senin</string>
     <string name="apptour62__outro_body">Nasıl dikte ettiğin konusunda hiçbir şey değişmiyor — kendi anahtarın, kendi sunucun ya da cihazdaki bir model. Tüm turları yeniden Ayarlar › Hakkında altında bulabilirsin.</string>
+    <string name="apptour63__cta_try">Dene</string>
+    <string name="apptour63__intro_eyebrow">Dictate 6.3</string>
+    <string name="apptour63__intro_title">Klavyeden çıkmadan daha fazlası</string>
+    <string name="apptour63__intro_body">Kamerayı basılı bir metne tut, metin alana düşsün. İmleç, seçim ve pano sonunda tek bir paneli paylaşıyor. Her Smartbar düğmesi uzun basışla ikinci bir eylem taşıyabiliyor. Ve çevrimdışı dikte için nihayet bir telefona gerçekten sığan modeller var.</string>
+    <string name="apptour63__scan_eyebrow">Yeni: metni tara</string>
+    <string name="apptour63__scan_title">Basılı metin doğrudan alana</string>
+    <string name="apptour63__scan_body">Mektuptaki IBAN, kutudaki seri numarası, kolideki adres: kamerayı doğrult, metin yazmakta olduğun yere gelsin, yeniden yazılmak yerine. Tanıma bu cihazda yapılır — hiçbir şey yüklenmez ve hiçbir sağlayıcı işin içine girmez. Dictate kamera iznini de hiç istemez: fotoğrafı sistem kamerası çeker ve yalnızca o tek görüntüyü geri verir; o görüntü okunur okunmaz silinir.</string>
+    <string name="apptour63__editing_eyebrow">Yeni: düzenleme paneli</string>
+    <string name="apptour63__editing_title">İmleç, seçim ve pano tek yerde</string>
+    <string name="apptour63__editing_body">Hepsi zaten vardı, bilmen gereken on bir tuşa dağılmış hâlde. Artık tek bir panel: karakter, sözcük ya da satır bazında hareket, seçme, kopyalama, yapıştırma, geri alma. Basılı tutulan tuş kendini tekrarlıyor, on bir dokunuş istemek yerine. Sayı tuş takımı da artık açıkça çağrılabiliyor; kimsenin atamadığı bir hareketle rastlantı sonucu bulunmak yerine.</string>
+    <string name="apptour63__second_eyebrow">Yeni: ikinci eylem için basılı tut</string>
+    <string name="apptour63__second_title">Bir Smartbar yerinde iki eylem</string>
+    <string name="apptour63__second_body">İkinci eylemi düğmeyle kendin eşleştiriyorsun ve uzun basış onu çalıştırıyor. Aynı anda yalnızca beş ya da altı düğme görünür — bir özelliğin var olmasıyla ona yer olması arasındaki fark tam da budur. Köşedeki küçük işaret, hangi düğmelerin böyle bir eylem taşıdığını gösterir.</string>
+    <string name="apptour63__floating_eyebrow">Yüzen düğme</string>
+    <string name="apptour63__floating_title">Basılı tutunca bir menü, ve yalnızca istediğin yerde</string>
+    <string name="apptour63__floating_body">Kısa bir menü için yüzen düğmeyi basılı tut; içindeki ilk şey bir dosyayı yazıya dökmek. Ayrıca ona hangi uygulamalarda hoş karşılandığını söyleyebilirsin; her birine peşinden gelmesi yerine. Durdurma artık tam olarak başlatmanın olduğu yerde kalıyor ve kapsül ekranın hangi kenarında olursa olsun akıcı açılıyor.</string>
+    <string name="apptour63__offline_eyebrow">Çevrimdışı dikte</string>
+    <string name="apptour63__offline_title">Telefona sığan modeller</string>
+    <string name="apptour63__offline_body">İngilizce, Almanca ve Rusça artık yalnızca 670 MB\'lık olanlarla değil, birkaç yüz megabaytlık modellerle de çevrimdışı dikte edilebiliyor. Dolphin, kataloğun şimdiye kadar yalnızca kötü yanıtlayabildiği kırk doğu dilini ekliyor. Ve liste mimariye göre değil, insanların gerçekten indirdiğine göre sıralanmış: yirmi dört yerine on satır, ayrıntılar bir dokunuş ötede.</string>
+    <string name="apptour63__more_eyebrow">Ayrıca</string>
+    <string name="apptour63__more_title">Bir sürü küçük şey</string>
+    <string name="apptour63__more_body">Kendi sözcük listen artık dosya olarak gelebiliyor ve dosya olarak çıkabiliyor. Kayıt çubuğu bir dalga formu çiziyor, böylece sesinin ne zaman durduğu görünüyor. Bir sağlayıcı hesabı verilerinin kalacağı bölgeyi seçebiliyor ve akış sunucusu da onunla taşınıyor. Bir dikte, kayıt yaptığı mikrofonun ortadan kalkmasına dayanıyor. Bağlantı testi artık yalnızca gerçekten denetlediğini söylüyor, sağlayıcının anahtar sayfası anahtarın yazıldığı alandan bir dokunuş uzakta ve yeni bir kurulum, özelliklerinin rastgele çıkış sırasıyla değil, klavyenin ne işe yaradığıyla açılıyor.</string>
+    <string name="apptour63__outro_eyebrow">İşte 6.3</string>
+    <string name="apptour63__outro_title">Daha az dolambaç, aynı klavye</string>
+    <string name="apptour63__outro_body">Nasıl dikte ettiğin konusunda hiçbir şey değişmiyor — kendi anahtarın, kendi sunucun ya da cihazdaki bir model. Tüm turları yeniden Ayarlar › Hakkında altında bulabilirsin.</string>
     <string name="changelog__v5_0_0">• YENİ: Kaydırarak yazma — tam kelimeler yazmak için tuşların üzerinde kaydırın, istek üzerine indirilen dile özel sözlüklerle. 👆\n• YENİ: Kelime önerileri ve otomatik düzeltme — yazım hataları otomatik düzeltilir ve yazdığınız kelime bir dokunuş uzağınızda kalır. ✨\n• YENİ: Gerçek zamanlı transkripsiyon — konuşurken kelimelerinizin belirişini izleyin; OpenAI, Deepgram, Soniox, AssemblyAI ve ElevenLabs ile. ⚡\n• YENİ: Üç transkripsiyon sağlayıcısı daha — ElevenLabs Scribe, Deepgram ve AssemblyAI. ☁️\n• YENİ: Klasik dikte düzeni — Dictate 3’ün klavyesiz ses ekranı geri döndü, sabit ya da yalnızca bir kaydırma uzakta. 🎙️\n• YENİ: Topluluk istem kütüphanesi — yeniden ifade istemlerine göz atın ve paylaşın. 📚\n• YENİ: Kilometre taşlarıyla dikte istatistikleri. 📊\n• YENİ: Çevrimdışı model NVIDIA Parakeet, ayrıca boş kayıtları atlayan bir sessizlik filtresi. 📴\n• Dahası: daha kararlı bir kayan düğme, akıl yürütme çabası denetimi, dokunsal geri bildirim, yeni bir E-Reader teması ve onlarca düzeltme. 🛠️</string>
     <string name="media__tab__gifs">GIFs</string>
     <string name="prefs__media__gif__title">GIFs</string>

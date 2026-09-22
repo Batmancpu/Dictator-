@@ -433,6 +433,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Pašizpildoša izvēršanās/sakļaušanās</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">Pašizpildoši izvērš/sakļauj kopīgo darbību rindu atbilstoši pašreizējam stāvoklim</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Darbību rindas novietojums</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">Otrās darbības</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">Turiet Smartbar pogu, lai izpildītu otro darbību</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Pieskarieties pogai un pēc tam darbībai, kas tai jāizpilda, turot to nospiestu. Abas saglabā savu pogu — vienu no tām paslēpiet tastatūras darbību redaktorā, lai atbrīvotu vietu.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">Ko {action} izpildīt, turot nospiestu?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Tikai kā otrā darbība — šīs pogas turot atkārtojas vai tām jau ir sava turēšanas funkcija</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Rakstīšana</string>
     <string name="pref__suggestion__title" comment="Preference group title">Ieteikumi</string>
@@ -1313,7 +1318,14 @@
     <string name="dictate__providers_add_custom_summary">Pašmitināts vai jebkurš ar OpenAI saderīgs galapunkts — runas atpazīšanai un pārfrāzēšanai</string>
     <string name="dictate__providers_azure_endpoint">Galapunkts ir blakus atslēgai portāla lapā “Keys and Endpoint”. MAI-Transcribe darbojas tikai reģionos East US, West US, West US 2, North Europe, Southeast Asia un Central India.</string>
     <string name="dictate__providers_ollama_no_stt">Ollama nav runas atpazīšanas galapunkta, tāpēc tas var tikai pārfrāzēt. Lai diktētu caur savu serveri, palaidiet runas serveri (piemēram, Speaches, faster-whisper-server vai whisper.cpp) un pievienojiet to sadaļā “Pievienot savu serveri” — vai izmantojiet atpazīšanu ierīcē, kurai serveris nav vajadzīgs vispār.</string>
+    <string name="dictate__providers_region_title">Reģions</string>
+    <string name="dictate__providers_region_us">Amerikas Savienotās Valstis</string>
+    <string name="dictate__providers_region_eu">Eiropas Savienība</string>
+    <string name="dictate__providers_region_jp">Japāna</string>
+    <string name="dictate__providers_region_in">Indija</string>
+    <string name="dictate__providers_region_global">Visā pasaulē</string>
     <string name="dictate__providers_custom_title">Pielāgots serveris</string>
+    <string name="dictate__providers_get_key">Iegūt API atslēgu</string>
     <string name="dictate__providers_field_name">Nosaukums</string>
     <string name="dictate__providers_field_transcription_model">Transkribēšanas modelis</string>
     <string name="dictate__providers_field_chat_model">Pārformulēšanas modelis</string>
@@ -1637,6 +1649,13 @@
     <string name="dictate__local_model_none_selected">Vēl nav lejupielādēts neviens modelis</string>
     <string name="dictate__local_model_delete_confirm">Dzēst “{model}”? Vēlāk to varēsiet lejupielādēt vēlreiz.</string>
     <string name="dictate__local_model_not_installed_error">Nav lejupielādēta lokāla modeļa</string>
+    <string name="dictate__local_model_family_installed">Instalēti {count} no {total}</string>
+    <string name="dictate__local_model_family_open">Rādīt variantus</string>
+    <plurals name="dictate__local_model_languages">
+        <item quantity="zero">{count} valodu</item>
+        <item quantity="one">{count} valoda</item>
+        <item quantity="other">{count} valodas</item>
+    </plurals>
     <string name="dictate__local_fallback_title">Bezsaistes rezerve</string>
     <string name="dictate__local_fallback_summary">Bezsaistē transkribē ierīcē ar lejupielādēto modeli pēc nodrošinātāja kļūmes</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Saglabātie pārformulēšanas norādījumi</string>
@@ -1644,6 +1663,8 @@
     <string name="dictate__floating_button_copy_to_clipboard_title">Kopēt katru diktātu starpliktuvē</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Katrs diktāts tiek arī kopēts starpliktuvē, lai to varētu ielīmēt manuāli, ja ievietošana neizdodas. Dažos tālruņos var parādīt starpliktuves paziņojumu.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Diktāti tiek tikai ievietoti, nevis kopēti starpliktuvē.</string>
+    <string name="dictate__floating_button_menu_group">Turēšanas izvēlne</string>
+    <string name="dictate__floating_button_menu_settings_title">Dictate iestatījumi</string>
     <string name="dictate__floating_button_undo_summary_off">Atsaukšanas poga netiek rādīta.</string>
     <string name="dictate__floating_button_undo_summary_on">Pēc diktēšanas blakus pogai parādās atsaukšanas poga, kas ar vienu pieskārienu noņem ievietoto tekstu.</string>
     <string name="dictate__floating_button_undo_title">Atsaukšanas poga</string>
@@ -2081,6 +2102,31 @@
     <string name="apptour62__outro_eyebrow">Tā ir 6.2</string>
     <string name="apptour62__outro_title">Tā pati tastatūra, vairāk no tās — tava</string>
     <string name="apptour62__outro_body">Nekas nemainās tajā, kā tu diktē — sava atslēga, savs serveris vai modelis ierīcē. Visas pamācības atkal atrodamas sadaļā Iestatījumi › Par.</string>
+    <string name="apptour63__cta_try">Izmēģināt</string>
+    <string name="apptour63__intro_eyebrow">Dictate 6.3</string>
+    <string name="apptour63__intro_title">Vairāk tastatūras, to nepametot</string>
+    <string name="apptour63__intro_body">Pavērs kameru pret drukātu tekstu, un tas nonāk laukā. Kursors, atlase un starpliktuve beidzot ir vienā panelī. Jebkura Smartbar poga ar ilgu piespiedienu var nest otru darbību. Un diktēšanai bezsaistē beidzot ir modeļi, kas tiešām ietilpst telefonā.</string>
+    <string name="apptour63__scan_eyebrow">Jaunums: skenēt tekstu</string>
+    <string name="apptour63__scan_title">Drukātais uzreiz laukā</string>
+    <string name="apptour63__scan_body">IBAN no vēstules, sērijas numurs no kastes, adrese no sūtījuma: pavērs kameru, un teksts nonāk tur, kur tu rakstīji, nevis jāpārraksta no jauna. Atpazīšana notiek šajā ierīcē — nekas netiek augšupielādēts un neviens pakalpojumu sniedzējs tajā nepiedalās. Dictate arī nekad neprasa kameras atļauju: fotoattēlu uzņem sistēmas kamera un atdod tikai šo vienu attēlu, kas tiek dzēsts, tiklīdz ir nolasīts.</string>
+    <string name="apptour63__editing_eyebrow">Jaunums: rediģēšanas panelis</string>
+    <string name="apptour63__editing_title">Kursors, atlase un starpliktuve vienuviet</string>
+    <string name="apptour63__editing_body">Tas viss jau bija, izkaisīts pa vienpadsmit taustiņiem, par kuriem bija jāzina. Tagad tas ir viens panelis: pārvietošanās pa rakstzīmēm, vārdiem vai rindām, atlasīšana, kopēšana, ielīmēšana, atsaukšana. Piespiests taustiņš atkārtojas, nevis prasa vienpadsmit pieskārienus. Un ciparu bloku beidzot var izsaukt tieši, nevis nokļūt tajā tikai ar žestu, ko neviens nebija piešķīris.</string>
+    <string name="apptour63__second_eyebrow">Jaunums: turi, lai veiktu otru darbību</string>
+    <string name="apptour63__second_title">Divas darbības vienā Smartbar vietā</string>
+    <string name="apptour63__second_body">Otru darbību pogai piekārto pats, un ilgs piespiediens to izpilda. Vienlaikus redzamas ir tikai piecas vai sešas pogas — tāda ir atšķirība starp to, ka funkcija pastāv, un to, ka tai ir vieta. Maza atzīme stūrī rāda, kurām pogām tāda ir.</string>
+    <string name="apptour63__floating_eyebrow">Peldošā poga</string>
+    <string name="apptour63__floating_title">Izvēlne, turot to, un tikai tur, kur tu to vēlies</string>
+    <string name="apptour63__floating_body">Turi peldošo pogu, lai atvērtu īsu izvēlni; pirmais tajā ir faila atšifrēšana. Tai vari arī pateikt, kurās lietotnēs tā ir gaidīta, nevis lai tā tev sekotu visur. Apturēšana tagad paliek tieši tur, kur bija sākšana, un kapsula vienmērīgi atveras jebkurā ekrāna malā.</string>
+    <string name="apptour63__offline_eyebrow">Diktēšana bezsaistē</string>
+    <string name="apptour63__offline_title">Modeļi, kas ietilpst telefonā</string>
+    <string name="apptour63__offline_body">Angļu, vācu un krievu valodu tagad var diktēt bezsaistē ar dažu simtu megabaitu modeļiem, nevis tikai ar 670 MB lielajiem. Dolphin pievieno četrdesmit austrumu valodas, uz kurām katalogs līdz šim spēja atbildēt tikai slikti. Un saraksts ir sakārtots pēc tā, ko cilvēki patiešām lejupielādē, nevis pēc arhitektūras: desmit rindas divdesmit četru vietā, detaļas viena pieskāriena attālumā.</string>
+    <string name="apptour63__more_eyebrow">Turklāt</string>
+    <string name="apptour63__more_title">Daudz sīkumu</string>
+    <string name="apptour63__more_body">Tavs vārdu saraksts tagad var ienākt kā fails un tāpat arī aiziet. Ierakstīšanas josla zīmē viļņa formu, tāpēc ir redzams, kad balss ir apklususi. Pakalpojumu sniedzēja konts var izvēlēties reģionu, kurā paliek tā dati, un straumēšanas resursdators pārceļas līdzi. Diktēšana pārdzīvo mikrofona pazušanu, no kura tā ierakstīja. Savienojuma pārbaude saka tikai to, ko tiešām ir pārbaudījusi, sniedzēja atslēgas lapa ir viena pieskāriena attālumā no lauka, kurā atslēga jāievada, un svaiga instalācija atveras ar to, kam tastatūra ir domāta, nevis ar secību, kādā tās funkcijas gadījās parādīties.</string>
+    <string name="apptour63__outro_eyebrow">Tā ir 6.3</string>
+    <string name="apptour63__outro_title">Mazāk līkumu, tā pati tastatūra</string>
+    <string name="apptour63__outro_body">Nekas nemainās tajā, kā tu diktē — sava atslēga, savs serveris vai modelis ierīcē. Visas pamācības atkal atrodamas sadaļā Iestatījumi › Par.</string>
     <string name="changelog__v5_0_0">• JAUNS: Vilkšanas rakstīšana — velc pār taustiņiem, lai rakstītu veselus vārdus, ar valodu vārdnīcām, kas tiek lejupielādētas pēc pieprasījuma. 👆\n• JAUNS: Vārdu ieteikumi un automātiskā labošana — drukas kļūdas tiek labotas automātiski, un ierakstītais vārds paliek viena pieskāriena attālumā. ✨\n• JAUNS: Reāllaika transkripcija — vēro, kā vārdi parādās, kamēr runā, ar OpenAI, Deepgram, Soniox, AssemblyAI un ElevenLabs. ⚡\n• JAUNS: Vēl trīs transkripcijas pakalpojumi — ElevenLabs Scribe, Deepgram un AssemblyAI. ☁️\n• JAUNS: Klasiskais diktēšanas izkārtojums — Dictate 3 balss ekrāns bez tastatūras ir atpakaļ, fiksēts vai viena vilkuma attālumā. 🎙️\n• JAUNS: Kopienas uzvednu bibliotēka — pārlūko un kopīgo pārformulēšanas uzvednes. 📚\n• JAUNS: Diktēšanas statistika ar atskaites punktiem. 📊\n• JAUNS: Bezsaistes modelis NVIDIA Parakeet, kā arī klusuma filtrs, kas izlaiž tukšos ierakstus. 📴\n• Vēl: stabilāka peldošā poga, spriešanas piepūles vadība, taktilā atsauce, jauna E-Reader tēma un desmitiem labojumu. 🛠️</string>
     <string name="media__tab__gifs">GIF</string>
     <string name="prefs__media__gif__title">GIF</string>

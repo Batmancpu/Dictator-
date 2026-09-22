@@ -48,6 +48,7 @@ fun QuickActionsOverflowPanel() {
     val keyboardManager by context.keyboardManager()
 
     val actionArrangement by prefs.smartbar.actionArrangement.collectAsState()
+    val secondActions by prefs.smartbar.actionSecondActions.collectAsState()
     val evaluator by keyboardManager.activeSmartbarEvaluator.collectAsState()
     val promptsLayout by prefs.dictate.promptsLayout.collectAsState()
 
@@ -79,6 +80,7 @@ fun QuickActionsOverflowPanel() {
                     action = action,
                     evaluator = evaluator,
                     type = QuickActionBarType.INTERACTIVE_TILE,
+                    secondAction = secondActions.childOf(action.keyData().code),
                 )
             }
             item(span = { GridItemSpan(maxLineSpan) }) {

@@ -16,10 +16,14 @@
 
 package dev.patrickgold.florisboard.app.settings.smartbar
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import dev.patrickgold.florisboard.R
+import dev.patrickgold.florisboard.app.LocalNavController
+import dev.patrickgold.florisboard.app.Routes
 import dev.patrickgold.florisboard.app.settings.search.settingsSearchAnchor
 import dev.patrickgold.florisboard.app.enumDisplayEntriesOf
 import dev.patrickgold.florisboard.ime.smartbar.CandidatesDisplayMode
@@ -27,6 +31,7 @@ import dev.patrickgold.florisboard.ime.smartbar.ExtendedActionsPlacement
 import dev.patrickgold.florisboard.ime.smartbar.SmartbarLayout
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
 import dev.patrickgold.jetpref.datastore.ui.ListPreference
+import dev.patrickgold.jetpref.datastore.ui.Preference
 import dev.patrickgold.jetpref.datastore.ui.PreferenceGroup
 import dev.patrickgold.jetpref.datastore.ui.SwitchPreference
 import org.florisboard.lib.compose.stringRes
@@ -37,6 +42,8 @@ fun SmartbarScreen() = FlorisScreen {
     previewFieldVisible = true
 
     content {
+        val navController = LocalNavController.current
+
         SwitchPreference(
             prefs.smartbar.enabled,
             modifier = Modifier.settingsSearchAnchor("pref__smartbar__enabled__label"),
@@ -49,6 +56,14 @@ fun SmartbarScreen() = FlorisScreen {
             title = stringRes(R.string.pref__smartbar__layout__label),
             entries = enumDisplayEntriesOf(SmartbarLayout::class),
             enabledIf = { prefs.smartbar.enabled isEqualTo true },
+        )
+        Preference(
+            icon = Icons.Default.TouchApp,
+            modifier = Modifier.settingsSearchAnchor("settings__smartbar__second_actions__title"),
+            title = stringRes(R.string.settings__smartbar__second_actions__title),
+            summary = stringRes(R.string.settings__smartbar__second_actions__summary),
+            enabledIf = { prefs.smartbar.enabled isEqualTo true },
+            onClick = { navController.navigate(Routes.Settings.SmartbarSecondActions) },
         )
 
         PreferenceGroup(title = stringRes(R.string.pref__smartbar__group_layout_specific__label)) {

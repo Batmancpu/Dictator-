@@ -370,6 +370,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Auto-expandir/recolher</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">Expande/recolhe automaticamente a linha de ação compartilhada com base no estado atual</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Posicionamento da linha de ação</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">Ações secundárias</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">Mantenha pressionado um botão da Smartbar para executar uma ação secundária</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Toque em um botão e depois na ação que ele deve executar quando for mantido pressionado. Ambos mantêm o próprio botão — oculte um deles no editor de ações do teclado para liberar o espaço.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">O que {action} deve executar quando for mantido pressionado?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Apenas como ação secundária — estes botões se repetem quando mantidos pressionados ou já têm a própria função de manter</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Digitação</string>
     <string name="pref__suggestion__title" comment="Preference group title">Sugestões</string>
@@ -1172,7 +1177,14 @@
     <string name="dictate__providers_add_custom_summary">Hospedado por você ou qualquer endpoint compatível com OpenAI — para reconhecimento de voz e reescrita</string>
     <string name="dictate__providers_azure_endpoint">O endpoint fica ao lado da chave na página “Keys and Endpoint” do portal. O MAI-Transcribe só funciona em East US, West US, West US 2, North Europe, Southeast Asia e Central India.</string>
     <string name="dictate__providers_ollama_no_stt">O Ollama não tem endpoint de reconhecimento de voz, então só consegue reescrever. Para ditar por um servidor seu, suba um servidor de voz (como Speaches, faster-whisper-server ou whisper.cpp) e adicione em «Adicionar seu próprio servidor» — ou use o motor no aparelho, que não precisa de servidor nenhum.</string>
+    <string name="dictate__providers_region_title">Região</string>
+    <string name="dictate__providers_region_us">Estados Unidos</string>
+    <string name="dictate__providers_region_eu">União Europeia</string>
+    <string name="dictate__providers_region_jp">Japão</string>
+    <string name="dictate__providers_region_in">Índia</string>
+    <string name="dictate__providers_region_global">Mundo inteiro</string>
     <string name="dictate__providers_custom_title">Servidor personalizado</string>
+    <string name="dictate__providers_get_key">Obter uma chave de API</string>
     <string name="dictate__providers_field_name">Nome</string>
     <string name="dictate__providers_field_transcription_model">Modelo de transcrição</string>
     <string name="dictate__providers_field_chat_model">Modelo de reformulação</string>
@@ -1496,6 +1508,12 @@
     <string name="dictate__local_model_none_selected">Nenhum modelo baixado ainda</string>
     <string name="dictate__local_model_delete_confirm">Excluir “{model}”? Você pode baixá-lo novamente mais tarde.</string>
     <string name="dictate__local_model_not_installed_error">Nenhum modelo local baixado</string>
+    <string name="dictate__local_model_family_installed">{count} de {total} instalados</string>
+    <string name="dictate__local_model_family_open">Mostrar variantes</string>
+    <plurals name="dictate__local_model_languages">
+        <item quantity="one">{count} idioma</item>
+        <item quantity="other">{count} idiomas</item>
+    </plurals>
     <string name="dictate__local_fallback_title">Alternativa offline</string>
     <string name="dictate__local_fallback_summary">Sem internet, transcreva no dispositivo com o modelo baixado após falha do provedor</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Prompts de reformulação salvos</string>
@@ -1503,6 +1521,8 @@
     <string name="dictate__floating_button_copy_to_clipboard_title">Copiar cada ditado para a área de transferência</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Cada ditado também é copiado para a área de transferência, para você poder colá-lo manualmente se a inserção falhar. Pode mostrar um aviso da área de transferência em alguns celulares.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Os ditados são apenas inseridos, não copiados para a área de transferência.</string>
+    <string name="dictate__floating_button_menu_group">Menu ao manter pressionado</string>
+    <string name="dictate__floating_button_menu_settings_title">Configurações do Dictate</string>
     <string name="dictate__floating_button_undo_summary_off">Nenhum botão de desfazer é exibido.</string>
     <string name="dictate__floating_button_undo_summary_on">Após um ditado, um botão de desfazer aparece ao lado do botão para remover o texto inserido com um toque.</string>
     <string name="dictate__floating_button_undo_title">Botão de desfazer</string>
@@ -1940,6 +1960,31 @@
     <string name="apptour62__outro_eyebrow">Essa é a 6.2</string>
     <string name="apptour62__outro_title">O mesmo teclado, mais dele seu</string>
     <string name="apptour62__outro_body">Nada muda no jeito como você dita — sua chave, seu servidor ou um modelo no aparelho. Você encontra todos os tours em Configurações › Sobre.</string>
+    <string name="apptour63__cta_try">Experimentar</string>
+    <string name="apptour63__intro_eyebrow">Dictate 6.3</string>
+    <string name="apptour63__intro_title">Mais teclado, sem sair dele</string>
+    <string name="apptour63__intro_body">Aponte a câmera para um texto impresso e ele aparece no campo. O cursor, a seleção e a área de transferência finalmente dividem um painel. Qualquer botão da Smartbar pode levar uma segunda ação com um toque longo. E o ditado offline enfim tem modelos que cabem de verdade num celular.</string>
+    <string name="apptour63__scan_eyebrow">Novo: escanear texto</string>
+    <string name="apptour63__scan_title">O impresso, direto no campo</string>
+    <string name="apptour63__scan_body">O IBAN de uma carta, o número de série de uma caixa, o endereço de uma encomenda: aponte a câmera e o texto chega onde você estava digitando, em vez de ser copiado na mão. O reconhecimento acontece neste aparelho — nada é enviado e nenhum provedor entra na história. O Dictate também nunca pede a permissão de câmera: a câmera do sistema tira a foto e devolve só aquela imagem, que é apagada assim que for lida.</string>
+    <string name="apptour63__editing_eyebrow">Novo: painel de edição</string>
+    <string name="apptour63__editing_title">Cursor, seleção e área de transferência num lugar só</string>
+    <string name="apptour63__editing_body">Tudo isso já existia, espalhado por onze teclas que você precisava conhecer. Agora é um painel só: mover por caractere, palavra ou linha, selecionar, copiar, colar, desfazer. Uma tecla segurada se repete em vez de exigir onze toques. E o teclado numérico agora pode ser chamado explicitamente, em vez de só ser alcançado por um gesto que ninguém tinha configurado.</string>
+    <string name="apptour63__second_eyebrow">Novo: segurar para uma segunda ação</string>
+    <string name="apptour63__second_title">Duas ações num lugar da Smartbar</string>
+    <string name="apptour63__second_body">Você mesmo associa uma segunda ação a um botão, e o toque longo executa ela. Só cinco ou seis botões ficam visíveis por vez: essa é a diferença entre ter um recurso e ter espaço para ele. Uma marquinha no canto mostra quais botões levam uma.</string>
+    <string name="apptour63__floating_eyebrow">Botão flutuante</string>
+    <string name="apptour63__floating_title">Um menu ao segurar, e só onde você quiser</string>
+    <string name="apptour63__floating_body">Segure o botão flutuante para um menu curto; transcrever um arquivo é a primeira entrada dele. Você também pode dizer em quais apps ele é bem-vindo, em vez de ele seguir você em todos. Parar agora fica exatamente onde iniciar estava, e a cápsula abre com fluidez em qualquer lado da tela.</string>
+    <string name="apptour63__offline_eyebrow">Ditado offline</string>
+    <string name="apptour63__offline_title">Modelos que cabem num celular</string>
+    <string name="apptour63__offline_body">Inglês, alemão e russo já podem ser ditados offline com modelos de algumas centenas de megabytes, e não só com os de 670 MB. O Dolphin acrescenta quarenta línguas orientais que o catálogo só respondia mal. E a lista está ordenada pelo que as pessoas realmente baixam, em vez de por arquitetura: dez linhas em vez de vinte e quatro, com os detalhes a um toque.</string>
+    <string name="apptour63__more_eyebrow">Além disso</string>
+    <string name="apptour63__more_title">Muitas coisas pequenas</string>
+    <string name="apptour63__more_body">Sua lista de palavras agora pode chegar como arquivo, e sair como arquivo. A barra de gravação desenha uma forma de onda, então dá para ver quando sua voz parou. Uma conta de provedor pode escolher a região onde seus dados ficam, e o servidor de streaming acompanha. Um ditado sobrevive ao sumiço do microfone em que estava gravando. O teste de conexão só diz o que realmente verificou, a página de chaves do provedor fica a um toque do campo onde a chave vai, e uma instalação nova abre com aquilo para que o teclado serve, e não com a ordem em que os recursos foram chegando.</string>
+    <string name="apptour63__outro_eyebrow">Essa é a 6.3</string>
+    <string name="apptour63__outro_title">Menos desvios, o mesmo teclado</string>
+    <string name="apptour63__outro_body">Nada muda no jeito como você dita — sua chave, seu servidor ou um modelo no aparelho. Você encontra todos os tours em Configurações › Sobre.</string>
     <string name="changelog__v5_0_0">• NOVO: Digitação por deslize — deslize pelas teclas para escrever palavras inteiras, com dicionários por idioma baixados sob demanda. 👆\n• NOVO: Sugestões de palavras e autocorreção — os erros são corrigidos automaticamente e a palavra que você digitou fica a um toque. ✨\n• NOVO: Transcrição em tempo real — veja suas palavras aparecerem enquanto você fala, com OpenAI, Deepgram, Soniox, AssemblyAI e ElevenLabs. ⚡\n• NOVO: Mais três provedores de transcrição — ElevenLabs Scribe, Deepgram e AssemblyAI. ☁️\n• NOVO: Layout de ditado clássico — a tela de voz sem teclado do Dictate 3 está de volta, fixa ou a um simples deslize. 🎙️\n• NOVO: Biblioteca de prompts da comunidade — explore e compartilhe prompts de reformulação. 📚\n• NOVO: Estatísticas de ditado com marcos. 📊\n• NOVO: Modelo offline NVIDIA Parakeet, além de um filtro de silêncio que ignora as gravações vazias. 📴\n• Mais: um botão flutuante mais estável, controle do esforço de raciocínio, feedback tátil, um novo tema E-Reader e dezenas de correções. 🛠️</string>
     <string name="media__tab__gifs">GIFs</string>
     <string name="prefs__media__gif__title">GIFs</string>

@@ -37,8 +37,9 @@ import dev.patrickgold.florisboard.R
 
 /**
  * An action that can be placed in the legacy dictation layout's configurable action row (issue #183 /
- * #194). The user arranges these freely in Settings → Dictate → Dictation layout; the row renders the
- * chosen ones left-to-right. Enum names are persisted (comma-separated) in
+ * #194). The user arranges these freely in Settings → Dictate → Dictation layout; the layout renders the
+ * chosen ones left-to-right, wrapping onto a second row once there are more than [MAX_PER_ROW] of them
+ * (issue #226 — see [rows]). Enum names are persisted (comma-separated) in
  * [dev.patrickgold.florisboard.app.AppPrefs.Dictate.legacyActionRow], so DON'T rename them.
  */
 enum class LegacyEditAction {
@@ -126,19 +127,53 @@ enum class LegacyEditAction {
         val DEFAULT: List<LegacyEditAction> =
             listOf(SELECT_ALL, UNDO, REDO, CUT, COPY, PASTE, EMOJI, NUMBERS)
 
-        /** Most action rows fit about this many keys comfortably across a phone; the editor caps here. */
+        /** Most action rows fit about this many keys comfortably across a phone. */
         // Raised from 8 when stickers and the clipboard joined: the default row already held
         // eight, so at the old limit both new buttons were greyed out for everyone who had
         // never edited the row — which is most people.
-        const val MAX_ROW = 10
+        const val MAX_PER_ROW = 10
+
+        /** How many rows the layout will ever wrap the chosen actions onto (issue #226). */
+        // Two, because the classic layout is ~215dp against the ~260–300dp keyboard it replaces: one
+        // extra 46dp row still leaves it shorter than that, a third would not. It is also enough to
+        // hold every action there is, which is what the request was actually about.
+        const val MAX_ROWS = 2
+
+        /** The most actions that can be placed at all — [MAX_ROWS] full rows. The editor caps here. */
+        const val MAX_TOTAL = MAX_PER_ROW * MAX_ROWS
+
+        /**
+         * Splits the chosen [actions] across the rows the layout draws (issue #226).
+         *
+         * Up to [MAX_PER_ROW] they stay on one row — the layout everyone had before. Beyond that they
+         * wrap onto a second row, **balanced** rather than filled-then-spilled: eleven buttons come out
+         * 6 + 5, not 10 + 1. The user never arranges this, they only pick buttons and an order; where the
+         * break falls is the layout's business.
+         */
+        fun rows(actions: List<LegacyEditAction>): List<List<LegacyEditAction>> = when {
+            actions.isEmpty() -> emptyList()
+            actions.size <= MAX_PER_ROW -> listOf(actions)
+            else -> {
+                val first = (actions.size + 1) / 2
+                listOf(actions.take(first), actions.drop(first))
+            }
+        }
 
         /** Serialises [actions] for the pref (comma-separated enum names). */
         fun serialize(actions: List<LegacyEditAction>): String = actions.joinToString(",") { it.name }
 
-        /** Parses the pref value back into actions, ignoring unknown names; empty falls back to [DEFAULT]. */
+        /**
+         * Parses the pref value back into actions, ignoring unknown names; empty falls back to [DEFAULT].
+         *
+         * An action appears at most once and the list is cut to [MAX_TOTAL]: the editor cannot produce
+         * anything else, but a hand-edited or restored pref can, and a duplicate key would be a button
+         * that does not answer where it is tapped.
+         */
         fun parse(raw: String): List<LegacyEditAction> {
             val parsed = raw.split(',')
                 .mapNotNull { token -> entries.firstOrNull { it.name == token.trim() } }
+                .distinct()
+                .take(MAX_TOTAL)
             return parsed.ifEmpty { DEFAULT }
         }
     }

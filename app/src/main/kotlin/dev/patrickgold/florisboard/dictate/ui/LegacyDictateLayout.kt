@@ -298,7 +298,8 @@ fun LegacyDictateLayout(
                     }
                 }
 
-                // Row 2: editing actions (select-all first, so it sits in the row below the strip).
+                // Row 2: editing actions (select-all first, so it sits in the row below the strip). One
+                // row, or two once the user has picked more buttons than fit across (#226).
                 LegacyEditRow(
                     keyboardManager = keyboardManager,
                     onEmoji = { keyboardManager.activeState.imeUiMode = ImeUiMode.MEDIA },
@@ -381,10 +382,15 @@ private fun ThemedIconKey(
 }
 
 /**
- * Editing-action row. The buttons are user-configurable (issue #183/#194): the ordered set comes from
+ * Editing-action rows. The buttons are user-configurable (issue #183/#194): the ordered set comes from
  * [dev.patrickgold.florisboard.app.AppPrefs.Dictate.legacyActionRow] and is arranged in Settings. The
  * default row is select-all · undo · redo · cut · copy · paste · emoji · numbers, but any of the actions
  * in [LegacyEditAction] (also language, history, reinsert, GIF) can be placed here.
+ *
+ * Past [LegacyEditAction.MAX_PER_ROW] buttons they wrap onto a second row (issue #226), split by
+ * [LegacyEditAction.rows]. Both rows use **one** slot width — that of the longer row — so the keys line
+ * up in columns and a 6+5 split doesn't render five oversized keys under six normal ones; the shorter
+ * row is centred under the longer one with the leftover half-slot on either side.
  */
 @Composable
 private fun LegacyEditRow(
@@ -399,26 +405,34 @@ private fun LegacyEditRow(
     val hasSelection = content.selection.isSelectionMode
 
     val actionRaw by prefs.dictate.legacyActionRow.collectAsState()
-    val actions = remember(actionRaw) { LegacyEditAction.parse(actionRaw) }
-    if (actions.isEmpty()) return
+    val rows = remember(actionRaw) { LegacyEditAction.rows(LegacyEditAction.parse(actionRaw)) }
+    if (rows.isEmpty()) return
+    val slots = rows.maxOf { it.size }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(EditRowHeight),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        val keyMod = Modifier.weight(1f).fillMaxHeight()
-        actions.forEachIndexed { index, action ->
-            key(index, action) {
-                LegacyActionKey(
-                    action = action,
-                    modifier = keyMod,
-                    keyboardManager = keyboardManager,
-                    hasSelection = hasSelection,
-                    onEmoji = onEmoji,
-                    onNumbers = onNumbers,
-                )
+    rows.forEachIndexed { rowIndex, row ->
+        key(rowIndex) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(EditRowHeight),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                val keyMod = Modifier.weight(1f).fillMaxHeight()
+                val padding = (slots - row.size) / 2f
+                if (padding > 0f) Spacer(modifier = Modifier.weight(padding))
+                row.forEachIndexed { index, action ->
+                    key(index, action) {
+                        LegacyActionKey(
+                            action = action,
+                            modifier = keyMod,
+                            keyboardManager = keyboardManager,
+                            hasSelection = hasSelection,
+                            onEmoji = onEmoji,
+                            onNumbers = onNumbers,
+                        )
+                    }
+                }
+                if (padding > 0f) Spacer(modifier = Modifier.weight(padding))
             }
         }
     }

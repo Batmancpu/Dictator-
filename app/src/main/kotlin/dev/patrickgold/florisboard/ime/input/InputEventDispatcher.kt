@@ -40,6 +40,27 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.florisboard.lib.kotlin.guardedByLock
 
+/**
+ * The key codes that repeat while they are held down.
+ *
+ * Top-level rather than a member of [InputEventDispatcher]: that class's companion reads
+ * [ViewConfiguration] at class-init, so anything touching it from a plain JVM unit test dies on
+ * "not mocked" (the app sets no `unitTests.isReturnDefaultValues`). A file-level `val` needs nothing
+ * but [KeyCode], which is what lets the Smartbar's second actions (issue #385) assert against this
+ * list instead of keeping a copy of it: a repeating key must never also carry a long-press action,
+ * because [InputEventDispatcher.sendDown] runs the repeat loop only when the long press declines.
+ */
+val RepeatableKeyCodes: Set<Int> = setOf(
+    KeyCode.ARROW_DOWN,
+    KeyCode.ARROW_LEFT,
+    KeyCode.ARROW_RIGHT,
+    KeyCode.ARROW_UP,
+    KeyCode.DELETE,
+    KeyCode.FORWARD_DELETE,
+    KeyCode.UNDO,
+    KeyCode.REDO,
+)
+
 class InputEventDispatcher private constructor(private val repeatableKeyCodes: IntArray) {
     companion object {
         private val DoubleTapTimeout = ViewConfiguration.getDoubleTapTimeout().toLong()

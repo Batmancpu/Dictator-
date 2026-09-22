@@ -71,6 +71,10 @@ import kotlin.math.roundToInt
  * currently assigned buttons as a reorderable list (long-press the ⣿ handle to drag), with a ✕ to remove
  * each and a palette of the remaining actions to add. Everything is persisted to
  * [dev.patrickgold.florisboard.app.AppPrefs.Dictate.legacyActionRow] on every change.
+ *
+ * It stays **one flat list** even though the layout may draw two rows (issue #226): the list is the order,
+ * and where it breaks is [LegacyEditAction.rows]' business, not something the user should have to arrange.
+ * The only thing that changed here is the cap — [LegacyEditAction.MAX_TOTAL] rather than a single row.
  */
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -174,11 +178,12 @@ fun LegacyActionRowSetting() {
             }
         }
 
-        // Palette of actions not yet in the row — always shown, so the user can see what else is available.
-        // When the row is full (MAX_ROW) the chips are greyed out and tapping one explains (via a tooltip)
-        // that a button must be removed first, rather than silently doing nothing.
+        // Palette of actions not yet placed — always shown, so the user can see what else is available.
+        // When there is no room left (MAX_TOTAL) the chips are greyed out and tapping one explains (via a
+        // tooltip) that a button must be removed first, rather than silently doing nothing. Since #226 the
+        // cap is two full rows, which is every action there is — so this only bites once a 21st is added.
         val available = LegacyEditAction.entries.filter { it !in items }
-        val full = items.size >= LegacyEditAction.MAX_ROW
+        val full = items.size >= LegacyEditAction.MAX_TOTAL
         if (available.isNotEmpty()) {
             Text(
                 text = stringRes(R.string.dictate__legacy_action_row_add),
@@ -209,7 +214,7 @@ fun LegacyActionRowSetting() {
                         }
                     } else {
                         AssistChip(
-                            onClick = { if (items.size < LegacyEditAction.MAX_ROW) { items.add(action); persist() } },
+                            onClick = { if (items.size < LegacyEditAction.MAX_TOTAL) { items.add(action); persist() } },
                             label = { Text(stringRes(action.labelRes)) },
                             leadingIcon = {
                                 Icon(action.icon, contentDescription = null, modifier = Modifier.size(AssistChipDefaults.IconSize))

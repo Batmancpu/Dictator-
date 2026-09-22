@@ -65,6 +65,7 @@ import dev.patrickgold.florisboard.ime.smartbar.IncognitoDisplayMode
 import dev.patrickgold.florisboard.ime.smartbar.SmartbarLayout
 import dev.patrickgold.florisboard.ime.smartbar.quickaction.QuickAction
 import dev.patrickgold.florisboard.ime.smartbar.quickaction.QuickActionArrangement
+import dev.patrickgold.florisboard.ime.smartbar.quickaction.QuickActionSecondActions
 import dev.patrickgold.florisboard.ime.smartbar.quickaction.QuickActionJsonConfig
 import dev.patrickgold.florisboard.ime.text.gestures.SwipeAction
 import dev.patrickgold.florisboard.ime.text.key.KeyCode
@@ -624,6 +625,22 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         // some OEMs like Samsung).
         val floatingButtonCopyToClipboard = boolean(
             key = "dictate__floating_button_copy_to_clipboard",
+            default = false,
+        )
+        // Extra entries in the menu the hold opens (issue #408), below the prompts. All off by default:
+        // for a Gboard + bubble user that menu is the only route to their prompts, so nothing joins it
+        // unasked. The hold is also the only free gesture the button has — #357 is why these are menu
+        // entries and not a second gesture.
+        val floatingButtonMenuTranscribeFile = boolean(
+            key = "dictate__floating_button_menu_transcribe_file",
+            default = false,
+        )
+        val floatingButtonMenuHistory = boolean(
+            key = "dictate__floating_button_menu_history",
+            default = false,
+        )
+        val floatingButtonMenuSettings = boolean(
+            key = "dictate__floating_button_menu_settings",
             default = false,
         )
         // Whether the user has opened the floating-button screen at least once (clears the "New" badge).
@@ -1592,6 +1609,14 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "smartbar__action_arrangement",
             default = QuickActionArrangement.Default,
             serializer = QuickActionArrangement.Serializer,
+        )
+        // Which action each Smartbar button runs when it is held (issue #385). Its own preference
+        // rather than a field on the arrangement above: a pairing moves nothing, so the arrangement's
+        // three lists — and everything that migrates them — stay exactly as they were.
+        val actionSecondActions = custom(
+            key = "smartbar__action_second_actions",
+            default = QuickActionSecondActions.Default,
+            serializer = QuickActionSecondActions.Serializer,
         )
         val flipToggles = boolean(
             key = "smartbar__flip_toggles",

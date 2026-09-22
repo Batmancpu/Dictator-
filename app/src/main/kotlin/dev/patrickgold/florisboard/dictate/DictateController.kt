@@ -24,9 +24,13 @@ import android.widget.Toast
 import android.content.Intent
 import android.net.Uri
 import android.media.AudioAttributes
+import android.media.AudioDeviceCallback
+import android.media.AudioDeviceInfo
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaRecorder
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import dev.patrickgold.florisboard.BuildConfig
 import dev.patrickgold.florisboard.R
@@ -438,6 +442,15 @@ object DictateController {
     private var focusRequest: AudioFocusRequest? = null
     private var btRouter: BluetoothMicRouter? = null
 
+    // The input-device watch that runs for the length of a recording (#411), and the coroutine that
+    // answers a lost microphone. Both are torn down by [cleanupAudioRouting], i.e. by every stop path.
+    private var deviceWatch: AudioDeviceCallback? = null
+    private var deviceWatchManager: AudioManager? = null
+    private var routeChangeJob: Job? = null
+    // Handovers already done in this dictation. Bounded, because a route that keeps handing back silence
+    // would otherwise be answered with a swap every second and a half for the length of the recording.
+    private var routeSwaps = 0
+
     /** When true, the next finished recording is fed to the rewording model instead of committed. */
     private var livePromptArmed = false
 
@@ -613,6 +626,15 @@ object DictateController {
     // mid-sentence. [REALTIME_TAIL_MAX_MS] caps the whole wait even while text keeps coming.
     private const val REALTIME_TAIL_IDLE_MS = 1_200L
     private const val REALTIME_TAIL_MAX_MS = 8_000L
+
+    // How long a lost microphone (#411) is left to settle before the route is decided again. A single
+    // disconnect arrives as a burst of removals and the audio service needs a moment to agree on what is
+    // left, so re-routing on the first event would only mean re-routing again on the third.
+    private const val ROUTE_SETTLE_MS = 250L
+
+    // At most this many handovers per dictation. A route that answers every swap with more silence is
+    // not going to be fixed by a fourth attempt, and repeating it would cut the recording to pieces.
+    private const val MAX_ROUTE_SWAPS = 3
 
     /**
      * 20 Hz is responsive for a voice indicator while avoiding a display-rate UI loop. Internal because
@@ -1109,8 +1131,29 @@ object DictateController {
 
     /** Aborts a recognition recording without transcribing (the caller cancelled). */
     fun cancelRecognition() {
+        // A resend (#409) has no recording left to stop — what is in flight is the request itself, and
+        // leaving the voice-input view has to take it with it rather than pay for an answer nobody is
+        // registered to receive any more (issue #192's rule). Both calls no-op outside their own state.
+        cancelTranscription()
         cancelRecording()
     }
+
+    /**
+     * Re-sends the audio kept from a failed voice-input dictation (issue #409), so the minimal voice-input
+     * view can offer the same one-tap retry the keyboard's error chip has. The output latch is re-claimed
+     * first: the failure left it on [OutputTarget.RECOGNITION_SERVICE], but a keyboard action in between
+     * may have moved it, and the retried transcript has to reach the caller through the bridge like the
+     * first attempt did. Returns whether a resend was started.
+     */
+    fun resendRecognition(context: Context): Boolean {
+        if (!hasRetainedAudio()) return false
+        outputTarget = OutputTarget.RECOGNITION_SERVICE
+        sendRetainedAudio(context)
+        return true
+    }
+
+    /** Whether a usable recording is being kept for a one-tap resend (drives the retry affordances). */
+    fun hasRetainedAudio(): Boolean = retained?.file?.let { it.exists() && it.length() > 0L } == true
 
     /** Aborts an in-progress recording and returns to idle (cancel button / leaving the keyboard). */
     fun cancelRecording(keepBarForMs: Long = 0L) {
@@ -1296,7 +1339,12 @@ object DictateController {
                     segmentVad != null -> { val v = segmentVad!!; { pcm, len -> v.feed(pcm, len) } }
                     else -> null
                 }
-                recorder = RecordingController(appContext).also { it.start(audioSource, pcmSink) }
+                routeSwaps = 0
+                recorder = RecordingController(appContext).also {
+                    it.start(audioSource, pcmSink, onCaptureLost = { reason ->
+                        onCaptureRouteLost(appContext, reason)
+                    })
+                }
                 if (prefs.dictate.skipSilentRecordings.get()) {
                     // Hide the one-time native VAD/session setup behind the user's recording time.
                     scope.launch { SpeechGate.prewarm(appContext) }
@@ -1307,6 +1355,7 @@ object DictateController {
                 _livePromptActive.value = livePromptArmed
                 if (segmented) initSegmented(appContext)
                 registerScreenOffReceiver(appContext)
+                registerInputDeviceWatch(appContext)
                 // Push-to-talk (#235): the finger came back up while this job was still acquiring audio
                 // focus / Bluetooth SCO. Now that a recorder exists, honour that release.
                 if (pttStopPending) {
@@ -1527,6 +1576,8 @@ object DictateController {
         }
         pendingTranscriptionDir(context).deleteRecursively()
         if (!claimed.exists() || claimed.length() == 0L) return false
+        // The keyboard is the one picking this file up, on its own field (issue #409).
+        claimKeyboardOutput()
         // A deliberately picked file is transcribed as-is (no silence gate — see issue #93).
         transcribe(context, claimed, gate = false, source = DictateHistorySource.IMPORT)
         return true
@@ -2268,11 +2319,12 @@ object DictateController {
                 // The model is language-specific, so the input-language pref is irrelevant here.
                 LocalRealtimeSession(localModelDir, callbacks)
             } else {
-                // Self-hosted streaming (#249): a custom endpoint's own base URL decides where the socket
-                // goes; for the cloud providers this is null and each keeps its fixed address.
+                // Where the socket goes when it is not the vendor's default address: a custom endpoint's
+                // own base URL (#249), or the streaming host of the account's data-residency region
+                // (#403). Null for everyone else, and each keeps its fixed address.
                 RealtimeClient.open(
                     api!!, account.apiKey, model, language, callbacks,
-                    baseUrl = baseUrlOverrideFor(account).takeIf { presetFor(account).isCustom },
+                    baseUrl = realtimeEndpointFor(account),
                     // Same as the batch path: the three providers with a list-shaped language field hear
                     // which languages to expect instead of nothing at all (#99).
                     expectedLanguages = expectedLanguages(),
@@ -3031,6 +3083,27 @@ object DictateController {
             )
 
     /**
+     * Claims the output latch for the keyboard, for an action the *keyboard* started.
+     *
+     * [outputTarget] is set by every start and never reset (see [foreignDictationInFlight]), so after a
+     * single floating-button or system-voice-input dictation it keeps pointing at the accessibility sink
+     * or the recognition bridge for the rest of the process's life. A later keyboard action that reads
+     * and writes the field through [sink] then works on a surface that is no longer there, and does it
+     * silently: [RecognitionSink] reports an empty selection and an empty field, so a prompt sees nothing
+     * to rewrite and returns, and a re-insert hands its text to a bridge with no receiver left. Both look
+     * exactly like a dead button (issue #409) — the report this fixes described it as "takes no action
+     * unless audio was transcribed in that session", which is precisely the moment the latch is IME again.
+     *
+     * A foreign dictation that is genuinely in flight keeps the latch: it owns the output it is about to
+     * produce, and taking it away mid-flight would deliver that text into the keyboard's field instead
+     * (the ownership rule from issue #293).
+     */
+    private fun claimKeyboardOutput() {
+        if (foreignDictationInFlight()) return
+        outputTarget = OutputTarget.IME
+    }
+
+    /**
      * The floating button's service is going away (switched off in the system settings, unbound by the
      * system) while it owns a dictation. Nobody is left to show or inject it, so it is finalized and kept
      * here — the duty the keyboard used to discharge by accident, now carried by the owner (#293). No-op
@@ -3210,6 +3283,7 @@ object DictateController {
         if (!prefs.dictate.rememberLastDictation.get()) return
         val text = prefs.dictate.lastDictation.get()
         if (text.isEmpty()) return
+        claimKeyboardOutput()
         sink(context).commitText(text)
         clearError()
     }
@@ -3377,7 +3451,7 @@ object DictateController {
             _state.value is UiState.Rewording
         ) return
         if (text.isEmpty()) return
-        outputTarget = OutputTarget.IME
+        claimKeyboardOutput()
         sink(context).commitText(text)
         clearError()
     }
@@ -3400,7 +3474,7 @@ object DictateController {
         if (!src.exists() || src.length() == 0L) return
         val temp = File(context.cacheDir, "dictate_history_replay.${src.extension.ifEmpty { "wav" }}")
         runCatching { src.copyTo(temp, overwrite = true) }.getOrElse { return }
-        outputTarget = OutputTarget.IME
+        claimKeyboardOutput()
         clearError()
         // A failed entry's first successful re-transcribe SHOULD count stats (it was never counted); an
         // already-successful entry's re-transcribe must not double-count → isReplay only when not failed.
@@ -3631,8 +3705,10 @@ object DictateController {
         // machine that is already coming up instead of one that has not been told yet.
         warmUpRewordingServer()
         // The floating overlay passes OVERLAY so the result is injected into the focused field via the
-        // accessibility sink rather than the keyboard's editor.
-        if (target != null) outputTarget = target
+        // accessibility sink rather than the keyboard's editor. Every other caller is a keyboard surface
+        // (the Smartbar strip, the always-on row, the prompt panel) and says so, rather than inheriting
+        // whichever surface dictated last — see [claimKeyboardOutput].
+        if (target != null) outputTarget = target else claimKeyboardOutput()
         val appContext = context.applicationContext
         val sink = sink(appContext)
         val raw = prompt.prompt.orEmpty()
@@ -4110,16 +4186,163 @@ object DictateController {
         // Non-Bluetooth path uses the user's chosen audio source (issue #62); Bluetooth SCO always needs
         // VOICE_COMMUNICATION. If BT is requested but can't be activated, fall back to the chosen source.
         val localSource = prefs.dictate.audioInputSource.get().resolve(context)
-        if (!prefs.dictate.useBluetoothMic.get()) return localSource
+        if (!prefs.dictate.useBluetoothMic.get()) {
+            logAudioRoute("off", localSource)
+            return localSource
+        }
         val router = BluetoothMicRouter(context).also { btRouter = it }
-        return if (router.activate()) {
-            MediaRecorder.AudioSource.VOICE_COMMUNICATION
-        } else {
-            localSource
+        val activated = router.activate()
+        val source = if (activated) MediaRecorder.AudioSource.VOICE_COMMUNICATION else localSource
+        logAudioRoute(if (activated) "active" else "unavailable", source)
+        return source
+    }
+
+    /**
+     * Says which microphone a recording (or a handover, #411) actually ended up on. Without it, a
+     * Bluetooth test that silently fell back to the local microphone is indistinguishable from one that
+     * used the headset and survived — a day's worth of measurements can mean nothing. Both values are
+     * platform constants and say nothing about the user.
+     */
+    private fun logAudioRoute(bluetooth: String, source: Int) {
+        Log.i(LATENCY_LOG_TAG, "phase=audioRoute bluetooth=$bluetooth source=$source")
+    }
+
+    /**
+     * Watches the input devices for as long as a recording runs, so a microphone that goes away
+     * mid-sentence is answered instead of read until it stops producing anything (#411).
+     *
+     * Only a **removal** is acted on, and only of the device this capture is actually routed to: a route
+     * change may rescue a dictation, never hijack one. A headset that connects while the user is already
+     * speaking is theirs to pick next time, not ours to switch to mid-sentence.
+     */
+    private fun registerInputDeviceWatch(appContext: Context) {
+        if (deviceWatch != null) return
+        val am = appContext.getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: return
+        val watch = object : AudioDeviceCallback() {
+            override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>) {
+                val routed = recorder?.routedInputDeviceId()
+                val ours = removedDevices.any { device ->
+                    device.isSource && (
+                        device.id == routed ||
+                            // `AudioRecord.getRoutedDevice()` is NOT a reliable identity for the microphone
+                            // we are listening to. Measured on an A55 (2026-09-21): while capture was
+                            // routed to a Bluetooth headset via `setCommunicationDevice`, it kept reporting
+                            // a built-in device (id 14) — and switching the headset off removed the SCO
+                            // input under its own id (3714), which the id comparison therefore missed. So a
+                            // Bluetooth input going away counts whenever *we* asked for Bluetooth,
+                            // whatever the platform believes the route to be.
+                            (device.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO && btRouter != null)
+                        )
+                }
+                // Logged whether or not it matched: a headset that is switched off mid-dictation did not
+                // produce a removal we recognised (#411, A55), and the only way to find out what the
+                // platform *did* report is to have written it down. Device ids and types are platform
+                // constants, nothing about the user.
+                if (_state.value is UiState.Recording) {
+                    Log.i(
+                        LATENCY_LOG_TAG,
+                        "phase=deviceRemoved matched=$ours routed=$routed inputs=" +
+                            removedDevices.filter { it.isSource }.joinToString(",") { "${it.type}#${it.id}" },
+                    )
+                }
+                if (ours) onCaptureRouteLost(appContext, "deviceRemoved")
+            }
+        }
+        runCatching { am.registerAudioDeviceCallback(watch, Handler(Looper.getMainLooper())) }
+            .onSuccess {
+                deviceWatch = watch
+                deviceWatchManager = am
+            }
+    }
+
+    /** Stops watching input devices. Called from every path that stops a recording. Idempotent. */
+    private fun unregisterInputDeviceWatch() {
+        val watch = deviceWatch ?: return
+        val am = deviceWatchManager
+        deviceWatch = null
+        deviceWatchManager = null
+        runCatching { am?.unregisterAudioDeviceCallback(watch) }
+    }
+
+    /**
+     * The microphone this dictation was recording from is gone (#411) — either the device watch saw it
+     * removed, or the capture thread has been getting errors instead of frames for long enough to be sure.
+     *
+     * Reached from the capture thread as well as from the main one, so it does nothing but hop onto the
+     * main thread; everything that reads the recording's state happens in [handleCaptureRouteLost].
+     */
+    private fun onCaptureRouteLost(appContext: Context, reason: String) {
+        scope.launch { handleCaptureRouteLost(appContext, reason) }
+    }
+
+    private fun handleCaptureRouteLost(appContext: Context, reason: String) {
+        // Every exit is logged, including the silent ones. A handover that never starts looks exactly
+        // like one that was never needed — in a realtime run on 2026-09-21 the capture ended up on a
+        // different source with no handover logged at all, which no reading of this code explains.
+        val declined = when {
+            _state.value !is UiState.Recording -> "notRecording"
+            routeSwaps >= MAX_ROUTE_SWAPS -> "capped"
+            routeChangeJob?.isActive == true -> "inFlight"
+            recorder == null -> "noRecorder"
+            else -> null
+        }
+        if (declined != null) {
+            Log.i(LATENCY_LOG_TAG, "phase=routeLost reason=$reason declined=$declined")
+            return
+        }
+        // Note that "inFlight" above is also what keeps a handover already under way from being restarted:
+        // cancelling one mid-acquisition would leave the capture parked on a recorder that is never
+        // installed. A route that is still broken afterwards reports itself again, by which time this job
+        // has finished.
+        Log.i(LATENCY_LOG_TAG, "phase=routeLost reason=$reason accepted")
+        routeChangeJob = scope.launch {
+            val startedAt = SystemClock.elapsedRealtime()
+            // Removals arrive in bursts — one disconnect is several events — and the audio service needs a
+            // moment to settle on what is left. Decide once, after the dust, not once per event.
+            delay(ROUTE_SETTLE_MS)
+            // Logged rather than returned silently: these two are the difference between "we decided not
+            // to" and "we never got here", and telling those apart from the outside is impossible.
+            val activeRecorder = recorder
+            if (activeRecorder == null || _state.value !is UiState.Recording) {
+                Log.i(
+                    LATENCY_LOG_TAG,
+                    "phase=routeSwap reason=$reason outcome=abandoned " +
+                        "recorder=${activeRecorder != null} state=${_state.value::class.simpleName}",
+                )
+                return@launch
+            }
+            // Re-run the routing decision from scratch rather than assuming what is left: with the
+            // Bluetooth headset gone this hands back the user's own local source, which is exactly the
+            // route the dictation should continue on.
+            btRouter?.deactivate()
+            btRouter = null
+            val source = runCatching { setupBluetoothIfEnabled(appContext) }.getOrNull()
+            val continued = source != null && activeRecorder.swapSource(source)
+            if (continued) routeSwaps++
+            // A handover is invisible by design — a short gap and the dictation goes on — which also makes
+            // it impossible to tell from "nothing happened" when testing it. The audio source is a
+            // platform constant, so this says which route took over without saying anything about the user.
+            Log.i(
+                LATENCY_LOG_TAG,
+                "phase=routeSwap reason=$reason outcome=${if (continued) "continued" else "ended"} " +
+                    "source=$source swaps=$routeSwaps phaseMs=${SystemClock.elapsedRealtime() - startedAt}",
+            )
+            if (continued) return@launch
+            // Re-check before ending it: the handover can take the best part of a second, and a stop that
+            // arrived in the meantime has already finalized this dictation. Stopping it a second time
+            // finds no recorder, and would replace the running transcription with "no audio".
+            if (_state.value !is UiState.Recording || recorder !== activeRecorder) return@launch
+            // Nothing left to record from. Everything spoken up to the handover is already in the WAV, so
+            // end the dictation the way the stop button would: the user keeps what was captured, and we
+            // never hand them a transcript of silence we knew we were recording.
+            stopAndTranscribe(appContext)
         }
     }
 
     private fun cleanupAudioRouting() {
+        routeChangeJob?.cancel()
+        routeChangeJob = null
+        unregisterInputDeviceWatch()
         focusRequest?.let { request -> audioManager?.abandonAudioFocusRequest(request) }
         focusRequest = null
         audioManager = null
@@ -4143,6 +4366,22 @@ object DictateController {
         } else {
             null
         }
+
+    /**
+     * Where a real-time session should connect, or null for the provider's own fixed address.
+     *
+     * Not the same question as [baseUrlOverrideFor], which is why it is its own function. A server of the
+     * user's own hands over the base URL its batch requests use and the session derives the socket from it
+     * (#249). A data-residency region instead names its streaming host itself, because that host is a
+     * sibling of the REST one rather than a path under it (#403) — deriving it would mean guessing at a
+     * vendor's naming scheme, and guessing wrong here means streaming out of the region the user chose
+     * while every other request honours it.
+     */
+    private fun realtimeEndpointFor(account: ProviderAccount): String? {
+        val preset = presetFor(account)
+        if (preset.isCustom) return baseUrlOverrideFor(account)
+        return ProviderRegistry.regionOf(preset, account.customBaseUrl)?.realtimeUrl
+    }
 
     /**
      * Says no before the microphone opens, when the active provider has no credential to use.

@@ -47,12 +47,20 @@ One-shot models — these transcribe after you stop speaking:
     https://github.com/openai/whisper
   - Parakeet TDT 0.6B v3 — © NVIDIA, licensed CC BY 4.0.
     https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
+  - Parakeet TDT 110M (English) — © NVIDIA, licensed CC BY 4.0.
+    https://huggingface.co/nvidia/parakeet-tdt_ctc-110m
   - Parakeet German (primeline) — a German-specialized fine-tune of NVIDIA Parakeet TDT 0.6B v3,
     © primeline, licensed CC BY 4.0. https://huggingface.co/primeline/parakeet-primeline
+  - FastConformer German — © NVIDIA, licensed CC BY 4.0.
+    https://huggingface.co/nvidia/stt_de_fastconformer_hybrid_large_pc
   - Canary 180M Flash — © NVIDIA, licensed CC BY 4.0.
     https://huggingface.co/nvidia/canary-180m-flash
-  - GigaAM v2 Russian — © Salute Devices, MIT License.
+  - GigaAM v2 and v3 Russian — © Salute Devices / GigaChat Team, MIT License.
     https://github.com/salute-developers/GigaAM
+  - Dolphin base (40 Eastern languages: Hindi, Arabic, Persian, Thai, Vietnamese, Indonesian,
+    Bengali, Tamil, Urdu and more) — © DataoceanAI and Tsinghua University, Apache-2.0.
+    https://github.com/DataoceanAI/Dolphin
+    Redistributed unmodified; only the CTC branch is exported.
   - SenseVoice Small (Chinese, Cantonese, English, Japanese, Korean) — © Alibaba Group,
     licensed under the FunASR Model Open Source License Agreement v1.1, which permits use,
     modification and sharing with attribution of the source, the author and the model name.

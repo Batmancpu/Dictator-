@@ -497,6 +497,13 @@ export const DASHBOARD_HTML = `<!doctype html>
    */
   .pill.test { background: var(--surface-2); color: var(--muted); border: 1px dashed var(--line); }
   tr.is-test td:first-child { box-shadow: inset 2px 0 0 var(--muted); }
+  /*
+   * Die Dauer steht in der letzten Spalte, und auf einem schmalen Fenster ist die weggescrollt.
+   * Eine Markierung, die man erst suchen muss, markiert nichts — deshalb dieselbe Kante wie oben,
+   * nur in Warnfarbe, am Anfang der Zeile. Nach .is-test, damit bei einer langsamen Testanfrage
+   * die Langsamkeit gewinnt: Als Test ist sie ohnehin schon an ihrem Schildchen zu erkennen.
+   */
+  tr.is-slow td:first-child { box-shadow: inset 2px 0 0 var(--warn); }
 
   /* ---- skeletons ---- */
   /*
@@ -745,16 +752,16 @@ export const DASHBOARD_HTML = `<!doctype html>
 
     <div class="panel">
       <h2>Abgleich mit Cloudflares Rechnung
-        <span class="hint" tabindex="0" data-tip="Die einzige Prüfung gegen echtes Geld. Bis zum Umzug verglich eine Regel täglich die eigene Rechnung mit der Abrechnung des Anbieters; Workers AI hat keinen solchen Endpunkt, also bleibt die Monatsrechnung von Hand. Links steht, was wir sagen — Neuronen abzüglich Freikontingent, tagweise. Rechts, was berechnet wurde, sobald du die Rechnung unter Ausgaben erfasst hast. Ein abgeschlossener Monat ohne Rechnung meldet sich nach zwei Wochen von selbst."></span>
+        <span class="hint" tabindex="0" data-tip="Die einzige Prüfung gegen echtes Geld. Bis zum Umzug verglich eine Regel täglich die eigene Rechnung mit der Abrechnung des Anbieters; Workers AI hat keinen solchen Endpunkt, also bleibt die Monatsrechnung von Hand. Links steht, was wir sagen — Neuronen abzüglich Freikontingent, tagweise. Rechts, was berechnet wurde, sobald du die Rechnung unter Ausgaben erfasst hast. Ein abgeschlossener Monat ohne Rechnung meldet sich nach zwei Wochen von selbst. Lag der Monat ganz im Freikontingent, gibt es keine Rechnung — dann gehört er mit 0 erfasst, sonst bleibt er ungeprüft."></span>
       </h2>
       <div id="reconcile" class="scroll"></div>
     </div>
 
     <div class="panel">
       <h2>Ausgaben erfassen
-        <span class="hint" tabindex="0" data-tip="Rechnungen werden von Hand erfasst, mit Rechnungsnummer. Für die Einnahmen-Überschuss-Rechnung zählt der Tag, an dem das Geld abgeht — nicht der Tag, an dem die Rechenzeit verbraucht wird."></span>
+        <span class="hint" tabindex="0" data-tip="Rechnungen werden von Hand erfasst, mit Rechnungsnummer. Für die Einnahmen-Überschuss-Rechnung zählt der Tag, an dem das Geld abgeht — nicht der Tag, an dem die Rechenzeit verbraucht wird. 0 ist ein gültiger Betrag: Ein Monat, der ganz im Freikontingent lag, hat keine Rechnung, und das ist eine Antwort und kein fehlender Eintrag."></span>
       </h2>
-      <p class="sub" style="margin:0 0 12px">Trage ein, was tatsächlich von deinem Konto abgegangen ist. „Belastet" ist der Betrag auf dem Kontoauszug inklusive Fremdwährungsaufschlag — leer gelassen rechne ich mit dem EZB-Kurs des Tages und kennzeichne es als Näherung.</p>
+      <p class="sub" style="margin:0 0 12px">Trage ein, was tatsächlich von deinem Konto abgegangen ist. „Belastet" ist der Betrag auf dem Kontoauszug inklusive Fremdwährungsaufschlag — leer gelassen rechne ich mit dem EZB-Kurs des Tages und kennzeichne es als Näherung. <strong>Lag ein Monat ganz im Freikontingent, trage ihn mit 0 ein</strong> — dann steht er im Abgleich als geprüft und die Erinnerung an die fehlende Rechnung bleibt aus. Als Datum nimmst du den Tag, an dem die Rechnung gekommen wäre; die Rechnungsnummer bleibt leer.</p>
       <div class="row">
         <input id="exDate" type="date" style="width:auto">
         <select id="exKind" style="width:auto">
@@ -762,7 +769,7 @@ export const DASHBOARD_HTML = `<!doctype html>
           <option value="domain">Domain</option>
           <option value="other">Sonstiges</option>
         </select>
-        <input id="exAmount" type="number" step="0.01" placeholder="Betrag laut Rechnung" style="width:auto">
+        <input id="exAmount" type="number" step="0.01" min="0" placeholder="Betrag laut Rechnung (0 = keine)" style="width:auto">
         <select id="exCurrency" style="width:auto"><option>USD</option><option>EUR</option></select>
         <input id="exHome" type="number" step="0.01" placeholder="belastet (optional)" style="width:auto">
         <input id="exRef" placeholder="Rechnungsnummer" style="width:auto">
@@ -807,7 +814,7 @@ export const DASHBOARD_HTML = `<!doctype html>
   <section id="view-traffic" class="stack" hidden>
     <div class="panel">
       <h2>Verkehr
-        <span class="hint" tabindex="0" data-tip="Eine Zeile je Anfrage — ausschließlich Metadaten. Inhalte, also Audio und Text, werden nie gespeichert. Einzelzeilen werden nach 90 Tagen gelöscht, die Tagessummen bleiben."></span>
+        <span class="hint" tabindex="0" data-tip="Eine Zeile je Anfrage — ausschließlich Metadaten. Inhalte, also Audio und Text, werden nie gespeichert. Einzelzeilen werden nach 90 Tagen gelöscht, die Tagessummen bleiben. Eine gelb markierte Dauer heißt: ein kurzes Diktat (bis 30 s Audio) über der Schwelle, die im Betrieb unter „Kurze Diktate langsam ab“ steht."></span>
       </h2>
       <div class="row">
         <select id="tKind" style="width:auto"><option value="">Alle Arten</option><option value="transcribe">Diktat</option><option value="reword">Umformulierung</option></select>
@@ -1262,15 +1269,15 @@ var GRAPH = ${GRAPH_JSON};
         ' · Schnitt 7 T ' + ne.avg7.toLocaleString('de-DE') + ' Neuronen</span>'
       : '';
 
-    // Woher die Zahl kommt. Alles andere auf dieser Karte ist wertlos, wenn dieser Satz nicht
-    // „gemessen" sagt — deshalb steht er dabei und nicht in der Erklärung.
+    // Woher die Zahl kommt — aber nur dann, wenn sie nicht gemessen ist. „Alles gemessen" ist der
+    // Normalfall und stand trotzdem jeden Tag als grüne Zeile unter der Karte; eine Meldung, die
+    // immer kommt, liest nach einer Woche niemand mehr und nimmt nur Platz. Der Ausnahmefall
+    // bleibt stehen, denn der ändert, was die Zahl darüber wert ist.
     var est = o.cost.estimatedRequests || 0;
     var meas = o.cost.measuredRequests || 0;
-    var origin = (meas + est) === 0 ? ''
-      : est === 0
-        ? '<br><span class="ok-text">alle ' + meas + ' Anfragen aus der Antwort gemessen</span>'
-        : '<br><span class="warn-text">' + est + ' von ' + (meas + est) +
-          ' Anfragen geschätzt — die Antwort nannte keine Neuronen</span>';
+    var origin = est === 0 ? ''
+      : '<br><span class="warn-text">' + est + ' von ' + (meas + est) +
+        ' Anfragen geschätzt — die Antwort nannte keine Neuronen</span>';
 
     html += card('Einkauf heute',
       'Was Cloudflare für heute wirklich berechnet: der Neuronenverbrauch, **abzüglich des Freikontingents**. An den meisten Tagen ist das null, und dann springt es — das ist kein Fehler, sondern ein Tag, der über dem Kontingent lag. Der Listenpreis darunter ist die Zahl ohne den Abzug; gegen ihn wird die Marge gerechnet. Beide stammen aus den Neuronen, die die Modelle selbst je Antwort melden, nicht aus einer Schätzung.',
@@ -1455,15 +1462,48 @@ var GRAPH = ${GRAPH_JSON};
     return '<span class="pill ' + cls + '">' + status + '</span>';
   }
 
+  /**
+   * Eine einzelne Zeile, gemessen an „Kurze Diktate langsam ab" aus dem Betrieb.
+   *
+   * Markiert wird nach genau derselben Definition wie in der Regel, nicht nach einer ähnlichen:
+   * nur Diktate, nur Aufnahmen bis 30 s Audio, nur beantwortete. Eine Markierung, die etwas anderes
+   * zählt als die Einstellung, die sie benennt, ist schlimmer als gar keine — dann sucht man später
+   * den Unterschied zwischen zwei Zahlen, die nie dasselbe gemeint haben. Lange Aufnahmen schwanken
+   * bei Workers AI von Haus aus zu stark, um eine Schwelle zu tragen; sie bleiben deshalb hier
+   * genauso außen vor wie dort.
+   *
+   * Die Regel selbst feuert auf dem p95 einer Stunde, also erst bei einer Häufung. Diese Markierung
+   * ist die Gegenrichtung: Sie zeigt die einzelnen Anfragen, aus denen so eine Häufung entsteht —
+   * und sie zeigt sie auch dann, wenn es für eine Warnung noch nicht reicht.
+   */
+  function isSlowShort(x, threshold) {
+    return threshold > 0 && x.kind === 'transcribe' && x.status === 200 &&
+      x.ms > threshold && x.seconds > 0 && x.seconds <= 30;
+  }
+
+  function msCell(x, threshold) {
+    if (!x.ms) return '—';
+    if (!isSlowShort(x, threshold)) return x.ms;
+    return '<span class="pill warn" title="' +
+      esc('Über der Schwelle von ' + threshold + ' ms für kurze Diktate (bis 30 s Audio). ' +
+        'Die Schwelle steht im Betrieb unter „Kurze Diktate langsam ab“; gewarnt wird erst, wenn ' +
+        'das p95 einer Stunde darüber liegt.') +
+      '">' + x.ms + '</span>';
+  }
+
   function loadTraffic() {
     var p = '?limit=' + PAGE + '&offset=' + trafficOffset;
     if ($('tKind').value) p += '&kind=' + $('tKind').value;
     if ($('tFail').checked) p += '&failures=1';
     if (!$('tTest').checked) p += '&test=0';
     get('/admin/api/requests' + p).then(function (r) {
+      var slowMs = n(r.slowShortMs);
       $('traffic').innerHTML = r.requests.length ? '<table><thead><tr><th>Zeit</th><th>Konto</th><th>Gerät</th><th>Art</th><th>Modell</th><th class="num">Sek.</th><th class="num">Tokens</th><th class="num">Kosten</th><th class="num">HTTP</th><th class="num">ms</th></tr></thead><tbody>' +
         r.requests.map(function (x) {
-          return '<tr' + (x.isTest ? ' class="is-test"' : '') + '><td>' + fmtDate(x.ts) + '</td><td class="mono">' + esc(String(x.walletId).slice(0, 8)) + '…' +
+          // Die Kante links, damit die Zeile auch dann auffällt, wenn die ms-Spalte rechts aus dem
+          // Fenster gescrollt ist — auf einem schmalen Fenster ist sie das immer.
+          var cls = [x.isTest ? 'is-test' : '', isSlowShort(x, slowMs) ? 'is-slow' : ''].join(' ').trim();
+          return '<tr' + (cls ? ' class="' + cls + '"' : '') + '><td>' + fmtDate(x.ts) + '</td><td class="mono">' + esc(String(x.walletId).slice(0, 8)) + '…' +
             (x.isTest ? ' <span class="pill test">Test</span>' : '') + '</td><td class="muted">' + esc(x.device || '—') +
             // A rewording has no audio, so its second count is not zero — it does not exist. Printing
             // 0 invites the reading "this dictation was empty", which is a different thing entirely.
@@ -1475,7 +1515,8 @@ var GRAPH = ${GRAPH_JSON};
             // A refusal is not a fault, and colouring it like one turns every out-of-credit
             // customer into a red line in a list meant to show breakage. Amber says "we said no",
             // red says "we broke".
-            '</td><td class="num">' + statusPill(x.status) + '</td><td class="num">' + (x.ms || '—') + '</td></tr>';
+            // Die Dauer, und ob sie über der Schwelle für kurze Diktate liegt — siehe msCell.
+            '</td><td class="num">' + statusPill(x.status) + '</td><td class="num">' + msCell(x, slowMs) + '</td></tr>';
         }).join('') + '</tbody></table>' : '<div class="empty">Keine Anfragen für diese Auswahl.</div>';
       pager($('trafficPager'), r, function (n) { trafficOffset = n; loadTraffic(); });
     });
@@ -1511,9 +1552,12 @@ var GRAPH = ${GRAPH_JSON};
         hint('Ein Alarm, den man nie ausgelöst hat, ist eine Annahme. Diese beiden Knöpfe stoßen genau das an, was sonst der Cron macht — so merkst du eine falsch eingetragene Absenderadresse jetzt und nicht in der Nacht, in der es darauf ankommt.') +
       '</h2><p class="sub">Der Wachhund läuft alle 15 Minuten von selbst, der Tagesbericht einmal täglich. Hier lässt sich beides sofort auslösen. Der Versand geht über Cloudflare Email Routing — dafür muss die Absenderdomain dort zum Versand freigegeben sein.</p>' +
       '<div class="row" style="margin-top:12px"><button class="btn ghost" id="runRules">Regeln jetzt prüfen</button><button class="btn ghost" id="runDigest">Testbericht senden</button></div></div>' +
-      '<div class="panel"><h2>Grenzwerte</h2><p class="sub">Tagesbudget, Gerätegrenze und die Schwellenwerte der Warnungen stehen oben und gelten sofort, ohne Ausrollen. Rate-Limits, Modelle und Paketpreise nicht: die stehen in <code>wrangler.jsonc</code>. So bleibt der veröffentlichte Quelltext frei von den Zahlen, gegen die jemand austarieren würde. Was in der Datenbank vom Ausgelieferten abweicht, ist oben mit <span class="pill info chg">geändert</span> markiert.</p><div class="kv" style="margin-top:10px"><dt>Tagesbudget</dt><dd>' + fmtUsd(o.budget.limitUsd) + '</dd><dt>Heute verbraucht</dt><dd>' + fmtUsd4(o.budget.spentUsd) + '</dd><dt>Zustand</dt><dd>' + (o.budget.killed ? 'gestoppt' : 'läuft') + '</dd></div></div>';
+      '<div class="panel"><h2>Grenzwerte</h2><p class="sub">Tagesbudget, Gerätegrenze und die Schwellenwerte der Warnungen stehen oben und gelten sofort, ohne Ausrollen. Rate-Limits, Modelle und Paketpreise nicht: die stehen in <code>wrangler.jsonc</code>. So bleibt der veröffentlichte Quelltext frei von den Zahlen, gegen die jemand austarieren würde. Was in der Datenbank vom Ausgelieferten abweicht, ist oben mit <span class="pill info chg">geändert</span> markiert.</p><div class="kv" style="margin-top:10px"><dt>Tagesbudget</dt><dd>' + fmtUsd(o.budget.limitUsd) + '</dd><dt>Heute verbraucht</dt><dd>' + fmtUsd4(o.budget.spentUsd) + '</dd><dt>Zustand</dt><dd>' + (o.budget.killed ? 'gestoppt' : 'läuft') + '</dd></div></div>' +
+      // Zuletzt, weil es als Einziges hier nichts am Dienst ändert, sondern an dieser Seite.
+      '<div class="panel" id="autoRefresh"></div>';
 
     loadSettings();
+    renderAutoRefresh();
 
     $('runRules').onclick = function () {
       $('runRules').disabled = true;
@@ -1549,6 +1593,117 @@ var GRAPH = ${GRAPH_JSON};
         });
       });
     };
+  }
+
+  /* ------------------------------------------------ Von selbst aktualisieren */
+
+  /*
+   * Der Reiter, den man offen liegen lässt.
+   *
+   * Ein Dashboard wird gelesen, indem man es offen lässt — und eine zwanzig Minuten alte Zahl sieht
+   * genau aus wie eine aktuelle. Das ist der Fehler, den diese Uhr verhindert. Sie drückt in
+   * Abständen denselben Knopf wie die Hand: loadAll, kein zweiter Weg, damit es auch nichts
+   * Zweites zu prüfen gibt.
+   *
+   * Drei Dinge tut sie mit Absicht nicht. Sie läuft nicht, während der Reiter im Hintergrund liegt:
+   * Die Geldansicht fragt bei Google nach, das ist die einzige Anfrage mit einem Limit am anderen
+   * Ende, und gelesen wird dabei ohnehin nichts — der erste Takt nach dem Zurückkommen holt es
+   * nach. Sie läuft nicht, während ein Dialog offen ist oder in einem Feld getippt wird, denn ein
+   * Neuaufbau ersetzt die Bedienfelder und verschluckte sonst einen halb eingetippten
+   * Schwellenwert. Und sie ist keine Servereinstellung: Sie ändert nichts am Dienst, sie ist am
+   * Schreibtisch sinnvollerweise anders als auf dem Handy, und im Prüfprotokoll hätte sie nichts
+   * verloren. Deshalb localStorage, je Browser.
+   */
+  var AUTO_ON_KEY = 'dictate.auto.on', AUTO_MIN_KEY = 'dictate.auto.min';
+  var AUTO_DEFAULT_MIN = 10, AUTO_MAX_MIN = 240;
+  var lastLoadAt = Date.now();
+
+  function autoSetting() {
+    var on = true, min = AUTO_DEFAULT_MIN;
+    // Ein privates Fenster wirft hier, statt null zu liefern. Das darf die Seite nicht mitnehmen:
+    // Ohne Gedächtnis gilt eben die Voreinstellung.
+    try {
+      var stored = localStorage.getItem(AUTO_ON_KEY);
+      if (stored !== null) on = stored === '1';
+      var m = Number(localStorage.getItem(AUTO_MIN_KEY));
+      if (isFinite(m) && m >= 1) min = Math.min(AUTO_MAX_MIN, Math.round(m));
+    } catch (e) {}
+    return { on: on, min: min };
+  }
+
+  function autoStore(on, min) {
+    try {
+      localStorage.setItem(AUTO_ON_KEY, on ? '1' : '0');
+      localStorage.setItem(AUTO_MIN_KEY, String(min));
+    } catch (e) {}
+  }
+
+  /*
+   * Arbeit, die ein Neuaufbau wegwischen würde: ein offener Dialog oder ein Eingabefeld, in dem
+   * gerade etwas steht.
+   *
+   * Nicht jedes Element mit dem Fokus zählt, und das ist der Punkt: Ein Haken und eine Auswahlliste
+   * behalten ihren Fokus, nachdem sie benutzt wurden, und sind dabei längst gespeichert oder werden
+   * beim Neuaufbau wieder ausgelesen. Hinge die Uhr daran, bliebe sie nach dem ersten Klick auf
+   * einen Haken für immer stehen — eine Pause, die niemand angeordnet hat und niemand sieht.
+   * Getippter, noch nicht abgeschickter Text ist der einzige Fall, der wirklich verloren ginge.
+   */
+  var KEEP_FOCUS = { checkbox: 1, radio: 1, button: 1, submit: 1, reset: 1 };
+  function autoBusy() {
+    if ($('explain').open || $('detail').open || $('modal').open) return true;
+    var el = document.activeElement;
+    if (!el) return false;
+    var tag = (el.tagName || '').toLowerCase();
+    if (tag === 'textarea') return true;
+    return tag === 'input' && !KEEP_FOCUS[(el.type || 'text').toLowerCase()];
+  }
+
+  /*
+   * Ein kurzer Takt, der nachsieht, statt eines langen, der feuert.
+   *
+   * Der Unterschied ist nicht akademisch: Ein Timer über zehn Minuten überlebt einen zugeklappten
+   * Deckel nicht verlässlich, und nach dem Aufwachen wäre die Seite alt und der Wecker trotzdem
+   * zufrieden. Hier entscheidet die Uhr, nicht der Timer — und weil die Uhr entscheidet, setzt
+   * jeder Druck auf „Aktualisieren“ den Abstand von selbst mit zurück.
+   */
+  function autoTick() {
+    var st = autoSetting();
+    if (!st.on || document.hidden) return;
+    if (Date.now() - lastLoadAt < st.min * 60000) return;
+    if (autoBusy()) return;
+    loadAll();
+  }
+  setInterval(autoTick, 20000);
+  // Zurück auf dem Reiter: sofort nachsehen, statt bis zu zwanzig Sekunden alte Zahlen anzuschauen.
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) autoTick(); });
+
+  function renderAutoRefresh() {
+    var st = autoSetting();
+    $('autoRefresh').innerHTML = '<h2>Von selbst aktualisieren' +
+      hint('Gilt nur für diesen Browser und steht nicht auf dem Server: Am Schreibtisch soll die Seite mitlaufen, auf dem Handy eher nicht. Pausiert, solange der Reiter im Hintergrund liegt, ein Dialog offen ist oder in einem Feld getippt wird — der nächste Takt holt es nach.') +
+      '</h2>' +
+      '<p class="sub" style="margin:0 0 12px">Dasselbe, was der Knopf oben rechts tut, nur von allein. ' +
+      'Zuletzt geladen: ' + esc(fmtDate(lastLoadAt)) + '.</p>' +
+      '<div class="row">' +
+        '<label class="row" style="gap:8px"><input type="checkbox" id="autoOn"' + (st.on ? ' checked' : '') +
+          ' style="width:auto"><span>eingeschaltet</span></label>' +
+        '<span class="muted">alle</span>' +
+        '<input id="autoMin" type="number" min="1" max="' + AUTO_MAX_MIN + '" step="1" value="' +
+          st.min + '" style="width:auto">' +
+        '<span class="muted">Minuten</span>' +
+      '</div>';
+
+    var apply = function () {
+      var min = Math.round(Number($('autoMin').value));
+      if (!isFinite(min) || min < 1) min = AUTO_DEFAULT_MIN;
+      min = Math.min(AUTO_MAX_MIN, min);
+      // Zurückgeschrieben, damit im Feld steht, was auch gilt — eine 0 oder eine 9000 wird sonst
+      // stillschweigend zu etwas anderem und niemand erfährt davon.
+      $('autoMin').value = min;
+      autoStore($('autoOn').checked, min);
+    };
+    $('autoOn').onchange = apply;
+    $('autoMin').onchange = apply;
   }
 
   /* ------------------------------------------------- Einstellungen Warnungen */
@@ -2113,7 +2268,11 @@ var GRAPH = ${GRAPH_JSON};
           state = off
             ? '<span class="pill warn">weicht ab</span>'
             : '<span class="pill ok">stimmt</span>';
-          if (m.invoiceReference) state += ' <span class="mono muted">' + esc(m.invoiceReference) + '</span>';
+          // Warum hier null steht, gehört an die Null. Ein erfasster Nullbetrag und eine nicht
+          // erfasste Rechnung sehen in der Spalte sonst fast gleich aus, bedeuten aber das
+          // Gegenteil voneinander: geprüft gegen ungeprüft.
+          if (m.invoiceHome === 0) state += ' <span class="muted">im Freikontingent</span>';
+          else if (m.invoiceReference) state += ' <span class="mono muted">' + esc(m.invoiceReference) + '</span>';
         }
         return '<tr><td class="mono">' + esc(m.month) + ' <span class="muted">' + m.days + ' T</span></td>' +
           '<td class="num">' + money(m.ownHome, cur) + ' <span class="muted">(' + fmtUsd4(m.ownUsd) + ')</span></td>' +
@@ -2157,7 +2316,10 @@ var GRAPH = ${GRAPH_JSON};
       }
       if (y.unconverted) warn.push(y.unconverted + ' Kauf/Käufe noch ohne Umrechnungskurs — Brutto, Steuer und Erlös sind um diese Beträge zu niedrig.');
       if (y.spendUnconverted) warn.push(y.spendUnconverted + ' Ausgabe(n) ohne belasteten Betrag.');
-      if (!y.spend) warn.push('Für dieses Jahr ist noch keine Ausgabe erfasst — ohne die ist „Bleibt" kein Gewinn, sondern nur die Einnahme.');
+      // Gezählt wird, ob etwas erfasst wurde, nicht ob dabei eine Summe herauskam: Ein Jahr, das
+      // ganz im Freikontingent lag, hat lauter Nullen erfasst und ist geprüft — es sieht nur aus
+      // wie ein Jahr, in das nie jemand geschaut hat.
+      if (!y.spendEntries) warn.push('Für dieses Jahr ist noch keine Ausgabe erfasst — ohne die ist „Bleibt" kein Gewinn, sondern nur die Einnahme.');
 
       return '<div class="card"><div class="row" style="align-items:flex-start">' +
         '<div style="flex:1;min-width:min(100%,190px)"><div class="label">Jahr ' + esc(y.year) + '</div>' +
@@ -2887,6 +3049,9 @@ var GRAPH = ${GRAPH_JSON};
 
   /** Reloads everything already on screen. The refresh button and anything that changed state. */
   function loadAll() {
+    // Der Abstand der selbsttätigen Aktualisierung zählt ab hier, egal wer geladen hat. Wer gerade
+    // von Hand aktualisiert hat, soll nicht zehn Sekunden später noch einmal alles neu bekommen.
+    lastLoadAt = Date.now();
     sum = null; moneyAt = 0;
     Object.keys(loaded).forEach(function (v) { if (LOADERS[v]) LOADERS[v](); });
     get('/admin/api/me').then(function (r) { $('who').textContent = r.email; });
@@ -2944,12 +3109,19 @@ var GRAPH = ${GRAPH_JSON};
   $('sMetric').onchange = renderHistory;
   $('exAdd').onclick = function () {
     if (!$('exDate').value) { tell('Datum fehlt', 'Bitte den Tag angeben, an dem das Geld abgegangen ist.'); return; }
-    if (!Number($('exAmount').value)) { tell('Betrag fehlt', 'Bitte den Rechnungsbetrag angeben.'); return; }
+    // Ein leeres Feld und eine eingetippte Null sind zwei verschiedene Dinge, und Number('')
+    // macht aus beiden dieselbe 0. Deshalb wird hier auf die leere Eingabe geprüft und nicht auf
+    // den Wahrheitswert der Zahl: Null ist ein Betrag — der Monat lag im Freikontingent.
+    var amount = $('exAmount').value.trim() === '' ? NaN : Number($('exAmount').value);
+    if (!isFinite(amount) || amount < 0) {
+      tell('Betrag fehlt', 'Bitte den Rechnungsbetrag angeben. 0 ist erlaubt und heißt: Der Monat lag ganz im Freikontingent, es gibt keine Rechnung.');
+      return;
+    }
     act({
       action: 'add_expense',
       paidAt: $('exDate').value,
       kind: $('exKind').value,
-      amount: Number($('exAmount').value),
+      amount: amount,
       currency: $('exCurrency').value,
       amountHome: $('exHome').value,
       reference: $('exRef').value,

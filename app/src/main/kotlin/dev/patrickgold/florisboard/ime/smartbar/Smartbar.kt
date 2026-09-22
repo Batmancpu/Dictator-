@@ -69,6 +69,7 @@ import dev.patrickgold.florisboard.dictate.ui.DictateSmartbarUi
 import dev.patrickgold.florisboard.editorInstance
 import dev.patrickgold.florisboard.ime.smartbar.quickaction.QuickActionButton
 import dev.patrickgold.florisboard.ime.smartbar.quickaction.QuickActionsRow
+import dev.patrickgold.florisboard.ime.smartbar.quickaction.keyData
 import dev.patrickgold.florisboard.ime.smartbar.quickaction.ToggleOverflowPanelAction
 import dev.patrickgold.florisboard.ime.theme.FlorisImeUi
 import dev.patrickgold.florisboard.keyboardManager
@@ -353,6 +354,7 @@ private fun SmartbarMainRow(modifier: Modifier = Modifier) {
     @Composable
     fun StickyAction() {
         val actionArrangement by prefs.smartbar.actionArrangement.collectAsState()
+        val secondActions by prefs.smartbar.actionSecondActions.collectAsState()
         val evaluator by keyboardManager.activeSmartbarEvaluator.collectAsState()
 
         val action = when {
@@ -372,6 +374,9 @@ private fun SmartbarMainRow(modifier: Modifier = Modifier) {
                 modifier = Modifier.padding(horizontal = 4.dp),
                 action = action,
                 evaluator = evaluator,
+                // The sticky slot is not necessarily the mic — anything can be dragged into it, and
+                // it is the one button that is always visible, so it earns a second action too.
+                secondAction = secondActions.childOf(action.keyData().code),
             )
         } else {
             Spacer(

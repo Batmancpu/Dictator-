@@ -70,6 +70,9 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.settings__localization__title, R.string.settings__localization__title, Routes.Settings.Localization),
         SettingsSearchEntry(R.string.settings__media__title, R.string.settings__media__title, Routes.Settings.Media),
         SettingsSearchEntry(R.string.settings__smartbar__title, R.string.settings__smartbar__title, Routes.Settings.Smartbar),
+        // Hand-added (issue #385): the generator has no entry for this screen file, and running it
+        // would drop the keywordsRes arguments below along with every other hand-added row.
+        SettingsSearchEntry(R.string.settings__smartbar__second_actions__title, R.string.settings__smartbar__second_actions__title, Routes.Settings.SmartbarSecondActions, parentRes = R.string.settings__smartbar__title),
         SettingsSearchEntry(R.string.settings__theme__title, R.string.settings__theme__title, Routes.Settings.Theme),
         SettingsSearchEntry(R.string.settings__typing__title, R.string.settings__typing__title, Routes.Settings.Typing),
         SettingsSearchEntry(R.string.about__version__title, R.string.about__title, Routes.Settings.About, anchor = "about__version__title"),
@@ -133,6 +136,7 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.dictate__floating_button_haptic_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_haptic_title"),
         SettingsSearchEntry(R.string.dictate__floating_button_undo_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_undo_title"),
         SettingsSearchEntry(R.string.dictate__floating_button_copy_to_clipboard_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_copy_to_clipboard_title"),
+        SettingsSearchEntry(R.string.dictate__floating_button_menu_group, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_menu_group"),
         SettingsSearchEntry(R.string.dictate__history_enable_title, R.string.dictate__history_title, Routes.Settings.DictateHistory, parentRes = R.string.dictate__title),
         SettingsSearchEntry(R.string.dictate__history_audio_title, R.string.dictate__history_title, Routes.Settings.DictateHistory, parentRes = R.string.dictate__title),
         SettingsSearchEntry(R.string.dictate__history_retention_title, R.string.dictate__history_title, Routes.Settings.DictateHistory, parentRes = R.string.dictate__title),
@@ -333,6 +337,8 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.prefs__media__sticker_folder_clear, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__sticker_folder_clear"),
         SettingsSearchEntry(R.string.pref__smartbar__enabled__label, R.string.settings__smartbar__title, Routes.Settings.Smartbar, anchor = "pref__smartbar__enabled__label"),
         SettingsSearchEntry(R.string.pref__smartbar__layout__label, R.string.settings__smartbar__title, Routes.Settings.Smartbar, anchor = "pref__smartbar__layout__label"),
+        // Hand-added (issue #385), the row that opens the second actions screen.
+        SettingsSearchEntry(R.string.settings__smartbar__second_actions__title, R.string.settings__smartbar__title, Routes.Settings.Smartbar, anchor = "settings__smartbar__second_actions__title"),
         SettingsSearchEntry(R.string.pref__smartbar__group_layout_specific__label, R.string.settings__smartbar__title, Routes.Settings.Smartbar),
         SettingsSearchEntry(R.string.pref__suggestion__display_mode__label, R.string.settings__smartbar__title, Routes.Settings.Smartbar, anchor = "pref__suggestion__display_mode__label"),
         SettingsSearchEntry(R.string.pref__smartbar__selection_metrics__label, R.string.settings__smartbar__title, Routes.Settings.Smartbar, anchor = "pref__smartbar__selection_metrics__label",

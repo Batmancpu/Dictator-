@@ -668,6 +668,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Auto-expand/collapse</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">Auto-expands/collapses the shared action row based on current state</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Action row placement</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">Second actions</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">Hold a Smartbar button to run a second action</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Tap a button, then the action it should run when held. Both keep their own button — hide one in the keyboard’s action editor to free up the slot.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">What should {action} run when held?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Only as a second action — these buttons repeat while held or already have a hold of their own</string>
 
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Typing</string>
@@ -1089,6 +1094,31 @@
     <string name="apptour62__outro_eyebrow">That is 6.2</string>
     <string name="apptour62__outro_title">Same keyboard, more of it yours</string>
     <string name="apptour62__outro_body">Nothing about the way you dictate has changed — your own key, your own server, or a model on the device. You can revisit any tour under Settings › About.</string>
+    <string name="apptour63__cta_try" comment="Button on a what\'s-new page that opens the settings screen for the feature just described">Try it</string>
+    <string name="apptour63__intro_eyebrow">Dictate 6.3</string>
+    <string name="apptour63__intro_title">More of the keyboard, without leaving it</string>
+    <string name="apptour63__intro_body">Point the camera at printed text and it lands in the field. The cursor, the selection and the clipboard finally share one panel. Any Smartbar button can carry a second action under a long press. And offline dictation has models that actually fit on a phone.</string>
+    <string name="apptour63__scan_eyebrow">New: scan text</string>
+    <string name="apptour63__scan_title">Printed text, straight into the field</string>
+    <string name="apptour63__scan_body">An IBAN off a letter, a serial number off a box, an address off a parcel: point the camera at it and the text arrives where you were typing, instead of being read out and typed again. It is recognised on this device — nothing is uploaded and no provider is involved. Dictate never asks for the camera permission either: the system camera takes the photo and hands back that one picture, which is deleted as soon as it has been read.</string>
+    <string name="apptour63__editing_eyebrow">New: editing panel</string>
+    <string name="apptour63__editing_title">Cursor, selection and clipboard in one place</string>
+    <string name="apptour63__editing_body">All of it existed already, spread across eleven keys you had to know were there. Now it is one panel: move by character, word or line, select, copy, paste, undo. Holding a key repeats it instead of asking for eleven taps. And the number pad can be asked for by name now, rather than only being stumbled into by a gesture nobody had bound.</string>
+    <string name="apptour63__second_eyebrow">New: hold for a second action</string>
+    <string name="apptour63__second_title">Two actions in one Smartbar seat</string>
+    <string name="apptour63__second_body">Pair a second action to a button yourself and a long press runs it. Only five or six buttons are ever visible at once, so this is the difference between having a feature and having room for it. A small mark in the corner shows which buttons carry one.</string>
+    <string name="apptour63__floating_eyebrow">Floating button</string>
+    <string name="apptour63__floating_title">A menu on hold, and only where you want it</string>
+    <string name="apptour63__floating_body">Hold the floating button for a short menu — transcribing a file is the first thing in it. You can also tell it which apps it is welcome in, instead of it following you into every one. Stop now stays exactly where start was, and the pill opens smoothly whichever side of the screen it sits on.</string>
+    <string name="apptour63__offline_eyebrow">Offline dictation</string>
+    <string name="apptour63__offline_title">Models that fit on a phone</string>
+    <string name="apptour63__offline_body">English, German and Russian can now be dictated offline with models in the hundred-megabyte range, instead of only the 670 MB ones. Dolphin adds forty Eastern languages the catalogue could answer only badly before. And the picker is ordered by what most people will actually download rather than by architecture — ten rows instead of twenty-four, with the details behind a tap.</string>
+    <string name="apptour63__more_eyebrow">Also</string>
+    <string name="apptour63__more_title">A lot of small things</string>
+    <string name="apptour63__more_body">Your own word list can arrive as a file now, and leave as one. The recording bar draws a waveform, so it is visible when your voice has stopped. A provider account can choose the region its data stays in, and the streaming host moves with it. A dictation survives the microphone it was recording from going away. The connection test says only what it really checked, the provider\'s own key page is one tap from the field where the key goes, and a fresh install opens on what the keyboard is for rather than on the order its features happened to ship in.</string>
+    <string name="apptour63__outro_eyebrow">That is 6.3</string>
+    <string name="apptour63__outro_title">Fewer detours, same keyboard</string>
+    <string name="apptour63__outro_body">Nothing about the way you dictate has changed — your own key, your own server, or a model on the device. You can revisit any tour under Settings › About.</string>
     <string name="about__website__title" comment="Preference title linking to the marketing website">Website</string>
     <string name="about__repository__title" comment="Preference title">Repository (GitHub)</string>
     <string name="about__repository__summary" comment="Preference summary">Source code, discussions, issues and info</string>
@@ -1818,6 +1848,8 @@
     <string name="dictate__floating_button_copy_to_clipboard_title" comment="Toggle: copy every floating-button dictation to the clipboard">Copy every dictation to clipboard</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on" comment="Summary when copy-every-dictation is enabled">Each dictation is also copied to the clipboard, so you can paste it manually if inserting ever fails. May show a clipboard notice on some phones.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off" comment="Summary when copy-every-dictation is disabled">Dictations are only inserted, not copied to the clipboard.</string>
+    <string name="dictate__floating_button_menu_group" comment="Header above the switches that add entries to the menu opened by holding the floating button">Hold menu</string>
+    <string name="dictate__floating_button_menu_settings_title" comment="Menu entry and switch that opens the Dictate settings from the floating button">Dictate settings</string>
     <string name="dictate__floating_button_no_prompts" comment="Toast when long-pressing the floating button but no rewording prompts exist">No rewording prompts yet — add some in Dictate settings.</string>
     <string name="dictate__floating_button_retry_hint" comment="Toast after a failed floating-button dictation whose recording was kept; %1$s is the error message. Tapping the button re-sends the recording.">%1$s — tap to retry</string>
     <string name="dictate__floating_button_badge_new" comment="Small 'New' badge on the floating-button settings entry. Keep very short.">New</string>
@@ -1987,7 +2019,17 @@
     <string name="dictate__providers_add_custom_summary" comment="Summary under the add-your-own-server button">Self-hosted or any OpenAI-compatible endpoint — for speech-to-text and rewording</string>
     <string name="dictate__providers_azure_endpoint" comment="Note at the top of the Azure provider editor: where the endpoint comes from, and the only regions that host the model">The endpoint is next to the key on the portal’s “Keys and Endpoint” page. MAI-Transcribe runs only in East US, West US, West US 2, North Europe, Southeast Asia and Central India.</string>
     <string name="dictate__providers_ollama_no_stt" comment="Note at the top of the Ollama provider editor; Ollama serves no transcription endpoint">Ollama has no speech-to-text endpoint, so it can only reword. To dictate through a server of your own, run a speech server (such as Speaches, faster-whisper-server or whisper.cpp) and add it under “Add your own server” — or use the on-device engine, which needs no server at all.</string>
+    <!-- Data residency (issue #403). The region is picked from a list because the valid addresses are the
+         provider’s own and short, and a mistyped residency host does not fail — it answers, from the
+         wrong continent. -->
+    <string name="dictate__providers_region_title" comment="Label of the field that picks a provider’s data-residency region">Region</string>
+    <string name="dictate__providers_region_us" comment="Name of the United States data-residency region">United States</string>
+    <string name="dictate__providers_region_eu" comment="Name of the European Union data-residency region">European Union</string>
+    <string name="dictate__providers_region_jp" comment="Name of the Japan data-residency region">Japan</string>
+    <string name="dictate__providers_region_in" comment="Name of the India data-residency region">India</string>
+    <string name="dictate__providers_region_global" comment="Name of the worldwide (non-regional) endpoint">Worldwide</string>
     <string name="dictate__providers_custom_title" comment="Dialog title when editing a custom endpoint">Custom server</string>
+    <string name="dictate__providers_get_key" comment="Accessibility label for the key icon beside the provider dialog title; it opens the provider's own page for creating an API key">Get an API key</string>
     <string name="dictate__providers_field_name" comment="Label for the custom endpoint display name field">Name</string>
     <string name="dictate__providers_field_transcription_model" comment="Label for the transcription model field in the provider editor">Transcription model</string>
     <string name="dictate__providers_field_transcription_rewording_model" comment="Label for the model field when single-call is on, where one model does transcription and rewording">Transcription &amp; rewording model</string>
@@ -2146,6 +2188,12 @@
     <string name="dictate__local_model_none_selected" comment="Summary on the on-device provider row when no model is downloaded/selected yet">No model downloaded yet</string>
     <string name="dictate__local_model_delete_confirm" comment="Confirmation question before deleting a downloaded model. {model} is the model name.">Delete “{model}”? You can download it again later.</string>
     <string name="dictate__local_model_not_installed_error" comment="Error shown when trying to dictate with the on-device provider but no model is downloaded">No on-device model downloaded</string>
+    <plurals name="dictate__local_model_languages" comment="How many languages an on-device model covers, shown under its name when there are too many to name one by one (issue #406). {count} is a number; it is never below six, because up to five are listed instead.">
+        <item quantity="one">{count} language</item>
+        <item quantity="other">{count} languages</item>
+    </plurals>
+    <string name="dictate__local_model_family_installed" comment="Shown under a model family (Whisper, Kroko) in the on-device picker when some of its variants are downloaded. Both {count} and {total} are numbers.">{count} of {total} installed</string>
+    <string name="dictate__local_model_family_open" comment="Spoken action label for the row that opens a model family (Whisper, Kroko) and shows the variants inside it">Show variants</string>
     <string name="dictate__local_fallback_title" comment="Title of the toggle that enables on-device transcription as an offline fallback">Offline fallback</string>
     <string name="dictate__local_fallback_summary" comment="Explains the offline fallback toggle">When offline, transcribe on-device with the downloaded model after the provider fails</string>
 

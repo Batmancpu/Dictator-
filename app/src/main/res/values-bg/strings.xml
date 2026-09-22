@@ -481,6 +481,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Автоматично разтваряне/сгъване</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">Автоматично се разтваря/сгъва споделения ред с действия, на базата на състоянието</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Място на реда с действия</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">Втори действия</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">Задръжте бутон от Smartbar, за да изпълните второ действие</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Докоснете бутон, след което действието, което той трябва да изпълнява при задържане. И двата запазват собствения си бутон — скрийте единия в редактора на действия на клавиатурата, за да освободите място.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">Какво да изпълнява {action} при задържане?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Само като второ действие — тези бутони се повтарят при задържане или вече имат собствена функция при задържане</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Въвеждане</string>
     <string name="pref__suggestion__title" comment="Preference group title">Предложения</string>
@@ -1368,7 +1373,14 @@
     <string name="dictate__providers_add_custom_summary">Собствен хостинг или всяка крайна точка, съвместима с OpenAI — за разпознаване на реч и преформулиране</string>
     <string name="dictate__providers_azure_endpoint">Endpoint стои до ключа на страницата „Keys and Endpoint“ в портала. MAI-Transcribe работи само в East US, West US, West US 2, North Europe, Southeast Asia и Central India.</string>
     <string name="dictate__providers_ollama_no_stt">Ollama няма крайна точка за разпознаване на реч, затова може само да преформулира. За диктовка през собствен сървър пуснете сървър за реч (например Speaches, faster-whisper-server или whisper.cpp) и го добавете от „Добавяне на собствен сървър“ — или използвайте разпознаването на устройството, за което изобщо не е нужен сървър.</string>
+    <string name="dictate__providers_region_title">Регион</string>
+    <string name="dictate__providers_region_us">Съединени щати</string>
+    <string name="dictate__providers_region_eu">Европейски съюз</string>
+    <string name="dictate__providers_region_jp">Япония</string>
+    <string name="dictate__providers_region_in">Индия</string>
+    <string name="dictate__providers_region_global">Целият свят</string>
     <string name="dictate__providers_custom_title">Персонализиран сървър</string>
+    <string name="dictate__providers_get_key">Вземете API ключ</string>
     <string name="dictate__providers_field_name">Име</string>
     <string name="dictate__providers_field_transcription_model">Модел за транскрибиране</string>
     <string name="dictate__providers_field_chat_model">Модел за преформулиране</string>
@@ -1692,6 +1704,12 @@
     <string name="dictate__local_model_none_selected">Все още няма изтеглен модел</string>
     <string name="dictate__local_model_delete_confirm">Да се изтрие ли „{model}“? Можете да го изтеглите отново по-късно.</string>
     <string name="dictate__local_model_not_installed_error">Няма изтеглен локален модел</string>
+    <string name="dictate__local_model_family_installed">{count} от {total} инсталирани</string>
+    <string name="dictate__local_model_family_open">Показване на вариантите</string>
+    <plurals name="dictate__local_model_languages">
+        <item quantity="one">{count} език</item>
+        <item quantity="other">{count} езика</item>
+    </plurals>
     <string name="dictate__local_fallback_title">Офлайн резервен режим</string>
     <string name="dictate__local_fallback_summary">Когато сте офлайн, транскрибирайте локално с изтегления модел след неуспех на доставчика</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Запазени промптове за преформулиране</string>
@@ -1699,6 +1717,8 @@
     <string name="dictate__floating_button_copy_to_clipboard_title">Копиране на всяка диктовка в клипборда</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Всяка диктовка се копира и в клипборда, за да можете да я поставите ръчно, ако вмъкването се провали. На някои телефони може да покаже известие за клипборда.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Диктовките само се вмъкват, но не се копират в клипборда.</string>
+    <string name="dictate__floating_button_menu_group">Меню при задържане</string>
+    <string name="dictate__floating_button_menu_settings_title">Настройки на Dictate</string>
     <string name="dictate__floating_button_undo_summary_off">Не се показва бутон за отмяна.</string>
     <string name="dictate__floating_button_undo_summary_on">След диктовка до бутона се появява бутон за отмяна, който премахва вмъкнатия текст с едно докосване.</string>
     <string name="dictate__floating_button_undo_title">Бутон за отмяна</string>
@@ -2136,6 +2156,31 @@
     <string name="apptour62__outro_eyebrow">Това е 6.2</string>
     <string name="apptour62__outro_title">Същата клавиатура, повече от нея ваша</string>
     <string name="apptour62__outro_body">Нищо не се променя в начина, по който диктувате — собствен ключ, собствен сървър или модел на устройството. Всички обиколки намирате отново в Настройки › Относно.</string>
+    <string name="apptour63__cta_try">Изпробвайте</string>
+    <string name="apptour63__intro_eyebrow">Dictate 6.3</string>
+    <string name="apptour63__intro_title">Повече клавиатура, без да я напускате</string>
+    <string name="apptour63__intro_body">Насочете камерата към печатен текст и той се озовава в полето. Курсорът, селекцията и буферът най-сетне споделят един панел. Всеки бутон на Smartbar може да носи второ действие при дълго натискане. А диктуването без мрежа най-после има модели, които наистина се побират в телефон.</string>
+    <string name="apptour63__scan_eyebrow">Ново: сканиране на текст</string>
+    <string name="apptour63__scan_title">Печатният текст направо в полето</string>
+    <string name="apptour63__scan_body">IBAN от писмо, сериен номер от кутия, адрес от пратка: насочете камерата и текстът се появява там, където пишехте, вместо да се преписва. Разпознаването става на това устройство — нищо не се качва и никой доставчик не участва. Dictate също така никога не иска разрешение за камерата: снимката прави системната камера и връща само това едно изображение, което се изтрива веднага щом бъде прочетено.</string>
+    <string name="apptour63__editing_eyebrow">Ново: панел за редактиране</string>
+    <string name="apptour63__editing_title">Курсор, селекция и буфер на едно място</string>
+    <string name="apptour63__editing_body">Всичко това вече съществуваше, пръснато по единадесет клавиша, за които трябваше да знаете. Сега е един панел: движение по знак, дума или ред, избиране, копиране, поставяне, отмяна. Задържан клавиш се повтаря, вместо да иска единадесет докосвания. А цифровата клавиатура най-сетне може да бъде извикана изрично, а не само чрез жест, който никой не беше задал.</string>
+    <string name="apptour63__second_eyebrow">Ново: задържане за второ действие</string>
+    <string name="apptour63__second_title">Две действия на едно място в Smartbar</string>
+    <string name="apptour63__second_body">Сами свързвате второ действие с бутон и дългото натискане го изпълнява. Наведнъж се виждат само пет или шест бутона — това е разликата между това функцията да съществува и това да има място за нея. Малък знак в ъгъла показва кои бутони носят такова.</string>
+    <string name="apptour63__floating_eyebrow">Плаващ бутон</string>
+    <string name="apptour63__floating_title">Меню при задържане, и само там, където го искате</string>
+    <string name="apptour63__floating_body">Задръжте плаващия бутон за кратко меню; транскрибирането на файл е първото в него. Можете също да му кажете в кои приложения е добре дошъл, вместо да ви следва във всяко. Спирането вече остава точно там, където беше стартът, а капсулата се отваря плавно от която и страна на екрана да стои.</string>
+    <string name="apptour63__offline_eyebrow">Диктуване без мрежа</string>
+    <string name="apptour63__offline_title">Модели, които се побират в телефон</string>
+    <string name="apptour63__offline_body">Английски, немски и руски вече могат да се диктуват офлайн с модели от порядъка на стотици мегабайта, а не само с тези от 670 МБ. Dolphin добавя четиридесет източни езика, на които каталогът досега отговаряше само зле. А списъкът е подреден според това, което хората наистина изтеглят, а не според архитектурата: десет реда вместо двадесет и четири, с подробностите на едно докосване.</string>
+    <string name="apptour63__more_eyebrow">Освен това</string>
+    <string name="apptour63__more_title">Много дребни неща</string>
+    <string name="apptour63__more_body">Собственият ви списък с думи вече може да дойде като файл и да си тръгне така. Лентата за запис рисува вълна, така че се вижда кога гласът е спрял. Акаунт на доставчик може да избере региона, в който остават данните му, а стрийминг хостът се мести с него. Диктуването оцелява, когато микрофонът, от който записваше, изчезне. Тестът на връзката казва само това, което наистина е проверил, страницата с ключа на доставчика е на едно докосване от полето, където ключът отива, а нова инсталация се отваря с това, за което служи клавиатурата, а не с реда, по който функциите ѝ случайно са се появявали.</string>
+    <string name="apptour63__outro_eyebrow">Това е 6.3</string>
+    <string name="apptour63__outro_title">По-малко заобикалки, същата клавиатура</string>
+    <string name="apptour63__outro_body">Нищо не се променя в начина, по който диктувате — собствен ключ, собствен сървър или модел на устройството. Всички обиколки намирате отново в Настройки › Относно.</string>
     <string name="changelog__v5_0_0">• НОВО: Писане с плъзгане — плъзгайте по клавишите, за да пишете цели думи, с речници за отделните езици, изтегляни при поискване. 👆\n• НОВО: Предложения за думи и автокорекция — печатните грешки се коригират автоматично, а написаната дума остава на едно докосване. ✨\n• НОВО: Транскрипция в реално време — гледайте как думите ви се появяват, докато говорите, с OpenAI, Deepgram, Soniox, AssemblyAI и ElevenLabs. ⚡\n• НОВО: Още три доставчика на транскрипция — ElevenLabs Scribe, Deepgram и AssemblyAI. ☁️\n• НОВО: Класическа подредба за диктовка — гласовият екран без клавиатура от Dictate 3 се завръща, фиксиран или на едно плъзгане. 🎙️\n• НОВО: Библиотека с промптове от общността — разглеждайте и споделяйте промптове за преформулиране. 📚\n• НОВО: Статистика за диктовка с етапи. 📊\n• НОВО: Офлайн модел NVIDIA Parakeet, плюс филтър за тишина, който пропуска празните записи. 📴\n• Още: по-стабилен плаващ бутон, контрол на усилието на разсъждение, тактилна обратна връзка, нова тема E-Reader и десетки поправки. 🛠️</string>
     <string name="media__tab__gifs">GIFs</string>
     <string name="prefs__media__gif__title">GIFs</string>

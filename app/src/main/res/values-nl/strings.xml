@@ -403,6 +403,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Automatisch uitvouwen/samenvouwen</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">De gedeelde actierij wordt automatisch uitgevouwen/samengevouwen op basis van de huidige status</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Plaatsing van actierij</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">Tweede acties</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">Houd een Smartbar-knop ingedrukt om een tweede actie uit te voeren</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Tik op een knop en daarna op de actie die hij moet uitvoeren als je hem ingedrukt houdt. Beide houden hun eigen knop — verberg er een in de actie-editor van het toetsenbord om de plek vrij te maken.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">Wat moet {action} doen als je de knop ingedrukt houdt?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Alleen als tweede actie — deze knoppen herhalen bij ingedrukt houden of hebben daar al een eigen functie voor</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Typen</string>
     <string name="pref__suggestion__title" comment="Preference group title">Suggesties</string>
@@ -1268,7 +1273,14 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__providers_add_custom_summary">Zelf gehost of elk OpenAI-compatibel endpoint — voor spraakherkenning en herformuleren</string>
     <string name="dictate__providers_azure_endpoint">Het endpoint staat naast de sleutel op de pagina ‘Keys and Endpoint’ in de portal. MAI-Transcribe draait alleen in East US, West US, West US 2, North Europe, Southeast Asia en Central India.</string>
     <string name="dictate__providers_ollama_no_stt">Ollama heeft geen endpoint voor spraakherkenning en kan dus alleen herformuleren. Wil je dicteren via een eigen server, draai dan een spraakserver (zoals Speaches, faster-whisper-server of whisper.cpp) en voeg die toe via “Je eigen server toevoegen” — of gebruik de herkenning op het toestel, waarvoor helemaal geen server nodig is.</string>
+    <string name="dictate__providers_region_title">Regio</string>
+    <string name="dictate__providers_region_us">Verenigde Staten</string>
+    <string name="dictate__providers_region_eu">Europese Unie</string>
+    <string name="dictate__providers_region_jp">Japan</string>
+    <string name="dictate__providers_region_in">India</string>
+    <string name="dictate__providers_region_global">Wereldwijd</string>
     <string name="dictate__providers_custom_title">Aangepaste server</string>
+    <string name="dictate__providers_get_key">API-sleutel ophalen</string>
     <string name="dictate__providers_field_name">Naam</string>
     <string name="dictate__providers_field_transcription_model">Transcriptiemodel</string>
     <string name="dictate__providers_field_chat_model">Herformuleringsmodel</string>
@@ -1592,6 +1604,12 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__local_model_none_selected">Nog geen model gedownload</string>
     <string name="dictate__local_model_delete_confirm">“{model}” verwijderen? Je kunt het later opnieuw downloaden.</string>
     <string name="dictate__local_model_not_installed_error">Geen lokaal model gedownload</string>
+    <string name="dictate__local_model_family_installed">{count} van {total} geïnstalleerd</string>
+    <string name="dictate__local_model_family_open">Varianten tonen</string>
+    <plurals name="dictate__local_model_languages">
+        <item quantity="one">{count} taal</item>
+        <item quantity="other">{count} talen</item>
+    </plurals>
     <string name="dictate__local_fallback_title">Offline terugval</string>
     <string name="dictate__local_fallback_summary">Offline transcriberen op het apparaat met het gedownloade model nadat de provider faalt</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Opgeslagen herformuleerprompts</string>
@@ -1599,6 +1617,8 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__floating_button_copy_to_clipboard_title">Elk dictaat naar klembord kopiëren</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Elk dictaat wordt ook naar het klembord gekopieerd, zodat je het handmatig kunt plakken als invoegen mislukt. Kan op sommige telefoons een klembordmelding tonen.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Dictaten worden alleen ingevoegd, niet naar het klembord gekopieerd.</string>
+    <string name="dictate__floating_button_menu_group">Menu bij ingedrukt houden</string>
+    <string name="dictate__floating_button_menu_settings_title">Dictate-instellingen</string>
     <string name="dictate__floating_button_undo_summary_off">Geen knop voor ongedaan maken weergegeven.</string>
     <string name="dictate__floating_button_undo_summary_on">Na een dictaat verschijnt er een knop voor ongedaan maken naast de knop om de ingevoegde tekst met één tik te verwijderen.</string>
     <string name="dictate__floating_button_undo_title">Knop voor ongedaan maken</string>
@@ -2036,6 +2056,31 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="apptour62__outro_eyebrow">Dat is 6.2</string>
     <string name="apptour62__outro_title">Hetzelfde toetsenbord, meer ervan van jou</string>
     <string name="apptour62__outro_body">Aan de manier waarop je dicteert verandert niets — je eigen sleutel, je eigen server of een model op het toestel. Alle rondleidingen vind je terug onder Instellingen › Over.</string>
+    <string name="apptour63__cta_try">Uitproberen</string>
+    <string name="apptour63__intro_eyebrow">Dictate 6.3</string>
+    <string name="apptour63__intro_title">Meer toetsenbord, zonder het te verlaten</string>
+    <string name="apptour63__intro_body">Richt de camera op gedrukte tekst en die belandt in het veld. Cursor, selectie en klembord delen eindelijk één paneel. Elke Smartbar-knop kan met lang indrukken een tweede actie dragen. En dicteren zonder internet heeft eindelijk modellen die echt op een telefoon passen.</string>
+    <string name="apptour63__scan_eyebrow">Nieuw: tekst scannen</string>
+    <string name="apptour63__scan_title">Gedrukte tekst, meteen in het veld</string>
+    <string name="apptour63__scan_body">Het IBAN van een brief, het serienummer van een doos, het adres van een pakket: richt de camera erop en de tekst staat waar je aan het typen was, in plaats van overgetikt te worden. De herkenning gebeurt op dit toestel — er wordt niets geüpload en er komt geen aanbieder aan te pas. Dictate vraagt ook nooit om de camerarechten: de systeemcamera maakt de foto en geeft alleen die ene afbeelding terug, die wordt verwijderd zodra ze gelezen is.</string>
+    <string name="apptour63__editing_eyebrow">Nieuw: bewerkpaneel</string>
+    <string name="apptour63__editing_title">Cursor, selectie en klembord op één plek</string>
+    <string name="apptour63__editing_body">Het bestond allemaal al, verspreid over elf toetsen waarvan je moest weten. Nu is het één paneel: verplaatsen per teken, woord of regel, selecteren, kopiëren, plakken, ongedaan maken. Een ingedrukte toets herhaalt zichzelf in plaats van elf tikken te vragen. En het numerieke blok kun je nu uitdrukkelijk oproepen, in plaats van het alleen via een gebaar te bereiken dat niemand had ingesteld.</string>
+    <string name="apptour63__second_eyebrow">Nieuw: houd vast voor een tweede actie</string>
+    <string name="apptour63__second_title">Twee acties op één Smartbar-plek</string>
+    <string name="apptour63__second_body">Je koppelt zelf een tweede actie aan een knop, en lang indrukken voert die uit. Er zijn altijd maar vijf of zes knoppen zichtbaar: dat is het verschil tussen een functie hebben en er plek voor hebben. Een klein teken in de hoek laat zien welke knoppen er een dragen.</string>
+    <string name="apptour63__floating_eyebrow">Zwevende knop</string>
+    <string name="apptour63__floating_title">Een menu bij vasthouden, en alleen waar jij hem wilt</string>
+    <string name="apptour63__floating_body">Houd de zwevende knop vast voor een kort menu; een bestand transcriberen staat er als eerste in. Je kunt hem ook vertellen in welke apps hij welkom is, in plaats van dat hij je overal volgt. Stoppen blijft nu precies waar starten stond, en de pil opent soepel aan welke schermrand hij ook zit.</string>
+    <string name="apptour63__offline_eyebrow">Dicteren zonder internet</string>
+    <string name="apptour63__offline_title">Modellen die op een telefoon passen</string>
+    <string name="apptour63__offline_body">Engels, Duits en Russisch kun je nu offline dicteren met modellen van enkele honderden megabytes, niet meer alleen met die van 670 MB. Dolphin voegt veertig oosterse talen toe die de catalogus alleen slecht kon beantwoorden. En de lijst is geordend naar wat mensen echt downloaden in plaats van naar architectuur: tien rijen in plaats van vierentwintig, met de details achter één tik.</string>
+    <string name="apptour63__more_eyebrow">Verder</string>
+    <string name="apptour63__more_title">Veel kleine dingen</string>
+    <string name="apptour63__more_body">Je eigen woordenlijst kan nu als bestand binnenkomen, en er weer als bestand uit. De opnamebalk tekent een golfvorm, zodat zichtbaar is wanneer je stem is gestopt. Een aanbiederaccount kan de regio kiezen waar zijn gegevens blijven, en de streaminghost verhuist mee. Een dictaat overleeft het verdwijnen van de microfoon waarmee het opnam. De verbindingstest zegt alleen nog wat hij echt heeft gecontroleerd, de sleutelpagina van de aanbieder ligt één tik naast het veld waar de sleutel hoort, en een verse installatie opent met waar het toetsenbord voor is in plaats van met de volgorde waarin de functies toevallig verschenen.</string>
+    <string name="apptour63__outro_eyebrow">Dat is 6.3</string>
+    <string name="apptour63__outro_title">Minder omwegen, hetzelfde toetsenbord</string>
+    <string name="apptour63__outro_body">Aan de manier waarop je dicteert verandert niets — je eigen sleutel, je eigen server of een model op het toestel. Alle rondleidingen vind je terug onder Instellingen › Over.</string>
     <string name="changelog__v5_0_0">• NIEUW: Veegtypen — veeg over de toetsen om hele woorden te typen, met woordenboeken per taal die op aanvraag worden gedownload. 👆\n• NIEUW: Woordsuggesties &amp; autocorrectie — typfouten worden automatisch hersteld en het woord dat je typte blijft één tik verwijderd. ✨\n• NIEUW: Realtime transcriptie — zie je woorden verschijnen terwijl je praat, met OpenAI, Deepgram, Soniox, AssemblyAI en ElevenLabs. ⚡\n• NIEUW: Drie extra transcriptieaanbieders — ElevenLabs Scribe, Deepgram en AssemblyAI. ☁️\n• NIEUW: Klassieke dicteerindeling — het toetsenbordloze spraakscherm uit Dictate 3 is terug, vastgezet of gewoon één veeg weg. 🎙️\n• NIEUW: Community-promptbibliotheek — blader door en deel herformuleringsprompts. 📚\n• NIEUW: Dicteerstatistieken met mijlpalen. 📊\n• NIEUW: Offline-model NVIDIA Parakeet, plus een stiltefilter dat lege opnames overslaat. 📴\n• Meer: een stabielere zwevende knop, instelbare redeneerinspanning, haptische feedback, een nieuw E-Reader-thema en tientallen oplossingen. 🛠️</string>
     <string name="media__tab__gifs">GIFs</string>
     <string name="prefs__media__gif__title">GIFs</string>

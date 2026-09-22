@@ -18,9 +18,11 @@ import android.os.Bundle
 import android.provider.OpenableColumns
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
@@ -37,7 +39,9 @@ import java.io.File
  * There is no focused field anywhere in that story, so the transcript needs a screen of its own to
  * land on — see [TranscribeShareScreen].
  *
- * Also registered for ACTION_VIEW, so "Open with → Dictate" works from any file manager.
+ * Also registered for ACTION_VIEW, so "Open with → Dictate" works from any file manager, and startable
+ * with no file at all ([pickIntent], issue #408) — it then runs the picker itself, which is how the
+ * floating button reaches this screen from a service that has no activity to take a result.
  *
  * **The grant dies with this activity.** A content Uri from ACTION_SEND is readable only while we
  * are alive, so the file is copied into our own cache before anything else happens. Everything
@@ -45,10 +49,23 @@ import java.io.File
  */
 class TranscribeShareActivity : ComponentActivity() {
 
+    /** The file picked here when the screen was opened without one ([EXTRA_PICK], issue #408). */
+    private val picked = mutableStateOf<List<Uri>?>(null)
+
+    private val picker = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        // Backing out of the picker means backing out of the whole screen: it was opened to transcribe
+        // a file, and without one there is nothing here to read.
+        if (uri == null) finish() else picked.value = listOf(uri)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val uris = incomingUris(intent)
+        val incoming = incomingUris(intent)
+        // Callers with no activity of their own — the floating button — ask the screen to run the picker
+        // itself. Only on a fresh start: after a recreation the launcher redelivers the result instead.
+        val pickHere = incoming.isEmpty() && intent?.getBooleanExtra(EXTRA_PICK, false) == true
+        if (pickHere && savedInstanceState == null) picker.launch(MIME_TYPES)
         val prefs by FlorisPreferenceStore
 
         setContent {
@@ -58,10 +75,15 @@ class TranscribeShareActivity : ComponentActivity() {
             ProvideLocalizedResources(this, appName = R.string.app_name_full) {
                 FlorisAppTheme(theme = theme) {
                     Surface(color = MaterialTheme.colorScheme.background) {
-                        TranscribeShareScreen(
-                            uris = uris,
-                            onClose = { finish() },
-                        )
+                        // Nothing until there is a file: while the picker is up the screen is behind it,
+                        // and an empty list here would flash "no file was shared" first.
+                        val uris = if (pickHere) picked.value else incoming
+                        if (uris != null) {
+                            TranscribeShareScreen(
+                                uris = uris,
+                                onClose = { finish() },
+                            )
+                        }
                     }
                 }
             }
@@ -81,6 +103,9 @@ class TranscribeShareActivity : ComponentActivity() {
         /** Extra carrying an already-picked file, used by the in-app "Transcribe a file" entry. */
         const val EXTRA_PICKED_URI = "dictate.pickedUri"
 
+        /** Extra asking the screen to open the file picker itself (issue #408). */
+        const val EXTRA_PICK = "dictate.pickFile"
+
         val MIME_TYPES = arrayOf("audio/*", "video/*")
 
         /** Launches the screen for a file the user picked inside the app. */
@@ -88,6 +113,17 @@ class TranscribeShareActivity : ComponentActivity() {
             Intent(context, TranscribeShareActivity::class.java)
                 .putExtra(EXTRA_PICKED_URI, uri)
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+        /**
+         * Launches the screen with no file yet, for a caller that cannot run a picker of its own: the
+         * floating button lives in an accessibility service, which has no activity to take a result
+         * (the same reason [dev.patrickgold.florisboard.dictate.FileTranscriptionActivity] exists for
+         * the keyboard). This screen already has an activity, so it runs the picker itself rather than
+         * hopping through a second one.
+         */
+        fun pickIntent(context: Context): Intent =
+            Intent(context, TranscribeShareActivity::class.java)
+                .putExtra(EXTRA_PICK, true)
 
         /**
          * Every audio/video Uri the intent carries, in the order it arrived.

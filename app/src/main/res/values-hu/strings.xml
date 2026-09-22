@@ -480,6 +480,11 @@
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__label" comment="Preference title">Automatikus kinyitás/összecsukás</string>
     <string name="pref__smartbar__shared_actions_auto_expand_collapse__summary" comment="Preference summary">A megosztott műveleti sor automata kinyitása/összecsukása a pillanatnyi állapot alapján</string>
     <string name="pref__smartbar__extended_actions_placement__label" comment="Preference title">Műveleti sor helye</string>
+    <string name="settings__smartbar__second_actions__title" comment="Title of the Smartbar second actions screen">Másodlagos műveletek</string>
+    <string name="settings__smartbar__second_actions__summary" comment="Preference summary">Tartson nyomva egy Smartbar-gombot másodlagos művelet futtatásához</string>
+    <string name="settings__smartbar__second_actions__note" comment="Header of the screen while nothing is being paired: says what to do">Koppintson egy gombra, majd arra a műveletre, amelyet nyomva tartáskor futtasson. Mindkettő megtartja a saját gombját — az egyiket rejtse el a billentyűzet műveletszerkesztőjében, hogy felszabaduljon a hely.</string>
+    <string name="settings__smartbar__second_actions__hint_pick_second" comment="Header while a button is selected; {action} is that button's name">Mit futtasson a(z) {action} nyomva tartáskor?</string>
+    <string name="settings__smartbar__second_actions__section_child_only" comment="Heading above the buttons that cannot carry a second action">Csak másodlagos műveletként — ezek a gombok nyomva tartáskor ismétlődnek, vagy már van saját nyomva tartási funkciójuk</string>
     <!-- Typing strings -->
     <string name="settings__typing__title" comment="Title of Typing screen">Gépelés</string>
     <string name="pref__suggestion__title" comment="Preference group title">Javaslatok</string>
@@ -1367,7 +1372,14 @@
     <string name="dictate__providers_add_custom_summary">Saját üzemeltetésű vagy bármilyen OpenAI-kompatibilis végpont — beszédfelismeréshez és újrafogalmazáshoz</string>
     <string name="dictate__providers_azure_endpoint">A végpont a portál „Keys and Endpoint” oldalán a kulcs mellett áll. A MAI-Transcribe csak az East US, West US, West US 2, North Europe, Southeast Asia és Central India régiókban fut.</string>
     <string name="dictate__providers_ollama_no_stt">Az Ollamának nincs beszédfelismerő végpontja, ezért csak újrafogalmazni tud. Ha saját szerverrel szeretne diktálni, indítson egy beszédszervert (például Speaches, faster-whisper-server vagy whisper.cpp), és adja hozzá a „Saját szerver hozzáadása” alatt — vagy használja a készüléken futó felismerést, amelyhez egyáltalán nem kell szerver.</string>
+    <string name="dictate__providers_region_title">Régió</string>
+    <string name="dictate__providers_region_us">Egyesült Államok</string>
+    <string name="dictate__providers_region_eu">Európai Unió</string>
+    <string name="dictate__providers_region_jp">Japán</string>
+    <string name="dictate__providers_region_in">India</string>
+    <string name="dictate__providers_region_global">Világszerte</string>
     <string name="dictate__providers_custom_title">Egyéni szerver</string>
+    <string name="dictate__providers_get_key">API-kulcs beszerzése</string>
     <string name="dictate__providers_field_name">Név</string>
     <string name="dictate__providers_field_transcription_model">Átírási modell</string>
     <string name="dictate__providers_field_chat_model">Átfogalmazási modell</string>
@@ -1691,6 +1703,12 @@
     <string name="dictate__local_model_none_selected">Még nincs letöltött modell</string>
     <string name="dictate__local_model_delete_confirm">Törlöd a(z) „{model}“ modellt? Később újra letöltheted.</string>
     <string name="dictate__local_model_not_installed_error">Nincs letöltött helyi modell</string>
+    <string name="dictate__local_model_family_installed">{count} / {total} telepítve</string>
+    <string name="dictate__local_model_family_open">Változatok megjelenítése</string>
+    <plurals name="dictate__local_model_languages">
+        <item quantity="one">{count} nyelv</item>
+        <item quantity="other">{count} nyelv</item>
+    </plurals>
     <string name="dictate__local_fallback_title">Offline tartalék</string>
     <string name="dictate__local_fallback_summary">Offline állapotban a letöltött modellel írd át helyben, miután a szolgáltató hibázott</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Mentett átfogalmazási utasítások</string>
@@ -1698,6 +1716,8 @@
     <string name="dictate__floating_button_copy_to_clipboard_title">Minden diktálás másolása a vágólapra</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Minden diktálás a vágólapra is másolódik, így kézzel beillesztheted, ha a beszúrás sikertelen. Egyes telefonokon vágólap-értesítést jeleníthet meg.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">A diktálások csak beszúrásra kerülnek, a vágólapra nem másolódnak.</string>
+    <string name="dictate__floating_button_menu_group">Nyomva tartás menü</string>
+    <string name="dictate__floating_button_menu_settings_title">Dictate beállításai</string>
     <string name="dictate__floating_button_undo_summary_off">Nem jelenik meg visszavonás gomb.</string>
     <string name="dictate__floating_button_undo_summary_on">Diktálás után a gomb mellett megjelenik egy visszavonás gomb, amellyel egyetlen koppintással eltávolítható a beillesztett szöveg.</string>
     <string name="dictate__floating_button_undo_title">Visszavonás gomb</string>
@@ -2135,6 +2155,31 @@
     <string name="apptour62__outro_eyebrow">Ez a 6.2</string>
     <string name="apptour62__outro_title">Ugyanaz a billentyűzet, több belőle a tiéd</string>
     <string name="apptour62__outro_body">Semmi nem változik abban, ahogy diktálsz — saját kulcs, saját kiszolgáló vagy egy modell az eszközön. Minden bemutatót újra megtalálsz a Beállítások › Névjegy alatt.</string>
+    <string name="apptour63__cta_try">Kipróbálom</string>
+    <string name="apptour63__intro_eyebrow">Dictate 6.3</string>
+    <string name="apptour63__intro_title">Több billentyűzet, anélkül hogy elhagynád</string>
+    <string name="apptour63__intro_body">Irányítsd a kamerát nyomtatott szövegre, és az a mezőben landol. A kurzor, a kijelölés és a vágólap végre egy panelen osztozik. Bármelyik Smartbar-gomb hordozhat második műveletet hosszú nyomásra. Az offline diktáláshoz pedig végre vannak modellek, amelyek tényleg elférnek egy telefonon.</string>
+    <string name="apptour63__scan_eyebrow">Új: szöveg beolvasása</string>
+    <string name="apptour63__scan_title">A nyomtatott szöveg egyenesen a mezőbe</string>
+    <string name="apptour63__scan_body">Az IBAN egy levélről, a sorozatszám egy dobozról, a cím egy csomagról: irányítsd rá a kamerát, és a szöveg ott jelenik meg, ahol éppen gépeltél, ahelyett hogy újra le kellene írni. A felismerés ezen az eszközön történik — semmi nem kerül feltöltésre, és egyetlen szolgáltató sem vesz részt benne. A Dictate a kamera engedélyét sem kéri soha: a fotót a rendszer kamerája készíti, és csak azt az egy képet adja vissza, amely törlődik, amint elolvastuk.</string>
+    <string name="apptour63__editing_eyebrow">Új: szerkesztőpanel</string>
+    <string name="apptour63__editing_title">Kurzor, kijelölés és vágólap egy helyen</string>
+    <string name="apptour63__editing_body">Mindez már létezett, tizenegy billentyűn szétszórva, amelyekről tudni kellett. Most egyetlen panel: mozgás karakterenként, szavanként vagy soronként, kijelölés, másolás, beillesztés, visszavonás. A nyomva tartott billentyű ismétel, ahelyett hogy tizenegy koppintást kérne. A számbillentyűzetet pedig végre kifejezetten elő lehet hívni, nem csak egy olyan mozdulattal, amelyet senki nem állított be.</string>
+    <string name="apptour63__second_eyebrow">Új: tartsd nyomva a második műveletért</string>
+    <string name="apptour63__second_title">Két művelet egy Smartbar-helyen</string>
+    <string name="apptour63__second_body">Te magad párosítasz egy második műveletet a gombhoz, és a hosszú nyomás lefuttatja. Egyszerre csak öt-hat gomb látszik — ez a különbség aközött, hogy egy funkció létezik, és aközött, hogy van is hely neki. A sarokban lévő kis jel mutatja, mely gombok hordoznak egyet.</string>
+    <string name="apptour63__floating_eyebrow">Lebegő gomb</string>
+    <string name="apptour63__floating_title">Menü nyomva tartásra, és csak ott, ahol szeretnéd</string>
+    <string name="apptour63__floating_body">Tartsd nyomva a lebegő gombot egy rövid menüért; az első bejegyzése egy fájl átírása. Azt is megmondhatod neki, mely alkalmazásokban látják szívesen, ahelyett hogy mindenhová követne. A leállítás most pontosan ott marad, ahol az indítás volt, és a kapszula bármelyik képernyőoldalon simán nyílik.</string>
+    <string name="apptour63__offline_eyebrow">Offline diktálás</string>
+    <string name="apptour63__offline_title">Modellek, amelyek elférnek egy telefonon</string>
+    <string name="apptour63__offline_body">Az angol, a német és az orosz mostantól néhány száz megabájtos modellekkel is diktálható offline, nem csak a 670 MB-osakkal. A Dolphin negyven keleti nyelvet tesz hozzá, amelyekre a katalógus eddig csak rosszul tudott válaszolni. A lista pedig aszerint van rendezve, amit az emberek valóban letöltenek, nem architektúra szerint: tíz sor huszonnégy helyett, a részletek egy koppintásnyira.</string>
+    <string name="apptour63__more_eyebrow">Ezenkívül</string>
+    <string name="apptour63__more_title">Rengeteg apróság</string>
+    <string name="apptour63__more_body">A saját szólistád mostantól fájlként érkezhet, és ugyanúgy távozhat. A felvételsáv hullámformát rajzol, így látszik, mikor állt le a hangod. Egy szolgáltatói fiók megválaszthatja, melyik régióban maradnak az adatai, és a streaming-kiszolgáló vele költözik. Egy diktálás túléli, ha eltűnik a mikrofon, amelyről felvett. A kapcsolatteszt már csak azt mondja, amit valóban ellenőrzött, a szolgáltató kulcsoldala egy koppintásra van a mezőtől, ahová a kulcs kerül, és egy friss telepítés azzal nyit, amire a billentyűzet való, nem azzal a sorrenddel, ahogy a funkciói véletlenül megjelentek.</string>
+    <string name="apptour63__outro_eyebrow">Ez a 6.3</string>
+    <string name="apptour63__outro_title">Kevesebb kerülő, ugyanaz a billentyűzet</string>
+    <string name="apptour63__outro_body">Semmi nem változik abban, ahogy diktálsz — saját kulcs, saját kiszolgáló vagy egy modell az eszközön. Minden bemutatót újra megtalálsz a Beállítások › Névjegy alatt.</string>
     <string name="changelog__v5_0_0">• ÚJ: Húzásos gépelés — húzza az ujját a billentyűkön, hogy egész szavakat írjon, igény szerint letöltődő, nyelvenkénti szótárakkal. 👆\n• ÚJ: Szójavaslatok és automatikus javítás — az elgépelések automatikusan javulnak, és a beírt szó egy koppintásra marad. ✨\n• ÚJ: Valós idejű átírás — nézze, ahogy a szavak megjelennek beszéd közben, OpenAI, Deepgram, Soniox, AssemblyAI és ElevenLabs használatával. ⚡\n• ÚJ: Három további átírási szolgáltató — ElevenLabs Scribe, Deepgram és AssemblyAI. ☁️\n• ÚJ: Klasszikus diktálási elrendezés — a Dictate 3 billentyűzet nélküli hangképernyője visszatért, rögzítve vagy egy húzásnyira. 🎙️\n• ÚJ: Közösségi prompt-könyvtár — böngésszen és osszon meg újrafogalmazási prompteket. 📚\n• ÚJ: Diktálási statisztikák mérföldkövekkel. 📊\n• ÚJ: Offline modell NVIDIA Parakeet, valamint egy csendszűrő, amely kihagyja az üres felvételeket. 📴\n• Továbbá: stabilabb lebegő gomb, gondolkodási erőfeszítés vezérlése, haptikus visszajelzés, új E-Reader téma és több tucat javítás. 🛠️</string>
     <string name="media__tab__gifs">GIF-ek</string>
     <string name="prefs__media__gif__title">GIF-ek</string>
