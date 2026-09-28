@@ -10,6 +10,7 @@
 
 package dev.patrickgold.florisboard.dictate
 
+import java.text.Collator
 import java.util.Locale
 
 /**
@@ -23,17 +24,17 @@ data class DictateLanguage(val code: String, val englishName: String) {
         get() = code.substringBefore('-').uppercase(Locale.ROOT)
 
     /**
-     * Human-readable name, localized to the device language when possible and falling back to the
-     * bundled English name. [DictateLanguages.DETECT] is special-cased by callers (globe icon), so
-     * this returns its English label.
+     * Human-readable name, localized to [locale] (the device language unless a caller asks for another)
+     * when possible and falling back to the bundled English name. [DictateLanguages.DETECT] is
+     * special-cased by callers (globe icon), so this returns its English label.
      */
-    fun displayName(): String {
+    fun displayName(locale: Locale = Locale.getDefault()): String {
         if (code == DictateLanguages.DETECT) return englishName
-        val localized = Locale.forLanguageTag(code).getDisplayName(Locale.getDefault())
+        val localized = Locale.forLanguageTag(code).getDisplayName(locale)
         // A code Android has no name for comes back as the code itself, which would put "Jw" or "Haw" in
         // the picker. Anything that short is the tag, not a language.
         val usable = localized.takeIf { it.isNotBlank() && !it.equals(code, ignoreCase = true) }
-        return (usable ?: englishName).replaceFirstChar { it.uppercase(Locale.getDefault()) }
+        return (usable ?: englishName).replaceFirstChar { it.uppercase(locale) }
     }
 }
 
@@ -156,6 +157,24 @@ object DictateLanguages {
 
     /** Resolves a code to its [DictateLanguage], falling back to "detect" for unknown codes. */
     fun of(code: String): DictateLanguage = byCode[code] ?: all.first()
+
+    /**
+     * [languages] in the order someone reading [locale] looks for them: by the name the list shows, not by
+     * the English one this catalog is kept in. Sorted by the English name, a German list files "Deutsch"
+     * between Georgisch and Griechisch, and a Hindi one is in no recognisable order at all. [DETECT] stays
+     * on top, since it is not a language but leaving the choice to the model.
+     *
+     * For showing a list only. A stored selection keeps catalog order, which is the order the recording
+     * bar cycles through, so it does not change with the language the phone happens to be set to.
+     */
+    fun sortedForDisplay(languages: List<DictateLanguage>, locale: Locale = Locale.getDefault()): List<DictateLanguage> {
+        val collator = Collator.getInstance(locale)
+        val (detect, rest) = languages.partition { it.code == DETECT }
+        return detect + rest
+            .map { it to it.displayName(locale) }
+            .sortedWith { a, b -> collator.compare(a.second, b.second) }
+            .map { it.first }
+    }
 
     /**
      * Finds the dictation language matching a device [locale] (e.g. the system language), or `null`

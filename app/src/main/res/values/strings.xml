@@ -2315,9 +2315,10 @@
     <string name="dictate__languages_title" comment="Setting: pick which dictation languages to cycle through">Transcription languages</string>
     <string name="dictate__languages_summary" comment="Explanation on the language picker screen">Pick the languages you dictate in. Switch between them quickly from the recording bar.</string>
     <string name="dictate__language_detect" comment="Language option: let the model auto-detect the spoken language">Detect automatically</string>
+    <string name="dictate__languages_selected_title" comment="Row/dialog title: the languages the user dictates in, listed by name under it; tapping opens a dialog with every language and a checkbox each">Selected languages</string>
     <string name="dictate__languages_active_title" comment="Row/dialog title to pick the currently active transcription language">Active language</string>
     <string name="dictate__languages_follow_keyboard" comment="Switch title: the dictation language follows the keyboard language">Follow the keyboard language</string>
-    <string name="dictate__languages_follow_keyboard_summary" comment="Switch summary. Only languages ticked in the list below this switch are switched to">Switches dictation too, if the language is ticked below</string>
+    <string name="dictate__languages_follow_keyboard_summary" comment="Switch summary. Only languages chosen under “Selected languages” are switched to. Must fit two lines">Switches dictation too, if the language is selected</string>
 
     <!-- Dictate prompt selection (system & style prompt: none / predefined / custom) -->
     <string name="dictate__prompt_selection_none" comment="Prompt option: do not send any prompt">None</string>

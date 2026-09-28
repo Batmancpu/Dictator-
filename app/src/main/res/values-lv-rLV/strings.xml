@@ -1465,9 +1465,10 @@
     <string name="dictate__languages_title">Transkribēšanas valodas</string>
     <string name="dictate__languages_summary">Izvēlieties valodas, kurās diktējat. Ātri pārslēdzieties starp tām no ierakstīšanas joslas.</string>
     <string name="dictate__language_detect">Noteikt automātiski</string>
+    <string name="dictate__languages_selected_title">Atlasītās valodas</string>
     <string name="dictate__languages_active_title">Aktīvā valoda</string>
     <string name="dictate__languages_follow_keyboard">Sekot tastatūras valodai</string>
-    <string name="dictate__languages_follow_keyboard_summary">Maina arī diktēšanas valodu, ja tā ir atzīmēta zemāk</string>
+    <string name="dictate__languages_follow_keyboard_summary">Maina arī diktēšanas valodu, ja tā ir atlasīta</string>
     <string name="quick_action__dictate_switch_provider">Transkribēšanas pakalpojuma sniedzējs</string>
     <string name="quick_action__dictate_switch_provider__tooltip">Mainīt transkribēšanas pakalpojuma sniedzēju</string>
     <string name="enum__space_bar_mode__transcription_provider">Transkribēšanas pakalpojuma sniedzējs</string>
