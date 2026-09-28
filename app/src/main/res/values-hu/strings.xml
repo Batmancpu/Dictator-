@@ -499,6 +499,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">A szavak nagybetűvel kezdése a bemeneti környezet alapján</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Automatikus szóköz írásjel után</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Szóköz automatikus beillesztése írásjel után</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Szóköz törlése írásjel előtt</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">A . , ? ! elé gépelt szóköz eltávolítása</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Caps lock állapot megjegyzése</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">Caps lock marad, ha egy másik szövegmezőbe ugrik</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Dupla érintés a szóközre</string>

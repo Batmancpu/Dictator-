@@ -500,6 +500,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Използват се главни букви въз основа на контекста на въвеждане</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Автом. поставяне на интервал след пунктуац. знак</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Автоматично се поставят интервали след пунктуационните знаци</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Премахване на интервал пред пунктуацията</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Премахва се интервалът, въведен пред . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Запомняне на състоянието на клавиш Caps Lock</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">Клавишът Caps Lock се оставя включен при преместване в друго текстово поле</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Двукратно натискане на интервала</string>

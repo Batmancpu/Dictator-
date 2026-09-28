@@ -472,6 +472,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">現在の入力コンテキストに基づいて単語を大文字にします</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">句読点の後に自動でスペースを挿入</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">句読点の後に自動的にスペースを挿入します</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">句読点の前のスペースを削除</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">「. , ? !」の前に入力したスペースを削除します</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">CapsLockの状態を記憶</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">別のテキストフィールドに移動してもCapsLockはオンのまま</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">スペースキーのダブルタップ</string>

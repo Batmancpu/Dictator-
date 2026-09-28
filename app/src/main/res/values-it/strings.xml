@@ -400,6 +400,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Rendi maiuscole le parole in base al contesto attuale</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Spaziatura automatica dopo la punteggiatura</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Inserisci automaticamente uno spazio dopo un segno di punteggiatura</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Nessuno spazio prima della punteggiatura</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Rimuovi lo spazio digitato prima di . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Ricorda lo stato del maiuscolo</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">Il maiuscolo rimarrà attivo quando ti sposti ad un altro campo di testo</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Doppio tocco sulla barra spaziatrice</string>

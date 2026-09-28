@@ -494,6 +494,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Использовать заглавные буквы в зависимости от текущего контекста ввода</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Пробел после знаков препинания</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Автоматически вставлять пробел после знака препинания</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Без пробела перед знаками препинания</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Удалять пробел, набранный перед . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Запоминать состояние Caps Lock</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">Caps Lock будет оставаться при переходе на другое текстовое поле</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Двойное нажатие пробела</string>

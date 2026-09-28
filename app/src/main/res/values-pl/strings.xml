@@ -500,6 +500,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Pisz wielkie litery w słowach na podstawie bieżącego kontekstu</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Automatyczny odstęp po interpunkcji</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Automatyczne wstawianie spacji po znaku interpunkcyjnym</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Bez odstępu przed interpunkcją</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Usuwanie spacji wpisanej przed . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Zapamiętaj stan caps lock</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">Caps lock pozostanie włączony po przejściu do innego pola tekstowego</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Dwukrotne naciśnięcie spacji</string>

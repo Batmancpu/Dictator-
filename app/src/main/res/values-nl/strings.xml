@@ -422,6 +422,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Woorden kapitaliseren op basis van de huidige invoercontext</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Automatische spatie na interpunctie</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Automatisch een spatie invoegen na leestekens</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Geen spatie vóór interpunctie</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Een getypte spatie vóór . , ? ! verwijderen</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Onthoud CapsLock status</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">CapsLock blijft aan bij het verplaatsen naar een ander tekstveld</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Dubbele tik op de spatiebalk</string>

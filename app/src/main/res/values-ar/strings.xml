@@ -382,6 +382,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">استخدام الأحرف الكبيرة في الكلمات على حسب سياق نص الإدخال الحالي</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">مسافة تلقائية بعد علامات الترقيم</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">وضع بشكل تلقائي مسافة بعد علامات الترقيم</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">إزالة المسافة قبل علامات الترقيم</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">حذف المسافة المكتوبة قبل . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">تذكر حالة زر الأحرف الكبيرة</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">يضل وضع الأحرف الكبيرة قيد التشغيل عند الإنتقال إلى حقل نصي آخر</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">نقر مزدوج على مفتاح المسافة</string>

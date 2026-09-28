@@ -486,6 +486,8 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Kapitalisasi kata berdasarkan konteks input saat ini</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Spasi otomatis setelah tanda baca</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Tambahkan spasi secara otomatis setelah tanda baca</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Tanpa spasi sebelum tanda baca</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Hapus spasi yang diketik sebelum . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Ingat keadaan caps lock</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">Kunci huruf kapital akan tetap aktif saat pindah ke bidang teks lain</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Ketuk dua kali bilah spasi</string>

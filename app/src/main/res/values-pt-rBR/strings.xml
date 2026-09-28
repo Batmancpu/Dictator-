@@ -389,6 +389,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Deixar palavras em maiúsculo com base no contexto de entrada atual</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Espaço automático após pontuação</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Inserir um espaço automaticamente após uma pontuação</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Sem espaço antes da pontuação</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Remover um espaço digitado antes de . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Lembrar do estado do caps lock</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">O caps lock permanecerá ligado ao mudar para outro campo de texto</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Toque duplo na barra de espaço</string>

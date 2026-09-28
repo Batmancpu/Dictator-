@@ -397,6 +397,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Posa en majúscula les paraules en base al context d\'entrada actual</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Espaiat automàtic després de punt</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Insereix automàticament un espai després de posar un punt</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Sense espai abans de la puntuació</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Elimina l\'espai escrit abans de . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Recorda l\'estat de bloqueig de les majúscules</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">Es mantindrà el bloqueig de les majúscules en moure\'s a un altre camp de text</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Doble pulsació a la barra espaiadora</string>

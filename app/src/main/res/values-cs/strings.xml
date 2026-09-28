@@ -499,6 +499,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Kapitalizovat slova na základě aktuálního vstupního kontextu</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Automatická mezera za interpunkcí</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Automaticky vložit mezeru za interpunkcí</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Bez mezery před interpunkcí</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Odstranit mezeru napsanou před . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Pamatovat stav CapsLocku</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">Caps lock zůstane aktivní při přesunu do jiného textového pole</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Dvojí klepnutí na mezerník</string>

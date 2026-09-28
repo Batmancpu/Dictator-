@@ -490,6 +490,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Poner en mayúsculas las palabras según el contexto de entrada actual</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Espacio automático en puntuación</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Insertar automáticamente un espacio después de un punto</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Sin espacio antes de la puntuación</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Eliminar el espacio escrito antes de . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Recordar bloqueo de mayúsculas</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">El bloqueo de las mayúsculas se mantendrá cuando se pase a otro campo de texto</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Doble pulsación en la barra espaciadora</string>
