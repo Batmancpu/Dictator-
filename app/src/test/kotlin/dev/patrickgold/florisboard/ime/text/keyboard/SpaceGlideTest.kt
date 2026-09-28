@@ -231,4 +231,153 @@ class SpaceGlideTest {
         }
         assertEquals(-(40 / unitsPerLine), line)
     }
+
+    // --- Issue #428: a thumb scrubbing sideways drifts up and down the space bar as it goes. ---
+
+    @Test
+    fun `the drift that used to jump a line no longer does once the glide set out sideways`() {
+        // The report: three units of vertical drift — 24 dp at the stock threshold, well inside the space
+        // bar — was a whole line, and in a one-line message that is the start or the end of the text.
+        val sideways = SpaceGlide.lineSteps(32, beganSideways = true)
+        assertEquals(1, SpaceGlide.lineAt(3, SpaceGlide.unitsPerLine(32)), "the old reading of it")
+        for (units in 0 until sideways.firstLine) {
+            assertEquals(0, SpaceGlide.nextLine(0, units, sideways), "down $units units")
+            assertEquals(0, SpaceGlide.nextLine(0, -units, sideways), "up $units units")
+        }
+    }
+
+    @Test
+    fun `a sideways glide takes its first line a key row out, and ordinary lines after it`() {
+        val sideways = SpaceGlide.lineSteps(32, beganSideways = true)
+        assertEquals(SpaceGlide.SIDEWAYS_FIRST_LINE_TRAVEL_DP, sideways.firstLine * unitDp(32))
+        assertEquals(-1, SpaceGlide.nextLine(0, -sideways.firstLine, sideways))
+        assertEquals(1, SpaceGlide.nextLine(0, sideways.firstLine, sideways))
+        // Past the first line the finger is navigating on purpose, so the rest come at the usual rate.
+        assertEquals(-2, SpaceGlide.nextLine(-1, -(sideways.firstLine + sideways.perLine), sideways))
+    }
+
+    @Test
+    fun `a glide that sets out vertically starts exactly as before`() {
+        // The diagonal of issue #364 — three lines up and a few words in — begins vertically, and must
+        // not pay for a problem that only sideways glides have.
+        val vertical = SpaceGlide.lineSteps(32, beganSideways = false)
+        assertEquals(SpaceGlide.unitsPerLine(32), vertical.firstLine)
+        assertEquals(-1, SpaceGlide.nextLine(0, -vertical.perLine, vertical))
+    }
+
+    @Test
+    fun `the first sideways line stays about a key row across the whole threshold range`() {
+        // Same promise as the ordinary line: whatever the sideways slider says, the distance the finger
+        // has to travel stays what it was meant to be, and always more than an ordinary first line.
+        for (threshold in 12..72) {
+            val steps = SpaceGlide.lineSteps(threshold, beganSideways = true)
+            val travel = steps.firstLine * unitDp(threshold)
+            assertTrue(
+                travel >= SpaceGlide.SIDEWAYS_FIRST_LINE_TRAVEL_DP * 5 / 6 &&
+                    travel <= SpaceGlide.SIDEWAYS_FIRST_LINE_TRAVEL_DP * 7 / 6,
+                "threshold $threshold dp gives a first line of $travel dp",
+            )
+            assertTrue(steps.firstLine > steps.perLine, "threshold $threshold dp")
+        }
+    }
+
+    @Test
+    fun `a first sideways line still fits below the space bar`() {
+        // About 77 dp between the middle of the space bar and the bottom of the screen: the first line
+        // downwards has to be reachable there, or the lock would have taken the direction away.
+        for (threshold in 12..72) {
+            val steps = SpaceGlide.lineSteps(threshold, beganSideways = true)
+            assertTrue(steps.firstLine * unitDp(threshold) < 77.0, "threshold $threshold dp")
+        }
+    }
+
+    @Test
+    fun `a line once taken is held until the finger is clearly back`() {
+        // 3 units a line and 2 of slack at the stock threshold: taken at 3, given back only at 0.
+        val vertical = SpaceGlide.lineSteps(32, beganSideways = false)
+        assertEquals(2, vertical.returnSlack)
+        assertEquals(1, SpaceGlide.nextLine(0, 3, vertical))
+        assertEquals(1, SpaceGlide.nextLine(1, 2, vertical))
+        assertEquals(1, SpaceGlide.nextLine(1, 1, vertical))
+        assertEquals(0, SpaceGlide.nextLine(1, 0, vertical))
+        // Mirrored upwards.
+        assertEquals(-1, SpaceGlide.nextLine(-1, -1, vertical))
+        assertEquals(0, SpaceGlide.nextLine(-1, 0, vertical))
+    }
+
+    @Test
+    fun `going further out is never held back`() {
+        val vertical = SpaceGlide.lineSteps(32, beganSideways = false)
+        assertEquals(2, SpaceGlide.nextLine(1, 6, vertical))
+        assertEquals(-2, SpaceGlide.nextLine(-1, -6, vertical))
+    }
+
+    @Test
+    fun `a finger resting on a boundary sends one step, not a flicker`() {
+        // Right after taking a line the finger sits just past the boundary, and scrubbing along that line
+        // wobbles it back and forth across it. Without the slack every wobble was an arrow key.
+        for (sideways in listOf(false, true)) {
+            val steps = SpaceGlide.lineSteps(32, beganSideways = sideways)
+            val boundary = steps.firstLine
+            var line = 0
+            var presses = 0
+            repeat(10) {
+                for (units in listOf(boundary, boundary - 1)) {
+                    val next = SpaceGlide.nextLine(line, -units, steps)
+                    presses += abs(next - line)
+                    line = next
+                }
+            }
+            assertEquals(-1, line, "sideways=$sideways")
+            assertEquals(1, presses, "sideways=$sideways")
+        }
+    }
+
+    @Test
+    fun `the slack stays below a line across the whole threshold range`() {
+        // At a full line or more the way back would only begin once the finger had crossed to the far side
+        // of the start, and a glide that returns to where it began would no longer be on its first line.
+        for (threshold in 12..72) {
+            val steps = SpaceGlide.lineSteps(threshold, beganSideways = false)
+            assertTrue(steps.returnSlack in 0 until steps.perLine, "threshold $threshold dp")
+        }
+    }
+
+    @Test
+    fun `a glide that turns around still lands where it set out, with the slack and the lock`() {
+        // The #364 property, through the new rules, for every threshold and both kinds of glide: out five
+        // lines and back unit by unit, one line per step at most, never outwards on the way back, and on
+        // the starting line again at the start.
+        for (threshold in 12..72) {
+            for (sideways in listOf(false, true)) {
+                for (sign in listOf(-1, 1)) {
+                    val steps = SpaceGlide.lineSteps(threshold, beganSideways = sideways)
+                    val far = steps.firstLine + 4 * steps.perLine
+                    var line = 0
+                    var sent = 0
+                    for (units in (0..far) + (far - 1 downTo 0)) {
+                        val next = SpaceGlide.nextLine(line, sign * units, steps)
+                        val delta = next - line
+                        assertTrue(abs(delta) <= 1, "threshold $threshold, jumped $delta at $units units")
+                        sent += delta
+                        line = next
+                    }
+                    assertEquals(0, line, "threshold $threshold, sideways=$sideways, sign $sign")
+                    assertEquals(0, sent, "threshold $threshold, sideways=$sideways, sign $sign")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `the way back never moves the cursor further out`() {
+        val steps = SpaceGlide.lineSteps(32, beganSideways = true)
+        val far = steps.firstLine + 4 * steps.perLine
+        var line = SpaceGlide.nextLine(0, -far, steps)
+        for (units in far - 1 downTo 0) {
+            val next = SpaceGlide.nextLine(line, -units, steps)
+            assertTrue(next >= line, "moved from $line to $next at $units units on the way back")
+            line = next
+        }
+    }
 }
