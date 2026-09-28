@@ -11,6 +11,7 @@
 package dev.patrickgold.florisboard.ime.editor
 
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -100,5 +101,53 @@ class TightenPunctuationTest {
     @Test
     fun `an empty commit tightens nothing`() {
         assertFalse(tightens("", "hallo "))
+    }
+
+    // --- Issue #428: straight after a silent correction, without the switch. ---
+
+    /** What the shipped `default` and `french` rules put before an auto-space — they happen to agree. */
+    private val autoSpace = ".,?‽!\"&%)]}»"
+
+    private fun afterCorrection(tightening: String = default) = spaceTighteningSymbols(
+        symbolsTighteningSpace = tightening,
+        symbolsPrecedingAutoSpace = autoSpace,
+        switchedOn = false,
+        spaceConfirmedCorrection = true,
+    )
+
+    @Test
+    fun `the four marks from the report take the space a correction was confirmed with`() {
+        for (mark in ".,?!") {
+            assertTrue(tightens(mark.toString(), "the ", afterCorrection()), "expected $mark to tighten")
+        }
+    }
+
+    @Test
+    fun `an emoticon after a correction keeps its space`() {
+        // `:` and `;` are marks the switch tightens, but they also open `:)` and `;)`. Nobody switched
+        // anything on here, so the ambiguous pair is left alone.
+        assertEquals(".,?!‽", afterCorrection())
+        assertFalse(tightens(":", "the ", afterCorrection()))
+        assertFalse(tightens(";", "the ", afterCorrection()))
+    }
+
+    @Test
+    fun `french keeps its space before a question mark after a correction too`() {
+        assertEquals(".,", afterCorrection(french))
+        assertFalse(tightens("?", "mot ", afterCorrection(french)))
+        assertTrue(tightens(",", "mot ", afterCorrection(french)))
+    }
+
+    @Test
+    fun `the switch keeps its whole list, correction or not`() {
+        for (confirmed in listOf(false, true)) {
+            val symbols = spaceTighteningSymbols(default, autoSpace, switchedOn = true, spaceConfirmedCorrection = confirmed)
+            assertEquals(default, symbols, "confirmed=$confirmed")
+        }
+    }
+
+    @Test
+    fun `without the switch and without a correction nothing tightens`() {
+        assertEquals("", spaceTighteningSymbols(default, autoSpace, switchedOn = false, spaceConfirmedCorrection = false))
     }
 }

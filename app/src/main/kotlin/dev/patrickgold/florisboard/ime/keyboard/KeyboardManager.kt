@@ -612,6 +612,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         } else {
             null
         }
+        lastWordCorrection = pendingAutoCorrection
     }
 
     /**
@@ -646,6 +647,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             commitAutoCorrection(candidate)
             lastTypedWord = null
         } else {
+            lastWordCorrection = null
             offerFinishedWordForLearning()
         }
         TouchTrace.reset() // word boundary (issue #242)
@@ -696,6 +698,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         // A tap on the strip replaces whatever the previous correction left behind, so there is nothing
         // left to take back. [commitAutoCorrection] re-arms it immediately afterwards for its own case.
         pendingAutoCorrection = null
+        lastWordCorrection = null
         scope.launch {
             candidate.sourceProvider?.notifySuggestionAccepted(subtypeManager.activeSubtype, candidate)
         }
@@ -749,6 +752,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         // Same as above: a glide never passes through onInputKeyUp (issues #283, #295).
         pendingExpansion = null
         pendingAutoCorrection = null
+        lastWordCorrection = null
         // A glide produces a whole word at once, so there are no per-character taps to reason about (#242).
         TouchTrace.reset()
         val text = fixCase(word)
@@ -913,6 +917,20 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
     private var pendingAutoCorrection: AutoCorrection? = null
 
     /**
+     * The silent correction the last finished word ended in, until another word finishes (issue #428):
+     * a punctuation mark typed behind it swallows the space the correction was confirmed with.
+     *
+     * Deliberately not [pendingAutoCorrection], whose one keystroke is too short for this. `?` and `!`
+     * sit on the symbol layer, and the tap that brings the layer up is a keystroke too — the undo is
+     * right to let go there, but the space in front of the cursor is still the correction's.
+     *
+     * Proves itself against the editor ([boundaryAfter]) before it is used, so it only has to be let go
+     * where a word ends some other way — [endOfWord] without a correction, a candidate, a glide — or
+     * where the correction itself is taken back.
+     */
+    private var lastWordCorrection: AutoCorrection? = null
+
+    /**
      * Expands a typed snippet trigger (issue #283): if the word right before the cursor is a shortcut
      * of a `[snippet]` prompt, it is replaced by that snippet plus [boundary] — the space, punctuation
      * mark or line break that ended the word. Returns true when that happened, in which case the caller
@@ -987,6 +1005,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
     private fun undoAutoCorrection(): Boolean {
         val correction = pendingAutoCorrection ?: return false
         pendingAutoCorrection = null
+        lastWordCorrection = null
         val boundary = boundaryAfter(correction) ?: return false
         editorInstance.replaceTextBeforeCursor(
             correction.inserted.length + boundary.length,
@@ -1316,6 +1335,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         if (!editorInstance.activeContent.textBeforeSelection.endsWith(word)) return
         editorInstance.replaceTextBeforeCursor(word.length, capitalized)
         pendingAutoCorrection = AutoCorrection(inserted = capitalized, replaced = word)
+        lastWordCorrection = pendingAutoCorrection
     }
 
     /**
@@ -2088,10 +2108,14 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
                                         TouchTrace.commit(text)
                                         editorInstance.commitChar(text)
                                     } else if (!expandSnippet(text)) {
+                                        // Read before endOfWord lets the correction go (issue #428);
+                                        // which marks may take the space is the editor's call.
+                                        val spaceConfirmedCorrection =
+                                            lastWordCorrection?.let { boundaryAfter(it) } == " "
                                         // Punctuation ends the word: correct it or learn it, then drop
                                         // the tap evidence (issues #242, #318).
                                         endOfWord()
-                                        editorInstance.commitChar(text)
+                                        editorInstance.commitChar(text, spaceConfirmedCorrection)
                                     }
                                 }
                             }
