@@ -154,6 +154,12 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
                 historyNumGridColumnsLandscape
             }
         }
+        // Off by default since issue #395: pins only ever grow, so on top they pushed what was just
+        // copied further down with every one added. The header tabs keep them one tap away below.
+        val historyPinnedOnTop = boolean(
+            key = "clipboard__history_pinned_on_top",
+            default = false,
+        )
         val historyAutoCleanOldEnabled = boolean(
             key = "clipboard__history_auto_clean_old_enabled",
             default = false,
@@ -874,6 +880,14 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "dictate__active_input_language",
             default = "detect",
         )
+        // Switching the keyboard's language also switches the dictation language, when that language is
+        // one of inputLanguages (issue #431). Off by default: #347 settled that a layout says nothing
+        // about the spoken language for most people, so this is for the ones for whom it does. Acts on
+        // the switch only — never on opening the keyboard — so a language picked by hand stays picked.
+        val languageFollowsKeyboard = boolean(
+            key = "dictate__language_follows_keyboard",
+            default = false,
+        )
         // Guard so the one-time seeding of the device/system dictation language (added on top of the
         // default detect,en) runs only once on a fresh install. See
         // DictateLegacyMigrator.seedDeviceLanguageIfNeeded.
@@ -927,6 +941,13 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         val rewordingEnabled = boolean(
             key = "dictate__rewording_enabled",
             default = true,
+        )
+        // The spoken command word (issue #139): a dictation opening with it runs as a live prompt
+        // instead of being inserted. Blank (the default) switches the whole recognition off — there is
+        // no word everyone says rarely enough to be a safe default, so the user picks their own.
+        val commandTriggerWord = string(
+            key = "dictate__command_trigger_word",
+            default = "",
         )
         // Reasoning effort sent as OpenAI-compatible `reasoning_effort` on rewording chat calls for
         // reasoning models (issue #141). OFF omits the field, so non-reasoning models are unaffected.
@@ -1164,6 +1185,21 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         )
     }
 
+    // On-device translation bar (issue #424). Both are catalog codes ("de", "zh_hant", "en"); the source
+    // may also be empty, which means "detect it". The target is empty until the bar is first opened, when
+    // it is set to the likeliest choice (see TranslateBarController.initialTarget) and then remembered.
+    val translation = Translation()
+    inner class Translation {
+        val sourceLanguage = string(
+            key = "translation__source_language",
+            default = "",
+        )
+        val targetLanguage = string(
+            key = "translation__target_language",
+            default = "",
+        )
+    }
+
     val sticker = Sticker()
     inner class Sticker {
         // The folder the user picked, as a SAF tree URI we hold a persisted read permission on.
@@ -1219,13 +1255,17 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "gestures__swipe_down",
             default = SwipeAction.HIDE_KEYBOARD,
         )
+        // Off by default (issue #418), where FlorisBoard switched the language. That default was harmless
+        // while a swipe hardly ever fired; since the swipe commits under the finger (#327) it fires every
+        // time, so a thumb sliding sideways over the letters changed the language by accident. Anyone with
+        // two or more languages has the globe on the utility key anyway.
         val swipeLeft = enum(
             key = "gestures__swipe_left",
-            default = SwipeAction.SWITCH_TO_NEXT_SUBTYPE,
+            default = SwipeAction.NO_ACTION,
         )
         val swipeRight = enum(
             key = "gestures__swipe_right",
-            default = SwipeAction.SWITCH_TO_PREV_SUBTYPE,
+            default = SwipeAction.NO_ACTION,
         )
         // Up and down default to a cursor move, where up used to do nothing at all (issue #364): the
         // vertical glide they switch on is the other half of the one left/right have had all along, and a

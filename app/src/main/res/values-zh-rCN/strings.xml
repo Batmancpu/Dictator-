@@ -718,6 +718,7 @@
     <string name="clipboard__group_pinned">置顶</string>
     <string name="clipboard__group_recent">最新</string>
     <string name="clipboard__group_other">其他</string>
+    <string name="pref__clipboard__history_pinned_on_top__label">置顶项显示在上方</string>
     <string name="clipboard__item_description_email">电子邮箱</string>
     <string name="clipboard__item_description_url">链接地址</string>
     <string name="clipboard__item_description_phone">电话号码</string>
@@ -1141,6 +1142,8 @@
     <string name="quick_action__ime_ui_mode_editing__tooltip">移动光标、选择和编辑文本</string>
     <string name="quick_action__ime_ui_mode_scan">扫描文字</string>
     <string name="quick_action__ime_ui_mode_scan__tooltip">拍摄印刷文字并插入</string>
+    <string name="quick_action__translate">翻译</string>
+    <string name="quick_action__translate__tooltip">边输入边翻译，全程在本机完成</string>
     <string name="quick_action__ime_ui_mode_dictate">听写</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">点按开始听写，再次点按进行转录</string>
     <string name="quick_action__dictate_live_prompt">实时指令</string>
@@ -1265,7 +1268,7 @@
     <string name="dictate__floating_button_snap_title">吸附到边缘</string>
     <string name="dictate__interrupted_recording">已中断（{time}）</string>
     <string name="dictate__providers_summary_both">转写：{transcription} · 改写：{rewording}</string>
-    <string name="dictate__remember_last_dictation_summary">保留上次听写，可用 Smartbar 的“重新插入”按钮再次插入。</string>
+    <string name="dictate__remember_last_dictation_summary">保留你最近一次的听写，以便悬浮按钮可以撤销它、经典布局可以重新插入它。</string>
     <string name="dictate__remember_last_dictation_title">记住上次听写</string>
     <string name="changelog__v4_2_0">• 新功能：悬浮听写按钮——即使其他键盘处于激活状态，也能直接在任何应用中听写。可从三种样式（胶囊、圆环、光球）中选择，说话时显示实时波形，可拖到任意位置并吸附到边缘，设置颜色和大小，长按即可改写。在 设置 ▸ Dictate ▸ 悬浮按钮 中开启。\n• 新功能：Google Gemini — 使用你自己的 AI Studio API 密钥进行转录和改写。\n• 提示词现在默认显示在按键上方的常驻行中。\n• 跨应用的文本插入更可靠，包括浏览器和其他键盘。</string>
     <string name="dictate__promo_floating_button_message">新功能：在任何应用中听写</string>
@@ -1366,6 +1369,10 @@
     <string name="dictate__providers_cap_chat">改写</string>
     <string name="dictate__providers_add_custom">添加你自己的服务器</string>
     <string name="dictate__providers_add_custom_summary">自建服务器或任何兼容 OpenAI 的端点——可用于语音识别和改写</string>
+    <string name="dictate__providers_add">添加服务商</string>
+    <string name="dictate__providers_search">搜索服务商</string>
+    <string name="dictate__providers_filter_eu">欧盟</string>
+    <string name="dictate__providers_add_none">没有匹配的服务商</string>
     <string name="dictate__providers_azure_endpoint">终结点就在门户“Keys and Endpoint”页面上密钥的旁边。MAI-Transcribe 仅在 East US、West US、West US 2、North Europe、Southeast Asia 和 Central India 运行。</string>
     <string name="dictate__providers_ollama_no_stt">Ollama 没有语音识别端点，因此只能改写。若要通过自己的服务器听写，请运行一个语音服务器（例如 Speaches、faster-whisper-server 或 whisper.cpp），并在“添加你自己的服务器”中添加——或者使用设备端识别，它完全不需要服务器。</string>
     <string name="dictate__providers_region_title">区域</string>
@@ -1509,6 +1516,11 @@
     <string name="dictate__languages_summary">选择您听写所用的语言。可从录音栏快速切换。</string>
     <string name="dictate__language_detect">自动检测</string>
     <string name="dictate__languages_active_title">当前语言</string>
+    <string name="dictate__languages_follow_keyboard">跟随键盘语言</string>
+    <string name="dictate__languages_follow_keyboard_summary">若该语言已在下方勾选，听写语言也随之切换</string>
+    <string name="quick_action__dictate_switch_provider">转录服务商</string>
+    <string name="quick_action__dictate_switch_provider__tooltip">切换转录服务商</string>
+    <string name="enum__space_bar_mode__transcription_provider">转录服务商</string>
     <string name="dictate__prompt_selection_none">无</string>
     <string name="dictate__prompt_selection_predefined">默认</string>
     <string name="dictate__prompt_selection_custom">自定义</string>
@@ -1555,6 +1567,12 @@
     <string name="dictate__manage_prompts_title">管理提示词</string>
     <string name="dictate__manage_prompts_summary">{count} 条提示词</string>
     <string name="dictate__manage_prompts_summary_loading">添加、编辑和删除您的提示词</string>
+    <string name="dictate__command_word_title">指令唤醒词</string>
+    <string name="dictate__command_word_off">关闭</string>
+    <string name="dictate__command_word_summary">以“{word}”开头的听写将作为实时指令执行</string>
+    <string name="dictate__command_word_placeholder">贾维斯</string>
+    <string name="dictate__command_word_info_title">关于指令唤醒词</string>
+    <string name="dictate__command_word_info_description">Dictate 通常会把你说的话原样写下来。设置唤醒词后，以它开头的听写会改为按指令处理：该词被去掉，其余内容连同选中的文本（如果有）一起发送给 AI。\n\n“贾维斯，把这段改得正式一点”会改写选中的文本；“贾维斯，日本的首都是哪里”会把答案写进输入框。也就是把实时指令按钮从“点一下”变成“叫一声”。\n\n该词只有位于听写最开头、且作为完整词出现时才生效，所以请挑一个你很少用来起头的词。</string>
     <string name="dictate__auto_formatting_title">自动格式化</string>
     <string name="dictate__auto_formatting_summary">将口述的格式提示转换为 Markdown（标题、列表等）</string>
     <string name="dictate__system_prompt_title">改写指令</string>
@@ -2392,4 +2410,23 @@
     <string name="scan__select_all">全选</string>
     <string name="scan__discard">放弃</string>
     <string name="scan__approve">确认</string>
+
+    <!-- On-device translation (issue #424) -->
+    <string name="settings__translation__title">翻译</string>
+    <string name="translate__settings_intro">直接在手机上翻译，你输入的内容不会离开手机。在智能栏中点按“翻译”即可打开。</string>
+    <string name="translate__group_installed">已下载</string>
+    <string name="translate__group_available">可下载</string>
+    <string name="translate__english_included">始终内置</string>
+    <string name="translate__size_installed">占用本机 {size}</string>
+    <string name="translate__size_download">下载 {download} · 占用本机 {size}</string>
+    <string name="translate__hint">输入要翻译的文字</string>
+    <string name="translate__detect">检测语言</string>
+    <string name="translate__detected">{language}（已检测）</string>
+    <string name="translate__swap">交换语言</string>
+    <string name="translate__no_languages">尚未下载任何语言</string>
+    <string name="translate__get_languages">下载语言</string>
+    <string name="translate__more_languages">更多语言</string>
+    <string name="translate__missing">{language}尚未下载</string>
+    <string name="translate__failed">翻译失败</string>
+    <string name="translate__unsupported">此设备不支持翻译</string>
 </resources>

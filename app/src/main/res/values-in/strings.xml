@@ -703,6 +703,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="clipboard__group_pinned">Disematkan</string>
     <string name="clipboard__group_recent">Terkini</string>
     <string name="clipboard__group_other">Lainnya</string>
+    <string name="pref__clipboard__history_pinned_on_top__label">Item yang disematkan di atas</string>
     <string name="clipboard__item_description_email">Email</string>
     <string name="clipboard__item_description_url">URL</string>
     <string name="clipboard__item_description_phone">Ponsel</string>
@@ -1101,6 +1102,8 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="quick_action__ime_ui_mode_editing__tooltip">Pindahkan kursor, pilih, dan edit teks</string>
     <string name="quick_action__ime_ui_mode_scan">Pindai teks</string>
     <string name="quick_action__ime_ui_mode_scan__tooltip">Foto teks cetak lalu sisipkan</string>
+    <string name="quick_action__translate">Terjemahkan</string>
+    <string name="quick_action__translate__tooltip">Terjemahkan sambil mengetik, di perangkat ini</string>
     <string name="quick_action__ime_ui_mode_dictate">Dikte</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Ketuk untuk mendikte, ketuk lagi untuk mentranskripsi</string>
     <string name="quick_action__dictate_live_prompt">Perintah suara</string>
@@ -1225,7 +1228,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__floating_button_snap_title">Tempel ke tepi</string>
     <string name="dictate__interrupted_recording">Terputus ({time})</string>
     <string name="dictate__providers_summary_both">Transkripsi: {transcription} · Penyusunan ulang: {rewording}</string>
-    <string name="dictate__remember_last_dictation_summary">Menyimpan dikte terakhir Anda agar dapat disisipkan ulang lewat tombol Sisipkan ulang di Smartbar.</string>
+    <string name="dictate__remember_last_dictation_summary">Menyimpan dikte terakhir Anda agar tombol mengambang dapat membatalkannya dan tata letak klasik dapat menyisipkannya kembali.</string>
     <string name="dictate__remember_last_dictation_title">Ingat dikte terakhir</string>
     <string name="changelog__v4_2_0">• BARU: tombol dikte mengambang — dikte langsung ke aplikasi apa pun, bahkan saat keyboard lain aktif. Pilih dari tiga gaya (Pil, Cincin, Bola), lihat gelombang langsung saat Anda berbicara, seret ke mana saja dengan pengancingan tepi, atur warna dan ukurannya, dan tekan lama untuk menyusun ulang. Aktifkan di Setelan ▸ Dictate ▸ Tombol mengambang.\n• BARU: Google Gemini — gunakan kunci API AI Studio Anda sendiri untuk transkripsi dan penulisan ulang.\n• Prompt kini muncul secara bawaan dalam baris tetap di atas tombol.\n• Penyisipan teks yang lebih andal di seluruh aplikasi, termasuk peramban dan keyboard lain.</string>
     <string name="dictate__promo_floating_button_message">Baru: dikte di app mana pun</string>
@@ -1326,6 +1329,10 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__providers_cap_chat">Penyusunan ulang</string>
     <string name="dictate__providers_add_custom">Tambah server milikmu sendiri</string>
     <string name="dictate__providers_add_custom_summary">Dihosting sendiri atau endpoint apa pun yang kompatibel dengan OpenAI — untuk pengenalan suara dan penulisan ulang</string>
+    <string name="dictate__providers_add">Tambah penyedia</string>
+    <string name="dictate__providers_search">Cari penyedia</string>
+    <string name="dictate__providers_filter_eu">UE</string>
+    <string name="dictate__providers_add_none">Tidak ada penyedia yang cocok</string>
     <string name="dictate__providers_azure_endpoint">Endpoint ada di sebelah kunci pada halaman “Keys and Endpoint” di portal. MAI-Transcribe hanya berjalan di East US, West US, West US 2, North Europe, Southeast Asia, dan Central India.</string>
     <string name="dictate__providers_ollama_no_stt">Ollama tidak punya endpoint pengenalan suara, jadi hanya bisa menulis ulang. Untuk mendikte lewat server sendiri, jalankan server suara (misalnya Speaches, faster-whisper-server, atau whisper.cpp) dan tambahkan lewat “Tambah server milikmu sendiri” — atau pakai mesin di perangkat, yang sama sekali tidak butuh server.</string>
     <string name="dictate__providers_region_title">Wilayah</string>
@@ -1469,6 +1476,11 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__languages_summary">Pilih bahasa yang Anda gunakan untuk mendikte. Beralih di antaranya dengan cepat dari bilah perekaman.</string>
     <string name="dictate__language_detect">Deteksi otomatis</string>
     <string name="dictate__languages_active_title">Bahasa aktif</string>
+    <string name="dictate__languages_follow_keyboard">Ikuti bahasa keyboard</string>
+    <string name="dictate__languages_follow_keyboard_summary">Juga mengganti bahasa dikte, jika dicentang di bawah</string>
+    <string name="quick_action__dictate_switch_provider">Penyedia transkripsi</string>
+    <string name="quick_action__dictate_switch_provider__tooltip">Ganti penyedia transkripsi</string>
+    <string name="enum__space_bar_mode__transcription_provider">Penyedia transkripsi</string>
     <string name="dictate__prompt_selection_none">Tidak ada</string>
     <string name="dictate__prompt_selection_predefined">Bawaan</string>
     <string name="dictate__prompt_selection_custom">Kustom</string>
@@ -1515,6 +1527,12 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__manage_prompts_title">Kelola perintah</string>
     <string name="dictate__manage_prompts_summary">{count} perintah</string>
     <string name="dictate__manage_prompts_summary_loading">Tambah, edit, dan hapus perintah Anda</string>
+    <string name="dictate__command_word_title">Kata perintah</string>
+    <string name="dictate__command_word_off">Mati</string>
+    <string name="dictate__command_word_summary">Dikte yang diawali “{word}” dijalankan sebagai perintah suara</string>
+    <string name="dictate__command_word_placeholder">Jarvis</string>
+    <string name="dictate__command_word_info_title">Tentang kata perintah</string>
+    <string name="dictate__command_word_info_description">Biasanya Dictate menuliskan apa yang Anda ucapkan. Jika kata perintah diatur, dikte yang diawali kata itu justru menjadi sebuah instruksi: katanya dihapus dan sisanya dikirim ke AI, beserta teks yang dipilih jika ada.\n\n“Jarvis, buat ini lebih formal” menulis ulang teks terpilih. “Jarvis, apa ibu kota Jepang” menuliskan jawabannya ke kolom. Ini tombol perintah suara yang sama, hanya dipanggil dengan menyebut namanya alih-alih mengetuknya.\n\nKata itu hanya berlaku di awal dikte dan hanya sebagai kata utuh, jadi pilih sesuatu yang jarang Anda pakai untuk memulai kalimat.</string>
     <string name="dictate__auto_formatting_title">Pemformatan otomatis</string>
     <string name="dictate__auto_formatting_summary">Ubah isyarat pemformatan lisan menjadi Markdown (judul, daftar, …)</string>
     <string name="dictate__system_prompt_title">Instruksi penyusunan ulang</string>
@@ -2353,4 +2371,23 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="scan__select_all">Pilih semua</string>
     <string name="scan__discard">Buang</string>
     <string name="scan__approve">Terima</string>
+
+    <!-- On-device translation (issue #424) -->
+    <string name="settings__translation__title">Terjemahan</string>
+    <string name="translate__settings_intro">Menerjemahkan langsung di ponselmu, dan apa pun yang kamu ketik tidak pernah keluar dari ponsel. Buka lewat “Terjemahkan” di Smartbar.</string>
+    <string name="translate__group_installed">Sudah diunduh</string>
+    <string name="translate__group_available">Tersedia</string>
+    <string name="translate__english_included">Selalu tersedia</string>
+    <string name="translate__size_installed">{size} di perangkat ini</string>
+    <string name="translate__size_download">Unduhan {download} · {size} di perangkat ini</string>
+    <string name="translate__hint">Ketik untuk menerjemahkan</string>
+    <string name="translate__detect">Deteksi bahasa</string>
+    <string name="translate__detected">{language} (terdeteksi)</string>
+    <string name="translate__swap">Tukar bahasa</string>
+    <string name="translate__no_languages">Belum ada bahasa yang diunduh</string>
+    <string name="translate__get_languages">Unduh bahasa</string>
+    <string name="translate__more_languages">Bahasa lainnya</string>
+    <string name="translate__missing">{language} belum diunduh</string>
+    <string name="translate__failed">Terjemahan gagal</string>
+    <string name="translate__unsupported">Terjemahan tidak tersedia di perangkat ini</string>
 </resources>

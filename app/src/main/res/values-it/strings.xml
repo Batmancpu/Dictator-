@@ -599,6 +599,7 @@
     <string name="clipboard__group_pinned">Fissati</string>
     <string name="clipboard__group_recent">Recenti</string>
     <string name="clipboard__group_other">Altro</string>
+    <string name="pref__clipboard__history_pinned_on_top__label">Elementi fissati in alto</string>
     <string name="clipboard__item_description_email">Email</string>
     <string name="clipboard__item_description_url">URL</string>
     <string name="clipboard__item_description_phone">Telefono</string>
@@ -929,6 +930,8 @@
     <string name="quick_action__ime_ui_mode_editing__tooltip">Sposta il cursore, seleziona e modifica il testo</string>
     <string name="quick_action__ime_ui_mode_scan">Scansiona testo</string>
     <string name="quick_action__ime_ui_mode_scan__tooltip">Fotografa un testo stampato e inseriscilo</string>
+    <string name="quick_action__translate">Traduci</string>
+    <string name="quick_action__translate__tooltip">Traduci mentre scrivi, su questo dispositivo</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Tocca per dettare, tocca di nuovo per trascrivere</string>
     <string name="quick_action__dictate_live_prompt">Istruzione dal vivo</string>
@@ -1053,7 +1056,7 @@
     <string name="dictate__floating_button_snap_title">Aggancia al bordo</string>
     <string name="dictate__interrupted_recording">Interrotto ({time})</string>
     <string name="dictate__providers_summary_both">Trascrizione: {transcription} · Riformulazione: {rewording}</string>
-    <string name="dictate__remember_last_dictation_summary">Conserva l\'ultima dettatura per reinserirla con il pulsante Reinserisci della Smartbar.</string>
+    <string name="dictate__remember_last_dictation_summary">Conserva l’ultima dettatura così il pulsante flottante può annullarla e il layout classico può reinserirla.</string>
     <string name="dictate__remember_last_dictation_title">Ricorda ultima dettatura</string>
     <string name="changelog__v4_2_0">• NOVITÀ: pulsante di dettatura flottante — detta direttamente in qualsiasi app, anche con un’altra tastiera attiva. Scegli tra tre stili (Pillola, Anello, Sfera), guarda una forma d’onda in tempo reale mentre parli, trascinalo ovunque con l’aggancio ai bordi, imposta colore e dimensione e tieni premuto per riformulare. Attivalo in Impostazioni ▸ Dictate ▸ Pulsante flottante.\n• NOVITÀ: Google Gemini — usa la tua chiave API di AI Studio per trascrizione e riformulazione.\n• I prompt ora appaiono per impostazione predefinita in una riga sempre visibile sopra i tasti.\n• Inserimento del testo più affidabile tra le app, inclusi browser e altre tastiere.</string>
     <string name="dictate__promo_floating_button_message">Novità: detta ovunque</string>
@@ -1154,6 +1157,10 @@
     <string name="dictate__providers_cap_chat">Riformulazione</string>
     <string name="dictate__providers_add_custom">Aggiungi un server tuo</string>
     <string name="dictate__providers_add_custom_summary">Self-hosted o qualsiasi endpoint compatibile con OpenAI — per trascrizione e riformulazione</string>
+    <string name="dictate__providers_add">Aggiungi fornitore</string>
+    <string name="dictate__providers_search">Cerca fornitori</string>
+    <string name="dictate__providers_filter_eu">UE</string>
+    <string name="dictate__providers_add_none">Nessun fornitore corrisponde</string>
     <string name="dictate__providers_azure_endpoint">L\'endpoint si trova accanto alla chiave nella pagina «Keys and Endpoint» del portale. MAI-Transcribe funziona solo in East US, West US, West US 2, North Europe, Southeast Asia e Central India.</string>
     <string name="dictate__providers_ollama_no_stt">Ollama non ha un endpoint di riconoscimento vocale, quindi può solo riformulare. Per dettare tramite un server tuo, avvia un server vocale (ad esempio Speaches, faster-whisper-server o whisper.cpp) e aggiungilo da «Aggiungi un server tuo» — oppure usa il motore sul dispositivo, che non richiede alcun server.</string>
     <string name="dictate__providers_region_title">Regione</string>
@@ -1297,6 +1304,11 @@
     <string name="dictate__languages_summary">Scegli le lingue in cui detti. Passa rapidamente dall\'una all\'altra dalla barra di registrazione.</string>
     <string name="dictate__language_detect">Rileva automaticamente</string>
     <string name="dictate__languages_active_title">Lingua attiva</string>
+    <string name="dictate__languages_follow_keyboard">Segui la lingua della tastiera</string>
+    <string name="dictate__languages_follow_keyboard_summary">Cambia anche la dettatura, se la lingua è spuntata qui sotto</string>
+    <string name="quick_action__dictate_switch_provider">Fornitore di trascrizione</string>
+    <string name="quick_action__dictate_switch_provider__tooltip">Cambia il fornitore di trascrizione</string>
+    <string name="enum__space_bar_mode__transcription_provider">Fornitore di trascrizione</string>
     <string name="dictate__prompt_selection_none">Nessuno</string>
     <string name="dictate__prompt_selection_predefined">Predefinito</string>
     <string name="dictate__prompt_selection_custom">Personalizzato</string>
@@ -1343,6 +1355,12 @@
     <string name="dictate__manage_prompts_title">Gestisci prompt</string>
     <string name="dictate__manage_prompts_summary">{count} prompt</string>
     <string name="dictate__manage_prompts_summary_loading">Aggiungi, modifica ed elimina i tuoi prompt</string>
+    <string name="dictate__command_word_title">Parola di comando</string>
+    <string name="dictate__command_word_off">Disattivato</string>
+    <string name="dictate__command_word_summary">Le dettature che iniziano con «{word}» vengono eseguite come istruzione dal vivo</string>
+    <string name="dictate__command_word_placeholder">Jarvis</string>
+    <string name="dictate__command_word_info_title">Informazioni sulla parola di comando</string>
+    <string name="dictate__command_word_info_description">Normalmente Dictate scrive quello che dici. Se imposti una parola di comando, una dettatura che inizia con essa diventa un’istruzione: la parola viene rimossa e il resto viene inviato all’IA, insieme al testo selezionato se presente.\n\n«Jarvis, rendilo più formale» riscrive la selezione. «Jarvis, qual è la capitale del Giappone» scrive la risposta nel campo. È il pulsante Istruzione dal vivo, raggiunto pronunciandone il nome invece di toccarlo.\n\nLa parola vale solo all’inizio della dettatura e solo come parola intera: scegli quindi qualcosa con cui inizi raramente una frase.</string>
     <string name="dictate__auto_formatting_title">Formattazione automatica</string>
     <string name="dictate__auto_formatting_summary">Converti gli indizi di formattazione dettati in Markdown (titoli, elenchi, …)</string>
     <string name="dictate__system_prompt_title">Istruzione di riformulazione</string>
@@ -2182,4 +2200,23 @@
     <string name="scan__select_all">Seleziona tutto</string>
     <string name="scan__discard">Scarta</string>
     <string name="scan__approve">Conferma</string>
+
+    <!-- On-device translation (issue #424) -->
+    <string name="settings__translation__title">Traduzione</string>
+    <string name="translate__settings_intro">Traduce direttamente sul telefono e nulla di ciò che scrivi ne esce. Si apre con «Traduci» nella Smartbar.</string>
+    <string name="translate__group_installed">Scaricate</string>
+    <string name="translate__group_available">Disponibili</string>
+    <string name="translate__english_included">Sempre incluso</string>
+    <string name="translate__size_installed">{size} sul dispositivo</string>
+    <string name="translate__size_download">{download} da scaricare · {size} sul dispositivo</string>
+    <string name="translate__hint">Scrivi per tradurre</string>
+    <string name="translate__detect">Rileva lingua</string>
+    <string name="translate__detected">{language} (rilevato)</string>
+    <string name="translate__swap">Inverti lingue</string>
+    <string name="translate__no_languages">Ancora nessuna lingua scaricata</string>
+    <string name="translate__get_languages">Scarica lingue</string>
+    <string name="translate__more_languages">Altre lingue</string>
+    <string name="translate__missing">Non scaricato: {language}</string>
+    <string name="translate__failed">Traduzione non riuscita</string>
+    <string name="translate__unsupported">La traduzione non è disponibile su questo dispositivo</string>
 </resources>

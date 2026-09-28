@@ -120,9 +120,15 @@ object KeyCode {
     // free numbers left in this block. Not -245, which is in QuickActionArrangement.REMOVED_ACTION_CODES
     // and would be stripped out of every stored arrangement.
     const val IME_UI_MODE_SCAN =            -229
+    // Opens or closes the on-device translate bar (issue #424). -230 is the last free number of this block,
+    // see IME_UI_MODE_SCAN above.
+    const val TRANSLATE =                   -230
 
     const val IME_SHOW_UI =                 -231
     const val IME_HIDE_UI =                 -232
+    // Dictate: opens the transcription provider picker over the keyboard (issue #431). -233 is the first
+    // free number after the -211…-230 block, which is full.
+    const val DICTATE_SWITCH_PROVIDER =     -233
 
     const val TOGGLE_SMARTBAR_VISIBILITY =  -241
     const val TOGGLE_ACTIONS_OVERFLOW =     -242

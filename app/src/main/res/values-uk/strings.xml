@@ -595,6 +595,7 @@
     <string name="clipboard__group_pinned">Закріплено</string>
     <string name="clipboard__group_recent">Останні</string>
     <string name="clipboard__group_other">Інше</string>
+    <string name="pref__clipboard__history_pinned_on_top__label">Закріплені вгорі</string>
     <string name="clipboard__item_description_email">Пошта</string>
     <string name="clipboard__item_description_url">Посилання</string>
     <string name="clipboard__item_description_phone">Телефон</string>
@@ -991,6 +992,8 @@
     <string name="quick_action__ime_ui_mode_editing__tooltip">Переміщення курсора, виділення та редагування тексту</string>
     <string name="quick_action__ime_ui_mode_scan">Сканувати текст</string>
     <string name="quick_action__ime_ui_mode_scan__tooltip">Сфотографувати друкований текст і вставити його</string>
+    <string name="quick_action__translate">Перекласти</string>
+    <string name="quick_action__translate__tooltip">Перекладати під час набору, прямо на пристрої</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Торкніться, щоб диктувати, торкніться ще раз для транскрибування</string>
     <string name="quick_action__dictate_live_prompt">Голосова інструкція</string>
@@ -1115,7 +1118,7 @@
     <string name="dictate__floating_button_snap_title">Прилипати до краю</string>
     <string name="dictate__interrupted_recording">Перервано ({time})</string>
     <string name="dictate__providers_summary_both">Транскрипція: {transcription} · Переформулювання: {rewording}</string>
-    <string name="dictate__remember_last_dictation_summary">Зберігає останнє диктування, щоб вставити його знову кнопкою «Вставити знову» на Smartbar.</string>
+    <string name="dictate__remember_last_dictation_summary">Зберігає останнє диктування, щоб плаваюча кнопка могла його скасувати, а класична розкладка — вставити знову.</string>
     <string name="dictate__remember_last_dictation_title">Запам’ятовувати останнє диктування</string>
     <string name="changelog__v4_2_0">• НОВЕ: плаваюча кнопка диктування — диктуйте прямо в будь-якому застосунку, навіть коли активна інша клавіатура. Виберіть один із трьох стилів (Капсула, Кільце, Сфера), дивіться живу форму хвилі під час мовлення, перетягуйте будь-куди з прилипанням до країв, задавайте колір і розмір та утримуйте для переформулювання. Увімкніть у Налаштуваннях ▸ Dictate ▸ Плаваюча кнопка.\n• НОВЕ: Google Gemini — використовуйте власний ключ API з AI Studio для транскрипції та переформулювання.\n• Запити тепер за замовчуванням показуються в постійному рядку над клавішами.\n• Надійніша вставка тексту в застосунках, включно з браузерами та іншими клавіатурами.</string>
     <string name="dictate__promo_floating_button_message">Нове: диктуйте всюди</string>
@@ -1216,6 +1219,10 @@
     <string name="dictate__providers_cap_chat">Переформулювання</string>
     <string name="dictate__providers_add_custom">Додати власний сервер</string>
     <string name="dictate__providers_add_custom_summary">Власний хостинг або будь-яка кінцева точка, сумісна з OpenAI — для розпізнавання мовлення та переформулювання</string>
+    <string name="dictate__providers_add">Додати постачальника</string>
+    <string name="dictate__providers_search">Пошук постачальників</string>
+    <string name="dictate__providers_filter_eu">ЄС</string>
+    <string name="dictate__providers_add_none">Немає відповідних постачальників</string>
     <string name="dictate__providers_azure_endpoint">Endpoint указано поряд із ключем на сторінці «Keys and Endpoint» у порталі. MAI-Transcribe працює лише в регіонах East US, West US, West US 2, North Europe, Southeast Asia та Central India.</string>
     <string name="dictate__providers_ollama_no_stt">В Ollama немає кінцевої точки розпізнавання мовлення, тож він уміє лише переформульовувати. Щоб диктувати через власний сервер, запустіть мовленнєвий сервер (наприклад, Speaches, faster-whisper-server або whisper.cpp) і додайте його через «Додати власний сервер» — або скористайтеся розпізнаванням на пристрої, якому сервер не потрібен зовсім.</string>
     <string name="dictate__providers_region_title">Регіон</string>
@@ -1359,6 +1366,11 @@
     <string name="dictate__languages_summary">Виберіть мови, якими ви диктуєте. Швидко перемикайтеся між ними на панелі запису.</string>
     <string name="dictate__language_detect">Визначати автоматично</string>
     <string name="dictate__languages_active_title">Активна мова</string>
+    <string name="dictate__languages_follow_keyboard">Слідувати мові клавіатури</string>
+    <string name="dictate__languages_follow_keyboard_summary">Змінює й мову диктування, якщо її позначено нижче</string>
+    <string name="quick_action__dictate_switch_provider">Постачальник транскрибування</string>
+    <string name="quick_action__dictate_switch_provider__tooltip">Змінити постачальника транскрибування</string>
+    <string name="enum__space_bar_mode__transcription_provider">Постачальник транскрибування</string>
     <string name="dictate__prompt_selection_none">Немає</string>
     <string name="dictate__prompt_selection_predefined">За замовчуванням</string>
     <string name="dictate__prompt_selection_custom">Власний</string>
@@ -1405,6 +1417,12 @@
     <string name="dictate__manage_prompts_title">Керування промптами</string>
     <string name="dictate__manage_prompts_summary">Промптів: {count}</string>
     <string name="dictate__manage_prompts_summary_loading">Додавайте, редагуйте та видаляйте свої промпти</string>
+    <string name="dictate__command_word_title">Командне слово</string>
+    <string name="dictate__command_word_off">Вимк.</string>
+    <string name="dictate__command_word_summary">Диктування, що починаються з «{word}», виконуються як голосова інструкція</string>
+    <string name="dictate__command_word_placeholder">Джарвіс</string>
+    <string name="dictate__command_word_info_title">Про командне слово</string>
+    <string name="dictate__command_word_info_description">Зазвичай Dictate записує те, що ви кажете. Якщо задано командне слово, диктування, яке починається з нього, стає інструкцією: слово прибирається, а решта йде до ШІ разом із виділеним текстом, якщо він є.\n\n«Джарвіс, зроби це офіційнішим» перепише виділення. «Джарвіс, яка столиця Японії» впише відповідь у поле. Це та сама кнопка голосової інструкції, лише викликана словом, а не дотиком.\n\nСлово зараховується лише на самому початку диктування і лише як ціле слово — оберіть те, з чого ви рідко починаєте речення.</string>
     <string name="dictate__auto_formatting_title">Автоформатування</string>
     <string name="dictate__auto_formatting_summary">Перетворювати озвучені вказівки щодо форматування на Markdown (заголовки, списки, …)</string>
     <string name="dictate__system_prompt_title">Інструкція переформулювання</string>
@@ -2246,4 +2264,23 @@
     <string name="scan__select_all">Вибрати все</string>
     <string name="scan__discard">Відхилити</string>
     <string name="scan__approve">Прийняти</string>
+
+    <!-- On-device translation (issue #424) -->
+    <string name="settings__translation__title">Переклад</string>
+    <string name="translate__settings_intro">Перекладає прямо на телефоні, і ніщо з того, що ви вводите, його не залишає. Відкривається кнопкою «Перекласти» на розумній панелі.</string>
+    <string name="translate__group_installed">Завантажені</string>
+    <string name="translate__group_available">Доступні</string>
+    <string name="translate__english_included">Завжди доступна</string>
+    <string name="translate__size_installed">{size} на пристрої</string>
+    <string name="translate__size_download">{download} для завантаження · {size} на пристрої</string>
+    <string name="translate__hint">Введіть текст для перекладу</string>
+    <string name="translate__detect">Визначити мову</string>
+    <string name="translate__detected">{language} (визначено)</string>
+    <string name="translate__swap">Поміняти мови місцями</string>
+    <string name="translate__no_languages">Ще не завантажено жодної мови</string>
+    <string name="translate__get_languages">Завантажити мови</string>
+    <string name="translate__more_languages">Інші мови</string>
+    <string name="translate__missing">Не завантажено: {language}</string>
+    <string name="translate__failed">Не вдалося перекласти</string>
+    <string name="translate__unsupported">Переклад недоступний на цьому пристрої</string>
 </resources>

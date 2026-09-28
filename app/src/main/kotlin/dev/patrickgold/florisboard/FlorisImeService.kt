@@ -397,6 +397,11 @@ class FlorisImeService : LifecycleInputMethodService() {
             // A new editor field invalidates any in-progress emoji search (issue #110); drop it so we
             // don't reappear on an unrelated field. imeUiMode is reset to TEXT just below anyway.
             keyboardManager.closeEmojiSearch(returnToMedia = false)
+            // The same for every other field of the keyboard's own (issue #424) — the GIF, sticker and
+            // clipboard searches used to survive into the next app's field. The translate bar writes into
+            // the field it was opened on, so a new field ends it without a last write, which would land in
+            // the wrong place. A restart of the same field (an app changing its input type) leaves them.
+            if (!restarting) keyboardManager.closeInternalFields(finishTranslate = false)
             if (activeState.imeUiMode != ImeUiMode.CLIPBOARD || prefs.clipboard.historyHideOnNextTextField.get()) {
                 activeState.imeUiMode = ImeUiMode.TEXT
             }
@@ -480,6 +485,19 @@ class FlorisImeService : LifecycleInputMethodService() {
             || prefs.physicalKeyboard.showOnScreenKeyboard.get()
     }
 
+    /**
+     * The user tapped the app's text field. Only the keyboard's own fields care: the translate bar
+     * (issue #424) hands the keys back to the app, a search closes (#394). Not every app reports this — a
+     * tap that moves the cursor is also caught in [onUpdateSelection] — but it is the one signal for a tap
+     * that lands exactly where the cursor already was.
+     */
+    override fun onViewClicked(focusChanged: Boolean) {
+        super.onViewClicked(focusChanged)
+        if (keyboardManager.translateQuery.value != null || keyboardManager.activeInternalField() != null) {
+            keyboardManager.onEditorClicked()
+        }
+    }
+
     override fun onUpdateSelection(
         oldSelStart: Int,
         oldSelEnd: Int,
@@ -490,6 +508,9 @@ class FlorisImeService : LifecycleInputMethodService() {
     ) {
         flogInfo { "old={start=$oldSelStart,end=$oldSelEnd} new={start=$newSelStart,end=$newSelEnd} composing={start=$candidatesStart,end=$candidatesEnd}" }
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd)
+        // A cursor the keyboard did not move means the user is working in the app's field again: the
+        // translate bar gives the keys back (#424), a search closes (#394).
+        keyboardManager.onAppSelectionChanged(oldSelStart, oldSelEnd, newSelStart, newSelEnd)
         activeState.batchEdit {
             activeState.isSelectionMode = (newSelEnd - newSelStart) != 0
             editorInstance.handleSelectionUpdate(
@@ -538,6 +559,9 @@ class FlorisImeService : LifecycleInputMethodService() {
         // an active recording this is the normal teardown. A recording the keyboard does not own — the
         // floating button's, or the system voice input's — is left running (issue #293).
         dev.patrickgold.florisboard.dictate.DictateController.stashRecordingOnHide(this)
+        // Hiding the keyboard closes its own fields (issue #424). A translation ends the way closing the
+        // bar does: what was typed is still translated into the field, which has not changed.
+        keyboardManager.closeInternalFields(finishTranslate = true)
         if (windowController.onWindowHidden()) {
             flogInfo(LogTopic.IMS_EVENTS)
             // The scan session deliberately survives a hidden window: the trip to the camera is itself
@@ -547,6 +571,7 @@ class FlorisImeService : LifecycleInputMethodService() {
                 activeState.imeUiMode = ImeUiMode.TEXT
                 activeState.isActionsOverflowVisible = false
                 activeState.isActionsEditorVisible = false
+                activeState.isTranscriptionProviderSelectionVisible = false
             }
         } else {
             flogWarning(LogTopic.IMS_EVENTS) { "Ignoring (is already hidden)" }

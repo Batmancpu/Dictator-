@@ -221,6 +221,8 @@
     <string name="quick_action__ime_ui_mode_editing__tooltip">Move the cursor, select and edit text</string>
     <string name="quick_action__ime_ui_mode_scan" comment="Opens the scan panel: photograph printed text and insert part of it. Mind the limited space.">Scan text</string>
     <string name="quick_action__ime_ui_mode_scan__tooltip">Photograph printed text and insert it</string>
+    <string name="quick_action__translate" comment="Opens the on-device translate bar. Mind the limited space.">Translate</string>
+    <string name="quick_action__translate__tooltip">Translate as you type, on this device</string>
     <string name="quick_action__ime_ui_mode_dictate" comment="Please mind the limited available space for the quick action strings">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Tap to dictate, tap again to transcribe</string>
     <string name="quick_action__dictate_live_prompt" comment="Please mind the limited available space for the quick action strings">Live prompt</string>
@@ -229,6 +231,8 @@
     <string name="quick_action__dictate_prompts__tooltip">Open the AI rewording prompts</string>
     <string name="quick_action__dictate_reinsert" comment="Please mind the limited available space for the quick action strings. Opens the dictation history panel">History</string>
     <string name="quick_action__dictate_reinsert__tooltip">Open your dictation history</string>
+    <string name="quick_action__dictate_switch_provider" comment="Please mind the limited available space for the quick action strings. Opens a list of the set-up transcription providers to switch between; also the title of that list">Transcription provider</string>
+    <string name="quick_action__dictate_switch_provider__tooltip">Switch the transcription provider</string>
     <string name="quick_action__language_switch" comment="Please mind the limited available space for the quick action strings">Switch language</string>
     <string name="quick_action__language_switch__tooltip">Perform language switch</string>
     <string name="quick_action__system_prev_input_method" comment="Quick action: switch back to the previously used keyboard/IME. Mind the limited space.">Switch keyboard</string>
@@ -1325,6 +1329,7 @@
     <string name="pref__clipboard__suggestion_enabled__label" comment="Preference title">Clipboard content suggestions</string>
     <string name="pref__clipboard__suggestion_enabled__summary" comment="Preference summary">Suggest previously copied clipboard content</string>
     <string name="pref__clipboard__num_history_grid_columns__label">Number of grid columns</string>
+    <string name="pref__clipboard__history_pinned_on_top__label" comment="Preference title">Pinned items on top</string>
     <string name="pref__clipboard__suggestion_timeout__label" comment="Preference title; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__summary` and is the first part">Limit clipboard suggestions to</string>
     <string name="pref__clipboard__suggestion_timeout__summary" comment="Preference summary; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__label` and is the second part">Items copied within the last {v} s</string>
     <string name="pref__clipboard__group_clipboard_history__label">Clipboard history</string>
@@ -1690,6 +1695,7 @@
     <string name="enum__space_bar_mode__nothing" comment="Enum value label">No label</string>
     <string name="enum__space_bar_mode__current_language" comment="Enum value label">Current language</string>
     <string name="enum__space_bar_mode__space_bar_key" comment="Enum value label">␣</string>
+    <string name="enum__space_bar_mode__transcription_provider" comment="Enum value label: the space bar shows the name of the active transcription provider, e.g. Groq">Transcription provider</string>
 
     <string name="enum__spelling_language_mode__use_system_languages" comment="Enum value label">Use system languages</string>
     <string name="enum__spelling_language_mode__use_keyboard_subtypes" comment="Enum value label">Use keyboard subtypes</string>
@@ -2017,6 +2023,10 @@
          their speech goes has no reason to open something called "custom endpoint" (issue #273). -->
     <string name="dictate__providers_add_custom" comment="Button to add a user-defined OpenAI-compatible endpoint">Add your own server</string>
     <string name="dictate__providers_add_custom_summary" comment="Summary under the add-your-own-server button">Self-hosted or any OpenAI-compatible endpoint — for speech-to-text and rewording</string>
+    <string name="dictate__providers_add" comment="Row at the end of the providers list, and title of the screen it opens, listing every provider not set up yet">Add a provider</string>
+    <string name="dictate__providers_search" comment="Placeholder of the search field on the add-a-provider screen">Search providers</string>
+    <string name="dictate__providers_filter_eu" comment="Filter chip: providers that keep data in the European Union. Use the usual abbreviation.">EU</string>
+    <string name="dictate__providers_add_none" comment="Shown when the search and filters on the add-a-provider screen leave no provider">No provider matches</string>
     <string name="dictate__providers_azure_endpoint" comment="Note at the top of the Azure provider editor: where the endpoint comes from, and the only regions that host the model">The endpoint is next to the key on the portal’s “Keys and Endpoint” page. MAI-Transcribe runs only in East US, West US, West US 2, North Europe, Southeast Asia and Central India.</string>
     <string name="dictate__providers_ollama_no_stt" comment="Note at the top of the Ollama provider editor; Ollama serves no transcription endpoint">Ollama has no speech-to-text endpoint, so it can only reword. To dictate through a server of your own, run a speech server (such as Speaches, faster-whisper-server or whisper.cpp) and add it under “Add your own server” — or use the on-device engine, which needs no server at all.</string>
     <!-- Data residency (issue #403). The region is picked from a list because the valid addresses are the
@@ -2289,7 +2299,7 @@
     <string name="dictate__haptic_feedback_title" comment="Setting: vibrate on dictation state changes">Haptic feedback</string>
     <string name="dictate__haptic_feedback_summary" comment="Summary for the haptic feedback setting">Vibrate on record start/stop, when a transcription is ready, and on rewording.</string>
     <string name="dictate__remember_last_dictation_title" comment="Setting: keep the last dictation so it can be re-inserted">Remember last dictation</string>
-    <string name="dictate__remember_last_dictation_summary" comment="Summary explaining the re-insert safety net">Keep your last dictation so you can re-insert it via the Smartbar\'s Re-insert button.</string>
+    <string name="dictate__remember_last_dictation_summary" comment="Summary explaining the re-insert safety net">Keep your last dictation so the floating button can undo it and the classic layout can re-insert it.</string>
 
     <!-- Dictate main screen pipeline groups -->
     <string name="dictate__transcription_group" comment="Group title for the transcription (speech-to-text) stage on the main Dictate screen">Transcription (speech → text)</string>
@@ -2306,6 +2316,8 @@
     <string name="dictate__languages_summary" comment="Explanation on the language picker screen">Pick the languages you dictate in. Switch between them quickly from the recording bar.</string>
     <string name="dictate__language_detect" comment="Language option: let the model auto-detect the spoken language">Detect automatically</string>
     <string name="dictate__languages_active_title" comment="Row/dialog title to pick the currently active transcription language">Active language</string>
+    <string name="dictate__languages_follow_keyboard" comment="Switch title: the dictation language follows the keyboard language">Follow the keyboard language</string>
+    <string name="dictate__languages_follow_keyboard_summary" comment="Switch summary. Only languages ticked in the list below this switch are switched to">Switches dictation too, if the language is ticked below</string>
 
     <!-- Dictate prompt selection (system & style prompt: none / predefined / custom) -->
     <string name="dictate__prompt_selection_none" comment="Prompt option: do not send any prompt">None</string>
@@ -2479,6 +2491,12 @@
     <string name="dictate__manage_prompts_title" comment="Setting: open the prompt management screen">Manage prompts</string>
     <string name="dictate__manage_prompts_summary" comment="Summary showing how many prompts exist. {count} is a number.">{count} prompts</string>
     <string name="dictate__manage_prompts_summary_loading" comment="Summary shown while the prompt count is loading">Add, edit and remove your prompts</string>
+    <string name="dictate__command_word_title" comment="Setting: a spoken word that turns a dictation into an instruction">Command word</string>
+    <string name="dictate__command_word_off" comment="Summary shown when no command word is set, i.e. the feature is off">Off</string>
+    <string name="dictate__command_word_summary" comment="Summary for the command word setting. {word} is the word the user picked.">Dictations starting with “{word}” run as a live prompt</string>
+    <string name="dictate__command_word_placeholder" comment="Example command word shown in the empty input field">Jarvis</string>
+    <string name="dictate__command_word_info_title" comment="Title of the info box explaining the command word">About the command word</string>
+    <string name="dictate__command_word_info_description" comment="Info box explaining what the command word does">Normally Dictate writes down what you say. With a command word set, a dictation that begins with it becomes an instruction instead: the word is removed and the rest is sent to the AI, together with the selected text if there is any.\n\n“Jarvis, make this more formal” rewrites the selection. “Jarvis, what is the capital of Japan” writes the answer into the field. It is the Live prompt button, reached by saying its name instead of tapping it.\n\nThe word only counts at the very start of a dictation and only as a whole word, so pick something you rarely begin a sentence with.</string>
     <string name="dictate__auto_formatting_title" comment="Setting: turn spoken formatting cues into Markdown">Auto-formatting</string>
     <string name="dictate__auto_formatting_summary" comment="Summary for the auto-formatting setting">Turn spoken formatting cues into Markdown (headings, lists, …)</string>
     <string name="dictate__system_prompt_title" comment="Setting: base instruction sent with every rewording request">Rewording instruction</string>
@@ -2630,4 +2648,22 @@
     <string name="changelog__v4_2_0" comment="What's-new text for the 4.2.0 release. One change per line.">• NEW: Floating dictation button — dictate straight into any app, even when another keyboard is active. Pick from three styles (Pill, Ring, Orb), watch a live waveform while you speak, drag it anywhere with edge-snapping, set its color and size, and long-press to reword. Turn it on in Settings ▸ Dictate ▸ Floating button.\n• NEW: Google Gemini — bring your own AI Studio API key for both transcription and rewording.\n• Prompts now appear in an always-on row above the keys by default.\n• More reliable text insertion across apps, including browsers and other keyboards.</string>
     <string name="changelog__v4_1_1" comment="What's-new text for the 4.1.1 release. One change per line.">• Fix: the accent color could appear green on some devices — keys and buttons are back to the Dictate blue.</string>
 
+    <!-- On-device translation (issue #424). Language names come from the system and need no strings. -->
+    <string name="settings__translation__title" comment="Title of the translation settings screen and its entry on the settings home">Translation</string>
+    <string name="translate__settings_intro" comment="The one line at the top of the translation settings. Say where the feature is opened: use the same word for the Smartbar as settings__smartbar__title and for the button as quick_action__translate.">Translates right on your phone, and nothing you type leaves it. Open it with Translate in the Smartbar.</string>
+    <string name="translate__group_installed" comment="Settings group: the translation languages already on the phone">Downloaded</string>
+    <string name="translate__group_available" comment="Settings group: the translation languages that can be downloaded">Available</string>
+    <string name="translate__english_included" comment="Subtitle of the English row: English needs no download, every language carries it">Always included</string>
+    <string name="translate__size_installed" comment="Subtitle of a downloaded language. {size} is e.g. 72 MB">{size} on this device</string>
+    <string name="translate__size_download" comment="Subtitle of a language not yet downloaded. {download} is what the download costs, {size} what stays on the phone, e.g. 52 MB / 72 MB">{download} download · {size} on this device</string>
+    <string name="translate__hint" comment="Placeholder in the translate bar's input line, above the keyboard">Type to translate</string>
+    <string name="translate__detect" comment="Language chip: the source language is detected automatically">Detect language</string>
+    <string name="translate__detected" comment="Language chip once detection has settled, e.g. German (detected)">{language} (detected)</string>
+    <string name="translate__swap" comment="Accessibility label of the button that swaps source and target language">Swap languages</string>
+    <string name="translate__no_languages" comment="Shown in the translate bar when no language is downloaded">No language downloaded yet</string>
+    <string name="translate__get_languages" comment="Button in the translate bar that opens the translation settings">Get languages</string>
+    <string name="translate__more_languages" comment="Last chip in the translate bar's language list, opens the settings to download more">More languages</string>
+    <string name="translate__missing" comment="{language} is one or more language names">{language} is not downloaded</string>
+    <string name="translate__failed">Translation failed</string>
+    <string name="translate__unsupported">Translation is not available on this device</string>
 </resources>

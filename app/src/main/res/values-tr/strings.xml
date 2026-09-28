@@ -707,6 +707,7 @@
     <string name="clipboard__group_pinned">Sabitlenmiş</string>
     <string name="clipboard__group_recent">Son Kullanılan</string>
     <string name="clipboard__group_other">Diğer</string>
+    <string name="pref__clipboard__history_pinned_on_top__label">Sabitlenmiş öğeler üstte</string>
     <string name="clipboard__item_description_email">E-posta</string>
     <string name="clipboard__item_description_url">URL</string>
     <string name="clipboard__item_description_phone">Telefon</string>
@@ -1125,6 +1126,8 @@
     <string name="quick_action__ime_ui_mode_editing__tooltip">İmleci taşıyın, metni seçin ve düzenleyin</string>
     <string name="quick_action__ime_ui_mode_scan">Metin tara</string>
     <string name="quick_action__ime_ui_mode_scan__tooltip">Basılı metni fotoğraflayıp ekleyin</string>
+    <string name="quick_action__translate">Çevir</string>
+    <string name="quick_action__translate__tooltip">Yazarken çevirin, doğrudan bu cihazda</string>
     <string name="quick_action__ime_ui_mode_dictate">Dikte</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Dikte etmek için dokunun, yazıya dökmek için tekrar dokunun</string>
     <string name="quick_action__dictate_live_prompt">Canlı komut</string>
@@ -1249,7 +1252,7 @@
     <string name="dictate__floating_button_snap_title">Kenara yapıştır</string>
     <string name="dictate__interrupted_recording">Kesildi ({time})</string>
     <string name="dictate__providers_summary_both">Yazıya dökme: {transcription} · Yeniden ifade: {rewording}</string>
-    <string name="dictate__remember_last_dictation_summary">Son diktenizi saklar, Smartbar üzerindeki „Yeniden ekle” düğmesiyle tekrar ekleyebilirsiniz.</string>
+    <string name="dictate__remember_last_dictation_summary">Son diktenizi saklar; böylece yüzen düğme geri alabilir, klasik düzen yeniden ekleyebilir.</string>
     <string name="dictate__remember_last_dictation_title">Son dikteyi hatırla</string>
     <string name="changelog__v4_2_0">• YENİ: kayan dikte düğmesi — başka bir klavye etkin olsa bile herhangi bir uygulamaya doğrudan dikte edin. Üç stilden birini seçin (Hap, Halka, Küre), konuşurken canlı dalga biçimini izleyin, kenara yapışmayla istediğiniz yere sürükleyin, rengini ve boyutunu ayarlayın ve yeniden ifade etmek için basılı tutun. Ayarlar ▸ Dictate ▸ Kayan düğme bölümünden açın.\n• YENİ: Google Gemini — transkripsiyon ve yeniden ifade için kendi AI Studio API anahtarını kullan.\n• İstemler artık varsayılan olarak tuşların üzerinde sabit bir sırada görünür.\n• Tarayıcılar ve diğer klavyeler dahil uygulamalar arası daha güvenilir metin ekleme.</string>
     <string name="dictate__promo_floating_button_message">Yeni: her yerde dikte et</string>
@@ -1350,6 +1353,10 @@
     <string name="dictate__providers_cap_chat">Yeniden ifade etme</string>
     <string name="dictate__providers_add_custom">Kendi sunucunuzu ekleyin</string>
     <string name="dictate__providers_add_custom_summary">Kendi barındırdığınız ya da OpenAI uyumlu herhangi bir uç nokta — konuşma tanıma ve yeniden yazma için</string>
+    <string name="dictate__providers_add">Sağlayıcı ekle</string>
+    <string name="dictate__providers_search">Sağlayıcı ara</string>
+    <string name="dictate__providers_filter_eu">AB</string>
+    <string name="dictate__providers_add_none">Eşleşen sağlayıcı yok</string>
     <string name="dictate__providers_azure_endpoint">Endpoint, portaldaki “Keys and Endpoint” sayfasında anahtarın yanında durur. MAI-Transcribe yalnızca East US, West US, West US 2, North Europe, Southeast Asia ve Central India bölgelerinde çalışır.</string>
     <string name="dictate__providers_ollama_no_stt">Ollama\'nın konuşma tanıma uç noktası yoktur, bu yüzden yalnızca yeniden yazabilir. Kendi sunucunuzla dikte etmek için bir konuşma sunucusu çalıştırın (örneğin Speaches, faster-whisper-server veya whisper.cpp) ve “Kendi sunucunuzu ekleyin” altından ekleyin — ya da hiç sunucu gerektirmeyen cihaz üzerindeki motoru kullanın.</string>
     <string name="dictate__providers_region_title">Bölge</string>
@@ -1493,6 +1500,11 @@
     <string name="dictate__languages_summary">Dikte ettiğiniz dilleri seçin. Kayıt çubuğundan aralarında hızlıca geçiş yapın.</string>
     <string name="dictate__language_detect">Otomatik algıla</string>
     <string name="dictate__languages_active_title">Etkin dil</string>
+    <string name="dictate__languages_follow_keyboard">Klavye dilini takip et</string>
+    <string name="dictate__languages_follow_keyboard_summary">Dil aşağıda işaretliyse dikte dili de değişir</string>
+    <string name="quick_action__dictate_switch_provider">Yazıya dökme sağlayıcısı</string>
+    <string name="quick_action__dictate_switch_provider__tooltip">Yazıya dökme sağlayıcısını değiştir</string>
+    <string name="enum__space_bar_mode__transcription_provider">Yazıya dökme sağlayıcısı</string>
     <string name="dictate__prompt_selection_none">Yok</string>
     <string name="dictate__prompt_selection_predefined">Varsayılan</string>
     <string name="dictate__prompt_selection_custom">Özel</string>
@@ -1539,6 +1551,12 @@
     <string name="dictate__manage_prompts_title">Komutları yönet</string>
     <string name="dictate__manage_prompts_summary">{count} komut</string>
     <string name="dictate__manage_prompts_summary_loading">Komutlarınızı ekleyin, düzenleyin ve kaldırın</string>
+    <string name="dictate__command_word_title">Komut kelimesi</string>
+    <string name="dictate__command_word_off">Kapalı</string>
+    <string name="dictate__command_word_summary">“{word}” ile başlayan dikteler canlı komut olarak çalıştırılır</string>
+    <string name="dictate__command_word_placeholder">Jarvis</string>
+    <string name="dictate__command_word_info_title">Komut kelimesi hakkında</string>
+    <string name="dictate__command_word_info_description">Dictate normalde söylediğinizi yazar. Bir komut kelimesi ayarlarsanız, onunla başlayan bir dikte bunun yerine bir talimata dönüşür: kelime çıkarılır, kalanı seçili metinle birlikte (varsa) yapay zekâya gönderilir.\n\n“Jarvis, bunu daha resmî yap” seçimi yeniden yazar. “Jarvis, Japonya’nın başkenti neresi” cevabı alana yazar. Bu, dokunmak yerine adını söyleyerek ulaşılan canlı komut düğmesidir.\n\nKelime yalnızca diktenin en başında ve yalnızca tam kelime olarak sayılır; bu yüzden cümleye nadiren başladığınız bir şey seçin.</string>
     <string name="dictate__auto_formatting_title">Otomatik biçimlendirme</string>
     <string name="dictate__auto_formatting_summary">Sözlü biçimlendirme ipuçlarını Markdown\'a dönüştür (başlıklar, listeler, …)</string>
     <string name="dictate__system_prompt_title">Yeniden ifade etme talimatı</string>
@@ -2378,4 +2396,23 @@
     <string name="scan__select_all">Tümünü seç</string>
     <string name="scan__discard">Vazgeç</string>
     <string name="scan__approve">Onayla</string>
+
+    <!-- On-device translation (issue #424) -->
+    <string name="settings__translation__title">Çeviri</string>
+    <string name="translate__settings_intro">Doğrudan telefonunuzda çevirir; yazdığınız hiçbir şey telefonunuzdan çıkmaz. Akıllı Çubuk\'taki “Çevir” düğmesiyle açılır.</string>
+    <string name="translate__group_installed">İndirilenler</string>
+    <string name="translate__group_available">Mevcut</string>
+    <string name="translate__english_included">Her zaman dahil</string>
+    <string name="translate__size_installed">Cihazda {size}</string>
+    <string name="translate__size_download">{download} indirme · cihazda {size}</string>
+    <string name="translate__hint">Çevirmek için yazın</string>
+    <string name="translate__detect">Dili algıla</string>
+    <string name="translate__detected">{language} (algılandı)</string>
+    <string name="translate__swap">Dillerin yerini değiştir</string>
+    <string name="translate__no_languages">Henüz indirilmiş dil yok</string>
+    <string name="translate__get_languages">Dil indir</string>
+    <string name="translate__more_languages">Diğer diller</string>
+    <string name="translate__missing">{language} indirilmemiş</string>
+    <string name="translate__failed">Çeviri başarısız</string>
+    <string name="translate__unsupported">Çeviri bu cihazda kullanılamıyor</string>
 </resources>

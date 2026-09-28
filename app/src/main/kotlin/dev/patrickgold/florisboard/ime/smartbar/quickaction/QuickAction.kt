@@ -125,10 +125,12 @@ fun QuickAction.computeDisplayName(evaluator: ComputingEvaluator): String {
             KeyCode.IME_UI_MODE_STICKER -> R.string.quick_action__ime_ui_mode_sticker
             KeyCode.IME_UI_MODE_EDITING -> R.string.quick_action__ime_ui_mode_editing
             KeyCode.IME_UI_MODE_SCAN -> R.string.quick_action__ime_ui_mode_scan
+            KeyCode.TRANSLATE -> R.string.quick_action__translate
             KeyCode.IME_UI_MODE_DICTATE -> R.string.quick_action__ime_ui_mode_dictate
             KeyCode.DICTATE_LIVE_PROMPT -> R.string.quick_action__dictate_live_prompt
             KeyCode.DICTATE_PROMPTS -> R.string.quick_action__dictate_prompts
             KeyCode.DICTATE_REINSERT -> R.string.quick_action__dictate_reinsert
+            KeyCode.DICTATE_SWITCH_PROVIDER -> R.string.quick_action__dictate_switch_provider
             KeyCode.LANGUAGE_SWITCH -> R.string.quick_action__language_switch
             KeyCode.SYSTEM_PREV_INPUT_METHOD -> R.string.quick_action__system_prev_input_method
             KeyCode.SYSTEM_INPUT_METHOD_PICKER -> R.string.quick_action__system_input_method_picker
@@ -178,10 +180,12 @@ fun QuickAction.computeTooltip(evaluator: ComputingEvaluator): String {
             KeyCode.IME_UI_MODE_STICKER -> R.string.quick_action__ime_ui_mode_sticker__tooltip
             KeyCode.IME_UI_MODE_EDITING -> R.string.quick_action__ime_ui_mode_editing__tooltip
             KeyCode.IME_UI_MODE_SCAN -> R.string.quick_action__ime_ui_mode_scan__tooltip
+            KeyCode.TRANSLATE -> R.string.quick_action__translate__tooltip
             KeyCode.IME_UI_MODE_DICTATE -> R.string.quick_action__ime_ui_mode_dictate__tooltip
             KeyCode.DICTATE_LIVE_PROMPT -> R.string.quick_action__dictate_live_prompt__tooltip
             KeyCode.DICTATE_PROMPTS -> R.string.quick_action__dictate_prompts__tooltip
             KeyCode.DICTATE_REINSERT -> R.string.quick_action__dictate_reinsert__tooltip
+            KeyCode.DICTATE_SWITCH_PROVIDER -> R.string.quick_action__dictate_switch_provider__tooltip
             KeyCode.LANGUAGE_SWITCH -> R.string.quick_action__language_switch__tooltip
             KeyCode.SYSTEM_PREV_INPUT_METHOD -> R.string.quick_action__system_prev_input_method__tooltip
             KeyCode.SYSTEM_INPUT_METHOD_PICKER -> R.string.quick_action__system_input_method_picker__tooltip

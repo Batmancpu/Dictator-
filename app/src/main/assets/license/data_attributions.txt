@@ -45,6 +45,8 @@ One-shot models — these transcribe after you stop speaking:
 
   - Whisper (tiny/base/small, multilingual and English) — © OpenAI, MIT License.
     https://github.com/openai/whisper
+  - Parakeet Ultra — a post-train of NVIDIA Parakeet TDT 0.6B v3 covering the same 25 European
+    languages, © moondream, licensed CC BY 4.0. https://huggingface.co/moondream/parakeet-ultra
   - Parakeet TDT 0.6B v3 — © NVIDIA, licensed CC BY 4.0.
     https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
   - Parakeet TDT 110M (English) — © NVIDIA, licensed CC BY 4.0.
@@ -128,7 +130,8 @@ remains the property of its owner, and their use here implies no affiliation or 
 The monochrome outlines come from two collections, both freely licensed:
 
   - Simple Icons, CC0-1.0 — OpenAI, OpenRouter, Google Gemini, Anthropic, Mistral AI, ElevenLabs,
-    Deepgram, DeepSeek, Ollama, Microsoft Azure. https://github.com/simple-icons/simple-icons
+    Deepgram, DeepSeek, Ollama, Microsoft Azure, Scaleway, OVHcloud.
+    https://github.com/simple-icons/simple-icons
   - Lobe Icons, MIT License — Groq, Together AI, DeepInfra, AssemblyAI, xAI, SiliconFlow (filed
     there under SiliconCloud, the name of their platform).
     https://github.com/lobehub/lobe-icons
@@ -151,3 +154,27 @@ not even on first use.
 
 No camera permission is declared for this: the system camera app takes the picture and hands the file
 back, and the photo is deleted from our cache as soon as it has been read.
+
+
+10. On-device translation models and engine (the translate bar)
+---------------------------------------------------------------
+
+Files: translation-models/<xx-en|en-xx>/  (downloaded on demand, per language)
+       libdictate_bergamot.so            (bundled)
+
+Translation runs entirely on the device, in a process of its own; no text is sent anywhere. The
+models are Mozilla's Firefox Translations models, mirrored unchanged to a release of this project
+(translation-models-v1) so that every download is pinned by its checksum. Mozilla trains them to and
+from English only, so a pair of two other languages is translated through English.
+
+  - Firefox Translations models, © Mozilla, Mozilla Public License 2.0.
+    https://github.com/mozilla/translations  (source code of the training pipeline and models)
+  - Bergamot translation engine (bergamot-translator, now mozilla/translations/inference), © the
+    Bergamot project and Mozilla, Mozilla Public License 2.0 — built unmodified from
+    https://github.com/mozilla/translations
+  - Marian NMT (the Bergamot fork), MIT License. https://github.com/marian-nmt/marian-dev
+  - SentencePiece, © Google, Apache License 2.0 (one line changed to compile with NDK 29, see
+    tools/bergamot/patches in the Dictate repository). https://github.com/google/sentencepiece
+  - ruy, © Google, Apache License 2.0; cpuinfo, BSD 2-Clause; simd_utils, BSD 2-Clause;
+    PCRE2, BSD 3-Clause; yaml-cpp and pathie-cpp, MIT / BSD 2-Clause; ssplit-cpp, Apache License 2.0.
+

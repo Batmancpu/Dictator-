@@ -682,6 +682,7 @@
     <string name="clipboard__group_pinned">ピン留め済み</string>
     <string name="clipboard__group_recent">最近の項目</string>
     <string name="clipboard__group_other">その他</string>
+    <string name="pref__clipboard__history_pinned_on_top__label">ピン留めした項目を上に表示</string>
     <string name="clipboard__item_description_email">メール</string>
     <string name="clipboard__item_description_url">URL</string>
     <string name="clipboard__item_description_phone">電話</string>
@@ -1078,6 +1079,8 @@
     <string name="quick_action__ime_ui_mode_editing__tooltip">カーソル移動、選択、テキスト編集</string>
     <string name="quick_action__ime_ui_mode_scan">テキストをスキャン</string>
     <string name="quick_action__ime_ui_mode_scan__tooltip">印刷された文字を撮影して挿入します</string>
+    <string name="quick_action__translate">翻訳</string>
+    <string name="quick_action__translate__tooltip">入力しながらこの端末上で翻訳します</string>
     <string name="quick_action__ime_ui_mode_dictate">音声入力</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">タップして音声入力、もう一度タップで文字起こし</string>
     <string name="quick_action__dictate_live_prompt">音声指示</string>
@@ -1202,7 +1205,7 @@
     <string name="dictate__floating_button_snap_title">端に吸着</string>
     <string name="dictate__interrupted_recording">中断されました ({time})</string>
     <string name="dictate__providers_summary_both">文字起こし: {transcription} · 言い換え: {rewording}</string>
-    <string name="dictate__remember_last_dictation_summary">最後の音声入力を保持し、Smartbar の「再挿入」ボタンで再び挿入できます。</string>
+    <string name="dictate__remember_last_dictation_summary">直前の音声入力を保持し、フローティングボタンで取り消したり、クラシックレイアウトで再挿入したりできるようにします。</string>
     <string name="dictate__remember_last_dictation_title">最後の音声入力を記憶</string>
     <string name="changelog__v4_2_0">• 新機能: フローティング音声入力ボタン — 別のキーボードが有効でも、どのアプリにも直接音声入力できます。3つのスタイル（ピル、リング、オーブ）から選び、話すとライブ波形が表示され、端に吸着させながらどこへでもドラッグでき、色とサイズを設定し、長押しで言い換えられます。設定 ▸ Dictate ▸ フローティングボタンでオンにできます。\n• 新機能：Google Gemini — 文字起こしと書き換えに自分の AI Studio API キーを使えます。\n• プロンプトがデフォルトでキーの上の常時表示の行に表示されるようになりました。\n• ブラウザーや他のキーボードを含む、アプリ全体でのより確実なテキスト挿入。</string>
     <string name="dictate__promo_floating_button_message">新機能：どのアプリでも音声入力</string>
@@ -1303,6 +1306,10 @@
     <string name="dictate__providers_cap_chat">言い換え</string>
     <string name="dictate__providers_add_custom">自分のサーバーを追加</string>
     <string name="dictate__providers_add_custom_summary">セルフホストまたは OpenAI 互換の任意のエンドポイント — 音声認識と言い換えの両方に</string>
+    <string name="dictate__providers_add">プロバイダーを追加</string>
+    <string name="dictate__providers_search">プロバイダーを検索</string>
+    <string name="dictate__providers_filter_eu">EU</string>
+    <string name="dictate__providers_add_none">一致するプロバイダーがありません</string>
     <string name="dictate__providers_azure_endpoint">エンドポイントはポータルの「Keys and Endpoint」ページでキーの隣にあります。MAI-Transcribe が動くのは East US、West US、West US 2、North Europe、Southeast Asia、Central India だけです。</string>
     <string name="dictate__providers_ollama_no_stt">Ollama には音声認識のエンドポイントがないため、言い換えしかできません。自分のサーバーで音声入力するには、音声サーバー（Speaches、faster-whisper-server、whisper.cpp など）を動かし、「自分のサーバーを追加」から登録してください。サーバーが一切不要な端末上の認識を使うこともできます。</string>
     <string name="dictate__providers_region_title">リージョン</string>
@@ -1446,6 +1453,11 @@
     <string name="dictate__languages_summary">音声入力する言語を選択します。録音バーから素早く切り替えられます。</string>
     <string name="dictate__language_detect">自動検出</string>
     <string name="dictate__languages_active_title">使用中の言語</string>
+    <string name="dictate__languages_follow_keyboard">キーボードの言語に合わせる</string>
+    <string name="dictate__languages_follow_keyboard_summary">下でチェックされた言語なら、音声入力も切り替わります</string>
+    <string name="quick_action__dictate_switch_provider">文字起こしプロバイダー</string>
+    <string name="quick_action__dictate_switch_provider__tooltip">文字起こしプロバイダーを切り替え</string>
+    <string name="enum__space_bar_mode__transcription_provider">文字起こしプロバイダー</string>
     <string name="dictate__prompt_selection_none">なし</string>
     <string name="dictate__prompt_selection_predefined">既定</string>
     <string name="dictate__prompt_selection_custom">カスタム</string>
@@ -1492,6 +1504,12 @@
     <string name="dictate__manage_prompts_title">プロンプトを管理</string>
     <string name="dictate__manage_prompts_summary">{count}個のプロンプト</string>
     <string name="dictate__manage_prompts_summary_loading">プロンプトの追加・編集・削除</string>
+    <string name="dictate__command_word_title">コマンドワード</string>
+    <string name="dictate__command_word_off">オフ</string>
+    <string name="dictate__command_word_summary">「{word}」で始まる音声入力は音声指示として実行されます</string>
+    <string name="dictate__command_word_placeholder">ジャービス</string>
+    <string name="dictate__command_word_info_title">コマンドワードについて</string>
+    <string name="dictate__command_word_info_description">Dictate は通常、話した内容をそのまま書き取ります。コマンドワードを設定すると、その語で始まる音声入力は指示として扱われます。語は取り除かれ、残りが（選択中のテキストがあればそれと一緒に）AI へ送られます。\n\n「ジャービス、もっと丁寧にして」は選択範囲を書き換えます。「ジャービス、日本の首都はどこ」は答えを入力欄に書き込みます。つまり、タップする代わりに名前を呼んで使う音声指示ボタンです。\n\nこの語は音声入力のいちばん最初にあるときだけ、しかも単独の語としてのみ有効です。文の書き出しにめったに使わない語を選んでください。</string>
     <string name="dictate__auto_formatting_title">自動書式設定</string>
     <string name="dictate__auto_formatting_summary">話した書式の指示をMarkdown（見出し、リストなど）に変換します</string>
     <string name="dictate__system_prompt_title">言い換えの指示</string>
@@ -2330,4 +2348,23 @@
     <string name="scan__select_all">すべて選択</string>
     <string name="scan__discard">破棄</string>
     <string name="scan__approve">確定</string>
+
+    <!-- On-device translation (issue #424) -->
+    <string name="settings__translation__title">翻訳</string>
+    <string name="translate__settings_intro">端末上で直接翻訳するため、入力した内容が外部に送られることはありません。スマートバーの「翻訳」から開けます。</string>
+    <string name="translate__group_installed">ダウンロード済み</string>
+    <string name="translate__group_available">ダウンロード可能</string>
+    <string name="translate__english_included">常に利用可能</string>
+    <string name="translate__size_installed">端末内: {size}</string>
+    <string name="translate__size_download">ダウンロード: {download} · 端末内: {size}</string>
+    <string name="translate__hint">入力して翻訳</string>
+    <string name="translate__detect">言語を検出</string>
+    <string name="translate__detected">{language}（検出）</string>
+    <string name="translate__swap">言語を入れ替え</string>
+    <string name="translate__no_languages">まだ言語がダウンロードされていません</string>
+    <string name="translate__get_languages">言語をダウンロード</string>
+    <string name="translate__more_languages">その他の言語</string>
+    <string name="translate__missing">{language}はダウンロードされていません</string>
+    <string name="translate__failed">翻訳に失敗しました</string>
+    <string name="translate__unsupported">この端末では翻訳を利用できません</string>
 </resources>

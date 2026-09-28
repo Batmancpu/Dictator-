@@ -127,7 +127,7 @@ Dictate nothing and are not going anywhere.
 - **Classic keyboard-free dictation layout** — bring back the pure, voice-first screen from Dictate 3: lock it in, or keep it just a swipe away from the full keyboard — now with a fully customizable action row (drag & drop), an Enter-key symbol popup and long-form controls.
 - **Wear OS keyboard** — dictate straight from your watch, tethered through your phone or fully standalone.
 - **Floating dictation button** — dictate straight into **any** app, even when another keyboard is active. Pick from six styles (Pill, Ring, Orb, the audio-reactive Cloud and the new Aurora and Lattice orbs), watch a live waveform while you speak, drag it anywhere with edge-snapping, set its color and size, and long-press for rewording — or for a **freeform voice command**: just say what you want and the AI does it, using any selected text as context.
-- **AI rewording & rewriting** — turn a selection into something more formal, casual, translated, summarised, or anything you define with custom prompts, with adjustable reasoning effort.
+- **AI rewording & rewriting** — turn a selection into something more formal, casual, translated, summarised, or anything you define with custom prompts, with adjustable reasoning effort. Give it a command word and you stop reaching for a button at all: a dictation that opens with it — “Jarvis, make this more formal” — is the instruction, not the text.
 - **Community prompt library** — browse rewording prompts shared by others and install them in a tap, or publish your own.
 - **Dictation statistics** — track how much you've dictated and typed, with milestones and a home-screen overview.
 - **Cleaner transcripts, cheaper uploads** — long silences are trimmed out of a recording before it is sent, and it can be sped up without your voice going higher: providers bill by audio length, so a recording a third shorter costs a third less. Long dictations are packed rather than refused, and can be split into paragraphs automatically at sentence boundaries.
@@ -138,10 +138,11 @@ Dictate nothing and are not going anywhere.
 - **GIF search** — search and insert GIFs right from the keyboard, powered by [KLIPY](https://klipy.com). Add your own free KLIPY API key (bring-your-own-key, like the AI providers); search terms are only sent while the GIF panel is open.
 - **Your own stickers** — point the keyboard at a folder of your own images and insert them straight into a chat. Subfolders become tabs, long-press pins a favourite or deletes the file, and nothing leaves the device. Share a sticker to Dictate from WhatsApp, Telegram or anywhere else and it lands in the folder.
 - **Scan text** — photograph an IBAN, a serial number or an address on an envelope and tap the part of it you want in the field. Recognition runs on the device, no camera permission is asked for, and the photo is deleted as soon as it has been read.
+- **Offline translation** — tap Translate in the Smartbar, type in your language and the translation appears in the text field as you go; press Enter and it is sent. Runs entirely on the phone with Mozilla's Firefox Translations models: 49 languages including Hindi, Japanese and Arabic, downloaded one at a time (30–75 MB each), and nothing you type leaves the device.
 - **Searchable settings** — find any option by name and jump straight to it, no digging through menus.
 - **Backup & restore** — take your whole setup to a new phone: preferences, rewording prompts, personal dictionary and learned words, themes, layouts. You choose what goes in, and an archive can be made **without** your API keys, passwords or Dictate Cloud credit — so it can be handed to someone else or attached to a bug report without leaking anything.
 - **Dictate Cloud — credit instead of an API key** *(optional)* — buy prepaid minutes through Google Play and skip the provider sign-up entirely. Neither your recordings nor your text are stored on the way through; the server that does it lives in [`cloud/`](cloud/) in this repository, so the privacy claims can be read rather than believed. No name, no email address — just a wallet and a recovery code you can delete from inside the app.
-- **Bring your own key & provider** — use your own API key with OpenAI, Google Gemini, Groq, Mistral, OpenRouter, Anthropic, Soniox, Deepgram, AssemblyAI, ElevenLabs, Azure Speech and other compatible endpoints, so you stay in control of usage and cost. Azure runs Microsoft's own MAI-Transcribe, which detects across 60 languages and follows a switch mid-sentence. Gemini transcribes with Google's dedicated speech-to-text models rather than a chat model under instruction, and if you speak more than one language you can say which ones instead of picking one and hoping. Where a provider runs its data where you are — Soniox has projects in the EU, Japan and India, OpenRouter an EU entry point — the region is a field in the provider editor, and it moves live streaming with it rather than leaving that one request on another continent.
+- **Bring your own key & provider** — use your own API key with OpenAI, Google Gemini, Groq, Mistral, OpenRouter, Anthropic, Soniox, Deepgram, AssemblyAI, ElevenLabs, Azure Speech and other compatible endpoints, so you stay in control of usage and cost. Azure runs Microsoft's own MAI-Transcribe, which detects across 60 languages and follows a switch mid-sentence. Gemini transcribes with Google's dedicated speech-to-text models rather than a chat model under instruction, and if you speak more than one language you can say which ones instead of picking one and hoping. Where a provider runs its data where you are — Soniox has projects in the EU, Japan and India, OpenRouter an EU entry point — the region is a field in the provider editor, and it moves live streaming with it rather than leaving that one request on another continent. For audio and text that never leave the EU at all, **Scaleway** (Paris) and **OVHcloud** (Gravelines) transcribe and reword in France, under the GDPR and with zero data retention.
 - **Self-hosting friendly** — point Dictate at a server of your own for transcription, rewording and even live streaming, and let it wake a sleeping GPU machine before the first request arrives.
 - **A real, full keyboard** *(courtesy of the FlorisBoard base):*
   - Huge variety of keyboard layouts and easy language/subtype switching, including **phonetic Russian** (ЯШЕРТЫ) beside ЙЦУКЕН
@@ -274,16 +275,20 @@ Dictate Keyboard is released under the terms of the
 - On-device transcription uses [OpenAI Whisper](https://openai.com/index/whisper/) (MIT),
   NVIDIA's [Parakeet](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3),
   [Canary](https://huggingface.co/nvidia/canary-180m-flash) and
-  [FastConformer](https://huggingface.co/nvidia/stt_de_fastconformer_hybrid_large_pc) models and the
+  [FastConformer](https://huggingface.co/nvidia/stt_de_fastconformer_hybrid_large_pc) models,
+  moondream's [Parakeet Ultra](https://huggingface.co/moondream/parakeet-ultra) post-train and the
   primeline German fine-tune (CC-BY-4.0),
   [GigaAM](https://github.com/salute-developers/GigaAM) for Russian (MIT),
   [Dolphin](https://github.com/DataoceanAI/Dolphin) by DataoceanAI and Tsinghua University for 40
   Eastern languages (Apache-2.0),
   and — for live transcription — the [Kroko ASR](https://huggingface.co/Banafo/Kroko-ASR)
-  community models by Banafo (CC-BY-SA). All of them are exported to ONNX by
-  [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx).
+  community models by Banafo (CC-BY-SA). They are exported to ONNX by
+  [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) — except Parakeet Ultra, whose weights are
+  substituted into sherpa-onnx's own Parakeet graph, since upstream publishes no ONNX build.
 - The Lattice button design is ported from
   [thinking-orbs](https://github.com/Jakubantalik/thinking-orbs) by Jakub Antalik (MIT).
+- Offline translation uses Mozilla's [Firefox Translations](https://github.com/mozilla/translations)
+  models and its Bergamot engine (MPL-2.0), built on [Marian NMT](https://marian-nmt.github.io) (MIT).
 - GIF search is powered by [KLIPY](https://klipy.com); GIFs are served by KLIPY under their terms.
 
 <br>
@@ -303,5 +308,6 @@ or [donating via PayPal](https://paypal.me/DevEmperor). Every bit helps — than
   <a href="https://github.com/cnfatman"><img src="https://github.com/cnfatman.png" width="72" alt="Codename: Fatman" title="Codename: Fatman — Dictate's first sponsor 💖"></a>
   <a href="https://github.com/george1612"><img src="https://github.com/george1612.png" width="72" alt="george1612" title="george1612"></a>
   <a href="https://github.com/nichu42"><img src="https://github.com/nichu42.png" width="72" alt="nichu42" title="nichu42"></a>
+  <a href="https://github.com/4kaimar"><img src="https://github.com/4kaimar.png" width="72" alt="4kaimar" title="4kaimar"></a>
 </p>
 <!-- SPONSORS:END -->

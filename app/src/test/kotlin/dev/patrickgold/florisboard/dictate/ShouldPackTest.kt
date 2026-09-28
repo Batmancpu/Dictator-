@@ -90,7 +90,7 @@ class ShouldPackTest {
     @Test
     fun `providers with room to spare never trip the limit clause`() {
         // Their ceilings are in gigabytes, so only the general threshold can ever decide for them.
-        for (id in listOf("elevenlabs", "deepgram", "assemblyai")) {
+        for (id in listOf("elevenlabs", "deepgram", "assemblyai", "ovhcloud")) {
             val limit = ProviderRegistry.maxUploadBytes(id)
             assertTrue(limit > mib(1024), "$id should have a documented ceiling far above a dictation")
             assertFalse(pack(mib(10), limit), "$id packed a 10 MiB recording it had no trouble with")
@@ -106,6 +106,14 @@ class ShouldPackTest {
         assertTrue(siliconflow == mib(50), "expected a documented 50 MiB ceiling, got $siliconflow")
         assertFalse(pack(mib(10), siliconflow))
         assertTrue(pack(mib(20), siliconflow))
+    }
+
+    @Test
+    fun `scaleway carries the ceiling its beta endpoint enforces`() {
+        // #423: documented as 25 MB and measured as 25 MiB. Without it the file-import path would send a
+        // shared recording whole, the way #321 found OpenRouter doing, and let the server refuse it.
+        val scaleway = ProviderRegistry.maxUploadBytes("scaleway")
+        assertTrue(scaleway == mib(25), "expected a documented 25 MiB ceiling, got $scaleway")
     }
 
     @Test

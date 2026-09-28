@@ -40,6 +40,7 @@ import dev.patrickgold.florisboard.app.devtools.AndroidLocalesScreen
 import dev.patrickgold.florisboard.app.devtools.AndroidSettingsScreen
 import dev.patrickgold.florisboard.app.devtools.DevtoolsScreen
 import dev.patrickgold.florisboard.app.devtools.ExportDebugLogScreen
+import dev.patrickgold.florisboard.app.settings.translation.TranslationScreen
 import dev.patrickgold.florisboard.app.ext.CheckUpdatesScreen
 import dev.patrickgold.florisboard.app.ext.ExtensionEditScreen
 import dev.patrickgold.florisboard.app.ext.ExtensionExportScreen
@@ -63,6 +64,7 @@ import dev.patrickgold.florisboard.app.settings.clipboard.ClipboardScreen
 import dev.patrickgold.florisboard.app.settings.dictate.DictateLanguagesScreen
 import dev.patrickgold.florisboard.app.settings.dictate.DictateMappingsScreen
 import dev.patrickgold.florisboard.app.settings.dictate.DictateCloudScreen
+import dev.patrickgold.florisboard.app.settings.dictate.DictateAddProviderScreen
 import dev.patrickgold.florisboard.app.settings.dictate.DictateProvidersScreen
 import dev.patrickgold.florisboard.app.settings.dictate.DictateProxyScreen
 import dev.patrickgold.florisboard.app.settings.dictate.DictateWearScreen
@@ -145,6 +147,10 @@ object Routes {
         @Serializable
         @Deeplink("settings/dictate/providers")
         object DictateProviders
+
+        @Serializable
+        @Deeplink("settings/dictate/providers/add")
+        object DictateProvidersAdd
 
         @Serializable
         @Deeplink("settings/dictate/mappings")
@@ -309,6 +315,11 @@ object Routes {
         @Serializable
         @Deeplink("settings/about/data-attributions")
         object DataAttributions
+
+        // On-device translation (issue #424); the translate bar deep-links here for its languages.
+        @Serializable
+        @Deeplink("settings/translation")
+        object Translation
     }
 
     object Devtools {
@@ -391,6 +402,7 @@ object Routes {
             composableWithDeepLink(Settings.Dictate::class) { DictateScreen() }
             composableWithDeepLink(Settings.DictateLanguages::class) { DictateLanguagesScreen() }
             composableWithDeepLink(Settings.DictateProviders::class) { DictateProvidersScreen() }
+            composableWithDeepLink(Settings.DictateProvidersAdd::class) { DictateAddProviderScreen() }
             composableWithDeepLink(Settings.DictateMappings::class) { DictateMappingsScreen() }
             composableWithDeepLink(Settings.DictateCloud::class) { DictateCloudScreen() }
             composableWithDeepLink(Settings.DictateProxy::class) { DictateProxyScreen() }
@@ -458,6 +470,7 @@ object Routes {
             composableWithDeepLink(Settings.ProjectLicense::class) { ProjectLicenseScreen() }
             composableWithDeepLink(Settings.ThirdPartyLicenses::class) { ThirdPartyLicensesScreen() }
             composableWithDeepLink(Settings.DataAttributions::class) { DataAttributionsScreen() }
+            composableWithDeepLink(Settings.Translation::class) { TranslationScreen() }
 
             composableWithDeepLink(Devtools.Home::class) { DevtoolsScreen() }
             composableWithDeepLink(Devtools.AndroidLocales::class) { AndroidLocalesScreen() }

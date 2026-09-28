@@ -44,10 +44,19 @@ object TouchBeamDecoder {
     class Candidate(val word: String, val cost: Float)
 
     /**
+     * A reading of the taps as the *start* of a word: every dictionary entry in `[lo, hi)` of the index
+     * begins with the same `taps`-long prefix, and [cost] is what reading the taps that way cost.
+     */
+    class PrefixReading(val lo: Int, val hi: Int, val cost: Float)
+
+    /**
      * Lexicographically sorted lowercase dictionary, supporting prefix queries as range narrowing.
      * Built once per language and cached alongside the other per-language data.
+     *
+     * [freqs], when given, holds each word's dictionary frequency at the same position, so a range can be
+     * searched for its most frequent words without a map lookup per entry (issue #381).
      */
-    class PrefixIndex(val words: Array<String>) {
+    class PrefixIndex(val words: Array<String>, val freqs: IntArray = IntArray(0)) {
 
         /**
          * Narrows `[lo, hi)` — all words sharing a prefix of length [depth] — to those whose character at
@@ -63,6 +72,53 @@ object TouchBeamDecoder {
             if (w.length <= depth || w[depth] != ch) return -1L
             val end = upperBound(start, hi, depth, ch)
             return (start.toLong() shl 32) or (end.toLong() and 0xFFFFFFFFL)
+        }
+
+        /** The packed range of every word starting with [prefix], or -1 when none does. */
+        fun rangeOf(prefix: String): Long = extend(0, words.size, 0, prefix, 0)
+
+        /**
+         * Narrows `[lo, hi)` — words sharing a prefix of length [depth] — by the characters of [s] from
+         * index [from] on, one per depth. Returns the packed range, or -1 as soon as nothing matches.
+         */
+        fun extend(lo: Int, hi: Int, depth: Int, s: String, from: Int): Long {
+            var a = lo
+            var b = hi
+            var d = depth
+            for (j in from until s.length) {
+                val packed = narrow(a, b, d, s[j])
+                if (packed < 0) return -1L
+                a = (packed ushr 32).toInt()
+                b = (packed and 0xFFFFFFFFL).toInt()
+                d++
+            }
+            return (a.toLong() shl 32) or (b.toLong() and 0xFFFFFFFFL)
+        }
+
+        /**
+         * The entry of a packed range that is exactly [length] characters long, or null. Within a range of
+         * words sharing a prefix of that length, it is the one that sorts first.
+         */
+        fun exactWord(packed: Long, length: Int): String? {
+            if (packed < 0) return null
+            val word = words[(packed ushr 32).toInt()]
+            return if (word.length == length) word else null
+        }
+
+        /**
+         * Calls [action] once per character occurring at position [depth] in `[lo, hi)` — words sharing a
+         * prefix of length [depth] — with the sub-range of entries that have it there. The entry that ends
+         * at [depth], if there is one, sorts first and has no such character.
+         */
+        fun forEachChild(lo: Int, hi: Int, depth: Int, action: (ch: Char, lo: Int, hi: Int) -> Unit) {
+            var p = lo
+            while (p < hi && words[p].length <= depth) p++
+            while (p < hi) {
+                val ch = words[p][depth]
+                val end = upperBound(p, hi, depth, ch)
+                action(ch, p, end)
+                p = end
+            }
         }
 
         private fun keyAt(index: Int, depth: Int): Int {
@@ -107,9 +163,42 @@ object TouchBeamDecoder {
         layout: KeyProximityInfo.Layout,
         maxResults: Int,
     ): List<Candidate> {
+        val beam = search(points, typed, index, layout) ?: return emptyList()
+        val length = points.size / 2
+        // A surviving range starts with the word that is exactly `length` characters long, if one exists —
+        // shorter-or-equal entries sort first among words sharing the prefix.
+        val out = ArrayList<Candidate>(minOf(beam.size, maxResults))
+        for (reading in beam) {
+            val word = index.words[reading.lo]
+            if (word.length == length) out.add(Candidate(word, reading.cost))
+            if (out.size >= maxResults) break
+        }
+        return out
+    }
+
+    /**
+     * Decodes [points] into the plausible *beginnings* of words — every prefix the beam still holds after
+     * the last tap, cheapest first (issue #381). [decode] keeps only the ones that are a whole word by
+     * themselves; this is what a half-typed word with a slip in it needs, since the word it belongs to is
+     * longer than what has been typed.
+     */
+    fun decodePrefixes(
+        points: FloatArray,
+        typed: String,
+        index: PrefixIndex,
+        layout: KeyProximityInfo.Layout,
+    ): List<PrefixReading> = search(points, typed, index, layout).orEmpty()
+
+    /** The beam itself: the surviving prefix readings after the last tap, cheapest first, or null. */
+    private fun search(
+        points: FloatArray,
+        typed: String,
+        index: PrefixIndex,
+        layout: KeyProximityInfo.Layout,
+    ): List<PrefixReading>? {
         val length = points.size / 2
         if (length == 0 || length > MAX_LENGTH || typed.length != length || index.words.isEmpty()) {
-            return emptyList()
+            return null
         }
 
         // Beam state, kept in parallel primitive arrays: dictionary range plus accumulated cost.
@@ -155,7 +244,7 @@ object TouchBeamDecoder {
                 }
             }
 
-            if (produced == 0) return emptyList()
+            if (produced == 0) return null
 
             // Keep the cheapest BEAM_WIDTH paths. A partial selection sort is fine at this size and avoids
             // allocating boxed comparators on a per-keystroke path.
@@ -178,14 +267,7 @@ object TouchBeamDecoder {
             count = keep
         }
 
-        // A surviving range starts with the word that is exactly `length` characters long, if one exists —
-        // shorter-or-equal entries sort first among words sharing the prefix.
-        val out = ArrayList<Candidate>(minOf(count, maxResults))
-        for (s in 0 until count) {
-            val word = index.words[los[s]]
-            if (word.length == length) out.add(Candidate(word, costs[s]))
-            if (out.size >= maxResults) break
-        }
-        return out
+        // The selection sort above leaves the survivors cheapest first.
+        return List(count) { s -> PrefixReading(los[s], his[s], costs[s]) }
     }
 }

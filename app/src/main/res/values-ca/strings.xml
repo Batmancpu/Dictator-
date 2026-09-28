@@ -611,6 +611,7 @@
     <string name="clipboard__group_pinned">Fixat</string>
     <string name="clipboard__group_recent">Recent</string>
     <string name="clipboard__group_other">Altres</string>
+    <string name="pref__clipboard__history_pinned_on_top__label">Elements fixats a dalt</string>
     <string name="clipboard__item_description_email">Correu</string>
     <string name="clipboard__item_description_url">Enllaç</string>
     <string name="clipboard__item_description_phone">Telèfon</string>
@@ -1016,6 +1017,8 @@
     <string name="quick_action__ime_ui_mode_editing__tooltip">Mou el cursor, selecciona i edita el text</string>
     <string name="quick_action__ime_ui_mode_scan">Escaneja text</string>
     <string name="quick_action__ime_ui_mode_scan__tooltip">Fotografia un text imprès i insereix-lo</string>
+    <string name="quick_action__translate">Tradueix</string>
+    <string name="quick_action__translate__tooltip">Tradueix mentre escrius, en aquest dispositiu</string>
     <string name="quick_action__ime_ui_mode_dictate">Dictate</string>
     <string name="quick_action__ime_ui_mode_dictate__tooltip">Toca per dictar, torna a tocar per transcriure</string>
     <string name="quick_action__dictate_live_prompt">Instrucció en directe</string>
@@ -1140,7 +1143,7 @@
     <string name="dictate__floating_button_snap_title">Ajusta a la vora</string>
     <string name="dictate__interrupted_recording">Interromput ({time})</string>
     <string name="dictate__providers_summary_both">Transcripció: {transcription} · Reformulació: {rewording}</string>
-    <string name="dictate__remember_last_dictation_summary">Conserva el teu últim dictat perquè el puguis tornar a inserir amb el botó Reinsereix de la Smartbar.</string>
+    <string name="dictate__remember_last_dictation_summary">Conserva l\'últim dictat perquè el botó flotant el pugui desfer i la disposició clàssica el pugui tornar a inserir.</string>
     <string name="dictate__remember_last_dictation_title">Recorda l’últim dictat</string>
     <string name="changelog__v4_2_0">• NOU: botó de dictat flotant — dicta directament a qualsevol app, fins i tot amb un altre teclat actiu. Tria entre tres estils (Píndola, Anella, Esfera), mira una forma d’ona en directe mentre parles, arrossega’l on vulguis amb ajust a les vores, defineix-ne el color i la mida i mantén premut per reformular. Activa’l a Configuració ▸ Dictate ▸ Botó flotant.\n• NOU: Google Gemini — fes servir la teva pròpia clau d’API d’AI Studio per a la transcripció i la reformulació.\n• Les indicacions ara apareixen per defecte en una fila fixa damunt de les tecles.\n• Inserció de text més fiable entre apps, inclosos navegadors i altres teclats.</string>
     <string name="dictate__promo_floating_button_message">Nou: dicta a qualsevol app</string>
@@ -1241,6 +1244,10 @@
     <string name="dictate__providers_cap_chat">Reformulació</string>
     <string name="dictate__providers_add_custom">Afegeix el teu propi servidor</string>
     <string name="dictate__providers_add_custom_summary">Autoallotjat o qualsevol endpoint compatible amb OpenAI: per a reconeixement de veu i reformulació</string>
+    <string name="dictate__providers_add">Afegeix un proveïdor</string>
+    <string name="dictate__providers_search">Cerca proveïdors</string>
+    <string name="dictate__providers_filter_eu">UE</string>
+    <string name="dictate__providers_add_none">Cap proveïdor coincideix</string>
     <string name="dictate__providers_azure_endpoint">L\'endpoint és al costat de la clau a la pàgina «Keys and Endpoint» del portal. MAI-Transcribe només funciona a East US, West US, West US 2, North Europe, Southeast Asia i Central India.</string>
     <string name="dictate__providers_ollama_no_stt">L\'Ollama no té cap endpoint de reconeixement de veu, així que només pot reformular. Per dictar a través d\'un servidor teu, engega un servidor de veu (com ara Speaches, faster-whisper-server o whisper.cpp) i afegeix-lo a «Afegeix el teu propi servidor» — o fes servir el motor al dispositiu, que no necessita cap servidor.</string>
     <string name="dictate__providers_region_title">Regió</string>
@@ -1384,6 +1391,11 @@
     <string name="dictate__languages_summary">Tria els idiomes en què dictes. Canvia ràpidament d\'un a l\'altre des de la barra de gravació.</string>
     <string name="dictate__language_detect">Detecta automàticament</string>
     <string name="dictate__languages_active_title">Idioma actiu</string>
+    <string name="dictate__languages_follow_keyboard">Segueix l\'idioma del teclat</string>
+    <string name="dictate__languages_follow_keyboard_summary">També canvia el dictat, si l\'idioma està marcat a sota</string>
+    <string name="quick_action__dictate_switch_provider">Proveïdor de transcripció</string>
+    <string name="quick_action__dictate_switch_provider__tooltip">Canvia el proveïdor de transcripció</string>
+    <string name="enum__space_bar_mode__transcription_provider">Proveïdor de transcripció</string>
     <string name="dictate__prompt_selection_none">Cap</string>
     <string name="dictate__prompt_selection_predefined">Per defecte</string>
     <string name="dictate__prompt_selection_custom">Personalitzat</string>
@@ -1430,6 +1442,12 @@
     <string name="dictate__manage_prompts_title">Gestiona els prompts</string>
     <string name="dictate__manage_prompts_summary">{count} prompts</string>
     <string name="dictate__manage_prompts_summary_loading">Afegeix, edita i elimina els teus prompts</string>
+    <string name="dictate__command_word_title">Paraula d\'ordre</string>
+    <string name="dictate__command_word_off">Desactivat</string>
+    <string name="dictate__command_word_summary">Els dictats que comencen amb «{word}» s\'executen com una instrucció en directe</string>
+    <string name="dictate__command_word_placeholder">Jarvis</string>
+    <string name="dictate__command_word_info_title">Sobre la paraula d\'ordre</string>
+    <string name="dictate__command_word_info_description">Normalment Dictate escriu el que dius. Si defineixes una paraula d\'ordre, un dictat que hi comenci es converteix en una instrucció: la paraula s\'elimina i la resta s\'envia a la IA, juntament amb el text seleccionat si n\'hi ha.\n\n«Jarvis, fes-ho més formal» reescriu la selecció. «Jarvis, quina és la capital del Japó» escriu la resposta al camp. És el botó d\'instrucció en directe, al qual arribes dient-ne el nom en lloc de tocar-lo.\n\nLa paraula només compta al principi del dictat i només com a paraula sencera, així que tria alguna cosa amb què rarament comencis una frase.</string>
     <string name="dictate__auto_formatting_title">Formatació automàtica</string>
     <string name="dictate__auto_formatting_summary">Converteix les indicacions de format dictades en Markdown (encapçalaments, llistes, …)</string>
     <string name="dictate__system_prompt_title">Instrucció de reformulació</string>
@@ -2269,4 +2287,23 @@
     <string name="scan__select_all">Selecciona-ho tot</string>
     <string name="scan__discard">Descarta</string>
     <string name="scan__approve">Accepta</string>
+
+    <!-- On-device translation (issue #424) -->
+    <string name="settings__translation__title">Traducció</string>
+    <string name="translate__settings_intro">Tradueix directament al telèfon, i res del que escrius no en surt. S\'obre amb «Tradueix» a la barra intel·ligent.</string>
+    <string name="translate__group_installed">Baixats</string>
+    <string name="translate__group_available">Disponibles</string>
+    <string name="translate__english_included">Sempre inclòs</string>
+    <string name="translate__size_installed">{size} al dispositiu</string>
+    <string name="translate__size_download">{download} de baixada · {size} al dispositiu</string>
+    <string name="translate__hint">Escriu per traduir</string>
+    <string name="translate__detect">Detecta l\'idioma</string>
+    <string name="translate__detected">{language} (detectat)</string>
+    <string name="translate__swap">Intercanvia els idiomes</string>
+    <string name="translate__no_languages">Encara no s\'ha baixat cap idioma</string>
+    <string name="translate__get_languages">Baixa idiomes</string>
+    <string name="translate__more_languages">Més idiomes</string>
+    <string name="translate__missing">Cal baixar {language}</string>
+    <string name="translate__failed">La traducció ha fallat</string>
+    <string name="translate__unsupported">La traducció no està disponible en aquest dispositiu</string>
 </resources>

@@ -18,6 +18,7 @@ package dev.patrickgold.florisboard.ime.keyboard
 
 import android.content.Context
 import android.icu.lang.UCharacter
+import android.os.SystemClock
 import android.view.KeyEvent
 import android.widget.Toast
 import androidx.compose.runtime.getValue
@@ -30,14 +31,18 @@ import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.appContext
 import dev.patrickgold.florisboard.clipboardManager
-import dev.patrickgold.florisboard.editorInstance
+import dev.patrickgold.florisboard.dictate.field.FieldAutoCorrection
+import dev.patrickgold.florisboard.dictate.field.FieldText
 import dev.patrickgold.florisboard.dictate.snippet.SnippetTriggers
+import dev.patrickgold.florisboard.dictate.translate.TranslateBarController
+import dev.patrickgold.florisboard.editorInstance
 import dev.patrickgold.florisboard.extensionManager
 import dev.patrickgold.florisboard.ime.ImeUiMode
 import dev.patrickgold.florisboard.ime.core.DisplayLanguageNamesIn
 import dev.patrickgold.florisboard.ime.core.Subtype
 import dev.patrickgold.florisboard.ime.core.SubtypePreset
 import dev.patrickgold.florisboard.ime.editor.EditorContent
+import dev.patrickgold.florisboard.ime.editor.EditorRange
 import dev.patrickgold.florisboard.ime.editor.FlorisEditorInfo
 import dev.patrickgold.florisboard.ime.editor.ImeOptions
 import dev.patrickgold.florisboard.ime.editor.InputAttributes
@@ -47,6 +52,7 @@ import dev.patrickgold.florisboard.ime.input.InputEventDispatcher
 import dev.patrickgold.florisboard.ime.input.InputKeyEventReceiver
 import dev.patrickgold.florisboard.ime.input.InputShiftState
 import dev.patrickgold.florisboard.ime.input.RepeatableKeyCodes
+import dev.patrickgold.florisboard.ime.nlp.BreakIteratorGroup
 import dev.patrickgold.florisboard.ime.nlp.ClipboardSuggestionCandidate
 import dev.patrickgold.florisboard.ime.nlp.PunctuationRule
 import dev.patrickgold.florisboard.ime.nlp.SuggestionCandidate
@@ -67,9 +73,9 @@ import dev.patrickgold.florisboard.ime.text.keyboard.DevanagariBase
 import dev.patrickgold.florisboard.ime.text.keyboard.TextKeyData
 import dev.patrickgold.florisboard.ime.text.keyboard.TextKeyboardCache
 import dev.patrickgold.florisboard.ime.window.ImeWindowMode
+import dev.patrickgold.florisboard.lib.FlorisLocale
 import dev.patrickgold.florisboard.lib.devtools.LogTopic
 import dev.patrickgold.florisboard.lib.devtools.flogError
-import dev.patrickgold.florisboard.lib.FlorisLocale
 import dev.patrickgold.florisboard.lib.ext.ExtensionComponentName
 import dev.patrickgold.florisboard.lib.lowercase
 import dev.patrickgold.florisboard.lib.titlecase
@@ -82,8 +88,12 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -134,7 +144,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
 
     /**
      * Holds the live query of the in-keyboard emoji search (issue #110), or `null` when no search is
-     * active. While non-null, the search panel replaces the Smartbar (see [TextInputLayout]) and the
+     * active. While non-null, the search panel sits above the Smartbar (see [TextInputLayout]) and the
      * user's own keyboard layout is used to type the query — character/space/delete keystrokes are
      * intercepted in [onInputKeyUp] and folded into this query instead of being committed to the editor.
      */
@@ -170,9 +180,182 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
      * Same shape as the sticker one, and for the same reason: the clips are already in memory, so the
      * list narrows on every keystroke and there is nothing to submit. The clipboard panel replaces the
      * keyboard, which is why searching it has to look like this at all — the query needs keys to type
-     * it with, so the search takes the Smartbar's slot and hands the layout below back to the user.
+     * it with, so the search sits above the Smartbar and hands the layout below back to the user.
      */
     val clipboardSearchQuery = MutableStateFlow<String?>(null)
+
+    /**
+     * What is typed into the translate bar (issue #424), or `null` while the bar is closed. Filled from
+     * the keys like the searches above, but its result is not a list to pick from: [translateBar] keeps
+     * the translation of it standing in the app's text field.
+     */
+    val translateQuery = MutableStateFlow<String?>(null)
+
+    /** Where in [translateQuery] the next character lands; the bar's field has a real cursor. */
+    val fieldCursor = MutableStateFlow(0)
+
+    /**
+     * Whether the translate bar's field has the keys. A tap into the app's own field takes them back
+     * without closing the bar, as in Gboard; a tap on the bar's field returns them. While it is false the
+     * keyboard types into the app as if the bar were not there.
+     */
+    val translateFocused = MutableStateFlow(true)
+
+    /**
+     * A marked stretch of the translate bar's text, or `null`. Made by swiping over Backspace, like the
+     * app's own field: released, the delete swipe removes it; a key typed over it replaces it.
+     */
+    val fieldSelection = MutableStateFlow<IntRange?>(null)
+    val translateBar by lazy {
+        TranslateBarController(appContext, translateQuery, fieldCursor, translateFocused, fieldSelection)
+    }
+
+    /** Whether keystrokes currently belong to the translate bar. */
+    val translateTakesKeys: Boolean
+        get() = translateQuery.value != null && translateFocused.value
+
+    /** Whether keystrokes currently belong to one of the keyboard's own fields (issue #424). */
+    val fieldTakesKeys: Boolean
+        get() = activeInternalField() != null
+
+    /** The keyboard's own fields (issue #424): the ones the keys can type into instead of the app. */
+    enum class InternalField { TRANSLATE, EMOJI_SEARCH, GIF_SEARCH, STICKER_SEARCH, CLIPBOARD_SEARCH }
+
+    /** The field that has the keys right now, or `null` when they go to the app. */
+    fun activeInternalField(): InternalField? = when {
+        translateTakesKeys -> InternalField.TRANSLATE
+        emojiSearchQuery.value != null -> InternalField.EMOJI_SEARCH
+        gifSearchQuery.value != null -> InternalField.GIF_SEARCH
+        stickerSearchQuery.value != null -> InternalField.STICKER_SEARCH
+        clipboardSearchQuery.value != null -> InternalField.CLIPBOARD_SEARCH
+        else -> null
+    }
+
+    private fun queryOf(field: InternalField): MutableStateFlow<String?> = when (field) {
+        InternalField.TRANSLATE -> translateQuery
+        InternalField.EMOJI_SEARCH -> emojiSearchQuery
+        InternalField.GIF_SEARCH -> gifSearchQuery
+        InternalField.STICKER_SEARCH -> stickerSearchQuery
+        InternalField.CLIPBOARD_SEARCH -> clipboardSearchQuery
+    }
+
+    /**
+     * The field's text with its cursor and marked stretch. The cursor and the stretch are shared by all
+     * five fields ([fieldCursor], [fieldSelection]): only one is ever open, and opening one resets both.
+     */
+    fun fieldText(field: InternalField): FieldText? {
+        val text = queryOf(field).value ?: return null
+        val selection = fieldSelection.value?.takeIf { it.first in 0..text.length && it.last in it.first..text.length }
+        return FieldText(text, fieldCursor.value.coerceIn(0, text.length), selection)
+    }
+
+    fun setFieldText(field: InternalField, value: FieldText) {
+        fieldSelection.value = value.selection
+        queryOf(field).value = value.text
+        fieldCursor.value = value.cursor
+    }
+
+    /** A tap on a field's text: the cursor goes where the finger was. */
+    fun placeFieldCursor(offset: Int) {
+        val field = activeInternalField() ?: return
+        val current = fieldText(field) ?: return
+        fieldAutoCorrection = null
+        setFieldText(field, FieldText(current.text, offset.coerceIn(0, current.text.length)))
+        reevaluateInputShiftState()
+    }
+
+    /** A field opening with nothing typed yet: empty, the cursor at its start, the shift of a new field. */
+    private fun startField(query: MutableStateFlow<String?>) {
+        fieldSelection.value = null
+        fieldCursor.value = 0
+        fieldAutoCorrection = null
+        query.value = ""
+        reevaluateInputShiftState()
+    }
+
+    /**
+     * What the strip's current field candidates were computed for — a correction on Space may only use
+     * them while the field still reads exactly that, since they arrive a moment after the keystroke.
+     */
+    @Volatile private var fieldCandidatesFor: FieldText? = null
+
+    /** A glide's alternatives stand in the strip until the field changes again (issue #127, in a field). */
+    @Volatile private var heldFieldText: FieldText? = null
+
+    /** The translate bar's last autocorrection, which the very next Backspace takes back. */
+    private var fieldAutoCorrection: FieldAutoCorrection? = null
+
+    /** Every open field closed — before a panel takes the keyboard, a new app field, or a hidden window. */
+    fun closeInternalFields(finishTranslate: Boolean = true) {
+        closeTranslate(finishTranslate)
+        closeEmojiSearch(returnToMedia = false)
+        closeGifSearch(returnToPanel = false)
+        closeStickerSearch(returnToPanel = false)
+        closeClipboardSearch(returnToPanel = false)
+    }
+
+    /**
+     * Suggestions for the field that has the keys (issue #424), computed from its own text the way the
+     * app's are from the app's, and shown in the strip in their place. The app's go on being computed
+     * underneath and come back the moment no field has the keys.
+     */
+    private suspend fun updateFieldSuggestions(state: Pair<InternalField, FieldText>?) {
+        if (state == null) {
+            fieldCandidatesFor = null
+            heldFieldText = null
+            if (nlpManager.isFieldMode) {
+                nlpManager.showFieldCandidates(null)
+                resetSuggestions(editorInstance.activeContent)
+            }
+            return
+        }
+        val field = state.second
+        if (field == heldFieldText) return
+        heldFieldText = null
+        if (field.selection != null) {
+            fieldCandidatesFor = field
+            nlpManager.showFieldCandidates(emptyList())
+            return
+        }
+        val composing = nlpManager.determineLocalComposing(field.text.substring(0, field.cursor), BreakIteratorGroup(), field.cursor)
+        val content = EditorContent(
+            text = field.text,
+            offset = 0,
+            localSelection = EditorRange(field.cursor, field.cursor),
+            localComposing = composing,
+            localCurrentWord = composing,
+        )
+        val candidates = nlpManager.suggestionsFor(subtypeManager.activeSubtype, content)
+        fieldCandidatesFor = field
+        nlpManager.showFieldCandidates(candidates)
+    }
+
+    /** A candidate tapped while a field has the keys: it goes into that field, never into the app. */
+    private fun commitIntoField(field: InternalField, candidate: SuggestionCandidate) {
+        val current = fieldText(field) ?: return
+        fieldAutoCorrection = null
+        setFieldText(field, current.replaceWord(candidate.text.toString()))
+        reevaluateInputShiftState()
+    }
+
+    /**
+     * Space in the translate bar applies the provider's autocorrection to the word just typed, as Space
+     * does in the app — and only there: the searches match emoji names, file names and clip text
+     * literally, where a "correction" would search for something else.
+     */
+    private fun autoCorrectTranslateWord(): Boolean {
+        val field = fieldText(InternalField.TRANSLATE) ?: return false
+        if (field.selection != null || field != fieldCandidatesFor) return false
+        val candidate = nlpManager.activeCandidates.firstOrNull { it.isEligibleForAutoCommit } ?: return false
+        val range = field.wordRange()
+        if (range.first == range.last || field.cursor != range.last) return false
+        val word = field.text.substring(range.first, range.last)
+        val corrected = candidate.text.toString()
+        if (corrected == word) return false
+        setFieldText(InternalField.TRANSLATE, field.replaceWord(corrected))
+        fieldAutoCorrection = FieldAutoCorrection(range.first, word, corrected)
+        return true
+    }
 
     private val activeEvaluatorGuard = Mutex(locked = false)
     private var activeEvaluatorVersion = AtomicInteger(0)
@@ -238,6 +421,18 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             }
             clipboardManager.primaryClipFlow.collectLatestIn(scope) {
                 updateActiveEvaluators()
+            }
+            scope.launch {
+                combine(
+                    listOf<Flow<Any?>>(
+                        translateQuery, fieldCursor, translateFocused, fieldSelection,
+                        emojiSearchQuery, gifSearchQuery, stickerSearchQuery, clipboardSearchQuery,
+                    ),
+                ) {
+                    activeInternalField()?.let { field -> fieldText(field)?.let { field to it } }
+                }.distinctUntilChanged().collectLatest { state ->
+                    updateFieldSuggestions(state)
+                }
             }
             editorInstance.activeContentFlow.collectIn(scope) { content ->
                 resetSuggestions(content)
@@ -312,9 +507,17 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
 
     fun reevaluateInputShiftState() {
         if (activeState.inputShiftState != InputShiftState.CAPS_LOCK && !inputEventDispatcher.isPressed(KeyCode.SHIFT)) {
+            // While the translate bar takes the keys, the sentence being typed is the bar's, not the
+            // app field's — which ends in the last translation and would capitalise mid-sentence.
+            // A field of the keyboard's own (issue #424) capitalises like a fresh app field: its first letter
+            // and the first after a sentence end, and nothing else — the searches used to keep the shift
+            // on after the first letter and type in capitals.
+            val typedInField = activeInternalField()?.let(::fieldText)?.let { it.text.substring(0, it.cursor) }
+            val startsSentence = typedInField?.let(TranslateBarController::startsSentence)
+                ?: (editorInstance.activeCursorCapsMode != InputAttributes.CapsMode.NONE)
             val shift = prefs.correction.autoCapitalization.get()
                 && subtypeManager.activeSubtype.primaryLocale.supportsCapitalization
-                && editorInstance.activeCursorCapsMode != InputAttributes.CapsMode.NONE
+                && startsSentence
             activeState.inputShiftState = when {
                 shift -> InputShiftState.SHIFTED_AUTOMATIC
                 else -> InputShiftState.UNSHIFTED
@@ -485,6 +688,10 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
      *  candidate of its own accord (see [commitAutoCorrection]).
      */
     fun commitCandidate(candidate: SuggestionCandidate, byUser: Boolean = true) {
+        activeInternalField()?.let { field ->
+            commitIntoField(field, candidate)
+            return
+        }
         pendingExpansion = null // this write does not come through onInputKeyUp (issue #283)
         // A tap on the strip replaces whatever the previous correction left behind, so there is nothing
         // left to take back. [commitAutoCorrection] re-arms it immediately afterwards for its own case.
@@ -562,11 +769,15 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         } else {
             "$current $text"
         }
-        emojiSearchQuery.value?.let { emojiSearchQuery.value = joined(it); return true }
-        gifSearchQuery.value?.let { gifSearchQuery.value = joined(it); return true }
-        stickerSearchQuery.value?.let { stickerSearchQuery.value = joined(it); return true }
-        clipboardSearchQuery.value?.let { clipboardSearchQuery.value = joined(it); return true }
-        return false
+        val field = activeInternalField() ?: return false
+        val current = fieldText(field) ?: return false
+        val before = current.text.substring(0, current.cursor)
+        setFieldText(field, current.insert(if (before.isEmpty() || before.last().isWhitespace()) text else " $text"))
+        reevaluateInputShiftState()
+        // The glide's alternatives are already in the strip; the field changing under them must not
+        // replace them with suggestions for the word they are alternatives to.
+        heldFieldText = fieldText(field)
+        return true
     }
 
     /**
@@ -590,7 +801,16 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
     /**
      * Handles [KeyCode] arrow and move events, behaves differently depending on text selection.
      */
-    fun handleArrow(code: Int, count: Int = 1) = editorInstance.apply {
+    fun handleArrow(code: Int, count: Int = 1) {
+        // While one of the keyboard's own fields has the keys, the cursor that moves is its own (#424).
+        if (fieldTakesKeys) {
+            moveFieldCursor(code, count)
+            return
+        }
+        handleEditorArrow(code, count)
+    }
+
+    private fun handleEditorArrow(code: Int, count: Int) = editorInstance.apply {
         val isShiftPressed = activeState.isManualSelectionMode || inputEventDispatcher.isPressed(KeyCode.SHIFT)
         val content = activeContent
         val selection = content.selection
@@ -1252,11 +1472,260 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
 
     /**
      * Opens the in-keyboard emoji search (issue #110): switches to the text keyboard so the user can type
-     * a query using their own selected layout, while the search panel is shown in place of the Smartbar.
+     * a query using their own selected layout, while the search panel is shown above the Smartbar.
      */
     fun activateEmojiSearch() {
-        emojiSearchQuery.value = ""
+        closeTranslate()
         activeState.imeUiMode = ImeUiMode.TEXT
+        startField(emojiSearchQuery)
+    }
+
+    /**
+     * Opens or closes the translate bar (issue #424), which sits above the Smartbar like a search and
+     * leaves the layout below for typing. Only one thing can take the keys at a time, so any open search
+     * is closed first — the order in [onInputKeyUp] would otherwise decide silently which one gets them.
+     */
+    fun toggleTranslate() {
+        if (translateQuery.value != null) {
+            closeTranslate()
+            return
+        }
+        closeEmojiSearch(returnToMedia = false)
+        closeGifSearch(returnToPanel = false)
+        closeStickerSearch(returnToPanel = false)
+        closeClipboardSearch(returnToPanel = false)
+        activeState.imeUiMode = ImeUiMode.TEXT
+        translateBar.open()
+        reevaluateInputShiftState()
+    }
+
+    /** Closes the translate bar; [finish] = false when the field it wrote into is already gone. */
+    fun closeTranslate(finish: Boolean = true) {
+        if (translateQuery.value == null) return
+        translateBar.close(finish)
+        reevaluateInputShiftState()
+    }
+
+    /**
+     * Folds a keystroke into the keyboard's own field that has the keys (issue #424) instead of letting
+     * it reach the app. Returns `true` when the key was consumed.
+     *
+     * One handler for all five fields, so the cursor, a marked stretch, the Backspace swipe and the
+     * space-bar glide behave the same in each. They differ in three keys:
+     * - **Enter** — the translate bar finishes its translation and then does the app's own Enter (in a
+     *   chat that sends the translated message); the GIF search runs its search; the other searches
+     *   swallow it, because their results are already filtered and a newline would land in the app.
+     * - **Backspace on an empty field** — a search closes, a common "back out" gesture; the translate bar
+     *   lets it through to the app, where the last translation stands.
+     * - **Space** autocorrects only in the translate bar: the searches match emoji names, file names and
+     *   clip text literally, where a correction would search for something else.
+     */
+    private fun handleFieldKey(data: KeyData): Boolean {
+        val field = activeInternalField() ?: return false
+        val current = fieldText(field) ?: return false
+        val translating = field == InternalField.TRANSLATE
+        // One Backspace right after an autocorrection takes it back; any other key lets it stand.
+        val correction = fieldAutoCorrection
+        fieldAutoCorrection = null
+        if (data.code == KeyCode.DELETE && correction != null) {
+            correction.undo(current)?.let { undone ->
+                setFieldText(field, undone)
+                reevaluateInputShiftState()
+                return true
+            }
+        }
+        if ((data.code == KeyCode.DELETE || data.code == KeyCode.DELETE_WORD) && current.selection != null) {
+            deleteFieldSelection()
+            reevaluateInputShiftState()
+            return true
+        }
+        when (data.code) {
+            KeyCode.SPACE -> if (!translating || !autoCorrectTranslateWord()) setFieldText(field, current.insert(" "))
+            KeyCode.ENTER -> {
+                when (field) {
+                    InternalField.TRANSLATE -> translateBar.submit { performTranslateEnter() }
+                    InternalField.GIF_SEARCH -> submitGifSearch(current.text)
+                    else -> Unit
+                }
+                return true
+            }
+            KeyCode.DELETE, KeyCode.DELETE_WORD -> {
+                if (current.text.isEmpty()) {
+                    if (translating) return false
+                    closeSearch(field)
+                    return true
+                }
+                if (current.cursor == 0) return true
+                val from = if (data.code == KeyCode.DELETE) {
+                    current.text.offsetByCodePoints(current.cursor, -1)
+                } else {
+                    current.text.substring(0, current.cursor).trimEnd().dropLastWhile { !it.isWhitespace() }.length
+                }
+                setFieldText(field, FieldText(current.text.removeRange(from, current.cursor), from))
+            }
+            else -> {
+                val text = data.asString(isForDisplay = false)
+                if (!keyProducesSearchText(data.type, text)) return false
+                setFieldText(field, current.insert(text))
+            }
+        }
+        reevaluateInputShiftState()
+        return true
+    }
+
+    /** Leaves a search for the panel it was opened from — what a Backspace on an empty one means. */
+    private fun closeSearch(field: InternalField) {
+        when (field) {
+            InternalField.EMOJI_SEARCH -> closeEmojiSearch()
+            InternalField.GIF_SEARCH -> closeGifSearch()
+            InternalField.STICKER_SEARCH -> closeStickerSearch()
+            InternalField.CLIPBOARD_SEARCH -> closeClipboardSearch()
+            InternalField.TRANSLATE -> closeTranslate()
+        }
+    }
+
+    private fun deleteFieldSelection() {
+        val field = activeInternalField() ?: return
+        val current = fieldText(field) ?: return
+        val range = current.selection ?: return
+        setFieldText(field, FieldText(current.text.removeRange(range.first, range.last), range.first))
+    }
+
+    /**
+     * The Backspace swipe while one of the keyboard's own fields has the keys: marks [units] characters
+     * or words before the cursor ([forward]: after it, with Shift held), the way the same swipe marks
+     * them in the app's field.
+     */
+    fun selectInField(units: Int, words: Boolean, forward: Boolean) {
+        val field = activeInternalField() ?: return
+        val current = fieldText(field) ?: return
+        if (units <= 0) {
+            fieldSelection.value = null
+            return
+        }
+        var edge = current.cursor
+        repeat(units) {
+            edge = if (forward) nextFieldBoundary(current.text, edge, words) else previousFieldBoundary(current.text, edge, words)
+        }
+        fieldSelection.value = if (edge == current.cursor) null else minOf(edge, current.cursor)..maxOf(edge, current.cursor)
+    }
+
+    /** Releasing a delete swipe: what it marked goes. */
+    fun finishFieldSwipeDelete() {
+        if (fieldSelection.value != null) deleteFieldSelection()
+        reevaluateInputShiftState()
+    }
+
+    private fun previousFieldBoundary(text: String, from: Int, words: Boolean): Int {
+        if (from <= 0) return 0
+        if (!words) return text.offsetByCodePoints(from, -1)
+        var i = from
+        while (i > 0 && text[i - 1].isWhitespace()) i--
+        while (i > 0 && !text[i - 1].isWhitespace()) i--
+        return i
+    }
+
+    private fun nextFieldBoundary(text: String, from: Int, words: Boolean): Int {
+        if (from >= text.length) return text.length
+        if (!words) return text.offsetByCodePoints(from, 1)
+        var i = from
+        while (i < text.length && text[i].isWhitespace()) i++
+        while (i < text.length && !text[i].isWhitespace()) i++
+        return i
+    }
+
+    /**
+     * Moves the field's cursor for an arrow key or a space-bar glide. Up and down have no lines to move
+     * between in a one-line field, so they go to the start and the end, like Home and End.
+     */
+    private fun moveFieldCursor(code: Int, count: Int) {
+        val field = activeInternalField() ?: return
+        val current = fieldText(field) ?: return
+        var cursor = current.cursor
+        when (code) {
+            KeyCode.ARROW_LEFT -> repeat(count) { if (cursor > 0) cursor = current.text.offsetByCodePoints(cursor, -1) }
+            KeyCode.ARROW_RIGHT -> repeat(count) { if (cursor < current.text.length) cursor = current.text.offsetByCodePoints(cursor, 1) }
+            KeyCode.ARROW_UP, KeyCode.MOVE_START_OF_LINE, KeyCode.MOVE_START_OF_PAGE -> cursor = 0
+            KeyCode.ARROW_DOWN, KeyCode.MOVE_END_OF_LINE, KeyCode.MOVE_END_OF_PAGE -> cursor = current.text.length
+        }
+        fieldAutoCorrection = null
+        setFieldText(field, FieldText(current.text, cursor))
+        reevaluateInputShiftState()
+    }
+
+    /**
+     * The app's field was tapped. The translate bar hands the keys back to it and stays open, as in
+     * Gboard (issue #424) — its translation stands in that field and the user may want to go on with it.
+     * A search closes instead (issue #394): it has nothing standing in the app, and a search left open
+     * while the app's cursor blinks again is a field that looks like it has the keys and has not — so the
+     * user typed into the search believing they were typing into the chat.
+     */
+    fun onEditorClicked() {
+        if (translateQuery.value != null) {
+            translateBar.unfocus()
+        } else {
+            closeSearchesForApp()
+        }
+        reevaluateInputShiftState()
+    }
+
+    /**
+     * The app reported a new selection. With the translate bar open, [TranslateBarController] decides
+     * what it means. With a search open, a cursor the keyboard did not move is the user tapping or
+     * dragging in the app's field — the other half of [onEditorClicked], for apps that don't report the
+     * tap itself — and closes the search the same way.
+     */
+    fun onAppSelectionChanged(oldStart: Int, oldEnd: Int, newStart: Int, newEnd: Int) {
+        if (translateQuery.value != null) {
+            translateBar.onSelectionChanged(oldStart, oldEnd, newStart, newEnd)
+            return
+        }
+        if (activeInternalField() == null) return
+        if (oldStart == newStart && oldEnd == newEnd) return
+        if (SystemClock.uptimeMillis() < searchOwnEditUntil) return
+        closeSearchesForApp()
+    }
+
+    /**
+     * Until when a moving app cursor is the keyboard's own doing: an emoji picked from the search goes
+     * into the app while the search stays open, and the cursor it moves must not close the search.
+     */
+    private var searchOwnEditUntil = 0L
+
+    /** Writes [text] into the app from an open search — an emoji picked from its results (issue #394). */
+    fun commitFromSearch(text: String) {
+        searchOwnEditUntil = SystemClock.uptimeMillis() + TranslateBarController.OWN_EDIT_WINDOW_MS
+        editorInstance.commitText(text)
+    }
+
+    /** Closes whichever search is open and leaves the keyboard to the app — not the panel it came from. */
+    private fun closeSearchesForApp() {
+        closeEmojiSearch(returnToMedia = false)
+        closeGifSearch(returnToPanel = false)
+        closeStickerSearch(returnToPanel = false)
+        closeClipboardSearch(returnToPanel = false)
+    }
+
+    /**
+     * The app's Enter after a translation was written: the field's action (send, search, done) or a line
+     * break, as [handleEnter] decides it — minus word learning and snippet expansion, which would act on
+     * the translated text as if the user had typed it.
+     */
+    private fun performTranslateEnter() {
+        val info = editorInstance.activeInfo
+        if (info.imeOptions.flagNoEnterAction || info.inputAttributes.flagTextMultiLine && inputEventDispatcher.isPressed(KeyCode.SHIFT)) {
+            editorInstance.performEnter()
+            return
+        }
+        when (val action = info.imeOptions.action) {
+            ImeOptions.Action.DONE,
+            ImeOptions.Action.GO,
+            ImeOptions.Action.NEXT,
+            ImeOptions.Action.PREVIOUS,
+            ImeOptions.Action.SEARCH,
+            ImeOptions.Action.SEND -> editorInstance.performEnterAction(action)
+            else -> editorInstance.performEnter()
+        }
     }
 
     /**
@@ -1269,74 +1738,35 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         if (returnToMedia) activeState.imeUiMode = ImeUiMode.MEDIA
     }
 
-    /**
-     * Folds a keystroke into [query] while that search is open, instead of letting it reach the editor.
-     * Returns `true` when the key was consumed, `false` when the search is closed or the key is not one
-     * that writes text.
-     *
-     * One function for all three searches (emoji, GIF, sticker). They were three copies of the same
-     * twenty lines, and the copies are what let the bug in [keyProducesSearchText] sit in all three at
-     * once: a rule that lives in one place can only be wrong once.
-     *
-     * A backspace on an empty query leaves the search — a common "back out" gesture — and Enter is the
-     * only thing the three still disagree about, so it is passed in: GIF submits its query, the other
-     * two swallow it, because their results are already filtered and a newline would land in whatever
-     * the user was writing.
-     */
-    private fun handleSearchKey(
-        query: MutableStateFlow<String?>,
-        data: KeyData,
-        onEnter: (String) -> Unit,
-        onExit: () -> Unit,
-    ): Boolean {
-        val current = query.value ?: return false
-        when (data.code) {
-            KeyCode.SPACE -> query.value = "$current "
-            KeyCode.ENTER -> onEnter(current)
-            KeyCode.DELETE, KeyCode.DELETE_WORD -> {
-                if (current.isEmpty()) {
-                    onExit()
-                } else {
-                    query.value = current.dropLast(1)
-                }
-            }
-            else -> {
-                val text = data.asString(isForDisplay = false)
-                if (!keyProducesSearchText(data.type, text)) return false
-                query.value = current + text
-            }
-        }
-        return true
-    }
-
     /** Empties the emoji query without leaving the search — the ✕ inside the search bar. */
     fun clearEmojiSearch() {
         if (emojiSearchQuery.value == null) return
-        emojiSearchQuery.value = ""
+        startField(emojiSearchQuery)
     }
 
     /** Empties the GIF query without leaving the search — the ✕ inside the search bar. */
     fun clearGifSearch() {
         if (gifSearchQuery.value == null) return
-        gifSearchQuery.value = ""
+        startField(gifSearchQuery)
     }
 
     /** Empties the sticker query without leaving the search — the ✕ inside the search bar. */
     fun clearStickerSearch() {
         if (stickerSearchQuery.value == null) return
-        stickerSearchQuery.value = ""
+        startField(stickerSearchQuery)
     }
 
     /** Empties the clipboard query without leaving the search — the ✕ inside the search bar. */
     fun clearClipboardSearch() {
         if (clipboardSearchQuery.value == null) return
-        clipboardSearchQuery.value = ""
+        startField(clipboardSearchQuery)
     }
 
     /** Starts a clipboard search: shows the text keyboard so the user can type what to look for. */
     fun activateClipboardSearch() {
-        clipboardSearchQuery.value = ""
+        closeTranslate()
         activeState.imeUiMode = ImeUiMode.TEXT
+        startField(clipboardSearchQuery)
     }
 
     /**
@@ -1352,8 +1782,9 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
 
     /** Starts a sticker search: shows the text keyboard so the user can type a file name. */
     fun activateStickerSearch() {
-        stickerSearchQuery.value = ""
+        closeTranslate()
         activeState.imeUiMode = ImeUiMode.TEXT
+        startField(stickerSearchQuery)
     }
 
     /**
@@ -1369,8 +1800,9 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
 
     /** Starts a GIF search: shows the text keyboard so the user can type the query. */
     fun activateGifSearch() {
-        gifSearchQuery.value = ""
+        closeTranslate()
         activeState.imeUiMode = ImeUiMode.TEXT
+        startField(gifSearchQuery)
     }
 
     /**
@@ -1420,30 +1852,8 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             pendingAutoCorrection = null
         }
         val windowController = FlorisImeService.windowControllerOrNull() ?: return@batchEdit
-        // Only one of the four can be open at a time — each is reached from its own panel — so the
-        // first one that answers has consumed the key.
-        val consumedInSmartbarSlot = handleSearchKey(
-            query = emojiSearchQuery,
-            data = data,
-            onEnter = { /* swallow: the results are already filtered */ },
-            onExit = { closeEmojiSearch() },
-        ) || handleSearchKey(
-            query = gifSearchQuery,
-            data = data,
-            onEnter = { query -> submitGifSearch(query) }, // Enter runs the search → full results page
-            onExit = { closeGifSearch() },
-        ) || handleSearchKey(
-            query = stickerSearchQuery,
-            data = data,
-            onEnter = { /* swallow: the results are already filtered */ },
-            onExit = { closeStickerSearch() },
-        ) || handleSearchKey(
-            query = clipboardSearchQuery,
-            data = data,
-            onEnter = { /* swallow: the results are already filtered */ },
-            onExit = { closeClipboardSearch() },
-        )
-        if (consumedInSmartbarSlot) {
+        // The keyboard's own fields (issue #424) — only one is ever open, and it takes the key first.
+        if (handleFieldKey(data)) {
             return@batchEdit
         }
         when (data.code) {
@@ -1503,47 +1913,60 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
                 activeState.imeUiMode = ImeUiMode.TEXT
             }
             KeyCode.IME_UI_MODE_MEDIA -> {
-                closeEmojiSearch(returnToMedia = false)
+                closeInternalFields()
                 activeState.imeUiMode = ImeUiMode.MEDIA
             }
             KeyCode.IME_UI_MODE_CLIPBOARD -> {
-                closeEmojiSearch(returnToMedia = false)
+                closeInternalFields()
                 activeState.imeUiMode = ImeUiMode.CLIPBOARD
             }
             // Opens the KLIPY GIF search panel (its own ImeUiMode, like the media/history panels); resets
             // any previous search so it opens on the home view (recent GIFs + trending).
             KeyCode.IME_UI_MODE_GIF -> {
-                closeEmojiSearch(returnToMedia = false)
+                closeInternalFields()
                 gifSearchSubmit.value = null
                 activeState.imeUiMode = ImeUiMode.GIF
             }
             // Opens the local sticker panel (issue #280) — the user's own folder, no network involved.
             KeyCode.IME_UI_MODE_STICKER -> {
-                closeEmojiSearch(returnToMedia = false)
+                closeInternalFields()
                 activeState.imeUiMode = ImeUiMode.STICKER
             }
             // Opens the text editing panel (issue #386). The keys on it send the very codes handled in
             // this `when`, so the panel adds a surface and no second implementation of anything.
             KeyCode.IME_UI_MODE_EDITING -> {
-                closeEmojiSearch(returnToMedia = false)
+                closeInternalFields()
                 activeState.imeUiMode = ImeUiMode.EDITING
             }
             // Opens the scan panel (issue #390). Nothing is captured here — the panel is the surface that
             // asks for a photo, so that opening it from an old session shows what was already recognised
             // instead of firing the camera at whoever only wanted to look.
             KeyCode.IME_UI_MODE_SCAN -> {
-                closeEmojiSearch(returnToMedia = false)
+                closeInternalFields()
                 activeState.imeUiMode = ImeUiMode.SCAN
             }
+            // The translate bar (issue #424). A toggle: the button stays in the Smartbar below the bar.
+            KeyCode.TRANSLATE -> toggleTranslate()
             KeyCode.IME_UI_MODE_DICTATE -> dev.patrickgold.florisboard.dictate.DictateController.onMicClick(appContext)
             KeyCode.DICTATE_LIVE_PROMPT -> dev.patrickgold.florisboard.dictate.DictateController.startLivePrompt(appContext)
             KeyCode.DICTATE_PROMPTS -> {
+                closeInternalFields()
                 dev.patrickgold.florisboard.dictate.DictateController.refreshPrompts(appContext)
                 activeState.imeUiMode = ImeUiMode.DICTATE
             }
             // Repurposed for the transcription history panel (issue #140): opens the browsable list of
             // recent dictations to quickly re-insert or re-transcribe, superseding the one-shot reinsert.
-            KeyCode.DICTATE_REINSERT -> { activeState.imeUiMode = ImeUiMode.HISTORY }
+            KeyCode.DICTATE_REINSERT -> {
+                // Every panel opener closes the keyboard's own fields (issue #424): the Smartbar stays up
+                // while one is open now, so its buttons can be pressed from a search or the translate bar.
+                closeInternalFields()
+                activeState.imeUiMode = ImeUiMode.HISTORY
+            }
+            // The transcription provider picker (issue #431): a sheet over the keys, like the keyboard
+            // language picker it is modelled on, so the field keeps its focus and the panel underneath stays.
+            KeyCode.DICTATE_SWITCH_PROVIDER -> {
+                activeState.isTranscriptionProviderSelectionVisible = true
+            }
             // Keys that are there to be looked at, not pressed: the अ key wearing the pending consonant
             // (issue #315). The consonant is already in the text, so writing anything would double it —
             // and without this branch the fallthrough below would try to encode a negative code point.
@@ -1568,6 +1991,8 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
                 prefs.smartbar.enabled.let { it.set(!it.get()) }
             }
             KeyCode.TOGGLE_ACTIONS_OVERFLOW -> {
+                // The grid takes the place of the keys, which a field would be left without.
+                if (!activeState.isActionsOverflowVisible) closeInternalFields()
                 activeState.isActionsOverflowVisible = !activeState.isActionsOverflowVisible
             }
             KeyCode.TOGGLE_ACTIONS_EDITOR -> {

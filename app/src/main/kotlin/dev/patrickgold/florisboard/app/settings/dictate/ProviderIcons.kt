@@ -50,6 +50,8 @@ fun providerIcon(providerId: String): ImageVector {
         "xai" -> R.drawable.ic_provider_xai
         "deepseek" -> R.drawable.ic_provider_deepseek
         "siliconflow" -> R.drawable.ic_provider_siliconflow
+        "scaleway" -> R.drawable.ic_provider_scaleway
+        "ovhcloud" -> R.drawable.ic_provider_ovhcloud
         "ollama" -> R.drawable.ic_provider_ollama
         // Nothing runs anywhere but here, so the phone is the mark.
         "local" -> return Icons.Default.PhoneAndroid

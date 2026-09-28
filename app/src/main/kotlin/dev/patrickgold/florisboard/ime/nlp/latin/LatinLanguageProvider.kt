@@ -38,6 +38,8 @@ import dev.patrickgold.florisboard.lib.devtools.flogDebug
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.MapSerializer
@@ -70,36 +72,60 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         // in both places, and the evaluation harness has to measure the same rule both use.
         private const val AUTOCORRECT_MIN_FREQ = AutoCommitGate.MIN_FREQ
 
-        // Spelling-fix suggestions (issue #212 / distance-2 fallback): how many edit-distance corrections
-        // to surface, how many strip slots to reserve for them so prefix completions of a typo don't crowd
-        // them out, and the max word length for the (more expensive) distance-2 fallback.
-        private const val CORRECTION_MAX = 3
+        // Spelling-fix suggestions (issue #212): how many corrections to surface, and how many strip slots
+        // to reserve for them so prefix completions of a typo don't crowd them out.
+        private const val CORRECTION_MAX = CorrectionReaders.MAX_CORRECTIONS
         private const val CORRECTION_RESERVE = 3
-        private const val MAX_DISTANCE2_LEN = 12
 
-        // Keyboard-proximity noisy-channel model (Tier 1). Distances are in key-width² units.
-        private const val PROX_SIGMA2 = 1.0         // touch variance (~1 key-width std): near mis-taps cost little
-        private const val NEUTRAL_SUB_SQDIST = 2.0  // fallback substitution distance² when key geometry is unknown
-        private const val LENGTH_DIFF_PENALTY = -0.7 // flat log-penalty for insert/delete candidates
-        private const val TRANSPOSE_PENALTY = -0.3   // adjacent-swap typo; cost independent of key distance
+        // A prefix with more dictionary words than this is left to the plain completion walk (issue #381):
+        // with over a thousand matches in ~64,000 words, the walk meets its eight within the first few
+        // hundred, which is cheaper than collecting and sorting the matches.
+        private const val DENSE_PREFIX_MATCHES = 1024
+
+        // The one language whose apostrophe forms are rebuilt rather than looked up — see the restoration
+        // block in [suggest] and [ElisionEvidence] for why French alone needs it.
+        private const val ELISION_LANG = "fr"
+
+        // Every word that can stand before an elided vowel in French. Only these: the elision is a closed
+        // class, so a list is the whole rule and a wrong entry cannot invent a prefix that does not exist.
+        // Longest first, so `quelqu'un` is split there rather than at the `qu` inside it.
+        private val FRENCH_ELISION_PREFIXES = listOf(
+            "lorsqu", "puisqu", "jusqu", "quelqu", "presqu", "qu",
+            "j", "c", "d", "l", "m", "n", "s", "t",
+        )
+
+        // What an elided suffix may start with. h is in the set although only h muet elides (l'homme, not
+        // "lhéros"): the corpus decides that case, and this only has to be cheap enough to run per
+        // keystroke — it exists to reject `jchat` and `ltrain` before anything is looked up at all.
+        private val FRENCH_ELISION_INITIALS = setOf('a', 'e', 'i', 'o', 'u', 'y', 'h')
+
+        /**
+         * The French elisions [word] could be, as prefix → suffix pairs, for a word typed without its
+         * apostrophe. Says nothing about whether any of them is a real word — [ElisionEvidence] answers
+         * that, and without it this produces `n'on` from `non` as readily as `j'aime` from `jaime`.
+         */
+        internal fun frenchElisionSplits(word: String): List<Pair<String, String>> {
+            val lower = word.lowercase()
+            return FRENCH_ELISION_PREFIXES.mapNotNull { prefix ->
+                if (word.length <= prefix.length || !lower.startsWith(prefix)) return@mapNotNull null
+                val suffix = word.substring(prefix.length)
+                // Fold one character rather than the whole suffix: this runs on every keystroke, and
+                // Normalizer.normalize is the expensive half of [DictFold.foldFrench].
+                val initial = DictFold.foldFrench(suffix.take(1)).firstOrNull() ?: return@mapNotNull null
+                if (initial in FRENCH_ELISION_INITIALS) prefix to suffix else null
+            }
+        }
 
         // Bigram context model (Tier 2): weight on ln(bigram-count+1) added to a candidate that commonly
         // follows the previous word, so context ("of the" over "of teh") re-ranks the correction.
         private const val CONTEXT_WEIGHT = 0.3
 
         // --- Touch-decoded corrections (issue #242) -------------------------------------------------
-        // Used only on the path where real tap coordinates are available; the legacy ranking above keeps its
-        // own constants so behaviour without a trace is bit-for-bit unchanged.
+        // Both correction readers, their constants and the rule that merges them live in
+        // [CorrectionReaders], and the prior and touch variance in [TouchScoring], because the evaluation
+        // harness has to score exactly the way this does — a second copy of the formula is what made the
+        // #242 numbers impossible to reproduce.
         //
-        // The prior and the touch variance live in [TouchScoring], because the evaluation harness has to
-        // score exactly the way this does — a second copy of the formula is what made the #242 numbers
-        // impossible to reproduce.
-        //
-        // Flat cost for a candidate of a different length (a dropped or doubled letter), which the beam
-        // cannot produce and which therefore comes from the edit-distance generator.
-        private const val TOUCH_LENGTH_PENALTY = -5.0
-        // How many words the beam returns before scoring.
-        private const val BEAM_CANDIDATES = 12
         // Whether a decoded correction may be swapped in silently now lives in [AutoCommitGate], so the
         // rule can be measured against both populations that care about it — mis-taps that must be fixed
         // and correctly typed unknown words that must not be touched (issue #295).
@@ -448,16 +474,56 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
     //
     // The bigram table re-ranks corrections by the previous word AND feeds prediction; the trigram
     // table (issue #334) feeds prediction only — see [nextWordPredictions] for why it goes no further.
-    private val bigramsByLang = guardedByLock { mutableMapOf<String, NgramIndex>() }
+    private val bigramsByLang = guardedByLock { mutableMapOf<String, Bigrams>() }
     private val trigramsByLang = guardedByLock { mutableMapOf<String, NgramIndex>() }
 
-    private suspend fun bigramsFor(subtype: Subtype): NgramIndex {
-        val lang = dictLangFor(subtype) ?: return NgramIndex.EMPTY
-        return bigramsByLang.withLock { cache ->
-            cache[lang] ?: loadTable(lang, "bigrams", GlideDictionaryManager.bigramFile(appContext, lang))
-                .also { cache[lang] = it }
+    /**
+     * The bigram table and, for the one language that needs it, the per-word counts the apostrophe
+     * restoration reads out of the same text ([ElisionEvidence]).
+     *
+     * Together rather than in two caches because the file is 2.4 MB and reading it twice to answer two
+     * questions about the same sentences would be the only cost either of them has.
+     */
+    private class Bigrams(val index: NgramIndex, val elisions: Map<String, Int>) {
+        companion object {
+            val EMPTY = Bigrams(NgramIndex.EMPTY, emptyMap())
         }
     }
+
+    private suspend fun bigramDataFor(subtype: Subtype): Bigrams {
+        val lang = dictLangFor(subtype) ?: return Bigrams.EMPTY
+        return bigramsByLang.withLock { cache ->
+            cache[lang] ?: run {
+                val text = tableText(lang, "bigrams", GlideDictionaryManager.bigramFile(appContext, lang))
+                val fold = if (DictFold.hasNonTrivialFold(lang)) { key: String -> DictFold.foldKey(lang, key) } else null
+                Bigrams(
+                    index = text?.let { runCatching { NgramIndex.parse(it, fold) }.getOrNull() } ?: NgramIndex.EMPTY,
+                    elisions = if (lang != ELISION_LANG || text == null) {
+                        emptyMap()
+                    } else {
+                        runCatching { ElisionEvidence.parse(text) { key -> DictFold.foldKey(lang, key) } }
+                            .getOrDefault(emptyMap())
+                    },
+                ).also { cache[lang] = it }
+            }
+        }
+    }
+
+    private suspend fun bigramsFor(subtype: Subtype): NgramIndex = bigramDataFor(subtype).index
+
+    /**
+     * How often each apostrophe form and its apostrophe-less spelling appear in [subtype]'s corpus.
+     *
+     * Empty for every language but French, and empty for French too when the bigram file never arrived —
+     * it is a best-effort download ([GlideDictionaryManager.ensureDownloaded]). Both cases leave the
+     * restoration exactly as it was before there was one: suggestions only, nothing swapped in.
+     *
+     * The language is checked before the table is touched, because this is asked on every keystroke and
+     * the bigram file is otherwise only read once there is a word of context — no other language should
+     * start paying for its 2.4 MB one word earlier than it used to.
+     */
+    private suspend fun elisionsFor(subtype: Subtype): Map<String, Int> =
+        if (dictLangFor(subtype) != ELISION_LANG) emptyMap() else bigramDataFor(subtype).elisions
 
     private suspend fun trigramsFor(subtype: Subtype): NgramIndex {
         val lang = dictLangFor(subtype) ?: return NgramIndex.EMPTY
@@ -468,8 +534,20 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
     }
 
     /**
-     * Read one context table. A downloaded per-language file takes precedence over a bundled asset —
-     * mirrors readDict for the unigram dictionaries. Only English bundles one, and only for bigrams.
+     * The raw text of one context table, or null when the language has none. A downloaded per-language
+     * file takes precedence over a bundled asset — mirrors readDict for the unigram dictionaries. Only
+     * English bundles one, and only for bigrams.
+     */
+    private fun tableText(lang: String, kind: String, downloaded: java.io.File): String? = runCatching {
+        if (downloaded.isFile && downloaded.length() > 0) {
+            downloaded.readText()
+        } else {
+            appContext.assets.readText("ime/dict/${lang}_$kind.txt")
+        }
+    }.getOrNull()
+
+    /**
+     * Read one context table.
      *
      * The file stores its keys lowercased; the lookup happens in fold space, so a language with
      * non-trivial folding has to fold the keys on the way in or no key would ever match. Folding the
@@ -477,11 +555,7 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
      * [NgramIndex.parse] re-sorts afterwards, because folding can reorder keys and collide them.
      */
     private fun loadTable(lang: String, kind: String, downloaded: java.io.File): NgramIndex = runCatching {
-        val text = if (downloaded.isFile && downloaded.length() > 0) {
-            downloaded.readText()
-        } else {
-            appContext.assets.readText("ime/dict/${lang}_$kind.txt")
-        }
+        val text = tableText(lang, kind, downloaded) ?: return NgramIndex.EMPTY
         val fold = if (DictFold.hasNonTrivialFold(lang)) { key: String -> DictFold.foldKey(lang, key) } else null
         NgramIndex.parse(text, fold)
     }.getOrDefault(NgramIndex.EMPTY)
@@ -553,6 +627,20 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         }
     }
 
+    private val prefixOrderByLang = guardedByLock { mutableMapOf<String, Pair<List<String>, PrefixOrder>>() }
+
+    /**
+     * [ranked] sorted by spelling as well, so the completion walk can find a rare prefix's words without
+     * reading the whole list (issue #381). Built once per language, for the very list it was given.
+     */
+    private suspend fun prefixOrderFor(subtype: Subtype, ranked: List<String>, rankedKeys: List<String>?): PrefixOrder? {
+        val lang = dictLangFor(subtype) ?: return null
+        return prefixOrderByLang.withLock { cache ->
+            cache[lang]?.takeIf { it.first === ranked }?.second
+                ?: PrefixOrder(ranked, rankedKeys).also { cache[lang] = ranked to it }
+        }
+    }
+
     // --- Spell check / autocorrect core (issue #127 follow-up) --------------------------------------
 
     /**
@@ -600,8 +688,11 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         val lang = dictLangFor(subtype) ?: return null
         val index = lowerIndexFor(subtype)
         return prefixIndexByLang.withLock { cache ->
-            cache[lang] ?: TouchBeamDecoder.PrefixIndex(index.freq.keys.toTypedArray().apply { sort() })
-                .also { cache[lang] = it }
+            cache[lang] ?: run {
+                val words = index.freq.keys.toTypedArray().apply { sort() }
+                // Each word's frequency beside it, so completions can rank a range without a lookup per entry.
+                TouchBeamDecoder.PrefixIndex(words, IntArray(words.size) { index.freq.getValue(words[it]) })
+            }.also { cache[lang] = it }
         }
     }
 
@@ -620,6 +711,7 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
                 wordDataByLang.withLock { it.clear() }
                 rankedWordsByLang.withLock { it.clear() }
                 rankedFoldKeysByLang.withLock { it.clear() }
+                prefixOrderByLang.withLock { it.clear() }
                 lowerIndexByLang.withLock { it.clear() }
                 bigramsByLang.withLock { it.clear() }
                 trigramsByLang.withLock { it.clear() }
@@ -702,73 +794,41 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
             val index = lowerIndexForLang(lang)
             if (index.freq.containsKey(index.fold(word))) return true
         }
+        // A French elision is a word the language writes constantly and the word list does not hold — 13
+        // apostrophe entries in 68,605 — so asking the word list alone underlines `d'une` and `qu'il` as
+        // misspellings while `c'est` passes, purely by which ones survived the generator's Hunspell pass.
+        // It matters more now that the restoration commits them: correcting into a word the spell checker
+        // then marks wrong would be the keyboard contradicting itself. The corpus is the same evidence the
+        // restoration uses, so the two can never disagree about what a French word is.
+        if (word.any { it == '\'' || it == '’' }) {
+            val elisions = elisionsFor(subtype)
+            if (elisions.isNotEmpty() &&
+                ElisionEvidence.isAttested(elisions, ElisionEvidence.key(DictFold.foldKey(ELISION_LANG, word)))
+            ) {
+                return true
+            }
+        }
         return isInUserDictionary(word, subtype)
     }
-
-    /** All strings one edit away from [word] — shared with the word learner (issue #318). */
-    private fun edits1(word: String, alphabet: Set<Char>): Set<String> =
-        EditDistance.edits1(word, alphabet)
 
     /** Dictionary words closest to (a misspelling of) [word], ranked by frequency. */
     private fun correctionsFor(
         word: String,
         index: LowerIndex,
+        prefixIndex: TouchBeamDecoder.PrefixIndex?,
         maxCount: Int,
         allowDistance2: Boolean,
         contextScore: (cand: String) -> Double = { 0.0 },
-    ): List<String> {
-        val lower = index.fold(word)
-        val e1 = edits1(lower, index.alphabet)
-        val known = e1.filterTo(LinkedHashSet()) { index.freq.containsKey(it) }
-        if (known.isEmpty() && allowDistance2) {
-            for (e in e1) for (ee in edits1(e, index.alphabet)) {
-                if (index.freq.containsKey(ee)) known.add(ee)
-            }
-        }
-        // Noisy-channel ranking (Tier 1): combine the unigram prior with a keyboard-proximity likelihood,
-        // so a fat-finger substitution of an adjacent key beats a merely more frequent but far-away word,
-        // instead of ranking purely by frequency.
-        return known.sortedByDescending { channelScore(lower, it, index.freq[it] ?: 0, contextScore) }
-            .take(maxCount)
-            .map { index.canonical[it] ?: it }
-    }
-
-    /**
-     * Noisy-channel score for ranking a correction candidate: log unigram prior + log likelihood that
-     * [typed] is a mis-tap of [cand] given the keyboard geometry (Tier 1) + a context bonus for how often
-     * [cand] follows the previous word (Tier 2 bigram). Higher is better.
-     */
-    private fun channelScore(typed: String, cand: String, freq: Int, contextScore: (String) -> Double): Double =
-        ln((freq + 1).toDouble()) + spatialLogLikelihood(typed, cand) + contextScore(cand)
-
-    /**
-     * log P(typed | cand): near-key substitutions cost little, far ones a lot (Gaussian over key distance);
-     * an adjacent transposition (finger-order slip) is a flat cost independent of distance; insert/delete
-     * candidates get a flat penalty so the frequency prior orders them. Neutral when key geometry is
-     * unavailable (layout not captured yet), which reduces this to frequency-only ranking.
-     */
-    private fun spatialLogLikelihood(typed: String, cand: String): Double {
-        if (typed.length != cand.length) return LENGTH_DIFF_PENALTY
-        if (isAdjacentTransposition(typed, cand)) return TRANSPOSE_PENALTY
-        var cost = 0.0
-        for (i in typed.indices) {
-            if (typed[i] == cand[i]) continue
-            val d2 = KeyProximityInfo.normSqDistance(typed[i], cand[i])?.toDouble() ?: NEUTRAL_SUB_SQDIST
-            cost += d2 / (2.0 * PROX_SIGMA2)
-        }
-        return -cost
-    }
-
-    /** True if [b] is [a] with exactly one pair of adjacent characters swapped (a transposition). */
-    private fun isAdjacentTransposition(a: String, b: String): Boolean {
-        if (a.length != b.length || a.length < 2) return false
-        var i = 0
-        while (i < a.length && a[i] == b[i]) i++
-        if (i >= a.length - 1) return false
-        if (a[i] != b[i + 1] || a[i + 1] != b[i]) return false
-        for (j in i + 2 until a.length) if (a[j] != b[j]) return false
-        return true
-    }
+    ): List<String> = CorrectionReaders.byEditDistance(
+        folded = index.fold(word),
+        freq = index.freq,
+        alphabet = index.alphabet,
+        prefixIndex = prefixIndex,
+        maxCount = maxCount,
+        allowDistance2 = allowDistance2,
+        sqDistance = KeyProximityInfo::normSqDistance,
+        contextScore = contextScore,
+    ).map { index.canonical[it] ?: it }
 
     // --- Next-word prediction (issue #245) ----------------------------------------------------------
 
@@ -869,22 +929,9 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
     // --- Touch-decoded corrections (issue #242) -----------------------------------------------------
 
     /**
-     * Corrections decoded from tap positions, plus how well the taps actually support the best one.
-     *
-     * [topCost] is the winning candidate's excess tap distance, or null when it came from edit distance and
-     * there is therefore no positional evidence either way (a dropped or doubled letter).
-     */
-    private class TouchCorrections(val words: List<String>, val topCost: Float?)
-
-    /**
-     * Corrections decoded from where the user's fingers actually landed, or null when that is not possible
-     * (no tap evidence for this exact word, no captured key geometry, or the beam found nothing) — in which
-     * case the caller falls back to the classic edit-distance path unchanged.
-     *
-     * The beam contributes same-length candidates with near-perfect recall; a dropped or doubled letter
-     * changes the length and cannot come out of it, so those still come from [edits1] and are scored with a
-     * flat penalty. Both are then ranked on one scale: linear log-frequency prior, minus the excess tap
-     * distance, plus the bigram context bonus.
+     * Corrections decoded from where the user's fingers actually landed (see [CorrectionReaders.byTouch]),
+     * or null when that is not possible — no tap evidence for this exact word, no captured key geometry,
+     * or the beam found nothing.
      */
     private suspend fun touchCorrectionsFor(
         word: String,
@@ -892,42 +939,51 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         index: LowerIndex,
         maxCount: Int,
         contextScore: (cand: String) -> Double,
-    ): TouchCorrections? {
+    ): CorrectionReaders.TouchReading? {
         val points = TouchTrace.pointsFor(word) ?: return null
         val layout = KeyProximityInfo.snapshot() ?: return null
         val prefixIndex = prefixIndexFor(subtype) ?: return null
-        val beam = TouchBeamDecoder.decode(
+        val reading = CorrectionReaders.byTouch(
             points = points,
             typed = word,
-            index = prefixIndex,
+            folded = index.fold(word),
+            freq = index.freq,
+            alphabet = index.alphabet,
+            prefixIndex = prefixIndex,
             layout = layout,
-            maxResults = BEAM_CANDIDATES,
+            maxCount = maxCount,
+            contextScore = contextScore,
+        ) ?: return null
+        return CorrectionReaders.TouchReading(
+            words = reading.words.map { index.canonical[it] ?: it },
+            topCost = reading.topCost,
         )
-        if (beam.isEmpty()) return null
+    }
 
-        val scored = HashMap<String, Double>(beam.size * 2)
-        // Tap cost per beam candidate, kept so the caller can tell a near-boundary slip (trustworthy enough
-        // to swap in silently) from a candidate a whole key away (offer it, but don't act on it).
-        val costs = HashMap<String, Float>(beam.size)
-        for (candidate in beam) {
-            val freq = index.freq[candidate.word] ?: continue
-            scored[candidate.word] =
-                TouchScoring.score(freq, candidate.cost, contextScore(candidate.word))
-            costs[candidate.word] = candidate.cost
+    /**
+     * Longer words a half-typed word with a slip in it probably belongs to (issue #381): from the taps where
+     * there are any, and from the typed string always — see [CorrectionReaders.completions].
+     */
+    private suspend fun completionsFor(
+        word: String,
+        subtype: Subtype,
+        index: LowerIndex,
+        maxCount: Int,
+        contextScore: (cand: String) -> Double,
+    ): List<String> {
+        val prefixIndex = prefixIndexFor(subtype) ?: return emptyList()
+        val folded = index.fold(word)
+        val points = TouchTrace.pointsFor(word)
+        val layout = KeyProximityInfo.snapshot()
+        val byTouch = if (points != null && layout != null) {
+            CorrectionReaders.completionsByTouch(points, word, folded, prefixIndex, layout, maxCount, contextScore)
+        } else {
+            emptyList()
         }
-        // Length-changing slips (a letter dropped or typed twice) are invisible to the beam.
-        val lower = index.fold(word)
-        for (edit in edits1(lower, index.alphabet)) {
-            if (edit.length == lower.length) continue
-            val freq = index.freq[edit] ?: continue
-            scored.putIfAbsent(edit, TouchScoring.lmPrior(freq) + TOUCH_LENGTH_PENALTY + contextScore(edit))
-        }
-        if (scored.isEmpty()) return null
-        val ranked = scored.entries.sortedByDescending { it.value }.take(maxCount)
-        return TouchCorrections(
-            words = ranked.map { index.canonical[it.key] ?: it.key },
-            topCost = costs[ranked.first().key],
+        val byString = CorrectionReaders.completionsByString(
+            folded, prefixIndex, index.alphabet, maxCount, KeyProximityInfo::normSqDistance, contextScore,
         )
+        return CorrectionReaders.completions(byTouch, byString).map { index.canonical[it] ?: it }
     }
 
     // --- German umlaut / ß restoration (issue #219) -------------------------------------------------
@@ -995,36 +1051,72 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
     // --- The user's own words as correction targets (issue #318 follow-up) ------------------------
 
     /**
-     * Fold key → stored spelling for every word the user added by hand, cached per language.
+     * Everything the user added by hand for one language and locale, read once and kept in memory.
      *
-     * A cache rather than a query because the corrector asks by *edit distance*: it needs to look up a
-     * few hundred candidate spellings per keystroke, and the personal dictionary's own lookup is a
-     * `LIKE '%word%'` scan. Dropped whenever the dictionary changes ([onPersonalVocabularyChanged]),
-     * which is the same handful of places that already rebuild the glide index.
+     * A copy rather than a query, for two reasons. The corrector asks by *edit distance* and looks up a few
+     * hundred candidate spellings per keystroke. And the strip used to ask the databases themselves three
+     * times per keystroke — is this word the user's own, which of their words start with it, what is stored
+     * behind it as a shortcut — which on a Galaxy A55 release build cost 25–70 ms per key press (issue #381):
+     * a `LIKE '%word%'` scan of the keyboard's own dictionary each time, and a content-provider call into
+     * another process for the system one.
+     *
+     * The copy is dropped when [DictionaryManager.userVocabularyVersion] moves, which counts every write to
+     * either dictionary, and on [onPersonalVocabularyChanged]. Before #381 it was dropped by the latter
+     * alone, which the settings screens never call, so a word added there reached the corrector only after
+     * a restart.
      */
-    private val personalWordsByLang = guardedByLock { mutableMapOf<String, Map<String, String>>() }
+    private class UserVocabulary(
+        val version: Int,
+        /** Fold key → stored spelling, for the corrector's edit-distance lookups. */
+        val byFold: Map<String, String>,
+        /** Every stored spelling with its fold key, in storage order, for completions. */
+        val words: List<Pair<String, String>>,
+        /** Every stored spelling, lowercased: is a typed word the user's own? */
+        val lowercase: Set<String>,
+        /** Shortcut, lowercased → what is stored behind it, in storage order. */
+        val shortcuts: Map<String, List<String>>,
+    )
+
+    private val userVocabularyByLocale = guardedByLock { mutableMapOf<String, UserVocabulary>() }
 
     override suspend fun onPersonalVocabularyChanged() {
-        personalWordsByLang.withLock { it.clear() }
+        userVocabularyByLocale.withLock { it.clear() }
     }
 
-    private suspend fun personalWordsFor(subtype: Subtype): Map<String, String> {
-        val lang = dictLangFor(subtype) ?: return emptyMap()
-        return personalWordsByLang.withLock { cache ->
-            cache.getOrPut(lang) {
-                runCatching {
-                    val dm = DictionaryManager.default()
-                    dm.loadUserDictionariesIfNecessary()
-                    buildMap {
-                        for (entry in dm.queryAllUserWords(subtype.primaryLocale)) {
-                            val word = entry.word.trim()
-                            if (word.isNotEmpty()) put(DictFold.foldKey(lang, word), word)
-                        }
+    private suspend fun userVocabularyFor(subtype: Subtype): UserVocabulary? {
+        val lang = dictLangFor(subtype) ?: return null
+        val dm = runCatching { DictionaryManager.default() }.getOrNull() ?: return null
+        runCatching { dm.loadUserDictionariesIfNecessary() }
+        // Read before the query, so a write that lands while the copy is being built makes the next
+        // keystroke build it again rather than keep a copy that already missed it.
+        val version = dm.userVocabularyVersion
+        val key = "$lang|${subtype.primaryLocale.localeTag()}"
+        return userVocabularyByLocale.withLock { cache ->
+            cache[key]?.takeIf { it.version == version } ?: run {
+                val entries = runCatching { dm.queryAllUserWords(subtype.primaryLocale) }.getOrDefault(emptyList())
+                val byFold = HashMap<String, String>()
+                val words = ArrayList<Pair<String, String>>(entries.size)
+                val lowercase = HashSet<String>()
+                val shortcuts = LinkedHashMap<String, MutableList<String>>()
+                for (entry in entries) {
+                    val word = entry.word.trim()
+                    if (word.isEmpty()) continue
+                    val folded = DictFold.foldKey(lang, word)
+                    byFold[folded] = word
+                    words.add(folded to word)
+                    lowercase.add(word.lowercase())
+                    entry.shortcut?.takeIf { it.isNotBlank() }?.let { shortcut ->
+                        val expansions = shortcuts.getOrPut(shortcut.lowercase()) { ArrayList() }
+                        if (word !in expansions) expansions.add(word)
                     }
-                }.getOrDefault(emptyMap())
-            }
+                }
+                UserVocabulary(version, byFold, words, lowercase, shortcuts)
+            }.also { cache[key] = it }
         }
     }
+
+    private suspend fun personalWordsFor(subtype: Subtype): Map<String, String> =
+        userVocabularyFor(subtype)?.byFold.orEmpty()
 
     /**
      * The user's own words one edit away from [word] — theirs to be corrected *into*, which no amount of
@@ -1068,12 +1160,8 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
             ?.takeIf { prefs.wordLearningIsOn }
             ?.let { lang -> runCatching { LearnedWordsStore.snapshot(appContext, lang) }.getOrNull() }
 
-    private fun isInUserDictionary(word: String, subtype: Subtype): Boolean = runCatching {
-        val dm = DictionaryManager.default()
-        dm.loadUserDictionariesIfNecessary()
-        dm.queryUserDictionary(word, subtype.primaryLocale)
-            .any { it.text.toString().equals(word, ignoreCase = true) }
-    }.getOrDefault(false)
+    private suspend fun isInUserDictionary(word: String, subtype: Subtype): Boolean =
+        userVocabularyFor(subtype)?.lowercase?.contains(word.trim().lowercase()) == true
 
     override val providerId = ProviderId
 
@@ -1142,7 +1230,7 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
             ?.let { index.fold(it) }?.takeIf { it.isNotEmpty() }
         val bigrams = if (prevWord != null) bigramsFor(subtype) else NgramIndex.EMPTY
         val suggestions = correctionsFor(
-            trimmed, index, maxSuggestionCount, allowDistance2 = true,
+            trimmed, index, prefixIndexFor(subtype), maxSuggestionCount, allowDistance2 = true,
             bigramContextScore(prevWord, bigrams),
         )
         return SpellingResult.typo(suggestions.toTypedArray())
@@ -1225,6 +1313,11 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         // strip), then the user's personal dictionary, then the main dictionary ranked by frequency.
         val out = LinkedHashMap<String, SuggestionCandidate>()
         val index = lowerIndexFor(subtype)
+        // Whether Space may swap a fix in *silently* — and nothing more. Every fix below is offered in the
+        // strip either way; this only ever decides `isEligibleForAutoCommit` (issue #381). It used to gate
+        // the fixes themselves, so switching autocorrect off — which the setting describes as "fix typos
+        // when you type a space" — also emptied the strip on every typo: `helwo` showed nothing at all,
+        // one letter away from `hello`. The people who turn it off are the ones who fix by tapping.
         val autoCorrectOn = prefs.suggestion.autoCorrect.get()
 
         // German umlaut/ß restoration (issue #219) runs FIRST, so the correct spelling leads the strip and a
@@ -1233,7 +1326,7 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         // substitution never wins over the umlaut form (Madchen→Mädchen, not Machen). Dictionary-driven, so
         // only real words are produced; a validly-typed word is never swapped, only offered (schon→schön).
         // ß-restoration is off for Swiss German (de-CH), which has no ß.
-        if (autoCorrectOn && isGermanSubtype(subtype) && word.length >= 3) {
+        if (isGermanSubtype(subtype) && word.length >= 3) {
             val allowSharpS = !subtype.primaryLocale.country.equals("CH", ignoreCase = true)
             val variants = germanSpellingVariants(word, allowSharpS).mapNotNull { v ->
                 index.freq[v.lowercase()]?.let { f -> Triple(v, f, index.canonical[v.lowercase()] ?: v) }
@@ -1257,7 +1350,8 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
                             confidence = f / 255.0,
                             // Auto-swap only the top variant of a NON-word; a validly typed word stays the
                             // user's choice and the variant is merely offered.
-                            isEligibleForAutoCommit = i == 0 && !typedIsWord && f >= AUTOCORRECT_MIN_FREQ,
+                            isEligibleForAutoCommit =
+                                i == 0 && autoCorrectOn && !typedIsWord && f >= AUTOCORRECT_MIN_FREQ,
                             sourceProvider = this,
                         ),
                     )
@@ -1325,24 +1419,80 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         // path below skips it), yet the apostrophe form is usually what was meant and more common. Offered at
         // the front of the strip as a tap suggestion — not auto-committed, so a genuine "ill"/"well" is never
         // silently turned into "i'll"/"we'll".
-        if (autoCorrectOn && word.length >= 3 && !word.contains('\'')) {
+        //
+        // French gets nothing at all out of that loop and needs the most: elisions are 4 % of everything
+        // written in the language, and the word list holds 13 apostrophe entries in 68,605 words, because
+        // the generator's Hunspell pass splits on the apostrophe and keeps only what follows it. So the
+        // forms are rebuilt from a prefix and a known suffix — and rebuilding is exactly as able to produce
+        // "n'on" from "non" as "j'aime" from "jaime", since "on" is a word and `n'` is a prefix. The corpus
+        // is what tells the two apart, and it decides both whether a form is offered at all and whether it
+        // may be taken silently; [ElisionEvidence] carries the measurements.
+        if (word.length >= 3 && word.none { it == '\'' || it == '’' }) {
             val typedFreq = index.freq[index.fold(word)] ?: 0
+            // Corpus key → its frequency on the dictionary's 128..255 scale and the spelling to show.
+            // Insertion order is the order they reach the strip.
+            val forms = LinkedHashMap<String, Pair<Int, String>>()
             (1 until word.length)
                 .map { word.substring(0, it) + "'" + word.substring(it) }
                 .mapNotNull { v -> index.fold(v).let { k -> index.freq[k]?.let { f -> f to (index.canonical[k] ?: v) } } }
                 .filter { it.first > typedFreq }
                 .sortedByDescending { it.first }
                 .forEach { (freq, canonical) ->
-                    // English "I" contractions are stored lowercase in the dictionary; show them capitalised.
-                    val display = if (canonical.startsWith("i'")) "I" + canonical.substring(1) else cased(canonical)
-                    out.putIfAbsent(
-                        display.lowercase(),
-                        WordSuggestionCandidate(
-                            text = display, confidence = freq / 255.0,
-                            isEligibleForAutoCommit = false, sourceProvider = this,
-                        ),
-                    )
+                    forms.putIfAbsent(ElisionEvidence.key(index.fold(canonical)), freq to canonical)
                 }
+
+            // French elisions, rebuilt because the word list does not hold them, and kept only when the
+            // corpus is on record as writing them. The frequency shown is the suffix's — the full form has
+            // none of its own — which is also what orders them among themselves.
+            val corpus = elisionsFor(subtype)
+            var rebuilt = false
+            if (corpus.isNotEmpty()) {
+                frenchElisionSplits(word)
+                    .mapNotNull { (prefix, suffix) ->
+                        val suffixKey = index.fold(suffix)
+                        val canonical = index.canonical[suffixKey] ?: return@mapNotNull null
+                        val display = "$prefix'$canonical"
+                        val key = ElisionEvidence.key(index.fold(display))
+                        if (ElisionEvidence.isAttested(corpus, key)) Triple(key, index.freq[suffixKey] ?: 0, display)
+                        else null
+                    }
+                    .sortedByDescending { it.second }
+                    .forEach { (key, freq, display) ->
+                        if (forms.putIfAbsent(key, freq to display) == null) rebuilt = true
+                    }
+            }
+
+            // What may be swapped in silently. Only a single unambiguous reading, and only when the corpus
+            // is lopsided enough to say the apostrophe-less spelling was a slip rather than a word
+            // ([ElisionEvidence.DOMINANCE]). Every other language stays tap-only, because "ill", "well" and
+            // "its" are exactly as common as the contractions they would be rewritten into.
+            val autoCommitKey = forms.keys.singleOrNull()?.takeIf {
+                autoCorrectOn && index.lang == ELISION_LANG &&
+                    ElisionEvidence.mayReplace(corpus, ElisionEvidence.key(index.fold(word)), it)
+            }
+            if (rebuilt || autoCommitKey != null) {
+                // Keep the typed spelling tappable and left-most, so an elision can be refused before it is
+                // taken and a real word is never pushed out of the strip by one (issue #150). Under its own
+                // plain key, like the German restoration above, so the completion walk does not add it twice.
+                out.putIfAbsent(
+                    word.lowercase(),
+                    WordSuggestionCandidate(
+                        text = word, confidence = 1.0, isEligibleForAutoCommit = false, sourceProvider = this,
+                    ),
+                )
+            }
+            forms.forEach { (key, entry) ->
+                val (freq, canonical) = entry
+                // English "I" contractions are stored lowercase in the dictionary; show them capitalised.
+                val display = if (canonical.startsWith("i'")) "I" + canonical.substring(1) else cased(canonical)
+                out.putIfAbsent(
+                    display.lowercase(),
+                    WordSuggestionCandidate(
+                        text = display, confidence = freq / 255.0,
+                        isEligibleForAutoCommit = key == autoCommitKey, sourceProvider = this,
+                    ),
+                )
+            }
         }
 
         // Noun capitalisation (issue #242 follow-up). German capitalises every noun, but typing one
@@ -1358,9 +1508,7 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         // Deliberately hangs off the existing "Auto-capitalization" preference rather than adding its own:
         // anyone who types in all-lowercase on purpose has already turned that off, since it would otherwise
         // capitalise every sentence start too.
-        if (autoCorrectOn && prefs.correction.autoCapitalization.get() &&
-            word.length >= 2 && word.none { it.isUpperCase() }
-        ) {
+        if (prefs.correction.autoCapitalization.get() && word.length >= 2 && word.none { it.isUpperCase() }) {
             val lower = index.fold(word)
             val canonical = index.canonical[lower]
             if (canonical != null && canonical.first().isUpperCase() && canonical != word &&
@@ -1375,7 +1523,14 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
                 out[lower] = WordSuggestionCandidate(
                     text = canonical,
                     confidence = (index.freq[lower] ?: 0) / 255.0,
-                    isEligibleForAutoCommit = true,
+                    // Not when a restoration above already claimed the slot. This rule carries no
+                    // frequency threshold of its own — the dictionary's capitalisation *is* the evidence,
+                    // which is the right weight for a German noun and the wrong one for a name that
+                    // happens to spell an elision: fr.json holds `Jaime`, so `jaime` was capitalised into
+                    // somebody's name rather than restored to `j'aime`, which the corpus attests 450 times
+                    // and the name not at all. First claim wins, and the apostrophe block's is the one
+                    // backed by a measurement.
+                    isEligibleForAutoCommit = autoCorrectOn && out.values.none { it.isEligibleForAutoCommit },
                     sourceProvider = this,
                 )
             }
@@ -1387,7 +1542,7 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         // Whether this word is a candidate for a spelling fix at all. One value rather than the same
         // conditions written twice, because the block that corrects and the slots reserved *for* correcting
         // have to agree — the digit rule (issue #309) was easy to add to one of them and forget in the other.
-        val mayCorrect = autoCorrectOn && !isKnown && word.length >= 3 && isDictionaryJudgeable(word)
+        val mayCorrect = !isKnown && word.length >= 3 && isDictionaryJudgeable(word)
         // Reserve a few slots for edit-distance corrections so a typo's fix isn't crowded out by prefix
         // completions of that typo (issue #212). Only when we'd actually correct.
         val completionCap = if (mayCorrect) {
@@ -1412,13 +1567,11 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         // relative to the dictionary, only the user's own words are put in the order they earned. A word
         // typed into the dictionary by hand has no count and stays at the front, because teaching a word
         // deliberately still outranks anything we merely noticed.
-        val personal = runCatching {
-            val dm = DictionaryManager.default()
-            dm.loadUserDictionariesIfNecessary()
-            dm.queryUserDictionary(word, subtype.primaryLocale)
-        }.getOrNull().orEmpty()
-            .map { it.text.toString() }
-            .filter { index.fold(it).startsWith(index.fold(word)) }
+        val userVocabulary = userVocabularyFor(subtype)
+        val foldedWord = index.fold(word)
+        val personal = userVocabulary?.words.orEmpty()
+            .filter { (folded, _) -> folded.startsWith(foldedWord) }
+            .map { (_, stored) -> stored }
             .distinctBy { it.lowercase() }
             .sortedByDescending { text ->
                 val score = learnedSnapshot?.scoreOfKey(index.fold(text)) ?: 0.0
@@ -1430,11 +1583,7 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         // is the opposite of a completion: it looks nothing like what was typed, and typing the shortcut
         // in full is as deliberate as a user gets. Never auto-committed — "mail" is also an ordinary word,
         // and space must not swap it for an address in the middle of a sentence.
-        val shortcutExpansions = runCatching {
-            val dm = DictionaryManager.default()
-            dm.loadUserDictionariesIfNecessary()
-            dm.queryUserShortcuts(word, subtype.primaryLocale)
-        }.getOrNull().orEmpty()
+        val shortcutExpansions = userVocabulary?.shortcuts?.get(word.lowercase()).orEmpty()
         for (expansion in shortcutExpansions) {
             if (out.size >= maxCandidateCount) break
             out.putIfAbsent(
@@ -1563,6 +1712,10 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
             }
         }
 
+        // A checkpoint for the next keystroke (issue #381): NlpManager cancels this computation as soon as
+        // one arrives, but the stages below are plain loops that would otherwise run to the end regardless.
+        currentCoroutineContext().ensureActive()
+
         val data = wordDataFor(subtype)
         // Prefix matching happens on the stored spellings, so an Arabic writer typing ان or a French
         // writer typing ho would miss أنا and hôte. Where the fold changes the lookup spelling, compare
@@ -1570,18 +1723,20 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         val ranked = rankedWordsFor(subtype)
         val rankedKeys = rankedFoldKeysFor(subtype, ranked)
         val foldedPrefix = if (rankedKeys != null) index.fold(word) else ""
-        for ((rank, dictWord) in ranked.withIndex()) {
-            if (out.size >= completionCap) break
+
+        /** Offers the dictionary word at [rank] if it extends the prefix; false once the strip is full. */
+        fun offerCompletion(rank: Int, dictWord: String): Boolean {
+            if (out.size >= completionCap) return false
             val matches = if (rankedKeys != null) {
                 rankedKeys[rank].startsWith(foldedPrefix)
             } else {
                 dictWord.startsWith(word, ignoreCase = true)
             }
-            if (!matches) continue
+            if (!matches) return true
             val freq = data[dictWord] ?: 0
             addPersonalDownTo(freq)
             addLearnedDownTo(freq)
-            if (out.size >= completionCap) break
+            if (out.size >= completionCap) return false
             val text = cased(dictWord)
             out.putIfAbsent(
                 text.lowercase(),
@@ -1591,6 +1746,19 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
                     sourceProvider = this,
                 ),
             )
+            return true
+        }
+
+        // A rare prefix — and every prefix with a slip in it is one — matches almost nothing, so walking the
+        // ranked list meant reading all of it on every keystroke (issue #381). Its matches are found by
+        // binary search instead, then offered in the same rank order. A common prefix keeps the walk: its
+        // matches sit among the first few hundred words, and collecting thousands of them would cost more.
+        val rareMatches = prefixOrderFor(subtype, ranked, rankedKeys)
+            ?.ranksStartingWith(if (rankedKeys != null) foldedPrefix else word, limit = DENSE_PREFIX_MATCHES)
+        if (rareMatches != null) {
+            for (rank in rareMatches) if (!offerCompletion(rank, ranked[rank])) break
+        } else {
+            for ((rank, dictWord) in ranked.withIndex()) if (!offerCompletion(rank, dictWord)) break
         }
         // Nothing (or too little) in the dictionary extends this prefix: the user's own words are all that
         // is left to offer, so they go in rather than being dropped for want of a rank to sit at.
@@ -1605,23 +1773,54 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         // swap in silently). #190: never correct a word valid in any configured language, #309: never one
         // that carries a digit.
         if (mayCorrect) {
+            currentCoroutineContext().ensureActive()
             val hadCandidatesBefore = out.isNotEmpty() // German restoration and/or prefix completions
             val prevWord = previousWordOf(content, index)
             val bigrams = if (prevWord != null) bigramsFor(subtype) else NgramIndex.EMPTY
             val ctx = bigramContextScore(prevWord, bigrams)
-            // Preferred: decode from the actual tap positions (issue #242). Falls back to edit distance
-            // whenever no usable tap evidence exists — hardware keyboard, glide, pasted or dictated text,
-            // or a cursor jump that desynced the trace.
+            // Preferred: decode from the actual tap positions (issue #242). Null whenever no usable tap
+            // evidence exists — hardware keyboard, glide, pasted or dictated text, or a cursor jump that
+            // desynced the trace.
             val touchCorrections = touchCorrectionsFor(word, subtype, index, CORRECTION_MAX, ctx)
-            var corrections = touchCorrections?.words
-                ?: correctionsFor(word, index, CORRECTION_MAX, allowDistance2 = false, ctx)
-            val distance1Empty = corrections.isEmpty()
-            if (touchCorrections == null && distance1Empty && word.length <= MAX_DISTANCE2_LEN) {
-                corrections = correctionsFor(word, index, CORRECTION_MAX, allowDistance2 = true, ctx)
-            }
+            // And the reading of the string, always (issue #381). It used to run only when the beam found
+            // nothing, so a beam that found *anything* hid it: every tap of `helwo` sits on a neighbour of
+            // `growl`, and `hello` — one letter away — never reached the strip. It gets one slot of its own
+            // but never the first, so what Space may take is decided exactly as before; distance 2 still
+            // runs only where the beam had nothing, because beside a beam it costs much and finds nothing.
+            val stringReading = CorrectionReaders.byString(
+                folded = index.fold(word),
+                freq = index.freq,
+                alphabet = index.alphabet,
+                prefixIndex = prefixIndexFor(subtype),
+                sqDistance = KeyProximityInfo::normSqDistance,
+                contextScore = ctx,
+                allowDistance2 = touchCorrections == null,
+            )
+            val distance1Empty = stringReading.distance1Empty
+            val corrections = CorrectionReaders.merge(
+                touch = touchCorrections?.words.orEmpty(),
+                text = stringReading.words.map { index.canonical[it] ?: it },
+                maxCount = CORRECTION_MAX,
+            )
+            // And the longer words a half-typed word with a slip in it was probably on its way to (issue
+            // #381): `dixt` is a prefix of nothing, so the walk above has nothing for `dictionary`, and every
+            // fix is a whole word. Worked in behind the first fix, never eligible — an offer about a word the
+            // user has not finished — and added after `hadCandidatesBefore` was read, so they cannot make
+            // the corrector more timid either.
+            currentCoroutineContext().ensureActive()
+            val offers = CorrectionReaders.withCompletions(
+                fixes = corrections,
+                completions = completionsFor(word, subtype, index, maxCandidateCount, ctx),
+                freqOf = { index.freq[index.fold(it)] ?: 0 },
+            )
             // What may be swapped in *silently* (the strip always shows everything either way).
             val topTouchCost = touchCorrections?.topCost
-            val allowAutoCommit = when {
+            // A restoration above (umlaut, spelling, apostrophe) that already claimed the slot keeps it:
+            // [NlpManager.getAutoCommitCandidate] takes the first eligible candidate, so a second one is
+            // never committed — it is only drawn bold, which is a lie about what Space is going to take.
+            // The dictionary fixes below already follow this rule against the personal ones.
+            val slotClaimed = out.values.any { it.isEligibleForAutoCommit }
+            val allowAutoCommit = autoCorrectOn && !slotClaimed && when {
                 // Decoded from the taps: act only when the fingers really were near that key. This replaces
                 // the `hadCandidatesBefore` gate, which suppressed 2.7 % of otherwise correct fixes merely
                 // because the typo prefixed some dictionary word — while a bare "a correction exists" rule
@@ -1663,7 +1862,8 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
                     ),
                 )
             }
-            corrections.forEachIndexed { i, correction ->
+            val lead = corrections.firstOrNull()
+            offers.forEach { correction ->
                 val text = cased(correction)
                 val freq = index.freq[index.fold(correction)] ?: 0
                 out.putIfAbsent(
@@ -1673,7 +1873,7 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
                         confidence = freq / 255.0,
                         // Only when nothing of the user's own already took the auto-commit slot: two bold
                         // candidates would be a lie about which one space is going to take.
-                        isEligibleForAutoCommit = allowAutoCommit && i == 0 &&
+                        isEligibleForAutoCommit = allowAutoCommit && correction == lead &&
                             personalFixes.isEmpty() && freq >= AUTOCORRECT_MIN_FREQ,
                         sourceProvider = this,
                     ),
@@ -1703,7 +1903,7 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
     ): Pair<String, Float>? {
         val layout = KeyProximityInfo.snapshot() ?: return null
         val prefixIndex = prefixIndexFor(subtype) ?: return null
-        val beam = TouchBeamDecoder.decode(points, word, prefixIndex, layout, BEAM_CANDIDATES)
+        val beam = TouchBeamDecoder.decode(points, word, prefixIndex, layout, CorrectionReaders.BEAM_CANDIDATES)
         var best: TouchBeamDecoder.Candidate? = null
         var bestScore = Double.NEGATIVE_INFINITY
         for (candidate in beam) {

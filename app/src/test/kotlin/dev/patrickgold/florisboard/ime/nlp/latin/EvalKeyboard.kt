@@ -41,8 +41,8 @@ internal object EvalKeyboard {
     /** The dictionary frequency a correction needs before it may be auto-committed. */
     const val MIN_FREQ = AutoCommitGate.MIN_FREQ
 
-    /** How many words the beam returns before scoring, mirroring `BEAM_CANDIDATES`. */
-    const val BEAM_CANDIDATES = 12
+    /** How many words the beam returns before scoring — the provider's own number, not a copy. */
+    const val BEAM_CANDIDATES = CorrectionReaders.BEAM_CANDIDATES
 
     val layout: KeyProximityInfo.Layout = run {
         val codes = ArrayList<Int>()
@@ -91,8 +91,10 @@ internal object EvalKeyboard {
     }
 
     /** `{"word": 231, …}` into a map. Hand-parsed to keep the test off the serialization runtime. */
-    fun readDict(name: String): Map<String, Int> {
-        val text = dictFile(name).readText()
+    fun readDict(name: String): Map<String, Int> = parseDict(dictFile(name).readText())
+
+    /** The word→frequency map in a `<lang>.json`, for a file that is not a bundled asset. */
+    fun parseDict(text: String): Map<String, Int> {
         val out = HashMap<String, Int>(70_000)
         var i = 0
         while (i < text.length) {

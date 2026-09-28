@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.toSize
 import dev.patrickgold.florisboard.FlorisImeService
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
+import dev.patrickgold.florisboard.dictate.provider.ProviderListing
 import dev.patrickgold.florisboard.dictate.ui.LegacyLayoutState
 import dev.patrickgold.florisboard.editorInstance
 import dev.patrickgold.florisboard.glideTypingManager
@@ -381,6 +382,13 @@ private fun TextKeyButton(
                     SpaceBarMode.NOTHING -> return@let
                     SpaceBarMode.CURRENT_LANGUAGE -> {}
                     SpaceBarMode.SPACE_BAR_KEY -> customLabel = "␣"
+                    // Collected here rather than in the evaluator, so switching the provider — from the
+                    // keyboard's own picker as much as from the settings — relabels the key at once.
+                    SpaceBarMode.TRANSCRIPTION_PROVIDER -> {
+                        val providerId by prefs.dictate.transcriptionProviderId.collectAsState()
+                        val accounts by prefs.dictate.providerAccounts.collectAsState()
+                        customLabel = ProviderListing.displayNameOf(providerId, accounts)
+                    }
                 }
             }
             SnyggText(
@@ -581,9 +589,13 @@ private class TextKeyboardLayoutController(
                     pointer.index = pointerIndex
                     if (swipeGestureDetector.onTouchUp(event, pointer) || pointer.hasTriggeredGestureMove) {
                         if (pointer.hasTriggeredGestureMove && pointer.initialKey?.computedData?.code == KeyCode.DELETE) {
-                            val selection = editorInstance.activeContent.selection
-                            if (selection.isSelectionMode) {
-                                editorInstance.deleteBackwards(OperationUnit.CHARACTERS)
+                            if (keyboardManager.fieldTakesKeys) {
+                                keyboardManager.finishFieldSwipeDelete()
+                            } else {
+                                val selection = editorInstance.activeContent.selection
+                                if (selection.isSelectionMode) {
+                                    editorInstance.deleteBackwards(OperationUnit.CHARACTERS)
+                                }
                             }
                         }
                         onTouchCancelInternal(event, pointer)
@@ -604,9 +616,14 @@ private class TextKeyboardLayoutController(
                                 pointer.initialKey?.computedData?.code == KeyCode.DELETE &&
                                 prefs.gestures.deleteKeySwipeLeft.get() != SwipeAction.SELECT_CHARACTERS_PRECISELY &&
                                 prefs.gestures.deleteKeySwipeLeft.get() != SwipeAction.SELECT_WORDS_PRECISELY) {
-                                val selection = editorInstance.activeContent.selection
-                                if (selection.isSelectionMode) {
-                                    editorInstance.deleteBackwards(OperationUnit.CHARACTERS)
+                                // The keyboard's own fields have their own marked stretch (issue #424).
+                                if (keyboardManager.fieldTakesKeys) {
+                                    keyboardManager.finishFieldSwipeDelete()
+                                } else {
+                                    val selection = editorInstance.activeContent.selection
+                                    if (selection.isSelectionMode) {
+                                        editorInstance.deleteBackwards(OperationUnit.CHARACTERS)
+                                    }
                                 }
                             }
                             onTouchCancelInternal(event, pointer)
@@ -943,6 +960,15 @@ private class TextKeyboardLayoutController(
                     if (abs(event.relUnitCountX) > 0) {
                         inputFeedbackController?.gestureMovingSwipe(TextKeyData.DELETE)
                     }
+                    // While one of the keyboard's own fields has the keys, the swipe marks its text, not the app's (#424).
+                    if (keyboardManager.fieldTakesKeys) {
+                        keyboardManager.selectInField(
+                            units = -event.absUnitCountX - 1,
+                            words = false,
+                            forward = inputEventDispatcher.isPressed(KeyCode.SHIFT),
+                        )
+                        return true
+                    }
                     val activeSelection = editorInstance.activeContent.selection
                     if (activeSelection.isValid) {
                         if (!inputEventDispatcher.isPressed(KeyCode.SHIFT)) {
@@ -966,6 +992,14 @@ private class TextKeyboardLayoutController(
                 SwipeAction.DELETE_WORDS_PRECISELY, SwipeAction.SELECT_WORDS_PRECISELY -> {
                     if (abs(event.relUnitCountX) > 0) {
                         inputFeedbackController?.gestureMovingSwipe(TextKeyData.DELETE)
+                    }
+                    if (keyboardManager.fieldTakesKeys) {
+                        keyboardManager.selectInField(
+                            units = -event.absUnitCountX / 2 - 1,
+                            words = true,
+                            forward = inputEventDispatcher.isPressed(KeyCode.SHIFT),
+                        )
+                        return true
                     }
                     val activeSelection = editorInstance.activeContent.selection
                     if (activeSelection.isValid) {
