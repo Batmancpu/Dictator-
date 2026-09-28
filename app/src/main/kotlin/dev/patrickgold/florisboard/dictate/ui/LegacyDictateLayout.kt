@@ -107,6 +107,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
+import androidx.compose.ui.window.PopupProperties
 import dev.patrickgold.florisboard.FlorisImeService
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
@@ -554,7 +555,12 @@ private fun LegacyLanguageKey(modifier: Modifier) {
                 Text(active.shortCode, color = fg, fontWeight = FontWeight.SemiBold)
             }
         }
-        DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+        // Not focusable, like the Smartbar chip's menu: a focusable one hides the keyboard (#284).
+        DropdownMenu(
+            expanded = menuOpen,
+            onDismissRequest = { menuOpen = false },
+            properties = PopupProperties(focusable = false),
+        ) {
             selection.forEach { lang ->
                 DropdownMenuItem(
                     text = {
