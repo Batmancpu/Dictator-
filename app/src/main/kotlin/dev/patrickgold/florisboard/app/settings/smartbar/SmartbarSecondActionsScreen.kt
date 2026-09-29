@@ -120,7 +120,7 @@ fun SmartbarSecondActionsScreen() = FlorisScreen {
                 .filter { it.keyData().code !in absorbed }
                 .inBarOrder()
         }
-        // Repeating keys and the mic: they can be somebody's second action but can never carry one.
+        // The arrows, Delete and the mic: they can be somebody's second action but can never carry one.
         val childOnly = remember(pairs, order) {
             val hostCodes = QuickActionSecondActions.EligibleHosts.map { it.keyData().code }.toSet()
             QuickActionSecondActions.KnownActions
