@@ -136,6 +136,44 @@ data class EmojiMappingForView(
     val simple: List<EmojiSet>,
 )
 
+/**
+ * The palette's emojis minus those this device cannot draw, kept for as long as what decides it stays
+ * the same (issue #433).
+ *
+ * Deciding it asks EmojiCompat, and the system font for whatever EmojiCompat does not know, about each of
+ * the palette's emojis — on the main thread, while the panel is being built. The panel is taken down
+ * whenever the keyboard goes back to letters, so every switch to the emojis paid for all of it again,
+ * although the answer only changes with the EmojiCompat instance, the emoji data or the app's metadata
+ * version. Compared by identity: the data is one instance per load, and comparing it by value would walk
+ * the whole palette to save walking the whole palette.
+ */
+private object DrawableEmojiCache {
+    private var compat: EmojiCompat? = null
+    private var data: EmojiData? = null
+    private var metadataVersion = 0
+    private var value: Map<EmojiCategory, List<EmojiSet>>? = null
+
+    fun get(
+        compat: EmojiCompat?,
+        data: EmojiData,
+        metadataVersion: Int,
+        compute: () -> Map<EmojiCategory, List<EmojiSet>>,
+    ): Map<EmojiCategory, List<EmojiSet>> {
+        // The empty set the panel shows for the moment the real data takes to arrive costs nothing to
+        // filter. Kept, it would push the real one out on every opening, and the cache would never hit.
+        if (data === EmojiData.Fallback) return compute()
+        value?.let { cached ->
+            if (compat === this.compat && data === this.data && metadataVersion == this.metadataVersion) return cached
+        }
+        return compute().also {
+            this.compat = compat
+            this.data = data
+            this.metadataVersion = metadataVersion
+            value = it
+        }
+    }
+}
+
 @Composable
 fun EmojiPaletteView(
     fullEmojiMappings: EmojiData,
@@ -156,12 +194,14 @@ fun EmojiPaletteView(
     val replaceAll = activeEditorInfo.emojiCompatReplaceAll
     val emojiCompatInstance by FlorisEmojiCompat.getAsFlow(replaceAll).collectAsState()
     val emojiMappings = remember(emojiCompatInstance, fullEmojiMappings, metadataVersion, systemFontPaint) {
-        fullEmojiMappings.byCategory.mapValues { (_, emojiSetList) ->
-            emojiSetList.mapNotNull { emojiSet ->
-                emojiSet.emojis.filter { emoji ->
-                    emojiCompatInstance?.getEmojiMatch(emoji.value, metadataVersion) == EmojiCompat.EMOJI_SUPPORTED ||
-                        systemFontPaint.hasGlyph(emoji.value)
-                }.let { if (it.isEmpty()) null else EmojiSet(it) }
+        DrawableEmojiCache.get(emojiCompatInstance, fullEmojiMappings, metadataVersion) {
+            fullEmojiMappings.byCategory.mapValues { (_, emojiSetList) ->
+                emojiSetList.mapNotNull { emojiSet ->
+                    emojiSet.emojis.filter { emoji ->
+                        emojiCompatInstance?.getEmojiMatch(emoji.value, metadataVersion) == EmojiCompat.EMOJI_SUPPORTED ||
+                            systemFontPaint.hasGlyph(emoji.value)
+                    }.let { if (it.isEmpty()) null else EmojiSet(it) }
+                }
             }
         }
     }
