@@ -101,11 +101,29 @@ class TranslateBarController(
     /** Serialises writes into the field, so two results can never interleave their delete and insert. */
     private val writeLock = Mutex()
 
-    /** Exactly what the last write put into the field, separator included; `null` when nothing is ours. */
-    private var written: String? = null
+    /**
+     * One stretch of translation standing in the app: from opening the bar, an Enter or a fresh start to
+     * the next. Each has its own record of what it wrote (issue #433) — shared, a segment still finishing
+     * after the next had begun read the newer one's state, found nothing of its own in the field and wrote
+     * its result a second time.
+     */
+    private class Segment {
+        /** Exactly what the last write put into the field, separator included; `null` when nothing is ours. */
+        var written: String? = null
 
-    /** The query the text in the field is the translation of. */
-    private var writtenFor: String? = null
+        /** The query the text in the field is the translation of. */
+        var writtenFor: String? = null
+    }
+
+    private var segment = Segment()
+
+    /**
+     * The Enter or close still bringing its segment's translation up to date. The first translation after
+     * opening waits for the engine to start (issue #433), and an Enter that seemed to do nothing got pressed
+     * again — each press then wrote the result once more. Now a second Enter waits its turn by being ignored,
+     * and a close waits for it.
+     */
+    private var finishing: Job? = null
 
     /**
      * Until when a selection change in the app is our own doing: a write, or the Enter after one, moves
@@ -116,8 +134,7 @@ class TranslateBarController(
     fun open() {
         if (query.value != null) return
         FlorisImeService.currentInputConnection()?.finishComposingText()
-        written = null
-        writtenFor = null
+        segment = Segment()
         val installed = TranslationModelManager.installed(appContext).value
         val source = prefs.translation.sourceLanguage.get().takeIf { it.isAvailable(installed) }
         _state.value = State(
@@ -141,39 +158,48 @@ class TranslateBarController(
     fun close(finish: Boolean = true) {
         val last = query.value ?: return
         val wasFocused = focused.value
+        val ending = segment
+        segment = Segment()
         query.value = null
         cursor.value = 0
         selection.value = null
         focused.value = true
         stopLive()
-        scope.launch {
+        val before = finishing
+        finishing = scope.launch {
+            before?.join()
             // Unfocused, the user has moved on to the app's own text: nothing more is written into it.
-            if (finish && wasFocused) finishWriting(last)
-            written = null
-            writtenFor = null
+            if (finish && wasFocused) finishWriting(ending, last)
+            // Opened again while this one was finishing: the engine belongs to the new bar now.
+            if (query.value != null) return@launch
             TranslationEngineClient.release(appContext)
             _state.update { it.copy(picking = null) }
         }
     }
 
     /**
-     * Enter in the bar: finish the translation, keep it, and then let Enter do what it does in the app
-     * ([sendEnter]) — in a chat that is sending, and a message must never go out half translated.
+     * Enter in the bar where the app's Enter is an action: finish the translation, keep it, and then let
+     * Enter do what it does in the app ([sendEnter]) — in a chat that is sending, and a message must never
+     * go out half translated.
+     *
+     * The field empties at once, so the press visibly took; whatever is typed while the last translation is
+     * still on its way waits in it and is translated as the next segment once the Enter has gone through.
      */
     fun submit(sendEnter: () -> Unit) {
         val last = query.value ?: return
+        if (finishing?.isActive == true) return
         stopLive()
-        scope.launch {
-            finishWriting(last)
-            written = null
-            writtenFor = null
+        val ending = segment
+        segment = Segment()
+        query.value = ""
+        cursor.value = 0
+        selection.value = null
+        finishing = scope.launch {
+            finishWriting(ending, last)
             if (query.value == null) return@launch
-            query.value = ""
-            cursor.value = 0
-            selection.value = null
             ownEditUntil = SystemClock.uptimeMillis() + OWN_EDIT_WINDOW_MS
             sendEnter()
-            startLive()
+            if (focused.value) startLive()
         }
     }
 
@@ -197,11 +223,22 @@ class TranslateBarController(
         stopLive()
     }
 
-    /** A tap on the bar's field: it takes the keys back, with the cursor where the finger was. */
+    /**
+     * A tap on the bar's field: it takes the keys back, with the cursor where the finger was.
+     *
+     * Unless the app's text moved on while the keys were there — the user edited it, moved its cursor, or
+     * the translation was replaced. Then the old translation is finished text, and the bar starts a new
+     * one, empty, where the app's cursor is now (issue #433). Carrying on with the old query wrote the
+     * whole of it a second time at the new place.
+     */
     fun focus(offset: Int) {
         val text = query.value ?: return
-        cursor.value = offset.coerceIn(0, text.length)
-        selection.value = null
+        if (!focused.value && !ownsTextBeforeCursor(segment)) {
+            startSegment()
+        } else {
+            cursor.value = offset.coerceIn(0, text.length)
+            selection.value = null
+        }
         if (focused.value) return
         focused.value = true
         startLive()
@@ -209,14 +246,40 @@ class TranslateBarController(
 
     /**
      * The app reported a new selection. Moved by us — within [OWN_EDIT_WINDOW_MS] of a write — it means
-     * nothing; moved by anyone else it was the user tapping or dragging in the app's field, which takes
-     * the keys back there (issue #424). Complements `onViewClicked`, which not every app sends.
+     * nothing. An app field that is empty now was sent or cleared by the app, as a chat does with the send
+     * button; the bar keeps the keys and starts afresh for the next message (issue #433). Moved by anyone
+     * else it was the user tapping or dragging in the app's field, which takes the keys back there (issue
+     * #424). Complements `onViewClicked`, which not every app sends.
      */
     fun onSelectionChanged(oldStart: Int, oldEnd: Int, newStart: Int, newEnd: Int) {
         if (query.value == null || !focused.value) return
         if (oldStart == newStart && oldEnd == newEnd) return
         if (SystemClock.uptimeMillis() < ownEditUntil) return
+        if (appFieldIsEmpty()) {
+            startSegment()
+            return
+        }
         unfocus()
+    }
+
+    /** An empty query and nothing of the app's text counted as ours: the next translation goes in fresh. */
+    private fun startSegment() {
+        segment = Segment()
+        query.value = ""
+        cursor.value = 0
+        selection.value = null
+    }
+
+    /** Whether the text in front of the app's cursor still ends with what [segment] wrote last. */
+    private fun ownsTextBeforeCursor(segment: Segment): Boolean {
+        val written = segment.written ?: return true
+        val before = FlorisImeService.currentInputConnection()?.getTextBeforeCursor(written.length, 0) ?: return false
+        return before.toString().endsWith(written)
+    }
+
+    private fun appFieldIsEmpty(): Boolean {
+        val ic = FlorisImeService.currentInputConnection() ?: return false
+        return ic.getTextBeforeCursor(1, 0)?.isEmpty() == true && ic.getTextAfterCursor(1, 0)?.isEmpty() == true
     }
 
     fun openPicker(side: Side?) = _state.update { it.copy(picking = side) }
@@ -229,7 +292,7 @@ class TranslateBarController(
             }
         }
         persist()
-        writtenFor = null
+        segment.writtenFor = null
         retranslate()
     }
 
@@ -240,7 +303,7 @@ class TranslateBarController(
             it.copy(source = it.target, detected = null, target = from, picking = null)
         }
         persist()
-        writtenFor = null
+        segment.writtenFor = null
         retranslate()
     }
 
@@ -250,7 +313,10 @@ class TranslateBarController(
                 // Emptying the query takes the result out at once; only a growing text waits.
                 .debounce { if (it.isEmpty()) 0L else DEBOUNCE_MS }
                 // Refocusing replays the current query; what is already in the field needs no rewrite.
-                .collectLatest { text -> if (text != writtenFor) translateAndWrite(text) }
+                .collectLatest { text ->
+                    val current = segment
+                    if (text != current.writtenFor) translateAndWrite(current, text, live = true)
+                }
         }
         live += scope.launch {
             TranslationModelManager.installed(appContext).collect { installed ->
@@ -282,16 +348,23 @@ class TranslateBarController(
     private fun retranslate() {
         val text = query.value ?: return
         if (!focused.value) return
-        live += scope.launch { translateAndWrite(text) }
+        val current = segment
+        live += scope.launch { translateAndWrite(current, text, live = true) }
     }
 
-    private suspend fun finishWriting(text: String) {
-        if (text != writtenFor) translateAndWrite(text)
+    /** The last write of [segment], which has ended: its translation brought up to date with [text]. */
+    private suspend fun finishWriting(segment: Segment, text: String) {
+        if (text != segment.writtenFor) translateAndWrite(segment, text, live = false)
     }
 
-    private suspend fun translateAndWrite(text: String) {
+    /**
+     * [text] translated and written into the app for [segment]. [live] is a result of the running segment,
+     * which is dropped if the segment has ended by the time it arrives; the finishing write of a segment
+     * that has just ended is not.
+     */
+    private suspend fun translateAndWrite(segment: Segment, text: String, live: Boolean) {
         if (text.isBlank()) {
-            write("", text)
+            write(segment, "", text, live)
             _state.update { if (it.status is Status.NoLanguages) it else it.copy(status = Status.Idle, detected = null) }
             return
         }
@@ -310,14 +383,14 @@ class TranslateBarController(
             return
         }
         if (source == current.target) {
-            write(text, text)
+            write(segment, text, text, live)
             _state.update { it.copy(status = Status.Idle) }
             return
         }
         _state.update { it.copy(status = Status.Translating) }
         when (val result = TranslationEngineClient.translate(appContext, source, current.target, text)) {
             is TranslationEngineClient.Result.Translated -> {
-                write(result.text, text)
+                write(segment, result.text, text, live)
                 _state.update { it.copy(status = Status.Idle) }
             }
             is TranslationEngineClient.Result.Failed -> _state.update {
@@ -333,21 +406,30 @@ class TranslateBarController(
         }
     }
 
-    private suspend fun write(translation: String, forQuery: String) = writeLock.withLock {
+    private suspend fun write(segment: Segment, translation: String, forQuery: String, live: Boolean) = writeLock.withLock {
+        // A result of a segment that an Enter or a fresh start has ended belongs to text that is finished.
+        if (live && segment !== this.segment) return@withLock
         val ic = FlorisImeService.currentInputConnection() ?: return@withLock
-        val previous = written
+        val previous = segment.written
         // One character more than we wrote, so the separator can see what stands in front of it.
         val before = ic.getTextBeforeCursor((previous?.length ?: 0) + 1, 0)?.toString().orEmpty()
         val edit = TranslationInsertion.edit(before, previous, translation)
+        if (edit == null) {
+            // Our last result is no longer in front of the cursor: the app's text changed under the bar
+            // (issue #433). The keys go back to the app, as after a tap into it, and a tap on the bar starts
+            // over wherever the cursor is then — writing on here put the translation in twice.
+            if (live) unfocus()
+            return@withLock
+        }
         if (edit.deleteBefore == 0 && edit.text.isEmpty()) {
-            written = null
-            writtenFor = forQuery
+            segment.written = null
+            segment.writtenFor = forQuery
             return@withLock
         }
         ownEditUntil = SystemClock.uptimeMillis() + OWN_EDIT_WINDOW_MS
         editorInstance.replaceTextBeforeCursor(edit.deleteBefore, edit.text)
-        written = edit.text.ifEmpty { null }
-        writtenFor = forQuery
+        segment.written = edit.text.ifEmpty { null }
+        segment.writtenFor = forQuery
     }
 
     /**
@@ -406,8 +488,11 @@ class TranslateBarController(
         private const val MIN_DETECT_CHARS = 12
         private const val MIN_DETECT_CONFIDENCE = 0.5f
 
-        /** Whether the next letter typed into [query] starts a sentence, for auto-capitalisation. */
+        /**
+         * Whether the next letter typed into [query] starts a sentence, for auto-capitalisation — also the
+         * first of a new line, which the bar can hold now (issue #433).
+         */
         fun startsSentence(query: String): Boolean =
-            query.isBlank() || Regex("""[.!?…]\s+$""").containsMatchIn(query)
+            query.isBlank() || Regex("""(?:[.!?…]\s+|\n\s*)$""").containsMatchIn(query)
     }
 }

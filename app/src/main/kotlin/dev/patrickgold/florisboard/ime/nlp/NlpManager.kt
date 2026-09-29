@@ -412,10 +412,20 @@ class NlpManager(context: Context) {
     @Volatile
     private var fieldCandidates: List<SuggestionCandidate>? = null
 
+    /**
+     * Where the cursor of a field that offers the copied text stands — the translate bar (issue #433) —
+     * so the clip is shown by the same rule as in the app's field. `null` for every other field.
+     */
+    data class FieldClipSpot(val isBlank: Boolean, val isAtWordBoundary: Boolean)
+
+    @Volatile
+    private var fieldClipSpot: FieldClipSpot? = null
+
     val isFieldMode: Boolean get() = fieldCandidates != null
 
-    fun showFieldCandidates(candidates: List<SuggestionCandidate>?) {
+    fun showFieldCandidates(candidates: List<SuggestionCandidate>?, clipSpot: FieldClipSpot? = null) {
         fieldCandidates = candidates
+        fieldClipSpot = clipSpot.takeIf { candidates != null }
         scope.launch { assembleCandidates() }
     }
 
@@ -671,8 +681,25 @@ class NlpManager(context: Context) {
     private fun assembleCandidates() {
         runBlocking {
             fieldCandidates?.let { field ->
-                // No clipboard offer and no sum here: both read the app's field, not the one being typed in.
-                val shown = if (isSuggestionOn()) field else emptyList()
+                // No sum here: it reads the app's field, not the one being typed in. The copied text is
+                // offered only where the field asks for it, and only as text — a picture has no place in it.
+                val spot = fieldClipSpot
+                val shown = when {
+                    !isSuggestionOn() -> emptyList()
+                    spot == null -> field
+                    else -> chooseStripCandidates(
+                        words = field,
+                        clip = clipboardSuggestionProvider.suggest(
+                            subtype = Subtype.DEFAULT,
+                            content = editorInstance.activeContent,
+                            maxCandidateCount = 8,
+                            allowPossiblyOffensive = true,
+                            isPrivateSession = keyboardManager.activeState.isIncognitoMode,
+                        ).filter { (it as? ClipboardSuggestionCandidate)?.clipboardItem?.type == ItemType.TEXT },
+                        isFieldBlank = spot.isBlank,
+                        isAtWordBoundary = spot.isAtWordBoundary,
+                    )
+                }
                 activeCandidates = shown
                 autoExpandCollapseSmartbarActions(shown, null)
                 return@runBlocking
