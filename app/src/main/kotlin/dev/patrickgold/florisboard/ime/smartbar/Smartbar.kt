@@ -56,6 +56,8 @@ import androidx.compose.ui.graphics.isUnspecified
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
@@ -80,6 +82,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.florisboard.lib.android.AndroidVersion
 import org.florisboard.lib.compose.horizontalTween
+import org.florisboard.lib.compose.stringRes
 import org.florisboard.lib.compose.verticalTween
 import org.florisboard.lib.snygg.ui.SnyggBox
 import org.florisboard.lib.snygg.ui.SnyggColumn
@@ -221,6 +224,8 @@ private fun SmartbarMainRow(modifier: Modifier = Modifier) {
 
     @Composable
     fun SharedActionsToggle() {
+        val showActionsLabel = stringRes(R.string.smartbar__a11y_show_actions)
+        val showSuggestionsLabel = stringRes(R.string.smartbar__a11y_show_suggestions)
         SnyggIconButton(
             elementName = FlorisImeUi.SmartbarSharedActionsToggle.elementName,
             onClick = {
@@ -231,7 +236,14 @@ private fun SmartbarMainRow(modifier: Modifier = Modifier) {
                     prefs.smartbar.sharedActionsExpanded.set(!sharedActionsExpanded)
                 }
             },
-            modifier = Modifier.sizeIn(maxHeight = FlorisImeSizing.smartbarHeight).aspectRatio(1f)
+            // Named after what a tap does, like the Dictate mic (#159): an arrow says nothing to a
+            // screen reader, which read this as a bare "button".
+            modifier = Modifier
+                .sizeIn(maxHeight = FlorisImeSizing.smartbarHeight)
+                .aspectRatio(1f)
+                .semantics {
+                    contentDescription = if (sharedActionsExpanded) showSuggestionsLabel else showActionsLabel
+                },
         ) {
             val transition = updateTransition(sharedActionsExpanded, label = "sharedActionsExpandedToggleBtn")
             val rotation by transition.animateFloat(
@@ -321,6 +333,8 @@ private fun SmartbarMainRow(modifier: Modifier = Modifier) {
 
     @Composable
     fun ExtendedActionsToggle() {
+        val showMoreActionsLabel = stringRes(R.string.smartbar__a11y_show_more_actions)
+        val hideMoreActionsLabel = stringRes(R.string.smartbar__a11y_hide_more_actions)
         SnyggIconButton(
             FlorisImeUi.SmartbarExtendedActionsToggle.elementName,
             onClick = {
@@ -331,7 +345,12 @@ private fun SmartbarMainRow(modifier: Modifier = Modifier) {
                     prefs.smartbar.extendedActionsExpanded.set(!extendedActionsExpanded)
                 }
             },
-            modifier = Modifier.sizeIn(maxHeight = FlorisImeSizing.smartbarHeight).aspectRatio(1f)
+            modifier = Modifier
+                .sizeIn(maxHeight = FlorisImeSizing.smartbarHeight)
+                .aspectRatio(1f)
+                .semantics {
+                    contentDescription = if (extendedActionsExpanded) hideMoreActionsLabel else showMoreActionsLabel
+                },
         ) {
             val transition = updateTransition(extendedActionsExpanded, label = "smartbarSecondaryRowToggleBtn")
             val alpha by transition.animateFloat(label = "alpha") { if (it) 1f else 0f }

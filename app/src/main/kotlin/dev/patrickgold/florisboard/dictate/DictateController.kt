@@ -87,6 +87,7 @@ import dev.patrickgold.florisboard.ime.text.key.KeyVariation
 import dev.patrickgold.florisboard.keyboardManager
 import dev.patrickgold.florisboard.lib.util.AppVersionUtils
 import dev.patrickgold.florisboard.lib.util.VersionName
+import org.florisboard.lib.kotlin.curlyFormat
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeoutOrNull
@@ -511,9 +512,14 @@ object DictateController {
                     // buzz to this rule, which is the accepted cost — the finger was on the button.
                     //
                     // A resend enters at Transcribing, so neither branch matches for it.
+                    //
+                    // A screen reader's double-tap is no key press and buzzes nothing of ours, and for
+                    // its user this buzz is the only sign the recording really started (#159).
                     (new is UiState.Recording && prev !is UiState.Recording) ||
                         (prev is UiState.Recording && new is UiState.Transcribing) -> {
-                        if (!pressAlreadyBuzzed()) DictateHaptics.short(appContext)
+                        if (DictateAccessibility.isScreenReaderOn(appContext) || !pressAlreadyBuzzed()) {
+                            DictateHaptics.short(appContext)
+                        }
                     }
                     // Transcription ready (heading to commit/idle or on to a rewording pass) — not on failure.
                     prev is UiState.Transcribing && (new is UiState.Idle || new is UiState.Rewording) ->
@@ -521,9 +527,33 @@ object DictateController {
                     // Rewording / LLM prompt applied.
                     prev is UiState.Rewording && new is UiState.Idle -> DictateHaptics.medium(appContext)
                 }
+                announceTransition(appContext, prev, new)
                 prev = new
             }
         }
+    }
+
+    /**
+     * The spoken half of the transitions above, for a screen reader (issue #159): the waits and whatever
+     * went wrong. Never the way into a recording — see [DictateAccessibility] — and never the finished
+     * text, which the screen reader already reads out as it lands in the field.
+     */
+    private fun announceTransition(context: Context, prev: UiState, new: UiState) {
+        val text = when {
+            // A retry, and the hand-over to the on-device model (#270), are news of their own.
+            new is UiState.Transcribing && (prev !is UiState.Transcribing ||
+                prev.attempt != new.attempt || prev.onDevice != new.onDevice) -> when {
+                new.attempt > 1 ->
+                    context.getString(R.string.dictate__status_retrying).curlyFormat("attempt" to new.attempt)
+                new.onDevice -> context.getString(R.string.dictate__status_transcribing_local)
+                else -> context.getString(R.string.dictate__status_transcribing)
+            }
+            new is UiState.Rewording && new != prev ->
+                new.label.ifBlank { context.getString(R.string.dictate__status_rewording) }
+            new is UiState.Error && new != prev -> new.message
+            else -> null
+        } ?: return
+        DictateAccessibility.announce(context, text)
     }
 
     /**
@@ -1364,6 +1394,10 @@ object DictateController {
      */
     private fun startRecording(context: Context, seedAccumulatedMs: Long = 0L) {
         if (_state.value is UiState.Recording) return
+        val appContext = context.applicationContext
+        // Before the credential check, not after: a missing key on the very first dictation is an error
+        // a screen reader has to speak (#159), and the observer only hears what happens once it runs.
+        ensureHapticObserver(appContext)
         if (refuseIfNoCredential(context)) return
         // Starting a fresh recording supersedes any kept audio (a failed retry or an interrupted
         // recording the user chose not to send), so drop it instead of leaving a stale offer behind.
@@ -1372,8 +1406,6 @@ object DictateController {
             discardRetainedAudio()
             discardCarryOver()
         }
-        val appContext = context.applicationContext
-        ensureHapticObserver(appContext)
         // A rewording server that has to be woken (#189) gets the length of this dictation to do it in.
         if (rewordingWillFollow()) warmUpRewordingServer()
         startJob = scope.launch {

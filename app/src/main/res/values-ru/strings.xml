@@ -1238,6 +1238,11 @@
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Кнопка также появляется, когда активна клавиатура Dictate.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Скрыта, когда активна клавиатура Dictate, так как у неё уже есть кнопка микрофона.</string>
     <string name="dictate__action_continue_recording">Продолжить запись</string>
+    <string name="dictate__a11y_mic_hold_local">Транскрибировать на устройстве</string>
+    <string name="smartbar__a11y_show_actions">Показать действия</string>
+    <string name="smartbar__a11y_show_suggestions">Показать подсказки</string>
+    <string name="smartbar__a11y_show_more_actions">Показать больше действий</string>
+    <string name="smartbar__a11y_hide_more_actions">Скрыть дополнительные действия</string>
     <string name="dictate__floating_button_auto_dim_summary_off">Всегда полностью виден.</string>
     <string name="dictate__floating_button_auto_dim_summary_on">Через несколько секунд сжимается в маленькую точку; коснитесь, чтобы восстановить.</string>
     <string name="dictate__floating_button_auto_dim_title">Затухать при бездействии</string>

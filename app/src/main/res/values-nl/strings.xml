@@ -1132,6 +1132,11 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__floating_button_show_with_keyboard_summary_on">De knop verschijnt ook terwijl het Dictate-toetsenbord actief is.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Verborgen terwijl het Dictate-toetsenbord actief is, omdat dat al een microfoontoets heeft.</string>
     <string name="dictate__action_continue_recording">Opname voortzetten</string>
+    <string name="dictate__a11y_mic_hold_local">Transcriberen op apparaat</string>
+    <string name="smartbar__a11y_show_actions">Acties tonen</string>
+    <string name="smartbar__a11y_show_suggestions">Suggesties tonen</string>
+    <string name="smartbar__a11y_show_more_actions">Meer acties tonen</string>
+    <string name="smartbar__a11y_hide_more_actions">Extra acties verbergen</string>
     <string name="dictate__floating_button_auto_dim_summary_off">Blijft altijd volledig zichtbaar.</string>
     <string name="dictate__floating_button_auto_dim_summary_on">Krimpt na enkele seconden tot een klein puntje; tik om te herstellen.</string>
     <string name="dictate__floating_button_auto_dim_title">Vervagen bij inactiviteit</string>

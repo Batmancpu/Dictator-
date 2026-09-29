@@ -1187,6 +1187,11 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Tombol juga muncul saat keyboard Dictate aktif.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Disembunyikan saat keyboard Dictate aktif, karena keyboard tersebut sudah memiliki tombol mikrofon.</string>
     <string name="dictate__action_continue_recording">Lanjutkan rekaman</string>
+    <string name="dictate__a11y_mic_hold_local">Transkripsikan di perangkat</string>
+    <string name="smartbar__a11y_show_actions">Tampilkan tindakan</string>
+    <string name="smartbar__a11y_show_suggestions">Tampilkan saran</string>
+    <string name="smartbar__a11y_show_more_actions">Tampilkan tindakan lainnya</string>
+    <string name="smartbar__a11y_hide_more_actions">Sembunyikan tindakan lainnya</string>
     <string name="dictate__floating_button_auto_dim_summary_off">Selalu tetap terlihat sepenuhnya.</string>
     <string name="dictate__floating_button_auto_dim_summary_on">Mengecil menjadi titik kecil setelah beberapa detik; ketuk untuk memulihkan.</string>
     <string name="dictate__floating_button_auto_dim_title">Pudar saat diam</string>

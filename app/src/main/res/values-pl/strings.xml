@@ -1249,6 +1249,11 @@
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Przycisk pojawia się również, gdy aktywna jest klawiatura Dictate.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Ukryty, gdy aktywna jest klawiatura Dictate, ponieważ ma ona już klawisz mikrofonu.</string>
     <string name="dictate__action_continue_recording">Kontynuuj nagrywanie</string>
+    <string name="dictate__a11y_mic_hold_local">Transkrybuj na urządzeniu</string>
+    <string name="smartbar__a11y_show_actions">Pokaż akcje</string>
+    <string name="smartbar__a11y_show_suggestions">Pokaż sugestie</string>
+    <string name="smartbar__a11y_show_more_actions">Pokaż więcej akcji</string>
+    <string name="smartbar__a11y_hide_more_actions">Ukryj dodatkowe akcje</string>
     <string name="dictate__floating_button_auto_dim_summary_off">Zawsze pozostaje w pełni widoczny.</string>
     <string name="dictate__floating_button_auto_dim_summary_on">Po kilku sekundach kurczy się do małej kropki; dotknij, aby przywrócić.</string>
     <string name="dictate__floating_button_auto_dim_title">Przygaszaj w bezczynności</string>

@@ -1090,6 +1090,11 @@
     <string name="dictate__floating_button_show_with_keyboard_summary_on">يظهر الزر أيضًا أثناء نشاط لوحة مفاتيح Dictate.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">مخفي أثناء نشاط لوحة مفاتيح Dictate، لأنها تحتوي بالفعل على زر ميكروفون.</string>
     <string name="dictate__action_continue_recording">متابعة التسجيل</string>
+    <string name="dictate__a11y_mic_hold_local">تفريغ على الجهاز</string>
+    <string name="smartbar__a11y_show_actions">إظهار الإجراءات</string>
+    <string name="smartbar__a11y_show_suggestions">إظهار الاقتراحات</string>
+    <string name="smartbar__a11y_show_more_actions">إظهار المزيد من الإجراءات</string>
+    <string name="smartbar__a11y_hide_more_actions">إخفاء الإجراءات الإضافية</string>
     <string name="dictate__floating_button_auto_dim_summary_off">يظل مرئيًا بالكامل دائمًا.</string>
     <string name="dictate__floating_button_auto_dim_summary_on">يتقلص إلى نقطة صغيرة بعد بضع ثوانٍ؛ انقر لاستعادته.</string>
     <string name="dictate__floating_button_auto_dim_title">تعتيم عند الخمول</string>

@@ -1265,6 +1265,11 @@
     <string name="dictate__action_dismiss">Verwerfen</string>
     <string name="dictate__interrupted_recording">Unterbrochen ({time})</string>
     <string name="dictate__action_continue_recording">Weiter aufnehmen</string>
+    <string name="dictate__a11y_mic_hold_local">Auf dem Gerät transkribieren</string>
+    <string name="smartbar__a11y_show_actions">Aktionen anzeigen</string>
+    <string name="smartbar__a11y_show_suggestions">Vorschläge anzeigen</string>
+    <string name="smartbar__a11y_show_more_actions">Weitere Aktionen anzeigen</string>
+    <string name="smartbar__a11y_hide_more_actions">Weitere Aktionen ausblenden</string>
     <string name="dictate__action_yes">Ja</string>
     <string name="dictate__action_no">Nein, danke</string>
     <string name="dictate__promo_rate_message">Gefällt dir Dictate?</string>

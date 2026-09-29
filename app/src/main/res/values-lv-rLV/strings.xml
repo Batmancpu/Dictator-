@@ -1177,6 +1177,11 @@
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Poga parādās arī tad, kad ir aktīva Dictate tastatūra.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Paslēpta, kamēr ir aktīva Dictate tastatūra, jo tai jau ir mikrofona taustiņš.</string>
     <string name="dictate__action_continue_recording">Turpināt ierakstu</string>
+    <string name="dictate__a11y_mic_hold_local">Transkribēt ierīcē</string>
+    <string name="smartbar__a11y_show_actions">Rādīt darbības</string>
+    <string name="smartbar__a11y_show_suggestions">Rādīt ieteikumus</string>
+    <string name="smartbar__a11y_show_more_actions">Rādīt vairāk darbību</string>
+    <string name="smartbar__a11y_hide_more_actions">Paslēpt papildu darbības</string>
     <string name="dictate__floating_button_auto_dim_summary_off">Vienmēr paliek pilnībā redzams.</string>
     <string name="dictate__floating_button_auto_dim_summary_on">Pēc dažām sekundēm sarūk līdz mazam punktam; pieskarieties, lai atjaunotu.</string>
     <string name="dictate__floating_button_auto_dim_title">Aptumšot dīkstāvē</string>

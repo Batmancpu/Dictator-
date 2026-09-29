@@ -1077,6 +1077,11 @@
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Кнопка також з’являється, коли активна клавіатура Dictate.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Прихована, коли активна клавіатура Dictate, оскільки вона вже має клавішу мікрофона.</string>
     <string name="dictate__action_continue_recording">Продовжити запис</string>
+    <string name="dictate__a11y_mic_hold_local">Транскрибувати на пристрої</string>
+    <string name="smartbar__a11y_show_actions">Показати дії</string>
+    <string name="smartbar__a11y_show_suggestions">Показати пропозиції</string>
+    <string name="smartbar__a11y_show_more_actions">Показати більше дій</string>
+    <string name="smartbar__a11y_hide_more_actions">Приховати додаткові дії</string>
     <string name="dictate__floating_button_auto_dim_summary_off">Завжди повністю видимий.</string>
     <string name="dictate__floating_button_auto_dim_summary_on">Через кілька секунд стискається до маленької крапки; торкніться, щоб відновити.</string>
     <string name="dictate__floating_button_auto_dim_title">Згасати при бездіяльності</string>

@@ -22,7 +22,8 @@ import dev.patrickgold.florisboard.app.FlorisPreferenceStore
  * step is done and it's worth looking at the screen again. Gated on `prefs.dictate.hapticFeedback`.
  *
  * Patterns (the reporter's suggestion): a short buzz on record start/stop, a double-short when the
- * transcription is ready, and a longer single buzz when a rewording/LLM prompt has been applied. The
+ * transcription is ready, and a longer single buzz when a rewording/LLM prompt has been applied. Always on
+ * while a screen reader runs (#159). The
  * start/stop buzz is skipped whenever the press that caused it has already buzzed by itself — see
  * `DictateController.pressAlreadyBuzzed`; the other two always fire, and they are the ones that carry
  * news the user has no other way of getting. The
@@ -48,7 +49,11 @@ object DictateHaptics {
     fun medium(context: Context) = vibrate(context, VibrationEffect.createOneShot(MEDIUM_MS, VibrationEffect.DEFAULT_AMPLITUDE))
 
     private fun vibrate(context: Context, effect: VibrationEffect) {
-        if (!prefs.dictate.hapticFeedback.get()) return
+        // On for everyone who runs a screen reader (#159), whatever the switch says: this is the feature
+        // for people who cannot see the screen, and they are the ones least likely to find a switch that
+        // is off by default. It also carries the one signal that is never spoken — see
+        // DictateAccessibility.
+        if (!prefs.dictate.hapticFeedback.get() && !DictateAccessibility.isScreenReaderOn(context)) return
         runCatching {
             val vibrator = vibratorOf(context)
             if (vibrator.hasVibrator()) vibrator.vibrate(effect)

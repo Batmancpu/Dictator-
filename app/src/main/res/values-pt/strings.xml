@@ -1212,6 +1212,11 @@
     <string name="dictate__floating_button_show_with_keyboard_summary_on">O botão também aparece enquanto o teclado Dictate está ativo.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Oculto enquanto o teclado Dictate está ativo, pois este já tem uma tecla de microfone.</string>
     <string name="dictate__action_continue_recording">Continuar gravação</string>
+    <string name="dictate__a11y_mic_hold_local">Transcrever no dispositivo</string>
+    <string name="smartbar__a11y_show_actions">Mostrar ações</string>
+    <string name="smartbar__a11y_show_suggestions">Mostrar sugestões</string>
+    <string name="smartbar__a11y_show_more_actions">Mostrar mais ações</string>
+    <string name="smartbar__a11y_hide_more_actions">Ocultar mais ações</string>
     <string name="dictate__floating_button_auto_dim_summary_off">Permanece sempre totalmente visível.</string>
     <string name="dictate__floating_button_auto_dim_summary_on">Reduz-se a um pequeno ponto após alguns segundos; toque para restaurar.</string>
     <string name="dictate__floating_button_auto_dim_title">Esmaecer quando inativo</string>
