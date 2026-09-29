@@ -500,6 +500,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Използват се главни букви въз основа на контекста на въвеждане</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Автом. поставяне на интервал след пунктуац. знак</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Автоматично се поставят интервали след пунктуационните знаци</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Премахване на интервал пред пунктуацията</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Премахва се интервалът, въведен пред . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Запомняне на състоянието на клавиш Caps Lock</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">Клавишът Caps Lock се оставя включен при преместване в друго текстово поле</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Двукратно натискане на интервала</string>
@@ -1520,9 +1522,10 @@
     <string name="dictate__languages_title">Езици за транскрибиране</string>
     <string name="dictate__languages_summary">Изберете езиците, на които диктувате. Превключвайте бързо между тях от лентата за запис.</string>
     <string name="dictate__language_detect">Откривай автоматично</string>
+    <string name="dictate__languages_selected_title">Избрани езици</string>
     <string name="dictate__languages_active_title">Активен език</string>
     <string name="dictate__languages_follow_keyboard">Следване на езика на клавиатурата</string>
-    <string name="dictate__languages_follow_keyboard_summary">Сменя и диктовката, ако езикът е отметнат по-долу</string>
+    <string name="dictate__languages_follow_keyboard_summary">Сменя и диктовката, ако езикът е избран</string>
     <string name="quick_action__dictate_switch_provider">Доставчик на транскрибиране</string>
     <string name="quick_action__dictate_switch_provider__tooltip">Смяна на доставчика на транскрибиране</string>
     <string name="enum__space_bar_mode__transcription_provider">Доставчик на транскрибиране</string>

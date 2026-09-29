@@ -10,10 +10,16 @@
 
 package dev.patrickgold.florisboard.dictate
 
+import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldNotContain
+import io.kotest.matchers.ints.shouldBeGreaterThan
+import io.kotest.matchers.ints.shouldBeLessThan
+import io.kotest.matchers.ints.shouldBeLessThanOrEqual
 import io.kotest.matchers.shouldBe
+import java.text.Collator
 import java.util.Locale
 
 /**
@@ -137,6 +143,41 @@ class DictateLanguageMatchTest : FunSpec({
             DictateLanguages.forKeyboard(Locale("jv"), "en,jw")?.code shouldBe "jw"
             // Java's legacy "iw" still comes out of Locale("he") on some runtimes; the tag is "he".
             DictateLanguages.forKeyboard(Locale("he", "IL"), "en,he")?.code shouldBe "he"
+        }
+    }
+
+    // Issue #431 follow-up: the catalog is kept in English-name order, but the picker shows each language
+    // under its name in the reader's language. Left in catalog order, a German reader finds "Deutsch"
+    // among the G's (German) and "Niederländisch" among the D's (Dutch), and a Hindi reader no order at all.
+    context("sortedForDisplay orders the picker by the names the reader sees") {
+        test("a German reader finds Deutsch under D and Niederländisch under N") {
+            val names = DictateLanguages.sortedForDisplay(DictateLanguages.all, Locale.GERMAN)
+                .map { it.displayName(Locale.GERMAN) }
+            names.indexOf("Deutsch") shouldBeLessThan names.indexOf("Englisch")
+            names.indexOf("Niederländisch") shouldBeGreaterThan names.indexOf("Englisch")
+        }
+
+        withData(
+            nameFn = { "every neighbour in ${it.toLanguageTag()} collation order" },
+            Locale.GERMAN,
+            Locale.ENGLISH,
+            Locale("hi"),
+            Locale.JAPANESE,
+            Locale("ar"),
+        ) { locale ->
+            val collator = Collator.getInstance(locale)
+            val names = DictateLanguages.sortedForDisplay(DictateLanguages.all, locale)
+                .drop(1)
+                .map { it.displayName(locale) }
+            names.zipWithNext().forEach { (a, b) ->
+                withClue("\"$a\" before \"$b\"") { collator.compare(a, b) shouldBeLessThanOrEqual 0 }
+            }
+        }
+
+        test("detect stays on top, and nothing is lost or doubled") {
+            val sorted = DictateLanguages.sortedForDisplay(DictateLanguages.all, Locale.GERMAN)
+            sorted.first().code shouldBe DictateLanguages.DETECT
+            sorted shouldContainExactlyInAnyOrder DictateLanguages.all
         }
     }
 })

@@ -500,6 +500,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">根据当前输入上下文将单词首字母大写</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">标点后自动空格</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">在标点符号后自动插入一个空格</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">标点前不留空格</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">删除在 . , ? ! 前输入的空格</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">记住大写锁定状态</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">移动到另一个文本框时，大写锁定将保持原状态</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">双击空格键</string>
@@ -1515,9 +1517,10 @@
     <string name="dictate__languages_title">转录语言</string>
     <string name="dictate__languages_summary">选择您听写所用的语言。可从录音栏快速切换。</string>
     <string name="dictate__language_detect">自动检测</string>
+    <string name="dictate__languages_selected_title">已选语言</string>
     <string name="dictate__languages_active_title">当前语言</string>
     <string name="dictate__languages_follow_keyboard">跟随键盘语言</string>
-    <string name="dictate__languages_follow_keyboard_summary">若该语言已在下方勾选，听写语言也随之切换</string>
+    <string name="dictate__languages_follow_keyboard_summary">若该语言已选中，听写语言也随之切换</string>
     <string name="quick_action__dictate_switch_provider">转录服务商</string>
     <string name="quick_action__dictate_switch_provider__tooltip">切换转录服务商</string>
     <string name="enum__space_bar_mode__transcription_provider">转录服务商</string>

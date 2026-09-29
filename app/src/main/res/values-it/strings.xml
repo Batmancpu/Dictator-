@@ -400,6 +400,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Rendi maiuscole le parole in base al contesto attuale</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Spaziatura automatica dopo la punteggiatura</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Inserisci automaticamente uno spazio dopo un segno di punteggiatura</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Nessuno spazio prima della punteggiatura</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Rimuovi lo spazio digitato prima di . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Ricorda lo stato del maiuscolo</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">Il maiuscolo rimarrà attivo quando ti sposti ad un altro campo di testo</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Doppio tocco sulla barra spaziatrice</string>
@@ -1303,9 +1305,10 @@
     <string name="dictate__languages_title">Lingue di trascrizione</string>
     <string name="dictate__languages_summary">Scegli le lingue in cui detti. Passa rapidamente dall\'una all\'altra dalla barra di registrazione.</string>
     <string name="dictate__language_detect">Rileva automaticamente</string>
+    <string name="dictate__languages_selected_title">Lingue selezionate</string>
     <string name="dictate__languages_active_title">Lingua attiva</string>
     <string name="dictate__languages_follow_keyboard">Segui la lingua della tastiera</string>
-    <string name="dictate__languages_follow_keyboard_summary">Cambia anche la dettatura, se la lingua è spuntata qui sotto</string>
+    <string name="dictate__languages_follow_keyboard_summary">Cambia anche la dettatura, se la lingua è selezionata</string>
     <string name="quick_action__dictate_switch_provider">Fornitore di trascrizione</string>
     <string name="quick_action__dictate_switch_provider__tooltip">Cambia il fornitore di trascrizione</string>
     <string name="enum__space_bar_mode__transcription_provider">Fornitore di trascrizione</string>

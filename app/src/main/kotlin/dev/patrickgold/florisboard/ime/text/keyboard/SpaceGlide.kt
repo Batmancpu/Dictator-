@@ -16,6 +16,8 @@
 
 package dev.patrickgold.florisboard.ime.text.keyboard
 
+import kotlin.math.abs
+
 /**
  * How far the finger has to travel up or down the space bar before the cursor changes line (issue #364).
  *
@@ -29,6 +31,13 @@ package dev.patrickgold.florisboard.ime.text.keyboard
  * So the vertical step is pinned to a real distance instead and converted into whatever units are
  * currently in force. Turning the threshold down buys a finer character step and leaves the line step
  * where it is, which is what someone asking for either of them actually means.
+ *
+ * A thumb does not travel in straight lines, though (issue #428). Scrubbing sideways it swings on its
+ * joint, and the arc carries it up or down the space bar as it goes — far enough, at 24 dp, that a glide
+ * meant to move three characters jumped a line instead, which in a one-line message means the start or
+ * the end of the text. Two rules keep that drift from counting, both below: a glide that set out sideways
+ * has to be pushed a whole key row before its first line, and a line once taken is only given back when
+ * the finger returns clearly past it.
  */
 object SpaceGlide {
     /**
@@ -37,6 +46,39 @@ object SpaceGlide {
      * hunted back from. Untested by feel on anything but a phone in portrait; it is one number to turn.
      */
     const val LINE_TRAVEL_DP = 24.0
+
+    /**
+     * Finger travel for the first line of a glide that set out sideways, in dp (issue #428) — about a key
+     * row, so the finger has to leave the space bar's row for good rather than wander to its edge.
+     *
+     * Only the first line costs this much. Once the finger has gone that far on purpose it is navigating
+     * by line, and every line after it is [LINE_TRAVEL_DP] again. A glide that sets out vertically never
+     * pays it at all, so the diagonal of issue #364 — three lines up and a few words in — still starts
+     * the way it always did.
+     *
+     * Downwards is the tight direction: about 77 dp lie between the middle of the space bar and the bottom
+     * of the screen, so this leaves room for a first line and a second one, not for a larger number.
+     */
+    const val SIDEWAYS_FIRST_LINE_TRAVEL_DP = 48.0
+
+    /**
+     * How far back past a line's boundary the finger has to come before the cursor returns to the line
+     * it came from, in dp (issue #428).
+     *
+     * Without it a finger resting just past a boundary — which is where it is right after taking a line,
+     * and where it stays while it scrubs along that line — sends the cursor back and forth with every
+     * tremor. Going further out is never delayed; only the way back is.
+     */
+    const val RETURN_SLACK_DP = 12.0
+
+    /** The axis that moved the cursor first in a glide: the one the thumb set out on (issue #428). */
+    enum class Axis { SIDEWAYS, VERTICAL }
+
+    /**
+     * The vertical geometry of one glide in the detector's units: [perLine] for each line, [firstLine]
+     * for the first one, and the [returnSlack] a line has to be cleared by on the way back.
+     */
+    data class LineSteps(val perLine: Int, val firstLine: Int, val returnSlack: Int)
 
     /**
      * The detector's units that make up one line, given the user's [swipeDistanceThresholdDp]. Its unit
@@ -55,17 +97,64 @@ object SpaceGlide {
     }
 
     /**
+     * The [LineSteps] of a glide under the user's [swipeDistanceThresholdDp], depending on whether it
+     * [beganSideways] (issue #428). Rounded like [unitsPerLine], and for the same reason.
+     *
+     * The slack stays below a line. That is what makes the way back land where the glide set out: at
+     * least one unit short of the first boundary, the start itself always reads as the starting line.
+     * Where a line is a single unit — thresholds of 65 dp and up — there is no slack left at all, and
+     * none is needed, since one unit is already 16 dp or more of travel.
+     */
+    fun lineSteps(swipeDistanceThresholdDp: Int, beganSideways: Boolean): LineSteps {
+        val perLine = unitsPerLine(swipeDistanceThresholdDp)
+        val unitDp = swipeDistanceThresholdDp / 4.0
+        if (unitDp <= 0.0) return LineSteps(perLine = perLine, firstLine = perLine, returnSlack = 0)
+        val firstLine = if (beganSideways) {
+            Math.round(SIDEWAYS_FIRST_LINE_TRAVEL_DP / unitDp).toInt().coerceAtLeast(perLine)
+        } else {
+            perLine
+        }
+        val returnSlack = Math.round(RETURN_SLACK_DP / unitDp).toInt().coerceIn(0, perLine - 1)
+        return LineSteps(perLine = perLine, firstLine = firstLine, returnSlack = returnSlack)
+    }
+
+    /**
      * Which line the finger stands on, counted from where the glide began. Negative is upwards, matching
-     * the screen's y axis.
+     * the screen's y axis. The first line is [unitsForFirstLine] away, every further one [unitsPerLine].
      *
      * Deliberately computed from the travel so far rather than accumulated from each report: a glide that
      * turns around has to retrace exactly, and a sum of rounded steps does not. It also means the first
      * report cannot move anything, which is the same half-unit of grace the horizontal half gets from its
      * `- 1` on the opening move.
      */
-    fun lineAt(absUnitCountY: Int, unitsPerLine: Int): Int {
+    fun lineAt(absUnitCountY: Int, unitsPerLine: Int, unitsForFirstLine: Int = unitsPerLine): Int {
         if (unitsPerLine <= 0) return 0
-        return absUnitCountY / unitsPerLine
+        val travel = abs(absUnitCountY)
+        if (travel < unitsForFirstLine) return 0
+        val lines = 1 + (travel - unitsForFirstLine) / unitsPerLine
+        return if (absUnitCountY < 0) -lines else lines
+    }
+
+    /**
+     * The line the cursor should stand on now that the finger is at [absUnitCountY], given that it
+     * stands on [current] (issue #428).
+     *
+     * Further out than [current] is taken at once — the finger plainly went there. Back towards the start
+     * is taken only once the travel has cleared the boundary behind the cursor by [LineSteps.returnSlack],
+     * which is what keeps a finger scrubbing along a boundary from flicking the cursor between two lines.
+     * Still read off the total travel, so a glide that comes all the way back is on its starting line
+     * again, exactly.
+     */
+    fun nextLine(current: Int, absUnitCountY: Int, steps: LineSteps): Int {
+        val target = lineAt(absUnitCountY, steps.perLine, steps.firstLine)
+        val goesOut = when {
+            current > 0 -> target > current
+            current < 0 -> target < current
+            else -> true
+        }
+        if (target == current || goesOut) return target
+        val held = if (current > 0) absUnitCountY + steps.returnSlack else absUnitCountY - steps.returnSlack
+        return lineAt(held, steps.perLine, steps.firstLine)
     }
 
     /**

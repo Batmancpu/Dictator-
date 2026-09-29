@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.ime.input.LocalInputFeedbackController
@@ -127,9 +128,11 @@ fun GifSearchPanel(
                                     )
                                     .padding(horizontal = 12.dp, vertical = 6.dp),
                             )
+                            // Not focusable: a focusable menu raised by the keyboard hides the keyboard (#284).
                             DropdownMenu(
                                 expanded = confirmDeleteTerm == term,
                                 onDismissRequest = { confirmDeleteTerm = null },
+                                properties = PopupProperties(focusable = false),
                             ) {
                                 DropdownMenuItem(
                                     text = { Text(stringRes(R.string.action__delete)) },

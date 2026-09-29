@@ -382,6 +382,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">استخدام الأحرف الكبيرة في الكلمات على حسب سياق نص الإدخال الحالي</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">مسافة تلقائية بعد علامات الترقيم</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">وضع بشكل تلقائي مسافة بعد علامات الترقيم</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">إزالة المسافة قبل علامات الترقيم</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">حذف المسافة المكتوبة قبل . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">تذكر حالة زر الأحرف الكبيرة</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">يضل وضع الأحرف الكبيرة قيد التشغيل عند الإنتقال إلى حقل نصي آخر</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">نقر مزدوج على مفتاح المسافة</string>
@@ -1378,9 +1380,10 @@
     <string name="dictate__languages_title">لغات التفريغ النصي</string>
     <string name="dictate__languages_summary">اختر اللغات التي تُملي بها. بدّل بينها بسرعة من شريط التسجيل.</string>
     <string name="dictate__language_detect">الكشف تلقائيًا</string>
+    <string name="dictate__languages_selected_title">اللغات المحدّدة</string>
     <string name="dictate__languages_active_title">اللغة النشطة</string>
     <string name="dictate__languages_follow_keyboard">اتّباع لغة لوحة المفاتيح</string>
-    <string name="dictate__languages_follow_keyboard_summary">يبدّل لغة الإملاء أيضًا إذا كانت اللغة محدّدة أدناه</string>
+    <string name="dictate__languages_follow_keyboard_summary">يبدّل لغة الإملاء أيضًا إذا كانت اللغة محدّدة</string>
     <string name="quick_action__dictate_switch_provider">مزوّد التفريغ النصي</string>
     <string name="quick_action__dictate_switch_provider__tooltip">تبديل مزوّد التفريغ النصي</string>
     <string name="enum__space_bar_mode__transcription_provider">مزوّد التفريغ النصي</string>

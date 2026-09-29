@@ -452,6 +452,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Pārveidot vārdu sākumburtus par lielajiem, balstoties uz pašreizējo ievades kopumu</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Automātiska atstarpe pēc pieturzīmes</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Automātiski ievietot atstarpi pēc pieturzīmes</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Bez atstarpes pirms pieturzīmes</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Noņemt atstarpi, kas ierakstīta pirms . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Atcerēties burtslēga stāvokli</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">Burtslēgs paliks ieslēgts pēc pārvietošanās uz citu ievades lauku</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Dubultpieskāriens atstarpes taustiņam</string>
@@ -1465,9 +1467,10 @@
     <string name="dictate__languages_title">Transkribēšanas valodas</string>
     <string name="dictate__languages_summary">Izvēlieties valodas, kurās diktējat. Ātri pārslēdzieties starp tām no ierakstīšanas joslas.</string>
     <string name="dictate__language_detect">Noteikt automātiski</string>
+    <string name="dictate__languages_selected_title">Atlasītās valodas</string>
     <string name="dictate__languages_active_title">Aktīvā valoda</string>
     <string name="dictate__languages_follow_keyboard">Sekot tastatūras valodai</string>
-    <string name="dictate__languages_follow_keyboard_summary">Maina arī diktēšanas valodu, ja tā ir atzīmēta zemāk</string>
+    <string name="dictate__languages_follow_keyboard_summary">Maina arī diktēšanas valodu, ja tā ir atlasīta</string>
     <string name="quick_action__dictate_switch_provider">Transkribēšanas pakalpojuma sniedzējs</string>
     <string name="quick_action__dictate_switch_provider__tooltip">Mainīt transkribēšanas pakalpojuma sniedzēju</string>
     <string name="enum__space_bar_mode__transcription_provider">Transkribēšanas pakalpojuma sniedzējs</string>

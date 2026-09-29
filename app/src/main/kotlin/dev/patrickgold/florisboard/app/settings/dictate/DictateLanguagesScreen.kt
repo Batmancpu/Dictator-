@@ -13,15 +13,12 @@ package dev.patrickgold.florisboard.app.settings.dictate
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -50,20 +47,18 @@ import dev.patrickgold.jetpref.datastore.model.collectAsState
 import dev.patrickgold.jetpref.material.ui.JetPrefAlertDialog
 import dev.patrickgold.jetpref.material.ui.JetPrefListItem
 import kotlinx.coroutines.launch
-import org.florisboard.lib.compose.florisScrollbar
 import org.florisboard.lib.compose.florisDialogScroll
 import org.florisboard.lib.compose.stringRes
 
 /**
- * Lets the user pick which dictation languages appear in the recording bar's quick cycle. Selection
- * is stored comma-separated in [prefs.dictate.inputLanguages]; catalog order is preserved and at
- * least one language always stays selected.
+ * Which languages the user dictates in, which of them is active, and whether switching the keyboard's
+ * language picks among them. The selection is stored comma-separated in [prefs.dictate.inputLanguages];
+ * catalog order is preserved and at least one language always stays selected.
  */
 @Composable
 fun DictateLanguagesScreen() = FlorisScreen {
     title = stringRes(R.string.dictate__languages_title)
     previewFieldVisible = true
-    scrollable = false
 
     val prefs by FlorisPreferenceStore
 
@@ -71,21 +66,19 @@ fun DictateLanguagesScreen() = FlorisScreen {
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
         val selectionRaw by prefs.dictate.inputLanguages.collectAsState()
-        val selectedCodes = remember(selectionRaw) {
-            DictateLanguages.parseSelection(selectionRaw).map { it.code }.toSet()
-        }
+        val selection = remember(selectionRaw) { DictateLanguages.parseSelection(selectionRaw) }
+        val selectedCodes = remember(selection) { selection.map { it.code }.toSet() }
         // The currently active language (what the recording bar's globe cycles and what is sent to the
         // model). Selectable here too, so floating-button-only users can change it without the keyboard
         // (issue #174 follow-up).
         val activeCode by prefs.dictate.activeInputLanguage.collectAsState()
         val enabledLanguages = remember(selectedCodes) { DictateLanguages.all.filter { it.code in selectedCodes } }
+        var showLanguagesPicker by remember { mutableStateOf(false) }
         var showActivePicker by remember { mutableStateOf(false) }
-        val state = rememberLazyListState()
 
-        fun toggle(code: String, checked: Boolean) {
-            val next = if (checked) selectedCodes + code else selectedCodes - code
+        fun saveSelection(codes: Set<String>) {
             // Preserve catalog order and never allow an empty selection.
-            val ordered = DictateLanguages.all.filter { it.code in next }
+            val ordered = DictateLanguages.all.filter { it.code in codes }
                 .ifEmpty { listOf(DictateLanguages.of(DictateLanguages.DETECT)) }
             scope.launch {
                 prefs.dictate.inputLanguages.set(DictateLanguages.serializeSelection(ordered))
@@ -112,62 +105,82 @@ fun DictateLanguagesScreen() = FlorisScreen {
         fun languageLabel(code: String): String =
             if (code == DictateLanguages.DETECT) detectLabel else DictateLanguages.of(code).displayName()
 
-        Column(modifier = Modifier.fillMaxSize()) {
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                text = stringRes(R.string.dictate__languages_summary),
-                color = LocalContentColor.current.copy(alpha = 0.7f),
-            )
-            // Directly pick the active language (mirrors the recording-bar globe).
-            JetPrefListItem(
-                modifier = Modifier.clickable { showActivePicker = true },
-                icon = { Icon(Icons.Default.Language, contentDescription = null) },
-                text = stringRes(R.string.dictate__languages_active_title),
-                secondaryText = languageLabel(activeCode),
-            )
-            // Issue #431. Turning it on follows the keyboard's current language straight away, so the effect
-            // is visible where the switch is; after that only a switch of the keyboard's language moves it.
-            JetPrefListItem(
-                modifier = Modifier
-                    .settingsSearchAnchor("dictate__languages_follow_keyboard")
-                    .clickable { setFollowsKeyboard(!followsKeyboard) },
-                icon = { Icon(Icons.Default.Keyboard, contentDescription = null) },
-                text = stringRes(R.string.dictate__languages_follow_keyboard),
-                secondaryText = stringRes(R.string.dictate__languages_follow_keyboard_summary),
-                trailing = {
-                    Switch(checked = followsKeyboard, onCheckedChange = { setFollowsKeyboard(it) })
+        Text(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            text = stringRes(R.string.dictate__languages_summary),
+            color = LocalContentColor.current.copy(alpha = 0.7f),
+        )
+        // Issue #431 follow-up. The selection used to be the screen itself, a checkbox on each of a hundred
+        // rows, so a language ticked by accident on the way past went unseen, while it joined the recording
+        // bar's cycle, the set auto-detect hands the provider (#99) and the languages the keyboard switch
+        // below may pick. Now the names are one line, and the list sits behind it in a dialog whose Cancel
+        // takes a stray tick back.
+        JetPrefListItem(
+            modifier = Modifier.clickable { showLanguagesPicker = true },
+            icon = { Icon(Icons.Default.Translate, contentDescription = null) },
+            text = stringRes(R.string.dictate__languages_selected_title),
+            secondaryText = selection.joinToString(", ") { languageLabel(it.code) },
+        )
+        // Directly pick the active language (mirrors the recording-bar globe).
+        JetPrefListItem(
+            modifier = Modifier.clickable { showActivePicker = true },
+            icon = { Icon(Icons.Default.Language, contentDescription = null) },
+            text = stringRes(R.string.dictate__languages_active_title),
+            secondaryText = languageLabel(activeCode),
+        )
+        // Issue #431. Turning it on follows the keyboard's current language straight away, so the effect
+        // is visible where the switch is; after that only a switch of the keyboard's language moves it.
+        JetPrefListItem(
+            modifier = Modifier
+                .settingsSearchAnchor("dictate__languages_follow_keyboard")
+                .clickable { setFollowsKeyboard(!followsKeyboard) },
+            icon = { Icon(Icons.Default.Keyboard, contentDescription = null) },
+            text = stringRes(R.string.dictate__languages_follow_keyboard),
+            secondaryText = stringRes(R.string.dictate__languages_follow_keyboard_summary),
+            trailing = {
+                Switch(checked = followsKeyboard, onCheckedChange = { setFollowsKeyboard(it) })
+            },
+        )
+
+        if (showLanguagesPicker) {
+            // Fixed for as long as the dialog is open: auto-detect and the user's own languages on top, so
+            // what is on can be seen and taken off without scrolling, then everything else. A row never
+            // moves under the finger that ticked it; the next opening puts it in its new group.
+            val (mine, rest) = remember {
+                DictateLanguages.sortedForDisplay(DictateLanguages.all)
+                    .map { it.code to languageLabel(it.code) }
+                    .partition { (code, _) -> code == DictateLanguages.DETECT || code in selectedCodes }
+            }
+            var draft by remember { mutableStateOf(selectedCodes) }
+            JetPrefAlertDialog(
+                scrollModifier = florisDialogScroll(),
+                title = stringRes(R.string.dictate__languages_selected_title),
+                confirmLabel = stringRes(R.string.action__ok),
+                onConfirm = {
+                    saveSelection(draft)
+                    showLanguagesPicker = false
                 },
-            )
-            HorizontalDivider()
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .florisScrollbar(state, isVertical = true),
-                state = state,
+                dismissLabel = stringRes(R.string.action__cancel),
+                onDismiss = { showLanguagesPicker = false },
             ) {
-                items(DictateLanguages.all) { lang ->
-                    val checked = lang.code in selectedCodes
-                    val label = if (lang.code == DictateLanguages.DETECT) {
-                        stringRes(R.string.dictate__language_detect)
-                    } else {
-                        lang.displayName()
+                Column {
+                    (mine + rest).forEachIndexed { index, (code, label) ->
+                        if (index == mine.size) HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                        LanguageCheckRow(label = label, checked = code in draft) { checked ->
+                            draft = if (checked) draft + code else draft - code
+                        }
                     }
-                    JetPrefListItem(
-                        modifier = Modifier.clickable { toggle(lang.code, !checked) },
-                        text = label,
-                        secondaryText = if (lang.code == DictateLanguages.DETECT) null else lang.shortCode,
-                        trailing = {
-                            Checkbox(
-                                checked = checked,
-                                onCheckedChange = { toggle(lang.code, it) },
-                            )
-                        },
-                    )
                 }
             }
         }
 
         if (showActivePicker) {
+            fun pick(code: String) {
+                scope.launch { prefs.dictate.activeInputLanguage.set(code) }
+                showActivePicker = false
+            }
+            // Rows spaced like the active-provider pickers: the radio button's own touch target is the
+            // row's height, with no padding on top of it.
             JetPrefAlertDialog(
                 scrollModifier = florisDialogScroll(),
                 title = stringRes(R.string.dictate__languages_active_title),
@@ -179,25 +192,32 @@ fun DictateLanguagesScreen() = FlorisScreen {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
-                                    scope.launch { prefs.dictate.activeInputLanguage.set(lang.code) }
-                                    showActivePicker = false
-                                }
-                                .padding(vertical = 10.dp),
+                                .clickable { pick(lang.code) },
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            RadioButton(
-                                selected = lang.code == activeCode,
-                                onClick = {
-                                    scope.launch { prefs.dictate.activeInputLanguage.set(lang.code) }
-                                    showActivePicker = false
-                                },
-                            )
+                            RadioButton(selected = lang.code == activeCode, onClick = { pick(lang.code) })
                             Text(text = languageLabel(lang.code), modifier = Modifier.padding(start = 8.dp))
                         }
                     }
                 }
             }
         }
+    }
+}
+
+/**
+ * One language in the selection dialog, spaced like the rows of the active-provider pickers. The whole row
+ * toggles it: a bare checkbox is a small target in a list this long.
+ */
+@Composable
+private fun LanguageCheckRow(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onCheckedChange(!checked) },
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+        Text(text = label, modifier = Modifier.padding(start = 8.dp))
     }
 }

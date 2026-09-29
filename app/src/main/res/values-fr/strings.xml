@@ -428,6 +428,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Capitaliser les mots en fonction du contexte de saisie actuel</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Espace automatique après ponctuation</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Insère automatiquement un espace après la ponctuation</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Resserrer la ponctuation</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Supprime l\'espace tapé avant un point ou une virgule</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Se souvenir de l\'état de verrouillage des majuscules</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">Le verrouillage des majuscules reste activé lorsque l\'on passe à un autre champ de texte</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Double appui sur la barre d’espace</string>
@@ -1398,9 +1400,10 @@
     <string name="dictate__languages_title">Langues de transcription</string>
     <string name="dictate__languages_summary">Choisissez les langues dans lesquelles vous dictez. Basculez rapidement entre elles depuis la barre d\'enregistrement.</string>
     <string name="dictate__language_detect">Détecter automatiquement</string>
+    <string name="dictate__languages_selected_title">Langues sélectionnées</string>
     <string name="dictate__languages_active_title">Langue active</string>
     <string name="dictate__languages_follow_keyboard">Suivre la langue du clavier</string>
-    <string name="dictate__languages_follow_keyboard_summary">Change aussi la dictée si la langue est cochée ci-dessous</string>
+    <string name="dictate__languages_follow_keyboard_summary">Change aussi la dictée si la langue est sélectionnée</string>
     <string name="quick_action__dictate_switch_provider">Fournisseur de transcription</string>
     <string name="quick_action__dictate_switch_provider__tooltip">Changer de fournisseur de transcription</string>
     <string name="enum__space_bar_mode__transcription_provider">Fournisseur de transcription</string>

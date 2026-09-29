@@ -422,6 +422,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Woorden kapitaliseren op basis van de huidige invoercontext</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Automatische spatie na interpunctie</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Automatisch een spatie invoegen na leestekens</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Geen spatie vóór interpunctie</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Een getypte spatie vóór . , ? ! verwijderen</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Onthoud CapsLock status</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">CapsLock blijft aan bij het verplaatsen naar een ander tekstveld</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Dubbele tik op de spatiebalk</string>
@@ -1420,9 +1422,10 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__languages_title">Transcriptietalen</string>
     <string name="dictate__languages_summary">Kies de talen waarin je dicteert. Wissel er snel tussen via de opnamebalk.</string>
     <string name="dictate__language_detect">Automatisch detecteren</string>
+    <string name="dictate__languages_selected_title">Geselecteerde talen</string>
     <string name="dictate__languages_active_title">Actieve taal</string>
     <string name="dictate__languages_follow_keyboard">Toetsenbordtaal volgen</string>
-    <string name="dictate__languages_follow_keyboard_summary">Wisselt ook het dicteren, als de taal hieronder is aangevinkt</string>
+    <string name="dictate__languages_follow_keyboard_summary">Wisselt ook het dicteren, als de taal is geselecteerd</string>
     <string name="quick_action__dictate_switch_provider">Transcriptieaanbieder</string>
     <string name="quick_action__dictate_switch_provider__tooltip">Wissel van transcriptieaanbieder</string>
     <string name="enum__space_bar_mode__transcription_provider">Transcriptieaanbieder</string>

@@ -116,6 +116,30 @@ internal fun shouldTightenSpaceBefore(
 }
 
 /**
+ * The marks that may swallow the space in front of them just now: the rule's whole
+ * [dev.patrickgold.florisboard.ime.nlp.PunctuationRule.symbolsTighteningSpace] when the user switched
+ * tightening on (issue #329), and without the switch only straight after a silent auto-correction
+ * (issue #428), where the backspace that would otherwise fix a stray space takes the correction back.
+ *
+ * That second case gets a narrower set, because nobody asked for it: only the marks that close a clause,
+ * which sit tight against the word *and* take a space after them — the rule's own
+ * [symbolsPrecedingAutoSpace]. That keeps `.`, `,`, `?` and `!` and leaves out `:` and `;`, which also
+ * open `:)` and `;)`; an emoticon glued to the word it follows is the removal nobody could have seen
+ * coming. Both lists come from the language, so French, whose rule tightens only `.` and `,`, keeps its
+ * space before `?`.
+ */
+internal fun spaceTighteningSymbols(
+    symbolsTighteningSpace: String,
+    symbolsPrecedingAutoSpace: String,
+    switchedOn: Boolean,
+    spaceConfirmedCorrection: Boolean,
+): String = when {
+    switchedOn -> symbolsTighteningSpace
+    spaceConfirmedCorrection -> symbolsTighteningSpace.filter { it in symbolsPrecedingAutoSpace }
+    else -> ""
+}
+
+/**
  * Whether the phantom space that follows an accepted candidate should be written into the editor at
  * once instead of being remembered and inserted in front of the next word (issue #393).
  *
@@ -313,7 +337,11 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
             punctuationRule.symbolsFollowingAutoSpace.contains(text.first())
     }
 
-    private fun shouldInsertAutoSpaceAfter(text: String): Boolean {
+    /**
+     * @param spaceGoes whether the space in front of the cursor is about to be swallowed by [text] —
+     *  see [shouldTightenSpaceBeforePunctuation].
+     */
+    private fun shouldInsertAutoSpaceAfter(text: String, spaceGoes: Boolean): Boolean {
         if (!prefs.correction.autoSpacePunctuation.get() || text.isEmpty()) return false
         if (activeInfo.isRawInputEditor) return false
         if (activeState.keyVariation != KeyVariation.NORMAL) return false
@@ -325,8 +353,12 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
         // auto-space or the space written ahead of the next word (issue #393). Without this, `hello` off
         // the strip followed by a full stop lost the auto-space *after* the stop, because the materialized
         // space in front of it made the text read as already finished.
+        //
+        // The same goes for a space the mark is about to swallow (issue #428): the mark lands tight
+        // against the word either way, so it has to be followed by the same space as if it had been
+        // typed there directly — `the?` then reads `the? `, not a bare `the?`.
         val textBefore = content.getTextBeforeCursor(3).let { textBefore ->
-            if ((autoSpace.isActive || phantomSpace.isMaterialized) &&
+            if ((autoSpace.isActive || phantomSpace.isMaterialized || spaceGoes) &&
                 textBefore.isNotEmpty() && textBefore.last() == ' '
             ) {
                 textBefore.dropLast(1)
@@ -345,39 +377,59 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
      * The mechanism is not new — [AbstractEditorInstance.commitChar] has always been able to drop the
      * preceding space, over the composing region and without a delete, so nothing flickers. All that
      * was missing is a reason to ask for it that isn't "we put that space there ourselves".
+     *
+     * [spaceConfirmedCorrection] is the one case that does not wait for the switch (issue #428): the
+     * space the user confirmed a silent auto-correction with. Everywhere else a stray space before a mark
+     * costs one backspace to fix, but right after a correction that backspace is spoken for — it takes
+     * the correction back (issue #295), and teaches the keyboard the typo as a word while it is at it.
+     * Leaving `the ?` standing there would leave the user no cheap way out at all.
      */
-    private fun shouldTightenSpaceBeforePunctuation(text: String): Boolean {
-        if (!prefs.correction.tightenPunctuationSpacing.get() || text.isEmpty()) return false
+    private fun shouldTightenSpaceBeforePunctuation(text: String, spaceConfirmedCorrection: Boolean): Boolean {
+        val switchedOn = prefs.correction.tightenPunctuationSpacing.get()
+        if ((!switchedOn && !spaceConfirmedCorrection) || text.isEmpty()) return false
         if (activeInfo.isRawInputEditor) return false
         if (activeState.keyVariation != KeyVariation.NORMAL) return false
+        val punctuationRule = nlpManager.getActivePunctuationRule()
         return shouldTightenSpaceBefore(
             char = text,
             // Two characters is all the rule needs: the space itself and whatever stands in front of it.
             textBefore = activeContent.getTextBeforeCursor(2),
-            tighteningSymbols = nlpManager.getActivePunctuationRule().symbolsTighteningSpace,
+            tighteningSymbols = spaceTighteningSymbols(
+                symbolsTighteningSpace = punctuationRule.symbolsTighteningSpace,
+                symbolsPrecedingAutoSpace = punctuationRule.symbolsPrecedingAutoSpace,
+                switchedOn = switchedOn,
+                spaceConfirmedCorrection = spaceConfirmedCorrection,
+            ),
         )
     }
 
-    override fun commitChar(char: String): Boolean {
+    override fun commitChar(char: String): Boolean = commitChar(char, spaceConfirmedCorrection = false)
+
+    /**
+     * [commitChar], told whether the space in front of the cursor is the one a silent auto-correction
+     * was confirmed with (issue #428) — only the keyboard manager knows, since only it saw the correction.
+     */
+    fun commitChar(char: String, spaceConfirmedCorrection: Boolean): Boolean {
         val isInsertAutoSpaceBeforeChar = shouldInsertAutoSpaceBefore(char)
-        val isInsertAutoSpaceAfterChar = shouldInsertAutoSpaceAfter(char)
+        val isPhantomSpaceActive = phantomSpace.determine(char)
+        // Loses to anything that wants a space in that exact spot, so the two never fight over one
+        // position — removing a space and inserting one in the same commit is a no-op with extra steps.
+        // Decided before the auto-space after the mark, which has to know whether this space goes.
+        val isTightenSpace = !isPhantomSpaceActive && !isInsertAutoSpaceBeforeChar &&
+            shouldTightenSpaceBeforePunctuation(char, spaceConfirmedCorrection)
+        val isInsertAutoSpaceAfterChar = shouldInsertAutoSpaceAfter(char, spaceGoes = isTightenSpace)
         val isDeletePreviousSpace = isInsertAutoSpaceAfterChar && autoSpace.isActive
         if (isInsertAutoSpaceAfterChar) {
             autoSpace.setActive()
         } else {
             autoSpace.setInactive()
         }
-        val isPhantomSpaceActive = phantomSpace.determine(char)
         // The space written ahead of this character (issue #393) is taken back for whatever the phantom
         // space would never have been inserted for — a comma, a bracket, a full stop. Read before the
         // state is cleared, applied through the same `deletePreviousSpace` that the auto-space and the
         // tightening rule use, so nothing flickers and no two of them can delete twice.
         val isDropMaterializedSpace = phantomSpace.shouldDropMaterialized(char)
         phantomSpace.setInactive()
-        // Loses to anything that wants a space in that exact spot, so the two never fight over one
-        // position — removing a space and inserting one in the same commit is a no-op with extra steps.
-        val isTightenSpace = !isPhantomSpaceActive && !isInsertAutoSpaceBeforeChar &&
-            shouldTightenSpaceBeforePunctuation(char)
         return super.commitChar(
             char = char,
             deletePreviousSpace = isDeletePreviousSpace || isTightenSpace || isDropMaterializedSpace,

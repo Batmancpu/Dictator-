@@ -382,6 +382,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Використовувати великі літери на основі поточного контексту введення</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Автоматичний пробіл після пунктуації</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Автоматично додавати пробіл після знаків пунктуації</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Без пробілу перед пунктуацією</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Прибирати пробіл, введений перед . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Запам\'ятовувати стан Caps Lock</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">Caps Lock буде залишатись при переході на інше текстове поле</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Подвійне натискання пробілу</string>
@@ -1365,9 +1367,10 @@
     <string name="dictate__languages_title">Мови транскрибування</string>
     <string name="dictate__languages_summary">Виберіть мови, якими ви диктуєте. Швидко перемикайтеся між ними на панелі запису.</string>
     <string name="dictate__language_detect">Визначати автоматично</string>
+    <string name="dictate__languages_selected_title">Вибрані мови</string>
     <string name="dictate__languages_active_title">Активна мова</string>
     <string name="dictate__languages_follow_keyboard">Слідувати мові клавіатури</string>
-    <string name="dictate__languages_follow_keyboard_summary">Змінює й мову диктування, якщо її позначено нижче</string>
+    <string name="dictate__languages_follow_keyboard_summary">Змінює й мову диктування, якщо її вибрано</string>
     <string name="quick_action__dictate_switch_provider">Постачальник транскрибування</string>
     <string name="quick_action__dictate_switch_provider__tooltip">Змінити постачальника транскрибування</string>
     <string name="enum__space_bar_mode__transcription_provider">Постачальник транскрибування</string>

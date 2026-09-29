@@ -478,7 +478,14 @@ private fun LanguageChip() {
                 SnyggText(text = active.shortCode)
             }
         }
-        DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+        // Not focusable: a focusable menu takes the focus off the field, and the system answers by hiding
+        // the keyboard, menu and all (#284, see ErrorDetailPopup). Its window watches outside touches
+        // either way, so a tap beside the menu still closes it.
+        DropdownMenu(
+            expanded = menuOpen,
+            onDismissRequest = { menuOpen = false },
+            properties = PopupProperties(focusable = false),
+        ) {
             selection.forEach { lang ->
                 DropdownMenuItem(
                     text = {

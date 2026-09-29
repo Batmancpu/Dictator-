@@ -499,6 +499,8 @@
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">A szavak nagybetűvel kezdése a bemeneti környezet alapján</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Automatikus szóköz írásjel után</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Szóköz automatikus beillesztése írásjel után</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Szóköz törlése írásjel előtt</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">A . , ? ! elé gépelt szóköz eltávolítása</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Caps lock állapot megjegyzése</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">Caps lock marad, ha egy másik szövegmezőbe ugrik</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Dupla érintés a szóközre</string>
@@ -1519,9 +1521,10 @@
     <string name="dictate__languages_title">Átírási nyelvek</string>
     <string name="dictate__languages_summary">Válassza ki a nyelveket, amelyeken diktál. Gyorsan válthat közöttük a felvételi sávból.</string>
     <string name="dictate__language_detect">Automatikus felismerés</string>
+    <string name="dictate__languages_selected_title">Kiválasztott nyelvek</string>
     <string name="dictate__languages_active_title">Aktív nyelv</string>
     <string name="dictate__languages_follow_keyboard">A billentyűzet nyelvének követése</string>
-    <string name="dictate__languages_follow_keyboard_summary">A diktálás is vált, ha a nyelv lent be van jelölve</string>
+    <string name="dictate__languages_follow_keyboard_summary">A diktálás is vált, ha a nyelv ki van választva</string>
     <string name="quick_action__dictate_switch_provider">Átírási szolgáltató</string>
     <string name="quick_action__dictate_switch_provider__tooltip">Átírási szolgáltató váltása</string>
     <string name="enum__space_bar_mode__transcription_provider">Átírási szolgáltató</string>

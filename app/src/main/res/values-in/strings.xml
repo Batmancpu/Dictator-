@@ -486,6 +486,8 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="pref__correction__auto_capitalization__summary" comment="Preference summary">Kapitalisasi kata berdasarkan konteks input saat ini</string>
     <string name="pref__correction__auto_space_punctuation__label" comment="Preference title">Spasi otomatis setelah tanda baca</string>
     <string name="pref__correction__auto_space_punctuation__summary" comment="Preference summary">Tambahkan spasi secara otomatis setelah tanda baca</string>
+    <string name="pref__correction__tighten_punctuation_spacing__label" comment="Preference title">Tanpa spasi sebelum tanda baca</string>
+    <string name="pref__correction__tighten_punctuation_spacing__summary" comment="Preference summary">Hapus spasi yang diketik sebelum . , ? !</string>
     <string name="pref__correction__remember_caps_lock_state__label" comment="Preference title">Ingat keadaan caps lock</string>
     <string name="pref__correction__remember_caps_lock_state__summary" comment="Preference summary">Kunci huruf kapital akan tetap aktif saat pindah ke bidang teks lain</string>
     <string name="pref__correction__double_space_period__label" comment="Preference title">Ketuk dua kali bilah spasi</string>
@@ -1475,9 +1477,10 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__languages_title">Bahasa transkripsi</string>
     <string name="dictate__languages_summary">Pilih bahasa yang Anda gunakan untuk mendikte. Beralih di antaranya dengan cepat dari bilah perekaman.</string>
     <string name="dictate__language_detect">Deteksi otomatis</string>
+    <string name="dictate__languages_selected_title">Bahasa yang dipilih</string>
     <string name="dictate__languages_active_title">Bahasa aktif</string>
     <string name="dictate__languages_follow_keyboard">Ikuti bahasa keyboard</string>
-    <string name="dictate__languages_follow_keyboard_summary">Juga mengganti bahasa dikte, jika dicentang di bawah</string>
+    <string name="dictate__languages_follow_keyboard_summary">Juga mengganti bahasa dikte, jika bahasanya dipilih</string>
     <string name="quick_action__dictate_switch_provider">Penyedia transkripsi</string>
     <string name="quick_action__dictate_switch_provider__tooltip">Ganti penyedia transkripsi</string>
     <string name="enum__space_bar_mode__transcription_provider">Penyedia transkripsi</string>
