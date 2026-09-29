@@ -747,6 +747,7 @@
     <string name="pref__clipboard__trim_on_copy__label" comment="Preference title, keep short">Vágás másoláskor</string>
     <string name="pref__clipboard__trim_on_copy__summary" comment="Preference summary, keep short (one line)">Eltávolítja a széleken lévő szóközöket és sortöréseket</string>
     <string name="pref__clipboard__suggestion_enabled__summary" comment="Preference summary">Javasolja a vágólap korábban másolt tartalmát</string>
+    <string name="pref__clipboard__suggestion_show_extracted__label" comment="Preference title (switch) in the group Clipboard suggestions, keep short (one line): whether the links, email addresses and phone numbers found inside a copied text are also offered as suggestions of their own, next to the whole text">Hivatkozások, e-mailek, számok</string>
     <string name="pref__clipboard__num_history_grid_columns__label">Rácsoszlopok száma</string>
     <string name="pref__clipboard__suggestion_timeout__label" comment="Preference title; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__summary` and is the first part">Korlátozza a vágólapjavaslatokat a következőkre:</string>
     <string name="pref__clipboard__suggestion_timeout__summary" comment="Preference summary; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__label` and is the second part">Az utolsó {v} másodpercben másolt elemek</string>

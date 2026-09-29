@@ -1328,6 +1328,7 @@
     <string name="pref__clipboard__trim_on_copy__summary" comment="Preference summary, keep short (one line)">Drops spaces and line breaks at both ends</string>
     <string name="pref__clipboard__suggestion_enabled__label" comment="Preference title">Clipboard content suggestions</string>
     <string name="pref__clipboard__suggestion_enabled__summary" comment="Preference summary">Suggest previously copied clipboard content</string>
+    <string name="pref__clipboard__suggestion_show_extracted__label" comment="Preference title (switch) in the group Clipboard suggestions, keep short (one line): whether the links, email addresses and phone numbers found inside a copied text are also offered as suggestions of their own, next to the whole text">Links, emails and numbers</string>
     <string name="pref__clipboard__num_history_grid_columns__label">Number of grid columns</string>
     <string name="pref__clipboard__history_pinned_on_top__label" comment="Preference title">Pinned items on top</string>
     <string name="pref__clipboard__suggestion_timeout__label" comment="Preference title; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__summary` and is the first part">Limit clipboard suggestions to</string>

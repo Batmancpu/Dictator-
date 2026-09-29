@@ -801,6 +801,7 @@ class NlpManager(context: Context) {
         // call before reaching it; now that the clip is offered as a fallback too, the work is memoised
         // per copy so it is paid once instead of per character.
         private var cachedForItem: ClipboardItem? = null
+        private var cachedWithExtracted = true
         private var cachedCandidates: List<SuggestionCandidate> = emptyList()
 
         override val providerId = "org.florisboard.nlp.providers.clipboard"
@@ -831,12 +832,14 @@ class NlpManager(context: Context) {
                 return emptyList()
             }
             // Identity, not equality: the primary clip is one instance per copy, and the same instance
-            // always yields the same chips.
-            if (cachedForItem === currentItem) return cachedCandidates
+            // always yields the same chips — as long as the extraction switch has not been flipped since,
+            // which a trip to the settings within the suggestion timeout can easily do.
+            val showExtracted = prefs.clipboard.suggestionShowExtracted.get()
+            if (cachedForItem === currentItem && cachedWithExtracted == showExtracted) return cachedCandidates
 
             val candidates = buildList {
                 add(ClipboardSuggestionCandidate(currentItem, sourceProvider = this@ClipboardSuggestionProvider, context = context))
-                if (currentItem.isSensitive) {
+                if (currentItem.isSensitive || !showExtracted) {
                     return@buildList
                 }
                 if (currentItem.type == ItemType.TEXT) {
@@ -869,6 +872,7 @@ class NlpManager(context: Context) {
                 }
             }
             cachedForItem = currentItem
+            cachedWithExtracted = showExtracted
             cachedCandidates = candidates
             return candidates
         }

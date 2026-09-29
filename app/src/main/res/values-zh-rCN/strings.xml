@@ -746,6 +746,7 @@
     <string name="pref__clipboard__trim_on_copy__label" comment="Preference title, keep short">复制时去除空白</string>
     <string name="pref__clipboard__trim_on_copy__summary" comment="Preference summary, keep short (one line)">删除首尾的空格和换行</string>
     <string name="pref__clipboard__suggestion_enabled__summary" comment="Preference summary">建议之前复制的内容</string>
+    <string name="pref__clipboard__suggestion_show_extracted__label" comment="Preference title (switch) in the group Clipboard suggestions, keep short (one line): whether the links, email addresses and phone numbers found inside a copied text are also offered as suggestions of their own, next to the whole text">链接、电子邮件和电话号码</string>
     <string name="pref__clipboard__num_history_grid_columns__label">网格列数</string>
     <string name="pref__clipboard__suggestion_timeout__label" comment="Preference title; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__summary` and is the first part">将剪贴板建议限制为</string>
     <string name="pref__clipboard__suggestion_timeout__summary" comment="Preference summary; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__label` and is the second part">在过去 {v} 秒内复制的项目</string>

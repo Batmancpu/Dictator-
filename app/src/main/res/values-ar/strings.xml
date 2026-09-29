@@ -620,6 +620,7 @@
     <string name="pref__clipboard__trim_on_copy__label" comment="Preference title, keep short">اقتصاص عند النسخ</string>
     <string name="pref__clipboard__trim_on_copy__summary" comment="Preference summary, keep short (one line)">إزالة المسافات وفواصل الأسطر من الطرفين</string>
     <string name="pref__clipboard__suggestion_enabled__summary" comment="Preference summary">اقتراح المحتويات المنسوخة في سجل الحافظة</string>
+    <string name="pref__clipboard__suggestion_show_extracted__label" comment="Preference title (switch) in the group Clipboard suggestions, keep short (one line): whether the links, email addresses and phone numbers found inside a copied text are also offered as suggestions of their own, next to the whole text">الروابط والبريد الإلكتروني والأرقام</string>
     <string name="pref__clipboard__suggestion_timeout__label" comment="Preference title; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__summary` and is the first part">تحديد حجم مخصص لاقتراحات الحافظة إلى</string>
     <string name="pref__clipboard__suggestion_timeout__summary" comment="Preference summary; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__label` and is the second part">العناصر التي تم نسخها خلال آخر {v}</string>
     <string name="pref__clipboard__group_clipboard_history__label">سجل الحافظة</string>

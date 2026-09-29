@@ -621,6 +621,7 @@
     <string name="pref__clipboard__trim_on_copy__label" comment="Preference title, keep short">Обрізати під час копіювання</string>
     <string name="pref__clipboard__trim_on_copy__summary" comment="Preference summary, keep short (one line)">Прибирає пробіли та переноси з країв</string>
     <string name="pref__clipboard__suggestion_enabled__summary" comment="Preference summary">Пропонувати раніше скопійований вміст буфера обміну</string>
+    <string name="pref__clipboard__suggestion_show_extracted__label" comment="Preference title (switch) in the group Clipboard suggestions, keep short (one line): whether the links, email addresses and phone numbers found inside a copied text are also offered as suggestions of their own, next to the whole text">Посилання, пошта й номери</string>
     <string name="pref__clipboard__suggestion_timeout__label" comment="Preference title; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__summary` and is the first part">Обмежити пропозиції буфера обміну до</string>
     <string name="pref__clipboard__suggestion_timeout__summary" comment="Preference summary; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__label` and is the second part">Елементи, скопійовані за останні {v} с</string>
     <string name="pref__clipboard__group_clipboard_history__label">Історія буфера обміну</string>

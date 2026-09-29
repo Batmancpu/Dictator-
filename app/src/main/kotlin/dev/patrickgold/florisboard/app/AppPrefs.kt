@@ -133,6 +133,13 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "clipboard__suggestion_timeout",
             default = 60,
         )
+        // The links, email addresses and phone numbers pulled out of a copied text as chips of their own,
+        // beside the clip itself (issue #429). On by default because that is how it always behaved; off
+        // leaves the clip as the only thing offered, which is also what Gboard's equivalent switch does.
+        val suggestionShowExtracted = boolean(
+            key = "clipboard__suggestion_show_extracted",
+            default = true,
+        )
         val historyEnabled = boolean(
             key = "clipboard__history_enabled",
             default = false,

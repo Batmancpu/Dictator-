@@ -744,6 +744,7 @@
     <string name="pref__clipboard__trim_on_copy__label" comment="Preference title, keep short">Изрязване при копиране</string>
     <string name="pref__clipboard__trim_on_copy__summary" comment="Preference summary, keep short (one line)">Премахва интервалите и новите редове в краищата</string>
     <string name="pref__clipboard__suggestion_enabled__summary" comment="Preference summary">Предлага вече копирано съдържание</string>
+    <string name="pref__clipboard__suggestion_show_extracted__label" comment="Preference title (switch) in the group Clipboard suggestions, keep short (one line): whether the links, email addresses and phone numbers found inside a copied text are also offered as suggestions of their own, next to the whole text">Връзки, имейли и номера</string>
     <string name="pref__clipboard__num_history_grid_columns__label">Брой колони на решетката</string>
     <string name="pref__clipboard__suggestion_timeout__label" comment="Preference title; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__summary` and is the first part">Ограничаване на предложенията до</string>
     <string name="pref__clipboard__suggestion_timeout__summary" comment="Preference summary; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__label` and is the second part">Елементи, копирани през последните {v} секунди</string>
