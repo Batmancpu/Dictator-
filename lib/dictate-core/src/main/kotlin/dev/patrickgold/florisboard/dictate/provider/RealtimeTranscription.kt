@@ -13,7 +13,7 @@ package dev.patrickgold.florisboard.dictate.provider
 /**
  * The on-the-wire realtime protocol of a provider (issue #128). Selects which [RealtimeSession]
  * implementation drives the WebSocket. Two families: raw-binary-PCM after a config handshake
- * ([SONIOX]/[DEEPGRAM]/[ASSEMBLYAI]) and JSON events carrying base64 audio ([OPENAI]/[ELEVENLABS]/
+ * ([SONIOX]/[DEEPGRAM]/[ASSEMBLYAI]/[XAI]) and JSON events carrying base64 audio ([OPENAI]/[ELEVENLABS]/
  * [GEMINI]/[MISTRAL_VOXTRAL]). All use 16 kHz mono PCM16 except OpenAI (24 kHz — resampled on the fly).
  */
 enum class RealtimeApi {
@@ -24,6 +24,7 @@ enum class RealtimeApi {
     ELEVENLABS,
     GEMINI,
     MISTRAL_VOXTRAL,
+    XAI,
 }
 
 /**
@@ -31,7 +32,7 @@ enum class RealtimeApi {
  * [TranscriptionProvider]. Instead of uploading a finished file and awaiting one result, the caller opens
  * a session, pushes microphone PCM as it is captured, and receives interim + final transcript pieces over
  * a WebSocket. Every supporting provider (OpenAI realtime, Soniox, Deepgram, AssemblyAI, ElevenLabs,
- * Gemini Live, Mistral Voxtral) reduces to this same shape; only the wire framing differs per provider.
+ * Gemini Live, Mistral Voxtral, xAI) reduces to this same shape; only the wire framing differs per provider.
  *
  * A provider client may implement this alongside [TranscriptionProvider]/[LlmProvider]; the dictation
  * engine uses the streaming path only when the user has real-time mode on AND the selected provider
