@@ -57,6 +57,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.BlendMode
@@ -530,6 +531,14 @@ fun QuickActionButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val isEnabled = type == QuickActionBarType.EDITOR_TILE || evaluator.evaluateEnabled(action.keyData())
+    // The hold has a state of its own (issue #436): a greyed-out Copy still has to reach the Paste it
+    // carries, and a greyed-out second action must not run just because its host is live.
+    val isSecondEnabled = secondAction != null && evaluator.evaluateEnabled(secondAction.keyData())
+    // Read by the running gesture rather than keyed into it. A hold changes the very state these come
+    // from — pasting over a selection greys out the Copy under the finger — and a restarted gesture
+    // never releases the press it had begun, so the key stayed drawn as pressed.
+    val tapEnabled by rememberUpdatedState(isEnabled)
+    val holdEnabled by rememberUpdatedState(isSecondEnabled)
     val elementName = when (type) {
         QuickActionBarType.INTERACTIVE_BUTTON -> FlorisImeUi.SmartbarActionKey
         QuickActionBarType.INTERACTIVE_TILE -> FlorisImeUi.SmartbarActionTile
@@ -644,11 +653,14 @@ fun QuickActionButton(
                 .indication(interactionSource, LocalIndication.current)
                 // secondAction belongs in the keys: without it a pairing changed in settings would
                 // only take hold once the keyboard is rebuilt, which reads as the feature not working.
-                .pointerInput(action, isEnabled, secondAction) {
+                .pointerInput(action, secondAction) {
                     awaitEachGesture {
                         val down = awaitFirstDown()
                         down.consume()
-                        if (isEnabled && type != QuickActionBarType.EDITOR_TILE) {
+                        // Decided where the finger lands: a press that began on a greyed-out action
+                        // does not become a tap because the action came alive while it was held.
+                        val canTap = tapEnabled
+                        if ((canTap || holdEnabled) && type != QuickActionBarType.EDITOR_TILE) {
                             val press = PressInteraction.Press(down.position)
                             inputFeedbackController.keyPress(TextKeyData.UNSPECIFIED)
                             interactionSource.tryEmit(press)
@@ -656,8 +668,12 @@ fun QuickActionButton(
                             // gesture — see DictateHoldTouch for why nothing here may outlive a press.
                             action.onPointerDown(context) onLongPress@{
                                 val second = secondAction ?: return@onLongPress false
-                                inputFeedbackController.keyLongPress(TextKeyData.UNSPECIFIED)
-                                second.performAsSecondAction(context)
+                                // A greyed-out second action still takes the hold, so the tap it
+                                // stands for does not run in its place on release.
+                                if (holdEnabled) {
+                                    inputFeedbackController.keyLongPress(TextKeyData.UNSPECIFIED)
+                                    second.performAsSecondAction(context)
+                                }
                                 true
                             }
 
@@ -724,6 +740,7 @@ fun QuickActionButton(
                                 // handing that one over would leave the key held with nobody to release it.
                                 handleUpOrCancel(
                                     waitForUpOrRealCancellation(), press, interactionSource, action, context,
+                                    canTap,
                                 )
                             }
                         }
@@ -905,18 +922,23 @@ private suspend fun AwaitPointerEventScope.waitForUpOrRealCancellation(): Pointe
     }
 }
 
-/** Finishes a pointer gesture: a non-null [up] is a normal release (click), null is a cancellation. */
+/**
+ * Finishes a pointer gesture: a non-null [up] is a normal release (click), null is a cancellation.
+ * Without [canTap] the press was taken only for its second action (issue #436), so even a normal
+ * release withdraws the key instead of running it.
+ */
 private fun handleUpOrCancel(
     up: PointerInputChange?,
     press: PressInteraction.Press,
     interactionSource: MutableInteractionSource,
     action: QuickAction,
     context: Context,
+    canTap: Boolean,
 ) {
     if (up != null) {
         up.consume()
         interactionSource.tryEmit(PressInteraction.Release(press))
-        action.onPointerUp(context)
+        if (canTap) action.onPointerUp(context) else action.onPointerCancel(context)
     } else {
         interactionSource.tryEmit(PressInteraction.Cancel(press))
         action.onPointerCancel(context)
