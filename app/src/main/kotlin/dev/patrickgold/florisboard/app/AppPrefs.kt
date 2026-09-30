@@ -25,6 +25,7 @@ import dev.patrickgold.florisboard.app.settings.theme.SnyggLevel
 import dev.patrickgold.florisboard.app.setup.NotificationPermissionState
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonAppScope
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonDesign
+import dev.patrickgold.florisboard.dictate.DictateFloatingButtonShowWhen
 import dev.patrickgold.florisboard.dictate.DictateLongformMode
 import dev.patrickgold.florisboard.dictate.audio.AudioSpeedUp
 import dev.patrickgold.florisboard.dictate.audio.DictateAudioSource
@@ -554,20 +555,12 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "dictate__floating_button_enabled",
             default = false,
         )
-        // Whether the floating button also shows while the Dictate keyboard itself is the active input
-        // method. Default off: when our own keyboard is up it already has a mic key, so the bubble would
-        // be redundant; turning this on shows it everywhere regardless of the active keyboard.
-        val floatingButtonShowWithDictateKeyboard = boolean(
-            key = "dictate__floating_button_show_with_dictate_keyboard",
-            default = false,
-        )
-        // Whether the floating button waits for an on-screen keyboard (issue #439). Default off: a focused
-        // field alone is enough today, which is what apps with fields that never call themselves editable
-        // and hardware-keyboard users depend on. On, the button no longer appears over a messenger that
-        // focuses its composer the moment a chat is opened, before anyone means to type.
-        val floatingButtonOnlyWithKeyboard = boolean(
-            key = "dictate__floating_button_only_with_keyboard",
-            default = false,
+        // When the floating button comes up (issue #439): as soon as a field is selected, only while a
+        // keyboard is open, or also over the Dictate keyboard. Replaces the boolean
+        // `dictate__floating_button_show_with_dictate_keyboard`, which migrate() carries over.
+        val floatingButtonShowWhen = enum(
+            key = "dictate__floating_button_show_when",
+            default = DictateFloatingButtonShowWhen.FIELD_SELECTED,
         )
         // Visual style of the floating button: a compact ring (RING) or a bubble that expands into a pill
         // with a timer + live waveform while active (PILL). See DictateFloatingButtonDesign.
@@ -2047,6 +2040,16 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
                 } else {
                     entry.keepAsIs()
                 }
+            }
+
+            // The floating button's "Show with Dictate keyboard" switch became one of three entries of
+            // floatingButtonShowWhen (issue #439). Runs on load and on a backup import alike.
+            "dictate__floating_button_show_with_dictate_keyboard" -> {
+                entry.transform(
+                    type = PreferenceType.string(),
+                    key = "dictate__floating_button_show_when",
+                    rawValue = DictateFloatingButtonShowWhen.fromShowWithDictateKeyboard(entry.rawValue).name,
+                )
             }
 
             // Default: keep entry

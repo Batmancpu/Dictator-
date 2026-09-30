@@ -355,9 +355,9 @@ class DictateAccessibilityService : AccessibilityService() {
         // The keyboard is asked first because it is already known and settles the question without IPC. When
         // the user wants the button only with a keyboard up (#439), a field alone cannot bring it, so the
         // app's tree is not fetched to find one — the bubble controller applies the same rule over its flows,
-        // which is what reacts to the switch itself; this one only spares the node fetch.
+        // which is what reacts to the setting itself; this one only spares the node fetch.
         val imeShown = isImeWindowShown()
-        val keyboardRequired = prefs.dictate.floatingButtonOnlyWithKeyboard.get()
+        val keyboardRequired = prefs.dictate.floatingButtonShowWhen.get().keyboardRequired
         val focused = !blocked && (imeShown || (!keyboardRequired && focusedEditableNode() != null))
         if (_editableFocused.value != focused) {
             _editableFocused.value = focused
