@@ -1034,11 +1034,8 @@
     <string name="dictate__floating_button_mic_summary">Necessário para gravar sua voz · toque para conceder</string>
     <string name="dictate__floating_button_show_when_title">Quando mostrar</string>
     <string name="dictate__floating_button_show_when_field">Assim que um campo de texto é selecionado</string>
-    <string name="dictate__floating_button_show_when_field_summary">Mesmo antes de o teclado abrir.</string>
     <string name="dictate__floating_button_show_when_keyboard">Só com o teclado aberto</string>
-    <string name="dictate__floating_button_show_when_keyboard_summary">Espera até haver um teclado na tela.</string>
     <string name="dictate__floating_button_show_when_dictate_keyboard">Também com o teclado Dictate</string>
-    <string name="dictate__floating_button_show_when_dictate_keyboard_summary">Assim que um campo de texto é selecionado, mesmo com o teclado Dictate aberto.</string>
     <string name="dictate__action_continue_recording">Continuar gravação</string>
     <string name="dictate__a11y_mic_hold_local">Transcrever no dispositivo</string>
     <string name="smartbar__a11y_show_actions">Mostrar ações</string>

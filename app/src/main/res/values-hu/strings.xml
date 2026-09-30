@@ -1229,11 +1229,8 @@
     <string name="dictate__floating_button_mic_summary">A hangod rögzítéséhez szükséges · koppints az engedélyezéshez</string>
     <string name="dictate__floating_button_show_when_title">Mikor jelenjen meg</string>
     <string name="dictate__floating_button_show_when_field">Amint egy szövegmező ki van választva</string>
-    <string name="dictate__floating_button_show_when_field_summary">Még a billentyűzet megnyílása előtt.</string>
     <string name="dictate__floating_button_show_when_keyboard">Csak nyitott billentyűzetnél</string>
-    <string name="dictate__floating_button_show_when_keyboard_summary">Megvárja, amíg megjelenik egy billentyűzet.</string>
     <string name="dictate__floating_button_show_when_dictate_keyboard">A Dictate billentyűzettel is</string>
-    <string name="dictate__floating_button_show_when_dictate_keyboard_summary">Amint egy szövegmező ki van választva, akkor is, ha a Dictate billentyűzet nyitva van.</string>
     <string name="dictate__action_continue_recording">Felvétel folytatása</string>
     <string name="dictate__a11y_mic_hold_local">Átírás az eszközön</string>
     <string name="smartbar__a11y_show_actions">Műveletek megjelenítése</string>

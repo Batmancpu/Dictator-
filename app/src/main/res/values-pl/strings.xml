@@ -1247,11 +1247,8 @@
     <string name="dictate__floating_button_mic_summary">Wymagany do nagrywania głosu · dotknij, aby przyznać</string>
     <string name="dictate__floating_button_show_when_title">Kiedy pokazywać</string>
     <string name="dictate__floating_button_show_when_field">Gdy tylko wybrane zostanie pole tekstowe</string>
-    <string name="dictate__floating_button_show_when_field_summary">Jeszcze zanim otworzy się klawiatura.</string>
     <string name="dictate__floating_button_show_when_keyboard">Tylko przy otwartej klawiaturze</string>
-    <string name="dictate__floating_button_show_when_keyboard_summary">Czeka, aż na ekranie pojawi się klawiatura.</string>
     <string name="dictate__floating_button_show_when_dictate_keyboard">Także z klawiaturą Dictate</string>
-    <string name="dictate__floating_button_show_when_dictate_keyboard_summary">Gdy tylko wybrane zostanie pole tekstowe, także przy otwartej klawiaturze Dictate.</string>
     <string name="dictate__action_continue_recording">Kontynuuj nagrywanie</string>
     <string name="dictate__a11y_mic_hold_local">Transkrybuj na urządzeniu</string>
     <string name="smartbar__a11y_show_actions">Pokaż akcje</string>

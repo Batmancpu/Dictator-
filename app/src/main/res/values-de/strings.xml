@@ -1165,11 +1165,8 @@
     <string name="dictate__floating_button_mic_summary">Nötig, um deine Stimme aufzunehmen · tippen, um zu erlauben</string>
     <string name="dictate__floating_button_show_when_title">Wann anzeigen</string>
     <string name="dictate__floating_button_show_when_field">Sobald ein Textfeld ausgewählt ist</string>
-    <string name="dictate__floating_button_show_when_field_summary">Schon bevor sich die Tastatur öffnet.</string>
     <string name="dictate__floating_button_show_when_keyboard">Nur bei geöffneter Tastatur</string>
-    <string name="dictate__floating_button_show_when_keyboard_summary">Wartet, bis eine Tastatur zu sehen ist.</string>
     <string name="dictate__floating_button_show_when_dictate_keyboard">Auch mit der Dictate-Tastatur</string>
-    <string name="dictate__floating_button_show_when_dictate_keyboard_summary">Sobald ein Textfeld ausgewählt ist, auch während die Dictate-Tastatur offen ist.</string>
     <string name="dictate__floating_button_apps_title">App-Sichtbarkeit</string>
     <string name="dictate__floating_button_apps_summary_all">In jeder App</string>
     <string name="dictate__floating_button_apps_summary_only">Nur in {n} Apps</string>

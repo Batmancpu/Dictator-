@@ -1225,11 +1225,8 @@
     <string name="dictate__floating_button_mic_summary">录制语音所必需 · 点按以授予</string>
     <string name="dictate__floating_button_show_when_title">显示时机</string>
     <string name="dictate__floating_button_show_when_field">选中文本框时</string>
-    <string name="dictate__floating_button_show_when_field_summary">即使键盘尚未打开。</string>
     <string name="dictate__floating_button_show_when_keyboard">仅在键盘打开时</string>
-    <string name="dictate__floating_button_show_when_keyboard_summary">等到屏幕上出现键盘后再显示。</string>
     <string name="dictate__floating_button_show_when_dictate_keyboard">Dictate 键盘打开时也显示</string>
-    <string name="dictate__floating_button_show_when_dictate_keyboard_summary">选中文本框即显示，即使 Dictate 键盘已打开。</string>
     <string name="dictate__action_continue_recording">继续录音</string>
     <string name="dictate__a11y_mic_hold_local">在设备上转录</string>
     <string name="smartbar__a11y_show_actions">显示操作</string>

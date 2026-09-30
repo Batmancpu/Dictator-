@@ -189,17 +189,14 @@ fun DictateFloatingButtonScreen() = FlorisScreen {
                     entry(
                         DictateFloatingButtonShowWhen.FIELD_SELECTED,
                         stringRes(R.string.dictate__floating_button_show_when_field),
-                        stringRes(R.string.dictate__floating_button_show_when_field_summary),
                     )
                     entry(
                         DictateFloatingButtonShowWhen.KEYBOARD_OPEN,
                         stringRes(R.string.dictate__floating_button_show_when_keyboard),
-                        stringRes(R.string.dictate__floating_button_show_when_keyboard_summary),
                     )
                     entry(
                         DictateFloatingButtonShowWhen.ALSO_WITH_DICTATE_KEYBOARD,
                         stringRes(R.string.dictate__floating_button_show_when_dictate_keyboard),
-                        stringRes(R.string.dictate__floating_button_show_when_dictate_keyboard_summary),
                     )
                 },
             )

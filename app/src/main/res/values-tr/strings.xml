@@ -1209,11 +1209,8 @@
     <string name="dictate__floating_button_mic_summary">Sesinizi kaydetmek için gerekli · izin vermek için dokunun</string>
     <string name="dictate__floating_button_show_when_title">Ne zaman gösterilsin</string>
     <string name="dictate__floating_button_show_when_field">Bir metin alanı seçilir seçilmez</string>
-    <string name="dictate__floating_button_show_when_field_summary">Klavye açılmadan önce bile.</string>
     <string name="dictate__floating_button_show_when_keyboard">Yalnızca klavye açıkken</string>
-    <string name="dictate__floating_button_show_when_keyboard_summary">Ekranda bir klavye görünene kadar bekler.</string>
     <string name="dictate__floating_button_show_when_dictate_keyboard">Dictate klavyesiyle de</string>
-    <string name="dictate__floating_button_show_when_dictate_keyboard_summary">Bir metin alanı seçilir seçilmez, Dictate klavyesi açıkken bile.</string>
     <string name="dictate__action_continue_recording">Kaydı sürdür</string>
     <string name="dictate__a11y_mic_hold_local">Cihazda yazıya dök</string>
     <string name="smartbar__a11y_show_actions">Eylemleri göster</string>

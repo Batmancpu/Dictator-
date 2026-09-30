@@ -1088,11 +1088,8 @@
     <string name="dictate__floating_button_mic_summary">مطلوب لتسجيل صوتك · اضغط للمنح</string>
     <string name="dictate__floating_button_show_when_title">متى يظهر</string>
     <string name="dictate__floating_button_show_when_field">بمجرد تحديد حقل نصي</string>
-    <string name="dictate__floating_button_show_when_field_summary">حتى قبل أن تُفتح لوحة المفاتيح.</string>
     <string name="dictate__floating_button_show_when_keyboard">فقط عند فتح لوحة المفاتيح</string>
-    <string name="dictate__floating_button_show_when_keyboard_summary">ينتظر حتى تظهر لوحة مفاتيح على الشاشة.</string>
     <string name="dictate__floating_button_show_when_dictate_keyboard">مع لوحة مفاتيح Dictate أيضًا</string>
-    <string name="dictate__floating_button_show_when_dictate_keyboard_summary">بمجرد تحديد حقل نصي، حتى أثناء فتح لوحة مفاتيح Dictate.</string>
     <string name="dictate__action_continue_recording">متابعة التسجيل</string>
     <string name="dictate__a11y_mic_hold_local">تفريغ على الجهاز</string>
     <string name="smartbar__a11y_show_actions">إظهار الإجراءات</string>

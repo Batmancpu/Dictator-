@@ -1075,11 +1075,8 @@
     <string name="dictate__floating_button_mic_summary">Потрібен для запису вашого голосу · торкніться, щоб надати</string>
     <string name="dictate__floating_button_show_when_title">Коли показувати</string>
     <string name="dictate__floating_button_show_when_field">Щойно вибрано текстове поле</string>
-    <string name="dictate__floating_button_show_when_field_summary">Ще до того, як відкриється клавіатура.</string>
     <string name="dictate__floating_button_show_when_keyboard">Лише з відкритою клавіатурою</string>
-    <string name="dictate__floating_button_show_when_keyboard_summary">Чекає, доки на екрані не з’явиться клавіатура.</string>
     <string name="dictate__floating_button_show_when_dictate_keyboard">Також із клавіатурою Dictate</string>
-    <string name="dictate__floating_button_show_when_dictate_keyboard_summary">Щойно вибрано текстове поле, навіть якщо відкрита клавіатура Dictate.</string>
     <string name="dictate__action_continue_recording">Продовжити запис</string>
     <string name="dictate__a11y_mic_hold_local">Транскрибувати на пристрої</string>
     <string name="smartbar__a11y_show_actions">Показати дії</string>
