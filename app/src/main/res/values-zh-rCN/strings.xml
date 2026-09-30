@@ -1223,6 +1223,9 @@
     <string name="dictate__floating_button_disclosure_continue">打开设置</string>
     <string name="dictate__floating_button_mic_title">麦克风权限</string>
     <string name="dictate__floating_button_mic_summary">录制语音所必需 · 点按以授予</string>
+    <string name="dictate__floating_button_only_with_keyboard_title">仅在键盘打开时显示</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_on">按钮会等到屏幕上出现键盘后再显示。</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_off">选中文本框后按钮会立即显示。</string>
     <string name="dictate__floating_button_show_with_keyboard_title">随 Dictate 键盘一起显示</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">当 Dictate 键盘处于活动状态时，按钮也会显示。</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">当 Dictate 键盘处于活动状态时隐藏，因为它已经有麦克风键。</string>

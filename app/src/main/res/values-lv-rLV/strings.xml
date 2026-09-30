@@ -1173,6 +1173,9 @@
     <string name="dictate__floating_button_disclosure_continue">Atvērt iestatījumus</string>
     <string name="dictate__floating_button_mic_title">Mikrofona piekļuve</string>
     <string name="dictate__floating_button_mic_summary">Nepieciešama jūsu balss ierakstīšanai · pieskarieties, lai piešķirtu</string>
+    <string name="dictate__floating_button_only_with_keyboard_title">Tikai ar atvērtu tastatūru</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_on">Poga gaida, līdz ekrānā parādās tastatūra.</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_off">Poga parādās, tiklīdz ir atlasīts teksta lauks.</string>
     <string name="dictate__floating_button_show_with_keyboard_title">Rādīt ar Dictate tastatūru</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Poga parādās arī tad, kad ir aktīva Dictate tastatūra.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Paslēpta, kamēr ir aktīva Dictate tastatūra, jo tai jau ir mikrofona taustiņš.</string>

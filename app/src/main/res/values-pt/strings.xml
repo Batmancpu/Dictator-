@@ -1208,6 +1208,9 @@
     <string name="dictate__floating_button_disclosure_continue">Abrir definições</string>
     <string name="dictate__floating_button_mic_title">Acesso ao microfone</string>
     <string name="dictate__floating_button_mic_summary">Necessário para gravar a sua voz · toque para conceder</string>
+    <string name="dictate__floating_button_only_with_keyboard_title">Só com o teclado aberto</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_on">O botão espera até haver um teclado no ecrã.</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_off">O botão aparece assim que um campo de texto é selecionado.</string>
     <string name="dictate__floating_button_show_with_keyboard_title">Mostrar com o teclado Dictate</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">O botão também aparece enquanto o teclado Dictate está ativo.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Oculto enquanto o teclado Dictate está ativo, pois este já tem uma tecla de microfone.</string>

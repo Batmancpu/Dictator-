@@ -236,12 +236,16 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         val accentColor: Int,
     )
 
-    /** An [Emission] and the three signals from outside the bubble that can suppress it. */
+    /**
+     * An [Emission], the three signals from outside the bubble that can suppress it, and whether a
+     * focused field has to wait for a keyboard before it counts (#439).
+     */
     private data class Surroundings(
         val emission: Emission,
         val recognitionActive: Boolean,
         val screenOn: Boolean,
         val allowedInApp: Boolean,
+        val keyboardRequired: Boolean,
     )
 
     /** Starts observing the feature toggle + focus + design + dictation state to drive the bubble. */
@@ -283,9 +287,10 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
                 RecognitionBridge.active,
                 DictateAccessibilityService.screenOn,
                 allowedInApp,
-            ) { emission, recogActive, screenOn, appAllowed ->
-                Surroundings(emission, recogActive, screenOn, appAllowed)
-            }.collect { (emission, recogActive, screenOn, appAllowed) ->
+                prefs.dictate.floatingButtonOnlyWithKeyboard.asFlow(),
+            ) { emission, recogActive, screenOn, appAllowed, keyboardRequired ->
+                Surroundings(emission, recogActive, screenOn, appAllowed, keyboardRequired)
+            }.collect { (emission, recogActive, screenOn, appAllowed, keyboardRequired) ->
                 val (inputs, design, size, imeVisible, accent) = emission
                 val (enabled, showWithKeyboard, focused, dictateKeyboard, state) = inputs
                 if (design != currentDesign || size.scale != sizeScale || accent != accentColor) {
@@ -307,6 +312,8 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
                 val show = BubbleVisibility.shouldShow(
                     enabled = enabled,
                     focused = focused,
+                    keyboardRequired = keyboardRequired,
+                    keyboardShown = imeVisible,
                     state = state,
                     hiddenByOwnKeyboard = hiddenByOwnKeyboard,
                     recognitionActive = recogActive,

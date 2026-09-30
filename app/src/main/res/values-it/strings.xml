@@ -1011,6 +1011,9 @@
     <string name="dictate__floating_button_disclosure_continue">Apri impostazioni</string>
     <string name="dictate__floating_button_mic_title">Accesso al microfono</string>
     <string name="dictate__floating_button_mic_summary">Necessario per registrare la tua voce · tocca per concedere</string>
+    <string name="dictate__floating_button_only_with_keyboard_title">Solo con la tastiera aperta</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_on">Il pulsante attende che una tastiera sia sullo schermo.</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_off">Il pulsante compare non appena si seleziona un campo di testo.</string>
     <string name="dictate__floating_button_show_with_keyboard_title">Mostra con la tastiera Dictate</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Il pulsante compare anche mentre la tastiera Dictate è attiva.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Nascosto mentre la tastiera Dictate è attiva, poiché ha già un tasto microfono.</string>

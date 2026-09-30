@@ -1183,6 +1183,9 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__floating_button_disclosure_continue">Buka pengaturan</string>
     <string name="dictate__floating_button_mic_title">Akses mikrofon</string>
     <string name="dictate__floating_button_mic_summary">Diperlukan untuk merekam suara Anda · ketuk untuk memberikan</string>
+    <string name="dictate__floating_button_only_with_keyboard_title">Hanya saat keyboard terbuka</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_on">Tombol menunggu hingga keyboard muncul di layar.</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_off">Tombol muncul segera setelah kolom teks dipilih.</string>
     <string name="dictate__floating_button_show_with_keyboard_title">Tampilkan dengan keyboard Dictate</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Tombol juga muncul saat keyboard Dictate aktif.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Disembunyikan saat keyboard Dictate aktif, karena keyboard tersebut sudah memiliki tombol mikrofon.</string>

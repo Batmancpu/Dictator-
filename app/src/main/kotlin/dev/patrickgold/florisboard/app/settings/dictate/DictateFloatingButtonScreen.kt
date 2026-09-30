@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.BlurOn
 import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.KeyboardAlt
 import androidx.compose.material.icons.filled.PinDrop
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.Mic
@@ -178,6 +179,16 @@ fun DictateFloatingButtonScreen() = FlorisScreen {
         }
 
         if (enabled && serviceEnabled) {
+            // When it appears (issue #439): a focused field alone, or only once a keyboard is up too.
+            SwitchPreference(
+                prefs.dictate.floatingButtonOnlyWithKeyboard,
+                icon = Icons.Default.KeyboardAlt,
+                modifier = Modifier.settingsSearchAnchor("dictate__floating_button_only_with_keyboard_title"),
+                title = stringRes(R.string.dictate__floating_button_only_with_keyboard_title),
+                summaryOn = stringRes(R.string.dictate__floating_button_only_with_keyboard_summary_on),
+                summaryOff = stringRes(R.string.dictate__floating_button_only_with_keyboard_summary_off),
+            )
+
             SwitchPreference(
                 prefs.dictate.floatingButtonShowWithDictateKeyboard,
                 icon = Icons.Default.Keyboard,

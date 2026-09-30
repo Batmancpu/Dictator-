@@ -1086,6 +1086,9 @@
     <string name="dictate__floating_button_disclosure_continue">فتح الإعدادات</string>
     <string name="dictate__floating_button_mic_title">الوصول إلى الميكروفون</string>
     <string name="dictate__floating_button_mic_summary">مطلوب لتسجيل صوتك · اضغط للمنح</string>
+    <string name="dictate__floating_button_only_with_keyboard_title">فقط عند فتح لوحة المفاتيح</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_on">ينتظر الزر حتى تظهر لوحة مفاتيح على الشاشة.</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_off">يظهر الزر بمجرد تحديد حقل نصي.</string>
     <string name="dictate__floating_button_show_with_keyboard_title">الإظهار مع لوحة مفاتيح Dictate</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">يظهر الزر أيضًا أثناء نشاط لوحة مفاتيح Dictate.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">مخفي أثناء نشاط لوحة مفاتيح Dictate، لأنها تحتوي بالفعل على زر ميكروفون.</string>

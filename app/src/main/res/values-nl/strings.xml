@@ -1128,6 +1128,9 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__floating_button_disclosure_continue">Instellingen openen</string>
     <string name="dictate__floating_button_mic_title">Microfoontoegang</string>
     <string name="dictate__floating_button_mic_summary">Vereist om je stem op te nemen · tik om toe te staan</string>
+    <string name="dictate__floating_button_only_with_keyboard_title">Alleen bij geopend toetsenbord</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_on">De knop wacht tot er een toetsenbord in beeld is.</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_off">De knop verschijnt zodra een tekstveld is geselecteerd.</string>
     <string name="dictate__floating_button_show_with_keyboard_title">Tonen bij Dictate-toetsenbord</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">De knop verschijnt ook terwijl het Dictate-toetsenbord actief is.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Verborgen terwijl het Dictate-toetsenbord actief is, omdat dat al een microfoontoets heeft.</string>

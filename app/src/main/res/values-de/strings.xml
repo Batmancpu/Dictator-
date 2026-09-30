@@ -1163,6 +1163,9 @@
     <string name="dictate__floating_button_disclosure_continue">Einstellungen öffnen</string>
     <string name="dictate__floating_button_mic_title">Mikrofon-Zugriff</string>
     <string name="dictate__floating_button_mic_summary">Nötig, um deine Stimme aufzunehmen · tippen, um zu erlauben</string>
+    <string name="dictate__floating_button_only_with_keyboard_title">Nur bei geöffneter Tastatur</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_on">Der Button wartet, bis eine Tastatur zu sehen ist.</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_off">Der Button erscheint, sobald ein Textfeld ausgewählt ist.</string>
     <string name="dictate__floating_button_show_with_keyboard_title">Mit Dictate-Tastatur anzeigen</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Der Button erscheint auch, während die Dictate-Tastatur aktiv ist.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Ausgeblendet, während die Dictate-Tastatur aktiv ist, da diese bereits eine Mikrofontaste hat.</string>

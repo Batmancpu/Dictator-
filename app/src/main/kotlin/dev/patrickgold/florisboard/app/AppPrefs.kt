@@ -561,6 +561,14 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "dictate__floating_button_show_with_dictate_keyboard",
             default = false,
         )
+        // Whether the floating button waits for an on-screen keyboard (issue #439). Default off: a focused
+        // field alone is enough today, which is what apps with fields that never call themselves editable
+        // and hardware-keyboard users depend on. On, the button no longer appears over a messenger that
+        // focuses its composer the moment a chat is opened, before anyone means to type.
+        val floatingButtonOnlyWithKeyboard = boolean(
+            key = "dictate__floating_button_only_with_keyboard",
+            default = false,
+        )
         // Visual style of the floating button: a compact ring (RING) or a bubble that expands into a pill
         // with a timer + live waveform while active (PILL). See DictateFloatingButtonDesign.
         val floatingButtonDesign = enum(

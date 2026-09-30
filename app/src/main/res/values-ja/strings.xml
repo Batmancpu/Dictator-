@@ -1160,6 +1160,9 @@
     <string name="dictate__floating_button_disclosure_continue">設定を開く</string>
     <string name="dictate__floating_button_mic_title">マイクへのアクセス</string>
     <string name="dictate__floating_button_mic_summary">音声の録音に必要です · タップして許可</string>
+    <string name="dictate__floating_button_only_with_keyboard_title">キーボード表示中のみ</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_on">キーボードが画面に表示されるまでボタンは表示されません。</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_off">テキスト欄を選択するとすぐにボタンが表示されます。</string>
     <string name="dictate__floating_button_show_with_keyboard_title">Dictate キーボードでも表示</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Dictate キーボードが有効なときもボタンが表示されます。</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Dictate キーボードにはマイクキーがあるため、有効なときは非表示になります。</string>

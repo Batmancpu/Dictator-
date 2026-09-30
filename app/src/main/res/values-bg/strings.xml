@@ -1228,6 +1228,9 @@
     <string name="dictate__floating_button_disclosure_continue">Отваряне на настройките</string>
     <string name="dictate__floating_button_mic_title">Достъп до микрофона</string>
     <string name="dictate__floating_button_mic_summary">Необходим за записване на гласа ви · докоснете, за да разрешите</string>
+    <string name="dictate__floating_button_only_with_keyboard_title">Само при отворена клавиатура</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_on">Бутонът изчаква, докато на екрана се появи клавиатура.</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_off">Бутонът се появява веднага щом е избрано текстово поле.</string>
     <string name="dictate__floating_button_show_with_keyboard_title">Показвай с клавиатурата Dictate</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Бутонът се появява и докато клавиатурата Dictate е активна.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Скрит, докато клавиатурата Dictate е активна, тъй като тя вече има клавиш за микрофон.</string>

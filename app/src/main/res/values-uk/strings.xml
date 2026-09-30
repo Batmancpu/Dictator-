@@ -1073,6 +1073,9 @@
     <string name="dictate__floating_button_disclosure_continue">Відкрити налаштування</string>
     <string name="dictate__floating_button_mic_title">Доступ до мікрофона</string>
     <string name="dictate__floating_button_mic_summary">Потрібен для запису вашого голосу · торкніться, щоб надати</string>
+    <string name="dictate__floating_button_only_with_keyboard_title">Лише з відкритою клавіатурою</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_on">Кнопка чекає, доки на екрані не з’явиться клавіатура.</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_off">Кнопка з’являється, щойно вибрано текстове поле.</string>
     <string name="dictate__floating_button_show_with_keyboard_title">Показувати з клавіатурою Dictate</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Кнопка також з’являється, коли активна клавіатура Dictate.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Прихована, коли активна клавіатура Dictate, оскільки вона вже має клавішу мікрофона.</string>

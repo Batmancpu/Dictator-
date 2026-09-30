@@ -1106,6 +1106,9 @@
     <string name="dictate__floating_button_disclosure_continue">Ouvrir les paramètres</string>
     <string name="dictate__floating_button_mic_title">Accès au microphone</string>
     <string name="dictate__floating_button_mic_summary">Nécessaire pour enregistrer votre voix · touchez pour autoriser</string>
+    <string name="dictate__floating_button_only_with_keyboard_title">Uniquement avec le clavier ouvert</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_on">Le bouton attend qu’un clavier soit affiché.</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_off">Le bouton apparaît dès qu’un champ de texte est sélectionné.</string>
     <string name="dictate__floating_button_show_with_keyboard_title">Afficher avec le clavier Dictate</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Le bouton apparaît aussi lorsque le clavier Dictate est actif.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Masqué lorsque le clavier Dictate est actif, car il possède déjà une touche micro.</string>

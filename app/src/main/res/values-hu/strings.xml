@@ -1227,6 +1227,9 @@
     <string name="dictate__floating_button_disclosure_continue">Beállítások megnyitása</string>
     <string name="dictate__floating_button_mic_title">Mikrofon-hozzáférés</string>
     <string name="dictate__floating_button_mic_summary">A hangod rögzítéséhez szükséges · koppints az engedélyezéshez</string>
+    <string name="dictate__floating_button_only_with_keyboard_title">Csak nyitott billentyűzetnél</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_on">A gomb megvárja, amíg megjelenik egy billentyűzet.</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_off">A gomb megjelenik, amint egy szövegmező ki van választva.</string>
     <string name="dictate__floating_button_show_with_keyboard_title">Megjelenítés a Dictate billentyűzettel</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">A gomb akkor is megjelenik, amikor a Dictate billentyűzet aktív.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Elrejtve, amíg a Dictate billentyűzet aktív, mivel annak már van mikrofongombja.</string>

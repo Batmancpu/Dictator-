@@ -1245,6 +1245,9 @@
     <string name="dictate__floating_button_disclosure_continue">Otwórz ustawienia</string>
     <string name="dictate__floating_button_mic_title">Dostęp do mikrofonu</string>
     <string name="dictate__floating_button_mic_summary">Wymagany do nagrywania głosu · dotknij, aby przyznać</string>
+    <string name="dictate__floating_button_only_with_keyboard_title">Tylko przy otwartej klawiaturze</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_on">Przycisk czeka, aż na ekranie pojawi się klawiatura.</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_off">Przycisk pojawia się, gdy tylko zostanie wybrane pole tekstowe.</string>
     <string name="dictate__floating_button_show_with_keyboard_title">Pokazuj z klawiaturą Dictate</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Przycisk pojawia się również, gdy aktywna jest klawiatura Dictate.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Ukryty, gdy aktywna jest klawiatura Dictate, ponieważ ma ona już klawisz mikrofonu.</string>

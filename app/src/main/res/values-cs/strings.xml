@@ -1244,6 +1244,9 @@
     <string name="dictate__floating_button_disclosure_continue">Otevřít nastavení</string>
     <string name="dictate__floating_button_mic_title">Přístup k mikrofonu</string>
     <string name="dictate__floating_button_mic_summary">Vyžadováno k nahrávání hlasu · klepnutím povolíte</string>
+    <string name="dictate__floating_button_only_with_keyboard_title">Jen při otevřené klávesnici</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_on">Tlačítko počká, až bude na obrazovce klávesnice.</string>
+    <string name="dictate__floating_button_only_with_keyboard_summary_off">Tlačítko se zobrazí, jakmile je vybráno textové pole.</string>
     <string name="dictate__floating_button_show_with_keyboard_title">Zobrazit s klávesnicí Dictate</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_on">Tlačítko se zobrazí i během aktivní klávesnice Dictate.</string>
     <string name="dictate__floating_button_show_with_keyboard_summary_off">Skryté, když je aktivní klávesnice Dictate, protože ta už má klávesu mikrofonu.</string>
