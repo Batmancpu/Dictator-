@@ -265,6 +265,10 @@ private fun matchesKind(id: String, kind: ModelKind): Boolean {
             !l.contains("bge-") &&
             // An image generator and a safety classifier, both in OVHcloud's catalog: stable-diffusion-xl,
             // and Qwen3Guard, which answers with a verdict on the text rather than the text.
-            !l.contains("diffusion") && !l.contains("guard")
+            !l.contains("diffusion") && !l.contains("guard") &&
+            // OpenAI's realtime models answer only on v1/realtime: the page for gpt-realtime-mini lists Chat
+            // Completions as "Not supported" (read 2026-09-30). Picked for rewording, every request is
+            // refused (#416).
+            !l.contains("realtime")
     }
 }

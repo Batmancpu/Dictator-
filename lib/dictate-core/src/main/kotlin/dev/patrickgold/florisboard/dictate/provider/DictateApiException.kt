@@ -58,7 +58,24 @@ class DictateApiException(
             get() = this == TIMEOUT || this == NETWORK || this == SERVER_ERROR || this == UNKNOWN
     }
 
+    /**
+     * Whether sending this very request again could plausibly succeed — [Kind.isRetryable], minus the
+     * answers that were a refusal.
+     *
+     * A 4xx means the provider read the request and said no: a model it has shut down, one it does not
+     * serve on this endpoint, a parameter it does not take. The same bytes get the same no. Those land in
+     * [Kind.UNKNOWN] whenever their wording matches none of the keywords in [fromHttp], and UNKNOWN is
+     * retryable — so each one was sent four times with three-second pauses between, ten seconds of silence
+     * per rewording step before the error the first answer already held (#416). 408 and 425 are the two
+     * 4xx that ask to be sent again, and stay retryable.
+     */
+    val isRetryable: Boolean
+        get() = kind.isRetryable && (httpStatus == null || httpStatus !in 400..499 || httpStatus in RETRYABLE_4XX)
+
     companion object {
+        /** Request Timeout and Too Early: the only client errors whose remedy is to send the request again. */
+        private val RETRYABLE_4XX = setOf(408, 425)
+
         /**
          * Classifies a non-2xx HTTP response into a [Kind]. Works across all OpenAI-compatible providers
          * by combining the HTTP status (the most reliable, standardized signal) with the machine-readable

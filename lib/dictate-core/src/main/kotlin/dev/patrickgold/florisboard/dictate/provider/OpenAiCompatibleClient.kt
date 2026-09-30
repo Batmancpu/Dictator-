@@ -1271,7 +1271,7 @@ class OpenAiCompatibleClient(
                             "kind=${mapped.kind}",
                     )
                 }
-                if (mapped.kind.isRetryable && attempt < maxRetries) {
+                if (mapped.isRetryable && attempt < maxRetries) {
                     attempt++
                     onRetry(attempt + 1) // report the upcoming attempt (2nd, 3rd, …)
                     delay(RETRY_DELAY_MS)

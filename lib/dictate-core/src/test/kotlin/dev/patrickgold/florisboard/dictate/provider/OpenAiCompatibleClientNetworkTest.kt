@@ -518,6 +518,78 @@ class OpenAiCompatibleClientNetworkTest : FunSpec({
         }
     }
 
+    // Issue #416: a refusal whose wording matches no keyword is UNKNOWN, and UNKNOWN used to be retried —
+    // three more sends, three seconds apart, before the error the first answer already held. The body is
+    // the shape of such a refusal, not a recorded one. The queued answer behind it is what a retry would
+    // have received, so a regression shows up as a success rather than as a hang.
+    test("a refused request is named at once, not sent four times") {
+        MockWebServer().use { server ->
+            server.enqueue(
+                MockResponse().setResponseCode(400).setBody(
+                    """{"error":{"message":"The model `llama-3.1-8b-instant` has been decommissioned and """ +
+                        """is no longer supported.","type":"invalid_request_error","code":"model_decommissioned"}}""",
+                ),
+            )
+            server.enqueue(
+                MockResponse().setResponseCode(200).setBody("""{"choices":[{"message":{"content":"Hallo."}}]}"""),
+            )
+            val client = OpenAiCompatibleClient(
+                ProviderConfig(baseUrl = server.url("/v1/").toString(), apiKey = "test"),
+            )
+
+            val error = shouldThrow<DictateApiException> {
+                client.complete(ChatRequest.ofUser("llama-3.1-8b-instant", "Fix my typos"))
+            }
+
+            error.kind shouldBe DictateApiException.Kind.UNKNOWN
+            error.message.orEmpty() shouldContain "decommissioned"
+            server.requestCount shouldBe 1
+        }
+    }
+
+    // The reasoning-effort fallback sat behind the same retries: a model that will not take the field was
+    // asked four times *with* it before anything asked without it (#416).
+    test("a model that will not take reasoning_effort is asked again without it straight away") {
+        MockWebServer().use { server ->
+            server.enqueue(
+                MockResponse().setResponseCode(400).setBody(
+                    """{"error":{"message":"`reasoning_effort` is not supported with this model",""" +
+                        """"type":"invalid_request_error"}}""",
+                ),
+            )
+            server.enqueue(
+                MockResponse().setResponseCode(200).setBody("""{"choices":[{"message":{"content":"Hallo."}}]}"""),
+            )
+            val client = OpenAiCompatibleClient(
+                ProviderConfig(baseUrl = server.url("/v1/").toString(), apiKey = "test"),
+            )
+
+            val result = client.complete(
+                ChatRequest.ofUser("some/non-thinker", "Fix my typos", reasoningEffort = "minimal"),
+            )
+
+            result.text shouldBe "Hallo."
+            server.takeRequest().body.readUtf8() shouldContain "\"reasoning_effort\":\"minimal\""
+            server.takeRequest().body.readUtf8() shouldNotContain "reasoning_effort"
+            server.requestCount shouldBe 2
+        }
+    }
+
+    test("only a refusal loses its retries; a busy server, a lost connection and a 408 keep them") {
+        fun http(status: Int) = DictateApiException.fromHttp(status, "Something went wrong")
+
+        http(400).isRetryable shouldBe false
+        http(404).isRetryable shouldBe false
+        http(408).isRetryable shouldBe true
+        http(425).isRetryable shouldBe true
+        http(500).isRetryable shouldBe true
+        http(503).isRetryable shouldBe true
+        DictateApiException(DictateApiException.Kind.NETWORK, "reset").isRetryable shouldBe true
+        DictateApiException(DictateApiException.Kind.TIMEOUT, "timeout").isRetryable shouldBe true
+        // The resend chip still reads the kind: a resend the user taps is theirs to try, not a loop of ours.
+        http(400).kind.isRetryable shouldBe true
+    }
+
     // --- Azure Speech / MAI-Transcribe (issue #349) ---
 
     test("Azure carries every option in the definition part, with MAI switched on") {
