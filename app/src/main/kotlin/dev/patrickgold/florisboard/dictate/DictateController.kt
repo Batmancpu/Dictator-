@@ -103,6 +103,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -842,6 +843,8 @@ object DictateController {
      */
     fun canStartRecording(): Boolean = when {
         discardingBar -> false
+        // A start still under way already owns the next recording; see [startRecording] (#147).
+        startJob?.isCompleted == false -> false
         else -> when (_state.value) {
             is UiState.Recording, is UiState.Transcribing, is UiState.Rewording -> false
             else -> true
@@ -1263,8 +1266,9 @@ object DictateController {
         )
         _cancelSlideProgress.value = 0f
         _lockSlideProgress.value = 0f
+        // Cancelled, not forgotten: until the job has finished unwinding it still counts as a start under
+        // way, and [startRecording] waits for it (#147).
         startJob?.cancel()
-        startJob = null
         recorder?.cancel()
         recorder = null
         // Long-form segmented (#170): abort the background segment transcriptions; the realtime cleanup
@@ -1394,6 +1398,14 @@ object DictateController {
      */
     private fun startRecording(context: Context, seedAccumulatedMs: Long = 0L) {
         if (_state.value is UiState.Recording) return
+        // The state only turns to Recording at the very end of [startJob], after audio focus, Bluetooth SCO
+        // and the realtime socket. A second start inside that window (a second tap on a mic that has not
+        // visibly reacted yet, the bubble and the keyboard at once) used to launch a second job, and both
+        // opened a microphone: the later one took [recorder], and the earlier one was left with nothing that
+        // would ever stop it. It captured until the process died, into the same cache file (#147). A job
+        // that was cancelled but is still unwinding counts as well, because its cleanup would otherwise reach
+        // the recorder of the start that followed it.
+        if (startJob?.isCompleted == false) return
         val appContext = context.applicationContext
         // Before the credential check, not after: a missing key on the very first dictation is an error
         // a screen reader has to speak (#159), and the observer only hears what happens once it runs.
@@ -1439,6 +1451,12 @@ object DictateController {
                     else -> null
                 }
                 routeSwaps = 0
+                // Nothing should be left here by now. If anything ever is, it is a microphone that nobody
+                // would stop again once it is overwritten, so it is stopped instead (#147).
+                recorder?.let { stale ->
+                    Log.w(LATENCY_LOG_TAG, "phase=staleRecorder released")
+                    stale.cancel()
+                }
                 recorder = RecordingController(appContext).also {
                     it.start(audioSource, pcmSink, onCaptureLost = { reason ->
                         onCaptureRouteLost(appContext, reason)
@@ -1462,11 +1480,22 @@ object DictateController {
                     if (pttStopSends) stopAndTranscribe(appContext) else cancelRecording()
                 }
             } catch (t: Throwable) {
+                // Whatever this start had already opened goes with it. Only nulling [recorder] left the
+                // microphone running whenever something after `start` threw, and a realtime socket opened
+                // ahead of a busy microphone stayed connected with nothing to send (#147).
+                recorder?.cancel()
                 recorder = null
+                realtimeCancelled = true
+                realtimeSession?.cancel()
+                realtimeSession = null
+                realtimeClosed = null
                 segmentVad?.release()
                 segmentVad = null
                 _livePromptActive.value = false
                 cleanupAudioRouting()
+                // Cancelled by [cancelRecording] rather than failed: the user ended the start, and that is
+                // not a failure to report back to them.
+                if (!isActive) return@launch
                 _state.value = UiState.Error(
                     // Most common cause is the missing RECORD_AUDIO permission (granted in onboarding).
                     appContext.getString(R.string.dictate__error_recording_failed, t.message ?: ""),
