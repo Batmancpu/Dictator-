@@ -824,9 +824,10 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         when (candidate) {
             is ClipboardSuggestionCandidate -> editorInstance.commitClipboardItem(candidate.clipboardItem)
             // Written behind the cursor verbatim, not over the current word (issue #329). What stands
-            // in front of it is the sum the user typed, and "150 * 4 = " must keep every character of
-            // itself — commitCompletion would treat the trailing token as something to replace.
-            is MathSuggestionCandidate -> editorInstance.commitText(candidate.result)
+            // in front of it is the sum the user typed, and "150 * 4" must keep every character of
+            // itself — commitCompletion would treat the trailing token as something to replace. The
+            // completion brings its own "=" when none was typed yet (issue #440).
+            is MathSuggestionCandidate -> editorInstance.commitText(candidate.completion)
             else -> editorInstance.commitCompletion(candidate)
         }
     }

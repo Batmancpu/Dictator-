@@ -16,13 +16,14 @@ import java.text.DecimalFormatSymbols
 import java.util.Locale
 
 /**
- * Answers `150 * 4 =` in the suggestion strip (issue #329).
+ * Answers `150 * 4` in the suggestion strip (issues #329, #440).
  *
  * Two things shape everything here.
  *
  * The first is that this runs on **every keystroke**, in front of the word suggestions, so it has to
  * decide "not a sum" almost instantly and almost always. Hence the hard limits below and the fact that
- * the very first test is a single character comparison: no trailing `=`, no work.
+ * the very first test is a single character comparison: a sum ends in a digit, a bracket or `=`, and
+ * anything else costs no work.
  *
  * The second is the **decimal separator**. `1,5 * 2` is how half of Europe writes it and `1.5 * 2` is
  * how the other half does, and the same two characters swap roles as the thousands separator. Which is
@@ -53,31 +54,63 @@ object Calculator {
     private const val OPERATORS = "+-*/×÷−"
 
     /**
-     * The result of the arithmetic expression ending at the cursor, formatted for [locale], or null when
+     * The operators that mean arithmetic wherever they stand between two numbers. `-` and `/` are not
+     * among them: written tight, they are a date (`2026-10-01`, `10/1/2026`), a range (`9-5`), a phone
+     * number (`555-1234`) or a ratio (`24/7`) far more often than a calculation.
+     */
+    private const val UNAMBIGUOUS_OPERATORS = "+*×÷−"
+
+    /**
+     * A sum found in front of the cursor.
+     *
+     * @property result What it comes to, in the language's own notation — the label on the strip.
+     * @property completion What a tap writes behind the cursor so that the line reads as a finished sum:
+     *  `=5` where no equals sign was typed yet, only `5` where one was. Never a replacement — the
+     *  expression the user typed stays exactly as it is (issue #440).
+     */
+    data class Answer(val result: String, val completion: String)
+
+    /** The expression [trailingExpression] found, and how the user wrote it. */
+    internal data class Trailing(
+        val expression: String,
+        val equalsTyped: Boolean,
+        /** Whether the sum was written with spaces, which the completion then follows. */
+        val spaced: Boolean,
+    )
+
+    /**
+     * The answer to the arithmetic expression ending at the cursor, formatted for [locale], or null when
      * [textBeforeCursor] does not end in one.
      */
-    fun evaluateTrailing(textBeforeCursor: String, locale: Locale): String? {
-        val expression = trailingExpression(textBeforeCursor) ?: return null
+    fun evaluateTrailing(textBeforeCursor: String, locale: Locale): Answer? {
+        val trailing = trailingExpression(textBeforeCursor) ?: return null
         val symbols = DecimalFormatSymbols.getInstance(locale)
         val value = runCatching {
-            Parser(expression, symbols.decimalSeparator, symbols.groupingSeparator).parse()
+            Parser(trailing.expression, symbols.decimalSeparator, symbols.groupingSeparator).parse()
         }.getOrNull() ?: return null
-        return format(value, symbols.decimalSeparator)
+        val result = format(value, symbols.decimalSeparator) ?: return null
+        return Answer(result, completion(trailing, result, textBeforeCursor.endsWith(' ')))
     }
 
     /**
-     * The expression standing in front of a trailing `=`, or null.
+     * The expression standing at the cursor, with or without a trailing `=`, or null.
      *
      * Reads backwards from the cursor and stops at the first character that could not be part of a sum,
      * which is what keeps this out of the way of ordinary text: in `x=5` the character before the `=` is
      * a letter, so there is no expression at all. A letter or digit immediately in front of what was
      * collected disqualifies it for the same reason — `abc5+5=` is not arithmetic somebody typed.
+     *
+     * Without the `=` the sum has to say by itself that it is one (issue #440): `2+3` does, `2026-10-01`
+     * does not — see [asksForAnswer].
      */
-    internal fun trailingExpression(textBeforeCursor: String): String? {
-        // One trailing space is allowed, because "150 * 4 = " is how a person writes it.
-        val beforeEquals = textBeforeCursor.trimEnd(' ')
-        if (!beforeEquals.endsWith('=')) return null
-        val body = beforeEquals.dropLast(1)
+    internal fun trailingExpression(textBeforeCursor: String): Trailing? {
+        // Trailing spaces are allowed, because "150 * 4 = " is how a person writes it, and "2 + 3 " is
+        // what stands there the moment before the "=" is typed.
+        val trimmed = textBeforeCursor.trimEnd(' ')
+        val last = trimmed.lastOrNull() ?: return null
+        val equalsTyped = last == '='
+        if (!equalsTyped && !last.isDigit() && last != ')') return null
+        val body = if (equalsTyped) trimmed.dropLast(1) else trimmed
 
         var start = body.length
         while (start > 0) {
@@ -97,7 +130,46 @@ object Calculator {
         // A bare number followed by "=" is not a calculation, it is a line of a form being filled in.
         // The leading sign of a negative number does not count as the operator that makes it one.
         if (expression.drop(1).none { it in OPERATORS }) return null
-        return expression
+        if (!equalsTyped && !asksForAnswer(expression)) return null
+        return Trailing(
+            expression = expression,
+            equalsTyped = equalsTyped,
+            // In "2+3 =" the space before the equals sign is the only one there is, and it still says
+            // how this person writes a sum.
+            spaced = ' ' in expression || body.endsWith(' '),
+        )
+    }
+
+    /**
+     * Whether [expression] reads as a sum somebody wants answered even though no `=` asked for it.
+     *
+     * One operator from [UNAMBIGUOUS_OPERATORS] is enough. `-` and `/` count only with a space beside
+     * them, because `10 - 3` is somebody calculating and `10-3` is as likely a score or a date. Typing the
+     * `=` settles it either way, which is why this is never asked when one was typed.
+     */
+    internal fun asksForAnswer(expression: String): Boolean =
+        (1 until expression.length).any { i ->
+            val c = expression[i]
+            c in UNAMBIGUOUS_OPERATORS ||
+                (c == '-' || c == '/') && (expression[i - 1] == ' ' || expression.getOrNull(i + 1) == ' ')
+        }
+
+    /**
+     * What a tap writes behind the cursor, in the spacing the user chose for the sum itself: `2+3`
+     * becomes `2+3=5`, `2 + 3` becomes `2 + 3 = 5`, and `2 + 3 =` only gets its ` 5`.
+     *
+     * Completing rather than replacing is the point of issue #440: the expression is what the reader of
+     * the message needs to see, and somebody who wanted only the number would not have typed the sum
+     * into the field in the first place.
+     */
+    private fun completion(trailing: Trailing, result: String, endsWithSpace: Boolean): String {
+        val gap = if (trailing.spaced) " " else ""
+        return when {
+            trailing.equalsTyped && endsWithSpace -> result
+            trailing.equalsTyped -> "$gap$result"
+            endsWithSpace -> "= $result"
+            else -> "$gap=$gap$result"
+        }
     }
 
     /** Plain decimal notation, trailing zeros removed, in the language's own decimal separator. */

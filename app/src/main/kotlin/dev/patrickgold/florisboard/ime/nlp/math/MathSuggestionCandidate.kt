@@ -17,17 +17,21 @@ import dev.patrickgold.florisboard.ime.nlp.SuggestionCandidate
 import dev.patrickgold.florisboard.ime.nlp.SuggestionProvider
 
 /**
- * The answer to a sum the user just finished typing, offered in the suggestion strip (issue #329).
+ * The answer to a sum standing at the cursor, offered in the suggestion strip (issues #329, #440).
  *
- * Never [isEligibleForAutoCommit]: the strip may offer an answer, it may not decide that `=` meant the
- * user wanted one. Somebody typing `x = ` in a note is not asking for arithmetic, and the cost of being
- * wrong about that is text they did not write.
+ * Never [isEligibleForAutoCommit]: the strip may offer an answer, it may not decide that the user wanted
+ * one. Somebody typing `x = ` in a note is not asking for arithmetic, and the cost of being wrong about
+ * that is text they did not write.
  *
  * The icon is what tells the two apart at a glance — a bare `600` sitting where word suggestions
  * normally are would read as a word the dictionary is proposing.
+ *
+ * Shows [result] but writes [completion], which finishes the line behind the cursor (`2+3` → `2+3=5`)
+ * — see [Calculator.Answer].
  */
 data class MathSuggestionCandidate(
     val result: String,
+    val completion: String,
     override val sourceProvider: SuggestionProvider? = null,
 ) : SuggestionCandidate {
     override val text: CharSequence

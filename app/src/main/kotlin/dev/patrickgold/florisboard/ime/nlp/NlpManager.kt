@@ -660,22 +660,24 @@ class NlpManager(context: Context) {
     }
 
     /**
-     * The answer to a sum the user just finished typing, or an empty list (issue #329).
+     * The answer to a sum standing at the cursor, or an empty list (issues #329, #440).
      *
-     * Ahead of both the clipboard and the word suggestions in [assembleCandidates], because typing `=`
-     * is an expressed intent and a clipboard offer is a guess. Never in a password field: the strip is
-     * the one place a keyboard shows back what is being typed, and there it must not.
+     * Ahead of both the clipboard and the word suggestions in [assembleCandidates], because a sum is what
+     * the user is writing right now and a clipboard offer is a guess. It only borrows the strip: nothing
+     * is dismissed or marked used, so the clip and the words are back by themselves with the first
+     * character that is not part of the sum. Never in a password field: the strip is the one place a
+     * keyboard shows back what is being typed, and there it must not.
      */
     private fun mathCandidates(): List<SuggestionCandidate> {
         if (!prefs.suggestion.mathSuggestions.get()) return emptyList()
         val state = keyboardManager.activeState
         if (state.keyVariation == KeyVariation.PASSWORD) return emptyList()
         if (editorInstance.activeInfo.isRawInputEditor) return emptyList()
-        val result = Calculator.evaluateTrailing(
+        val answer = Calculator.evaluateTrailing(
             textBeforeCursor = editorInstance.activeContent.textBeforeSelection,
             locale = subtypeManager.activeSubtype.primaryLocale.base,
         ) ?: return emptyList()
-        return listOf(MathSuggestionCandidate(result))
+        return listOf(MathSuggestionCandidate(result = answer.result, completion = answer.completion))
     }
 
     private fun assembleCandidates() {

@@ -1779,8 +1779,9 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             default = false,
         )
         // On by default (issue #329), unlike the learning above: this one keeps no record, changes
-        // nothing on its own, and only ever appears when somebody has literally typed a sum and then an
-        // equals sign. Tapping it is the only way anything reaches the field.
+        // nothing on its own, and only ever appears on a sum somebody has literally typed — with an
+        // equals sign, or with an operator that cannot mean anything else (issue #440). Tapping it is the
+        // only way anything reaches the field.
         val mathSuggestions = boolean(
             key = "suggestion__math_suggestions",
             default = true,
