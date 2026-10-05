@@ -1306,7 +1306,7 @@
     <string name="dictate__providers_field_realtime_model">Modelo em tempo real</string>
     <string name="dictate__providers_custom_realtime">Transmissão em tempo real</string>
     <string name="dictate__providers_custom_realtime_summary">Este servidor usa o protocolo realtime da OpenAI em /v1/realtime</string>
-    <string name="dictate__providers_custom_warm_up">Acordar antes de reformular</string>
+    <string name="dictate__providers_custom_warm_up">Acordar com antecedência</string>
     <string name="dictate__providers_custom_warm_up_summary">Aciona o servidor cedo para que uma máquina dormindo tenha tempo de ligar</string>
     <string name="dictate__providers_realtime_model_default">Padrão</string>
     <string name="dictate__instant_recording_title">Gravação instantânea</string>
