@@ -73,18 +73,7 @@
         <!-- Allow app to be profiled for benchmarking and baseline profile generation -->
         <profileable android:shell="true"/>
 
-        <!-- IME service -->
-        <service
-            android:name="dev.patrickgold.florisboard.FlorisImeService"
-            android:label="@string/floris_app_name"
-            android:permission="android.permission.BIND_INPUT_METHOD"
-            android:directBootAware="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.view.InputMethod"/>
-            </intent-filter>
-            <meta-data android:name="android.view.im" android:resource="@xml/method"/>
-        </service>
+        <!-- IME service removed -->
 
         <!-- Dictate floating-overlay accessibility service (issue #88): optional, user-enabled. Detects
              when a text field is focused in any app so the floating dictation button can appear, and
@@ -104,17 +93,7 @@
                 android:resource="@xml/accessibility_service_config"/>
         </service>
 
-        <!-- Spellchecker service -->
-        <service
-            android:name="dev.patrickgold.florisboard.FlorisSpellCheckerService"
-            android:label="@string/floris_app_name"
-            android:permission="android.permission.BIND_TEXT_SERVICE"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.service.textservice.SpellCheckerService"/>
-            </intent-filter>
-            <meta-data android:name="android.view.textservice.scs" android:resource="@xml/spellchecker"/>
-        </service>
+        <!-- Spellchecker service removed -->
 
         <!-- Wear OS Data Layer endpoint (#106): answers settings-sync requests from the watch app. -->
         <service
