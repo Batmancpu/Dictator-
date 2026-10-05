@@ -2,7 +2,7 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, dictator, dictator-* ]
   workflow_dispatch:
 
 permissions:
@@ -47,9 +47,16 @@ jobs:
         run: |
           chmod +x gradlew
           chmod +x tools/fetch-sherpa-onnx.sh
+          chmod +x tools/bergamot/build-android.sh
 
       - name: Fetch Sherpa ONNX Libraries
         run: ./tools/fetch-sherpa-onnx.sh
+
+      - name: Build Bergamot Translation Engine
+        run: |
+          export ANDROID_HOME=$ANDROID_SDK_ROOT
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "cmake;4.1.2" "ndk;29.0.14206865"
+          ./tools/bergamot/build-android.sh
 
       - name: Build APK
         run: ./gradlew assembleDebug

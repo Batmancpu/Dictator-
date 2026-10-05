@@ -1,12 +1,12 @@
 <div align="center">
 
-<img src="img/Icon_512x512_2_round.png" alt="Dictate Keyboard logo" width="120">
+<img src="img/Icon_512x512_2_round.png" alt="Dictator Keyboard logo" width="120">
 
-# Dictate Keyboard
+# Dictator Keyboard
 
 ### Speak instead of type — in any app.
 
-A powerful Whisper AI keyboard for dictation, real-time transcription and typing.
+A powerful Whisper AI keyboard for dictation, real-time transcription and typing. Created by Mangoloads, with proportional credit to the original Dictate creators.
 
 <p>
   <a href="https://dictatekeyboard.com"><img alt="Website" src="https://img.shields.io/badge/website-dictatekeyboard.com-30B7E6?labelColor=1b1e2b&logo=googlechrome&logoColor=white"></a>
