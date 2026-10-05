@@ -65,6 +65,60 @@ object TranscriptJoin {
         return out.append(text)
     }
 
+    /**
+     * The marks the keyboard's phantom space accepts on either side of a seam — the "default" rule of the
+     * localization extension, for callers with no keyboard in reach. See [separatorBefore].
+     */
+    const val DEFAULT_SEAM_PRECEDING = ".,;:?‽!&%)]}»©®™"
+    const val DEFAULT_SEAM_FOLLOWING = "¿⸘¡([{"
+
+    /**
+     * The separator a dictation needs in front of it to sit next to [textBefore], the text already in the
+     * field up to the cursor: a single space, or nothing.
+     *
+     * Two dictations in a row used to be glued — `Testing 1, 2, 3.Testing one-two-three.` — because every
+     * write went in exactly as transcribed. The keyboard only ever spaced a seam it made itself, through
+     * the phantom space after a picked suggestion; a dictation never set that up, and the floating button
+     * has no keyboard to ask at all. So this is the phantom space's own rule, asked of the field instead
+     * of a flag: a space between a word (or a closing mark from [precedingSymbols]) and a word (or an
+     * opening one from [followingSymbols]), and nowhere else. A mark that binds backwards (`.`, `,`) and a
+     * field that already ends in whitespace both get nothing.
+     *
+     * Scripts written without spaces between words — Chinese, Japanese, Thai and their neighbours — never
+     * get one, on either side of the seam. That is decided from the characters rather than from the
+     * keyboard's locale, because the floating button writes beside keyboards we cannot ask.
+     *
+     * [textBefore] null means the field could not be read, and an unread field gets no space: a stray one
+     * at the start of a field is as wrong as a missing one in the middle, and only one of them is ours.
+     */
+    fun separatorBefore(
+        textBefore: String?,
+        piece: String,
+        precedingSymbols: String = DEFAULT_SEAM_PRECEDING,
+        followingSymbols: String = DEFAULT_SEAM_FOLLOWING,
+    ): String {
+        val before = textBefore?.lastOrNull() ?: return ""
+        val first = piece.firstOrNull() ?: return ""
+        if (before.isWhitespace() || first.isWhitespace()) return ""
+        if (writtenWithoutSpaces(before) || writtenWithoutSpaces(first)) return ""
+        val closesWord = before.isLetterOrDigit() || precedingSymbols.contains(before)
+        val opensWord = first.isLetterOrDigit() || followingSymbols.contains(first)
+        return if (closesWord && opensWord) " " else ""
+    }
+
+    private fun writtenWithoutSpaces(ch: Char): Boolean = when (Character.UnicodeScript.of(ch.code)) {
+        Character.UnicodeScript.HAN,
+        Character.UnicodeScript.HIRAGANA,
+        Character.UnicodeScript.KATAKANA,
+        Character.UnicodeScript.THAI,
+        Character.UnicodeScript.LAO,
+        Character.UnicodeScript.KHMER,
+        Character.UnicodeScript.MYANMAR,
+        Character.UnicodeScript.TIBETAN,
+        -> true
+        else -> false
+    }
+
     /** [appendPiece] for the callers that hold their head as a plain string. */
     fun join(
         head: String,
@@ -116,3 +170,20 @@ internal fun Context.transcriptTighteningSymbols(): String = runCatching {
     val nlp = nlpManager()
     if (nlp.isInitialized()) nlp.value.getActivePunctuationRule().symbolsTighteningSpace else null
 }.getOrNull() ?: TranscriptJoin.DEFAULT_TIGHTENING_SYMBOLS
+
+/**
+ * [TranscriptJoin.separatorBefore] with the active punctuation rule's phantom-space marks, on the same
+ * terms as [transcriptTighteningSymbols]: the keyboard's rule when it is already up, the default otherwise.
+ */
+internal fun Context.transcriptSeparatorBefore(textBefore: String?, piece: String): String {
+    val rule = runCatching {
+        val nlp = nlpManager()
+        if (nlp.isInitialized()) nlp.value.getActivePunctuationRule() else null
+    }.getOrNull()
+    return TranscriptJoin.separatorBefore(
+        textBefore = textBefore,
+        piece = piece,
+        precedingSymbols = rule?.symbolsPrecedingPhantomSpace ?: TranscriptJoin.DEFAULT_SEAM_PRECEDING,
+        followingSymbols = rule?.symbolsFollowingPhantomSpace ?: TranscriptJoin.DEFAULT_SEAM_FOLLOWING,
+    )
+}

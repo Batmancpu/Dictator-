@@ -105,4 +105,56 @@ class TranscriptJoinTest : FunSpec({
         // the active rule passes it instead.
         TranscriptJoin.DEFAULT_TIGHTENING_SYMBOLS shouldBe ".,;:?!‽"
     }
+
+    test("a dictation after a finished sentence gets the space it was missing (issue #443's video)") {
+        // `Testing 1, 2, 3.Testing one-two-three.` — the second dictation glued to the first.
+        TranscriptJoin.separatorBefore("1, 2, 3.", "Testing one-two-three.") shouldBe " "
+        TranscriptJoin.separatorBefore("Hey there", "how are you") shouldBe " "
+        TranscriptJoin.separatorBefore("Wait,", "what") shouldBe " "
+        TranscriptJoin.separatorBefore("(see above)", "Then") shouldBe " "
+    }
+
+    test("whitespace already in the field, or at the head of the dictation, is the separator") {
+        TranscriptJoin.separatorBefore("Hey there ", "how") shouldBe ""
+        TranscriptJoin.separatorBefore("First line\n", "Second") shouldBe ""
+        TranscriptJoin.separatorBefore("Hey there", " how") shouldBe ""
+    }
+
+    test("the start of a field, an unreadable field and an empty dictation get nothing") {
+        TranscriptJoin.separatorBefore("", "Hello") shouldBe ""
+        // Null is "could not read", not "empty" — a stray space at the start of a field would be ours.
+        TranscriptJoin.separatorBefore(null, "Hello") shouldBe ""
+        TranscriptJoin.separatorBefore("Hello", "") shouldBe ""
+    }
+
+    test("a dictation opening with a mark that binds backwards goes straight against the word") {
+        TranscriptJoin.separatorBefore("Hey there", ".") shouldBe ""
+        TranscriptJoin.separatorBefore("Hey there", ", and then") shouldBe ""
+        TranscriptJoin.separatorBefore("Hey there", "?") shouldBe ""
+    }
+
+    test("opening marks on the left and closing marks on the right are not word edges") {
+        TranscriptJoin.separatorBefore("Note (", "see above") shouldBe ""
+        TranscriptJoin.separatorBefore("\"", "Hello") shouldBe ""
+        TranscriptJoin.separatorBefore("Hey", ")") shouldBe ""
+        // …while an opening mark at the head of the dictation still starts a new word.
+        TranscriptJoin.separatorBefore("Hey there.", "(Aside)") shouldBe " "
+        TranscriptJoin.separatorBefore("Hola.", "¿Qué tal?") shouldBe " "
+    }
+
+    test("scripts written without spaces never get one, on either side of the seam") {
+        TranscriptJoin.separatorBefore("你好", "我很好") shouldBe ""
+        TranscriptJoin.separatorBefore("こんにちは", "元気です") shouldBe ""
+        TranscriptJoin.separatorBefore("สวัสดี", "ครับ") shouldBe ""
+        TranscriptJoin.separatorBefore("OK", "你好") shouldBe ""
+        TranscriptJoin.separatorBefore("你好。", "OK") shouldBe ""
+        // Korean spaces its words, so it is treated like any other spaced script.
+        TranscriptJoin.separatorBefore("안녕하세요.", "반갑습니다") shouldBe " "
+    }
+
+    test("the marks come from the caller, so a rule without opening marks spaces fewer seams") {
+        TranscriptJoin.separatorBefore("Hey there.", "(Aside)", followingSymbols = "") shouldBe ""
+        TranscriptJoin.separatorBefore("50%", "of it", precedingSymbols = "") shouldBe ""
+        TranscriptJoin.separatorBefore("50%", "of it") shouldBe " "
+    }
 })

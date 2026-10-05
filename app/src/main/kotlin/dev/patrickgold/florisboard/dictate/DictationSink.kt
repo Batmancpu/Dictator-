@@ -45,6 +45,14 @@ interface DictationSink {
     fun selectAll()
 
     /**
+     * Up to [length] characters in front of the cursor (in front of the selection, when there is one),
+     * or null when the field cannot be read. Empty means the cursor sits at the start of the field —
+     * the two are kept apart because only the second is a fact. Used to space a dictation against the
+     * text it lands next to ([TranscriptJoin.separatorBefore]).
+     */
+    fun textBeforeCursor(length: Int): String?
+
+    /**
      * Presses Enter / triggers the editor action (auto-enter, roadmap 10.1). Returns whether the field
      * accepted it — the keyboard dispatches a real key event and always does, while the overlay can only
      * *ask* the field, and an app that implements no editor action simply refuses (issue #278).
@@ -116,6 +124,14 @@ class ImeDictationSink(context: Context) : DictationSink {
             return
         }
         editorInstance.performClipboardSelectAll()
+    }
+
+    override fun textBeforeCursor(length: Int): String? {
+        field()?.let { field ->
+            val current = keyboardManager.fieldText(field) ?: return null
+            return current.text.substring(0, current.cursor.coerceIn(0, current.text.length)).takeLast(length)
+        }
+        return editorInstance.activeContent.textBeforeSelection.takeLast(length)
     }
 
     override fun performEnter(): Boolean {

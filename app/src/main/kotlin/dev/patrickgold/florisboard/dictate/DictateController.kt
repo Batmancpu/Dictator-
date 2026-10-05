@@ -318,6 +318,18 @@ object DictateController {
     private var realtimeClosed: CompletableDeferred<Unit>? = null
     private var realtimeContext: Context? = null     // app context to edit the field's provisional text
     private val realtimeShown = StringBuilder()       // text currently committed to the field this session
+
+    /**
+     * The separator decided for the dictation currently in the field — a space or nothing (issue #443),
+     * see [leadFor]. Decided once, at the dictation's first write: by its second, the text in front of the
+     * cursor is our own. While [realtimeShown] holds a preview it begins with this, so the diff, the
+     * finalize and the cancel all carry the separator along without knowing about it.
+     */
+    private var dictationLead = ""
+
+    /** The separator in front of the last committed dictation, so the bubble's undo takes it back too. */
+    private var lastDictationLead = ""
+
     /**
      * Everything the stream has produced so far, whether or not any of it was put into the field (#345).
      *
@@ -2213,18 +2225,28 @@ object DictateController {
         }
         // Deterministic find-and-replace dictionary (issue #129), applied right before insert.
         val outputText = prefs.dictate.customMappings.get().apply(paragraphed)
+        // The space in front of it, if the field needs one (#443). Kept out of [outputText] on purpose:
+        // the history, the re-insert cache and the clipboard copies hold the dictation, not the seam.
+        val lead: String
         if (finalizeViaComposing) {
             // Realtime (#128): replace the live-streamed preview with the finished (reworded) result via the
             // minimal diff, then honor auto-enter — instead of committing on top of the preview.
             val outSink = sink(appContext)
+            // A preview already on screen carries the separator decided at its first word; asking the field
+            // now would find our own preview in front of the cursor.
+            lead = when {
+                outputText.isEmpty() -> ""
+                realtimeShown.isNotEmpty() -> dictationLead
+                else -> leadFor(appContext, outputText)
+            }
             // Off the main thread for the overlay, like every other accessibility write: this one ends
             // in the same resolve-focus-write-verify round trip (see [writeToSink]).
             val landed = if (outputTarget == OutputTarget.OVERLAY) {
                 withContext(Dispatchers.IO) {
-                    outSink.commitDictationFinal(outputText, realtimeShown.toString())
+                    outSink.commitDictationFinal(lead + outputText, realtimeShown.toString())
                 }
             } else {
-                outSink.commitDictationFinal(outputText, realtimeShown.toString())
+                outSink.commitDictationFinal(lead + outputText, realtimeShown.toString())
             }
             realtimeShown.setLength(0)
             realtimeTranscript.setLength(0)
@@ -2248,7 +2270,8 @@ object DictateController {
             ) {
                 copyToSystemClipboard(appContext, outputText)
             }
-            val committed = commitOutput(appContext, outputText)
+            lead = leadFor(appContext, outputText)
+            val committed = commitOutput(appContext, lead + outputText)
             if (committed) latencyTrace?.let { logLatency(it, "outputCommitted") }
             // Floating button (#156): the accessibility insert can be silently swallowed by some app fields
             // (Gemini's Compose box, WebViews). Don't flash a false green check — surface an error, and
@@ -2272,6 +2295,7 @@ object DictateController {
         }
         // Re-insert safety net (issue #111) + lifetime stats (issue #142) + history log (issue #140).
         rememberLastDictation(outputText)
+        lastDictationLead = lead
         if (capture?.isReplay != true) {
             DictateStats.recordDictation(prefs, outputText, recordedSeconds)
             if (recordedSeconds > 0L) creditAudioSeconds(recordedSeconds)
@@ -2427,7 +2451,7 @@ object DictateController {
         // unless the preview is held back (#345), in which case the words are only remembered and the field
         // sees nothing until stop. The stream itself runs identically either way; this is purely what the
         // user is shown, so hiding it costs no speed and removes the word-by-word churn.
-        fun showLive(full: String) {
+        suspend fun showLive(full: String) {
             if (realtimeCancelled) return   // a late callback must not re-add text after a cancel
             _interimText.value = full
             realtimeTranscript.setLength(0)
@@ -2466,9 +2490,13 @@ object DictateController {
                 }
             }
             if (realtimeHidden) return
-            runCatching { sink(appContext).setDictationPreview(full, realtimeShown.toString()) }
+            // The separator is settled before the first word goes in (#443) and then travels with the
+            // preview, so the finalize replaces like with like.
+            if (realtimeShown.isEmpty()) dictationLead = leadFor(appContext, full)
+            val shown = if (full.isEmpty()) "" else dictationLead + full
+            runCatching { sink(appContext).setDictationPreview(shown, realtimeShown.toString()) }
             realtimeShown.setLength(0)
-            realtimeShown.append(full)
+            realtimeShown.append(shown)
         }
         // Read once for the whole session rather than per piece, so a subtype switch mid-dictation cannot
         // leave one transcript joined by two different conventions.
@@ -2834,7 +2862,13 @@ object DictateController {
                 segmentCommitIndex++
                 if (raw.isNotEmpty()) {
                     val prev = realtimeShown.toString()
-                    val full = TranscriptJoin.join(prev, raw, tightening)
+                    // The first segment is the one that meets the field's own text (#443).
+                    val full = if (prev.isEmpty()) {
+                        dictationLead = leadFor(appContext, raw)
+                        dictationLead + raw
+                    } else {
+                        TranscriptJoin.join(prev, raw, tightening)
+                    }
                     runCatching { sink(appContext).setDictationPreview(full, prev) }
                     realtimeShown.setLength(0)
                     realtimeShown.append(full)
@@ -3033,6 +3067,27 @@ object DictateController {
             sink.performEnter()
         }
         return committed
+    }
+
+    /**
+     * The separator a dictation of [text] needs against what already sits in front of the cursor: a space,
+     * or nothing (issue #443). Two dictations in a row used to be glued — `1, 2, 3.Testing` — on the
+     * keyboard as much as over the floating button, because the keyboard only ever spaced a seam it made
+     * itself, after a picked suggestion. The rule is [TranscriptJoin.separatorBefore]; this only asks the
+     * field, off the main thread for the overlay like every other accessibility call.
+     *
+     * Nothing for the system voice input: the calling app joins our result into its own field.
+     */
+    private suspend fun leadFor(appContext: Context, text: String): String {
+        if (text.isEmpty() || outputTarget == OutputTarget.RECOGNITION_SERVICE) return ""
+        val sink = sink(appContext)
+        // One character is all the rule looks at.
+        val before = if (outputTarget == OutputTarget.OVERLAY) {
+            withContext(Dispatchers.IO) { sink.textBeforeCursor(1) }
+        } else {
+            sink.textBeforeCursor(1)
+        }
+        return appContext.transcriptSeparatorBefore(before, text)
     }
 
     /**
@@ -3485,7 +3540,12 @@ object DictateController {
         val text = prefs.dictate.lastDictation.get()
         if (text.isEmpty()) return false
         outputTarget = OutputTarget.OVERLAY
-        if (!sink(context).deleteLastText(text)) return false
+        // The space put in front of it (#443) goes with it; the bare text is the fallback for a field the
+        // user has edited in between, and for a dictation from before the process last restarted.
+        val sink = sink(context)
+        val lead = lastDictationLead
+        if (!(lead.isNotEmpty() && sink.deleteLastText(lead + text)) && !sink.deleteLastText(text)) return false
+        lastDictationLead = ""
         scope.launch { prefs.dictate.lastDictation.set("") }
         clearError()
         return true
