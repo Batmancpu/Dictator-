@@ -358,6 +358,10 @@ object DictateController {
     private val segmentMutex = Mutex()        // orders index assignment + rotate + the commit drain
     private var segmentInFlightCount = 0      // segments cut but not yet committed
     private var segmentStopped = false        // stop requested; finish once the queue drains
+    // Moves on whenever a session ends or gives up on its pending segments. A segment job carries the
+    // value it was cut under, and a result from another one is dropped: it belongs to a dictation that is
+    // over, and the maps and the field it would write into now belong to the next one (#172).
+    private var segmentGeneration = 0
     private var segmentRecordedSeconds = 0L
     private var segmentVad: LiveSpeechSplitter? = null  // live VAD auto-split, when enabled (Phase 2)
     private val segmentAudioFiles = HashMap<Int, File>()  // kept segment WAVs (index -> file) for history merge
@@ -1381,6 +1385,12 @@ object DictateController {
      */
     fun cancelTranscription() {
         if (_state.value !is UiState.Transcribing) return
+        // A stopped long-form dictation has no transcribeJob to cancel; its work is the segment jobs.
+        val segmentContext = realtimeContext
+        if (segmentedActive && segmentContext != null) {
+            abandonPendingSegments(segmentContext)
+            return
+        }
         transcribeJob?.cancel()
         transcribeJob = null
         _pendingPrompts.value = emptyList()
@@ -2739,6 +2749,7 @@ object DictateController {
     }
 
     private fun resetSegmentedState() {
+        segmentGeneration++
         segmentedActive = false
         segmentNextIndex = 0
         segmentCommitIndex = 0
@@ -2764,6 +2775,7 @@ object DictateController {
     private fun flushSegment(context: Context, splitterAlreadyReset: Boolean) {
         if (!segmentedActive || _state.value !is UiState.Recording) return
         val appContext = context.applicationContext
+        val generation = segmentGeneration
         // Manual cuts reset the analyzer at call time so audio queued after this point belongs to the next
         // turn. Automatic cuts already reset atomically inside LiveSpeechSplitter before invoking us.
         if (!splitterAlreadyReset) segmentVad?.notifyCut()
@@ -2780,11 +2792,11 @@ object DictateController {
             } ?: return@launch
             val (idx, wav) = assigned
             if (wav != null && wav.exists() && wav.length() > 0L) {
-                launchSegmentTranscription(appContext, idx, wav)
+                launchSegmentTranscription(appContext, idx, wav, generation)
             } else {
                 // Nothing captured since the last cut (e.g. a double tap): keep the index sequence
                 // contiguous so the ordered drain never stalls.
-                onSegmentResult(appContext, idx, "")
+                onSegmentResult(appContext, idx, "", generation)
             }
         }
     }
@@ -2820,6 +2832,7 @@ object DictateController {
         segmentRecordedSeconds = recordedSecondsOf(_state.value)
         _segmentedRecording.value = false
         setTranscribing()
+        val generation = segmentGeneration
         scope.launch {
             val assigned = segmentMutex.withLock {
                 val i = segmentNextIndex++
@@ -2840,14 +2853,42 @@ object DictateController {
             }
             val (idx, wav) = assigned
             if (!discardFinal && wav != null && wav.exists() && wav.length() > 0L) {
-                launchSegmentTranscription(appContext, idx, wav)
+                launchSegmentTranscription(appContext, idx, wav, generation)
             } else {
-                onSegmentResult(appContext, idx, "")
+                onSegmentResult(appContext, idx, "", generation)
             }
         }
     }
 
-    private fun launchSegmentTranscription(appContext: Context, idx: Int, wav: File) {
+    /**
+     * The stop button while a stopped long-form dictation still waits for its last segments (#172). It used
+     * to cancel nothing: the state went to Idle, the segment jobs ran on and committed their text anyway,
+     * and one still running when the next recording started wrote into that one.
+     *
+     * Now it keeps what has already landed in the field, gives up on everything still pending, and finishes
+     * with that through the normal end (formatting, prompts, history) — the promise the trash button makes
+     * during the recording (#183). A segment that finished out of order is dropped with the rest: it sits
+     * behind a gap that is never going to close.
+     */
+    private fun abandonPendingSegments(appContext: Context) {
+        scope.launch {
+            segmentMutex.withLock {
+                segmentGeneration++ // whatever is still in flight now belongs to no dictation
+                segmentJobs.forEach { it.cancel() }
+                segmentJobs.clear()
+                segmentResults.clear()
+                segmentAudioFiles.keys.filter { it >= segmentCommitIndex }.forEach { idx ->
+                    segmentAudioFiles.remove(idx)?.let { runCatching { it.delete() } }
+                }
+                segmentInFlightCount = 0
+                _segmentsInFlight.value = 0
+                segmentStopped = true
+            }
+            finalizeSegmentedEnd(appContext)
+        }
+    }
+
+    private fun launchSegmentTranscription(appContext: Context, idx: Int, wav: File, generation: Int) {
         val job = scope.launch {
             // Best-effort cross-segment continuity: bias the recognizer with what's committed so far.
             val continuity = realtimeShown.toString()
@@ -2857,7 +2898,7 @@ object DictateController {
                 ?: transcribeSegmentRaw(appContext, wav, continuity)
             // Keep the WAV when it will be merged into the history audio; otherwise drop it now.
             if (!segmentKeepAudio) withContext(Dispatchers.IO) { runCatching { wav.delete() } }
-            onSegmentResult(appContext, idx, text ?: "")
+            onSegmentResult(appContext, idx, text ?: "", generation)
         }
         segmentJobs.add(job)
         job.invokeOnCompletion { segmentJobs.remove(job) }
@@ -2867,9 +2908,10 @@ object DictateController {
      * Buffers a finished segment's raw text and drains the ordered commit queue: appends every now-in-order
      * segment to the field's live preview. When the last segment lands after a stop, runs the end finalize.
      */
-    private suspend fun onSegmentResult(appContext: Context, idx: Int, text: String) {
+    private suspend fun onSegmentResult(appContext: Context, idx: Int, text: String, generation: Int) {
         val tightening = appContext.transcriptTighteningSymbols()
         val shouldFinish = segmentMutex.withLock {
+            if (generation != segmentGeneration) return@withLock false
             segmentResults[idx] = text
             while (segmentResults.containsKey(segmentCommitIndex)) {
                 val raw = segmentResults.remove(segmentCommitIndex)!!.trim()
