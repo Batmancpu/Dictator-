@@ -87,12 +87,21 @@ class WearAudioRecorder(private val context: Context) {
         thread = Thread {
             val buf = ByteArray(bufferSize)
             while (recording) {
-                val read = recorder.read(buf, 0, buf.size)
+                val read = runCatching { recorder.read(buf, 0, buf.size) }
+                    .getOrDefault(AudioRecord.ERROR_INVALID_OPERATION)
+                if (read < 0) {
+                    // A microphone that is going away does not block, it fails, and a loop that only
+                    // looked at `read > 0` spun at full speed on the watch's CPU until the user pressed
+                    // stop (#172; the phone's recorder learned the same in #411). Wait a moment and keep
+                    // what was captured: the watch has no other source to swap to, and stop still works.
+                    runCatching { Thread.sleep(READ_ERROR_BACKOFF_MS) }
+                    continue
+                }
                 // Keep draining the mic while paused (so the buffer never overflows) but drop the audio,
                 // so paused time contributes no samples — matching the phone's pause behavior.
                 if (read > 0 && !paused) {
-                    runCatching { out.write(buf, 0, read) }
-                    pcmBytes += read
+                    // Counted only once written, so the header never announces audio the file lacks.
+                    runCatching { out.write(buf, 0, read) }.onSuccess { pcmBytes += read }
                     updatePeak(buf, read)
                 }
             }
@@ -119,11 +128,7 @@ class WearAudioRecorder(private val context: Context) {
 
     /** Stops capture, releases the recorder and returns the recorded audio as a `.wav` file. */
     fun stop(): File {
-        recording = false
-        thread?.join()
-        thread = null
-        record?.run { stop(); release() }
-        record = null
+        shutDown()
 
         val out = checkNotNull(raf) { "Recorder was not started" }
         raf = null
@@ -144,16 +149,31 @@ class WearAudioRecorder(private val context: Context) {
     }
 
     fun cancel() {
-        recording = false
-        thread?.join()
-        thread = null
-        record?.run { stop(); release() }
-        record = null
+        shutDown()
         runCatching { raf?.close() }
         raf = null
         outputFile?.delete()
         outputFile = null
         pcmBytes = 0L
+    }
+
+    /**
+     * Ends capture in the phone recorder's order: stop the native recorder, then join, then release.
+     * `read()` blocks until the microphone hands over a buffer, so joining first made every stop and
+     * cancel wait for one — on the main thread, for cancel — and for ever if the read never returned.
+     * Stopping first makes the read return. Release waits for the reader to be gone, so the native object
+     * is never freed under a read in flight, unless stop itself failed, when releasing early is the only
+     * way left to give the microphone back.
+     */
+    private fun shutDown() {
+        recording = false
+        val rec = record
+        record = null
+        val stopped = rec != null && runCatching { rec.stop() }.isSuccess
+        if (!stopped) runCatching { rec?.release() }
+        runCatching { thread?.join() }
+        thread = null
+        if (stopped) runCatching { rec?.release() }
     }
 
     private fun wavHeader(dataLen: Long): ByteArray {
@@ -182,5 +202,7 @@ class WearAudioRecorder(private val context: Context) {
         const val CHANNELS = 1
         const val BITS_PER_SAMPLE = 16
         const val WAV_HEADER_SIZE = 44
+        /** Pause between reads while the microphone keeps failing, the same as the phone's recorder. */
+        const val READ_ERROR_BACKOFF_MS = 20L
     }
 }
