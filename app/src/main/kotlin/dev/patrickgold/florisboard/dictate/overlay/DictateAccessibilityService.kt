@@ -1031,14 +1031,14 @@ class DictateAccessibilityService : AccessibilityService() {
     private var lastPreviewMs = 0L
 
     /** Returns whether the field took the new tail, so callers only advance [previewShown] when it did. */
-    private fun applyPreviewDiff(old: String, new: String): Boolean {
+    private fun applyPreviewDiff(old: String, new: String, verify: Boolean = false): Boolean {
         if (old == new) return true
         val cp = old.commonPrefixWith(new).length
         if (cp < old.length) deleteLastTextFromFocused(old.substring(cp))
         if (cp >= new.length) return true
         // Streaming writes a tail many times a second; a read-back per update would double the IPC and
-        // fight the app's own rendering. The final commit is verified instead.
-        return commitTextIntoFocused(new.substring(cp), verify = false)
+        // fight the app's own rendering. The final commit is verified instead — see the caller.
+        return commitTextIntoFocused(new.substring(cp), verify = verify)
     }
 
     /**
@@ -1066,8 +1066,17 @@ class DictateAccessibilityService : AccessibilityService() {
         lastPreviewMs = now
     }
 
+    /**
+     * The finished realtime transcript, unthrottled and **verified** like a batch insert.
+     *
+     * The comment in [applyPreviewDiff] always promised that the final commit is the verified one, but it
+     * went through that same unverified write. Over the floating button that write is the whole dictation
+     * — the preview is always held back there — so an input connection that swallowed it (seen in AOSP
+     * Messaging, issue #443's investigation) ended in a green check over an unchanged field, while a batch
+     * dictation into the same field noticed and recovered through the node.
+     */
     private fun commitPreviewFinalOnFocused(finalText: String): Boolean {
-        val landed = applyPreviewDiff(previewShown, finalText)   // no throttle — final result always lands
+        val landed = applyPreviewDiff(previewShown, finalText, verify = true)
         previewShown = ""
         lastPreviewMs = 0L
         return landed
