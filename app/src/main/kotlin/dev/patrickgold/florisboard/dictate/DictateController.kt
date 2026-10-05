@@ -108,6 +108,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import java.io.File
 import java.text.NumberFormat
 import java.util.Locale
@@ -2455,7 +2456,7 @@ object DictateController {
         // sees nothing until stop. The stream itself runs identically either way; this is purely what the
         // user is shown, so hiding it costs no speed and removes the word-by-word churn.
         suspend fun showLive(full: String) {
-            if (realtimeCancelled) return   // a late callback must not re-add text after a cancel
+            if (realtimeCancelled) return   // a late callback must not re-add text after a cancel or a finalize
             _interimText.value = full
             realtimeTranscript.setLength(0)
             realtimeTranscript.append(full)
@@ -2635,6 +2636,16 @@ object DictateController {
                 // the clock is restarted by every piece of text and only silence ends it early.
                 val tailComplete = awaitRealtimeTail(closed)
                 runCatching { session?.cancel() }
+                // From here the transcript is read, and nothing that arrives later may touch the field.
+                // `close(1000)` keeps frames coming until the server's own close, and a final that lands
+                // after the commit used to go through showLive with an empty realtimeShown, typing the
+                // whole dictation in a second time: on a slow connection the provider's ordinary last
+                // message is enough, once it misses the silence window (#172). The yield first lets
+                // whatever is already queued on the main thread land: a session that closed before the
+                // wait began left `closed.await()` with nothing to suspend for, and its last segment can
+                // still be waiting behind this coroutine.
+                yield()
+                realtimeCancelled = true
                 // The transcript is everything the stream produced (finals + last partial), which with a
                 // hidden preview (#345) is the only place it exists; fall back to the finalized-segments
                 // buffer only if the stream produced nothing at all.
