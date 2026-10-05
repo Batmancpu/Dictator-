@@ -1799,6 +1799,8 @@
     <string name="dictate__mappings_wholeword_summary">Zastępuj tylko samodzielne słowa, a nie dopasowania wewnątrz dłuższych słów.</string>
     <string name="dictate__mappings_wholeword_title">Tylko całe słowo</string>
     <string name="dictate__wear_standalone_summary">Wyślij swój klucz API do zegarka, aby mógł dyktować bez telefonu w pobliżu.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Dyktowanie z zegarka</string>
+    <string name="dictate__wear_tether_notif_title">Transkrypcja dla zegarka…</string>
     <string name="dictate__wear_standalone_title">Synchronizuj klucz z zegarkiem</string>
     <string name="emoji__search__hint">Szukaj emoji</string>
     <string name="emoji__row__open_panel">Otwórz wszystkie emoji</string>

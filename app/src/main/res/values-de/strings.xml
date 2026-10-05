@@ -1749,6 +1749,8 @@
     <string name="dictate__mappings_wholeword_summary">Nur eigenständige Wörter ersetzen, keine Treffer innerhalb längerer Wörter.</string>
     <string name="dictate__mappings_wholeword_title">Nur ganzes Wort</string>
     <string name="dictate__wear_standalone_summary">Sende deinen API-Key an die Uhr, damit sie auch ohne Handy in der Nähe diktieren kann.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Diktat von der Uhr</string>
+    <string name="dictate__wear_tether_notif_title">Transkribiere für deine Uhr…</string>
     <string name="dictate__wear_standalone_title">Schlüssel mit Uhr synchronisieren</string>
     <string name="emoji__search__hint">Emoji suchen</string>
     <string name="emoji__row__open_panel">Alle Emojis öffnen</string>

@@ -1759,6 +1759,8 @@
     <string name="dictate__mappings_wholeword_summary">Yalnızca tek başına duran kelimeleri değiştir, daha uzun kelimelerin içindeki eşleşmeleri değil.</string>
     <string name="dictate__mappings_wholeword_title">Yalnızca tam kelime</string>
     <string name="dictate__wear_standalone_summary">API anahtarını saate gönder; telefon yokken de dikte edebilsin.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Saatten dikte</string>
+    <string name="dictate__wear_tether_notif_title">Saatin için yazıya dökülüyor…</string>
     <string name="dictate__wear_standalone_title">Anahtarı saatle senkronize et</string>
     <string name="emoji__search__hint">Emoji ara</string>
     <string name="emoji__row__open_panel">Tüm emojileri aç</string>

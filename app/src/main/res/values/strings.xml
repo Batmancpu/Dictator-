@@ -2153,6 +2153,8 @@
     <string name="dictate__wear_auto_rewording_summary" comment="Short summary for the auto-rewording-on-watch toggle">Reword dictations made from the watch, like on the phone.</string>
     <string name="dictate__wear_standalone_title" comment="Title of the toggle that lets a paired Wear OS watch transcribe on its own">Sync key to watch</string>
     <string name="dictate__wear_standalone_summary" comment="Short summary for the Wear OS standalone transcription toggle">Send your API key to the watch so it can dictate without the phone nearby.</string>
+    <string name="dictate__wear_tether_notif_channel_name" comment="Notification channel name for the short notice shown while the phone transcribes a watch dictation">Watch dictation</string>
+    <string name="dictate__wear_tether_notif_title" comment="Silent notification shown for the few seconds the phone transcribes a dictation sent from the watch">Transcribing for your watch…</string>
 
     <!-- Dictate network proxy -->
     <string name="dictate__proxy_title" comment="Title of the proxy settings screen / row">Proxy</string>

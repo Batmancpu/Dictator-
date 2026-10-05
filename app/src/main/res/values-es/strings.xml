@@ -1762,6 +1762,8 @@
     <string name="dictate__mappings_wholeword_summary">Reemplazar solo palabras independientes, no coincidencias dentro de palabras más largas.</string>
     <string name="dictate__mappings_wholeword_title">Solo palabra completa</string>
     <string name="dictate__wear_standalone_summary">Envía tu clave API al reloj para que pueda dictar sin el teléfono cerca.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Dictado desde el reloj</string>
+    <string name="dictate__wear_tether_notif_title">Transcribiendo para tu reloj…</string>
     <string name="dictate__wear_standalone_title">Sincronizar clave con el reloj</string>
     <string name="emoji__search__hint">Buscar emoji</string>
     <string name="emoji__row__open_panel">Abrir todos los emojis</string>

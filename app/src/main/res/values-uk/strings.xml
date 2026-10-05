@@ -1627,6 +1627,8 @@
     <string name="dictate__mappings_wholeword_summary">Замінювати лише окремі слова, а не збіги всередині довших слів.</string>
     <string name="dictate__mappings_wholeword_title">Лише ціле слово</string>
     <string name="dictate__wear_standalone_summary">Надішліть свій ключ API на годинник, щоб диктувати без телефона поруч.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Диктування з годинника</string>
+    <string name="dictate__wear_tether_notif_title">Розшифровка для вашого годинника…</string>
     <string name="dictate__wear_standalone_title">Синхронізувати ключ із годинником</string>
     <string name="emoji__search__hint">Пошук емодзі</string>
     <string name="emoji__row__open_panel">Відкрити всі емодзі</string>

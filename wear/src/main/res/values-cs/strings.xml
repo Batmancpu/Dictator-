@@ -51,4 +51,9 @@
     <string name="wear_err_bad_key">Špatný klíč</string>
     <string name="wear_err_offline">Telefon offline</string>
     <string name="wear_err_quota">Kvóta vyčerpána</string>
+    <string name="wear_status_interrupted">Přerušeno · Klepnutím odeslat</string>
+    <string name="wear_cd_resend">Odeslat znovu</string>
+    <string name="wear_cd_discard">Zahodit</string>
+    <string name="wear_err_phone_silent">Telefon neodpovídá</string>
+    <string name="wear_try_tap_cancel">Klepnutím zrušit</string>
 </resources>

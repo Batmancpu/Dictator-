@@ -1563,6 +1563,8 @@
     <string name="dictate__mappings_wholeword_summary">Sostituisci solo parole isolate, non le corrispondenze all\'interno di parole più lunghe.</string>
     <string name="dictate__mappings_wholeword_title">Solo parola intera</string>
     <string name="dictate__wear_standalone_summary">Invia la tua chiave API all\'orologio così può dettare senza il telefono vicino.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Dettatura dall’orologio</string>
+    <string name="dictate__wear_tether_notif_title">Trascrizione per il tuo orologio…</string>
     <string name="dictate__wear_standalone_title">Sincronizza chiave con l\'orologio</string>
     <string name="emoji__search__hint">Cerca emoji</string>
     <string name="emoji__row__open_panel">Apri tutte le emoji</string>

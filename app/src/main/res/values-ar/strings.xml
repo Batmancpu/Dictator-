@@ -1642,6 +1642,8 @@
     <string name="dictate__mappings_wholeword_summary">الاستبدال فقط للكلمات المستقلة، وليس للمطابقات داخل كلمات أطول.</string>
     <string name="dictate__mappings_wholeword_title">الكلمات الكاملة فقط</string>
     <string name="dictate__wear_standalone_summary">أرسل مفتاح API إلى الساعة لتتمكن من الإملاء دون وجود الهاتف قريبًا.</string>
+    <string name="dictate__wear_tether_notif_channel_name">الإملاء من الساعة</string>
+    <string name="dictate__wear_tether_notif_title">جارٍ النسخ لساعتك…</string>
     <string name="dictate__wear_standalone_title">مزامنة المفتاح مع الساعة</string>
     <string name="emoji__search__hint">البحث عن رمز تعبيري</string>
     <string name="emoji__row__open_panel">فتح كل الرموز التعبيرية</string>

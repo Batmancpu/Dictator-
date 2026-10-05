@@ -1760,6 +1760,8 @@
     <string name="dictate__mappings_wholeword_summary">Substituir apenas palavras isoladas, não correspondências dentro de palavras maiores.</string>
     <string name="dictate__mappings_wholeword_title">Apenas palavra inteira</string>
     <string name="dictate__wear_standalone_summary">Envia a tua chave API para o relógio para ditar sem o telemóvel por perto.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Ditado do relógio</string>
+    <string name="dictate__wear_tether_notif_title">A transcrever para o relógio…</string>
     <string name="dictate__wear_standalone_title">Sincronizar chave com o relógio</string>
     <string name="emoji__search__hint">Pesquisar emoji</string>
     <string name="emoji__row__open_panel">Abrir todos os emojis</string>

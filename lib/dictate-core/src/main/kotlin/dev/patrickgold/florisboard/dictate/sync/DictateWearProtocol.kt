@@ -36,6 +36,50 @@ object DictateWearProtocol {
     const val PATH_TRANSCRIBE_RESPONSE = "/dictate/transcribe/response"
 
     /**
+     * The tether exchange this build speaks, published as [DictateSyncedSettings.tetherProtocol] (#363).
+     *
+     * **0** is the original: one fixed request path and one fixed response path. An answer cannot be told
+     * from the answer to an earlier dictation, the watch cannot call a request off, and it can only wait a
+     * fixed time, not knowing whether the phone is still at work.
+     *
+     * **1** names every request: the watch opens its channel on [requestPath] with an id of its own; the
+     * phone answers on [responsePath] for that id, reports on [progressPath] while it works, and drops the
+     * work when [cancelPath] names it. A phone and a watch update separately (each has its own Play track),
+     * so either side may still be on 0: the watch only uses ids once the phone's snapshot says 1, and the
+     * phone answers a request on the path it came in on.
+     */
+    const val TETHER_PROTOCOL = 1
+
+    /** Stage byte of a [progressPath] message: the phone is transcribing. */
+    const val STAGE_TRANSCRIBING: Byte = 'T'.code.toByte()
+
+    /** Stage byte of a [progressPath] message: the transcript is in and the phone is rewording it. */
+    const val STAGE_REWORDING: Byte = 'R'.code.toByte()
+
+    private const val PATH_TRANSCRIBE_PROGRESS = "/dictate/transcribe/progress"
+    private const val PATH_TRANSCRIBE_CANCEL = "/dictate/transcribe/cancel"
+
+    fun requestPath(requestId: String): String = "$PATH_TRANSCRIBE_REQUEST/$requestId"
+    fun responsePath(requestId: String): String = "$PATH_TRANSCRIBE_RESPONSE/$requestId"
+    fun progressPath(requestId: String): String = "$PATH_TRANSCRIBE_PROGRESS/$requestId"
+    fun cancelPath(requestId: String): String = "$PATH_TRANSCRIBE_CANCEL/$requestId"
+
+    /**
+     * The request id a channel was opened for: `""` for the unnamed protocol-0 path, null when the channel
+     * is not a transcription request at all.
+     */
+    fun requestIdOf(channelPath: String): String? = when (channelPath) {
+        PATH_TRANSCRIBE_REQUEST -> ""
+        else -> idAfter(PATH_TRANSCRIBE_REQUEST, channelPath)
+    }
+
+    /** The request id a [cancelPath] message names, or null for any other path. */
+    fun cancelledIdOf(messagePath: String): String? = idAfter(PATH_TRANSCRIBE_CANCEL, messagePath)
+
+    private fun idAfter(base: String, path: String): String? =
+        path.removePrefix("$base/").takeIf { it != path && it.isNotEmpty() && '/' !in it }
+
+    /**
      * MessageClient path: the watch toggles standalone transcription on/off. Payload is a single byte
      * (1 = on, 0 = off). The phone stores it and re-publishes [PATH_SETTINGS] (the key is only included
      * in the snapshot while standalone is on).
@@ -149,6 +193,13 @@ data class DictateSyncedSettings(
     val autoApplyPrompts: List<SyncedPrompt> = emptyList(),
     /** Mirror the phone's dictation haptic feedback on the watch (issue #166). */
     val hapticFeedback: Boolean = false,
+    /**
+     * The phone's Request timeout in seconds, so a standalone call from the watch gives up when the
+     * phone's own would (#363). 0 = a phone too old to send it; the watch then keeps its default.
+     */
+    val requestTimeoutSeconds: Int = 0,
+    /** [DictateWearProtocol.TETHER_PROTOCOL] of the phone that published this; 0 for a phone too old to say. */
+    val tetherProtocol: Int = 0,
 ) {
     /** True when the watch can transcribe on its own (a key is present), i.e. works without the phone. */
     val canStandalone: Boolean get() = apiKey.isNotBlank() && baseUrl.isNotBlank()

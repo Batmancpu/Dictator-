@@ -51,4 +51,9 @@
     <string name="wear_err_bad_key">キーが無効</string>
     <string name="wear_err_offline">スマホがオフライン</string>
     <string name="wear_err_quota">上限に到達</string>
+    <string name="wear_status_interrupted">中断しました · タップで送信</string>
+    <string name="wear_cd_resend">再送信</string>
+    <string name="wear_cd_discard">破棄</string>
+    <string name="wear_err_phone_silent">スマホから応答なし</string>
+    <string name="wear_try_tap_cancel">タップでキャンセル</string>
 </resources>

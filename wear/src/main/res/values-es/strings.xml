@@ -51,4 +51,9 @@
     <string name="wear_err_bad_key">Clave errónea</string>
     <string name="wear_err_offline">Sin conexión</string>
     <string name="wear_err_quota">Cuota agotada</string>
+    <string name="wear_status_interrupted">Interrumpido · Toca para enviar</string>
+    <string name="wear_cd_resend">Enviar de nuevo</string>
+    <string name="wear_cd_discard">Descartar</string>
+    <string name="wear_err_phone_silent">El teléfono no responde</string>
+    <string name="wear_try_tap_cancel">Toca para cancelar</string>
 </resources>

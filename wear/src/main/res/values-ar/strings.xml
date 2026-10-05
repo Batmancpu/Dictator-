@@ -51,4 +51,9 @@
     <string name="wear_err_bad_key">مفتاح خاطئ</string>
     <string name="wear_err_offline">الهاتف غير متصل</string>
     <string name="wear_err_quota">انتهت الحصة</string>
+    <string name="wear_status_interrupted">تمت المقاطعة · انقر للإرسال</string>
+    <string name="wear_cd_resend">إرسال مجددًا</string>
+    <string name="wear_cd_discard">تجاهل</string>
+    <string name="wear_err_phone_silent">لا رد من الهاتف</string>
+    <string name="wear_try_tap_cancel">انقر للإلغاء</string>
 </resources>

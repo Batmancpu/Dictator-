@@ -53,8 +53,10 @@ import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Mood
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -77,9 +79,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.annotation.StringRes
 import androidx.wear.compose.material.Button
@@ -117,8 +121,20 @@ fun WearKeyboard(
     dictationState: WearDictationState,
     recordingInfo: WearRecordingInfo,
     errorMessage: String?,
+    canResend: Boolean = false,
     peakProvider: () -> Int = { 0 },
 ) {
+    // Hold the display on while the watch listens or waits for the text (#363), as the phone's floating
+    // button does while it records (#231). A Galaxy Watch turns the display off after 15 s out of the box,
+    // and a keyboard that goes dark mid-dictation is a keyboard that went away.
+    val view = LocalView.current
+    val holdScreen = dictationState == WearDictationState.RECORDING ||
+        dictationState == WearDictationState.TRANSCRIBING || dictationState == WearDictationState.REWORDING
+    DisposableEffect(view, holdScreen) {
+        view.keepScreenOn = holdScreen
+        onDispose { view.keepScreenOn = false }
+    }
+
     WearDictateTheme {
         val pages = WearPage.entries
         val pagerState = rememberPagerState(initialPage = WearPage.VOICE.ordinal, pageCount = { pages.size })
@@ -155,6 +171,7 @@ fun WearKeyboard(
                                 state = dictationState,
                                 recordingInfo = recordingInfo,
                                 errorMessage = errorMessage,
+                                canResend = canResend,
                                 actions = actions,
                                 peakProvider = peakProvider,
                                 onShowNumbers = {
@@ -249,6 +266,7 @@ private fun VoicePage(
     state: WearDictationState,
     recordingInfo: WearRecordingInfo,
     errorMessage: String?,
+    canResend: Boolean,
     actions: WearImeActions,
     peakProvider: () -> Int,
     onShowNumbers: () -> Unit,
@@ -303,6 +321,8 @@ private fun VoicePage(
             modifier = Modifier.align(Alignment.CenterEnd),
         )
 
+        // Kept audio of a failed or interrupted dictation: the big button sends it again.
+        val resend = state == WearDictationState.ERROR && canResend
         Button(
             onClick = actions.toggleDictation,
             enabled = !busy,
@@ -312,29 +332,40 @@ private fun VoicePage(
             when {
                 busy -> CircularProgressIndicator(modifier = Modifier.size(26.dp), strokeWidth = 3.dp)
                 recording -> Icon(Icons.Filled.Stop, contentDescription = stringResource(R.string.wear_cd_stop), modifier = Modifier.size(28.dp))
+                resend -> Icon(Icons.Filled.Refresh, contentDescription = stringResource(R.string.wear_cd_resend), modifier = Modifier.size(28.dp))
                 else -> Icon(Icons.Filled.Mic, contentDescription = stringResource(R.string.wear_cd_dictate), modifier = Modifier.size(28.dp))
             }
         }
 
-        // Timer + waveform above the button (only while recording).
-        if (recording) {
+        // Above the button: timer + waveform while recording, timer + what it is waiting for while busy
+        // (#363 — the wait used to be a spinner and nothing else, for up to six minutes).
+        if (recording || busy) {
             Column(
                 modifier = Modifier.align(Alignment.Center).offset(y = (-58).dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 ElapsedTimer(recordingInfo)
-                Waveform(levels)
+                if (recording) {
+                    Waveform(levels)
+                } else {
+                    Text(
+                        text = stringResource(if (rewording) R.string.wear_status_rewording else R.string.wear_status_transcribing),
+                        style = MaterialTheme.typography.caption2,
+                        color = MaterialTheme.colors.onBackground,
+                    )
+                }
             }
         }
 
-        // Controls (recording) / status line (otherwise) below the button.
+        // Below the button: the controls while recording; the X while waiting or holding kept audio, so
+        // neither can trap the user; the status line otherwise.
         Box(
             modifier = Modifier.align(Alignment.Center).offset(y = 56.dp),
             contentAlignment = Alignment.Center,
         ) {
-            if (recording) {
-                Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
+            when {
+                recording -> Row(horizontalArrangement = Arrangement.spacedBy(18.dp)) {
                     SmallAction(Icons.Filled.Close, stringResource(R.string.wear_cd_cancel), actions.cancelDictation)
                     SmallAction(
                         if (paused) Icons.Filled.PlayArrow else Icons.Filled.Pause,
@@ -342,28 +373,52 @@ private fun VoicePage(
                         actions.togglePause,
                     )
                 }
-            } else {
-                Text(
+                busy -> SmallAction(Icons.Filled.Close, stringResource(R.string.wear_cd_cancel), actions.cancelDictation)
+                resend -> Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    StatusLine(errorMessage ?: stringResource(R.string.wear_status_error), error = true, maxLines = 2)
+                    SmallAction(Icons.Filled.Close, stringResource(R.string.wear_cd_discard), actions.cancelDictation)
+                }
+                else -> StatusLine(
                     text = when (state) {
-                        WearDictationState.TRANSCRIBING -> stringResource(R.string.wear_status_transcribing)
-                        WearDictationState.REWORDING -> stringResource(R.string.wear_status_rewording)
                         WearDictationState.ERROR -> errorMessage ?: stringResource(R.string.wear_status_error)
                         else -> stringResource(R.string.wear_status_tap)
                     },
-                    style = MaterialTheme.typography.caption2,
-                    color = if (state == WearDictationState.ERROR) MaterialTheme.colors.error
-                    else MaterialTheme.colors.onBackground,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 6.dp),
+                    error = state == WearDictationState.ERROR,
                 )
             }
         }
     }
 }
 
+@Composable
+private fun StatusLine(text: String, error: Boolean, maxLines: Int = Int.MAX_VALUE) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.caption2,
+        color = if (error) MaterialTheme.colors.error else MaterialTheme.colors.onBackground,
+        textAlign = TextAlign.Center,
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
+        modifier = Modifier.padding(horizontal = 6.dp),
+    )
+}
+
 /** m:ss elapsed counter, ticking every 200ms while running and frozen while paused (phone parity). */
 @Composable
 private fun ElapsedTimer(info: WearRecordingInfo) {
+    Text(
+        text = rememberElapsedLabel(info),
+        style = MaterialTheme.typography.title3,
+        color = if (info.paused) MaterialTheme.colors.onSurfaceVariant else MaterialTheme.colors.primary,
+    )
+}
+
+/** The m:ss since [info] started, ticking while it runs; shared with the settings page's *Try dictation*. */
+@Composable
+internal fun rememberElapsedLabel(info: WearRecordingInfo): String {
     var elapsedMs by remember { mutableLongStateOf(info.accumulatedMs) }
     LaunchedEffect(info.startedAtMs, info.accumulatedMs, info.paused) {
         if (info.paused) {
@@ -376,11 +431,7 @@ private fun ElapsedTimer(info: WearRecordingInfo) {
         }
     }
     val totalSec = elapsedMs / 1000L
-    Text(
-        text = "%d:%02d".format(totalSec / 60L, totalSec % 60L),
-        style = MaterialTheme.typography.title3,
-        color = if (info.paused) MaterialTheme.colors.onSurfaceVariant else MaterialTheme.colors.primary,
-    )
+    return "%d:%02d".format(totalSec / 60L, totalSec % 60L)
 }
 
 /** Number of bars in the live recording waveform. */

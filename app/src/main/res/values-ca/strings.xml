@@ -1650,6 +1650,8 @@
     <string name="dictate__mappings_wholeword_summary">Substitueix només paraules independents, no coincidències dins de paraules més llargues.</string>
     <string name="dictate__mappings_wholeword_title">Només paraula sencera</string>
     <string name="dictate__wear_standalone_summary">Envia la teva clau API al rellotge perquè pugui dictar sense el telèfon a prop.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Dictat des del rellotge</string>
+    <string name="dictate__wear_tether_notif_title">Transcrivint per al rellotge…</string>
     <string name="dictate__wear_standalone_title">Sincronitza la clau amb el rellotge</string>
     <string name="emoji__search__hint">Cerca emojis</string>
     <string name="emoji__row__open_panel">Obre tots els emojis</string>

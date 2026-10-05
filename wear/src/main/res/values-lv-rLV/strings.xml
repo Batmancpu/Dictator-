@@ -51,4 +51,9 @@
     <string name="wear_err_bad_key">Nederīga atslēga</string>
     <string name="wear_err_offline">Tālrunis bezsaistē</string>
     <string name="wear_err_quota">Kvota sasniegta</string>
+    <string name="wear_status_interrupted">Pārtraukts · Pieskaries, lai nosūtītu</string>
+    <string name="wear_cd_resend">Sūtīt vēlreiz</string>
+    <string name="wear_cd_discard">Atmest</string>
+    <string name="wear_err_phone_silent">Tālrunis neatbild</string>
+    <string name="wear_try_tap_cancel">Pieskaries, lai atceltu</string>
 </resources>

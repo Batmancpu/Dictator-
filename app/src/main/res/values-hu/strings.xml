@@ -1779,6 +1779,8 @@
     <string name="dictate__mappings_wholeword_summary">Csak önálló szavakat cserél, a hosszabb szavakon belüli egyezéseket nem.</string>
     <string name="dictate__mappings_wholeword_title">Csak egész szó</string>
     <string name="dictate__wear_standalone_summary">Küldd el az API-kulcsod az órának, hogy telefon nélkül is diktálhasson.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Diktálás az óráról</string>
+    <string name="dictate__wear_tether_notif_title">Átírás az órádnak…</string>
     <string name="dictate__wear_standalone_title">Kulcs szinkronizálása az órára</string>
     <string name="emoji__search__hint">Emoji keresése</string>
     <string name="emoji__row__open_panel">Összes emodzsi megnyitása</string>

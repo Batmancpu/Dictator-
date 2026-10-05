@@ -13,6 +13,8 @@
     <string name="wear_status_transcribing">Transcribing…</string>
     <string name="wear_status_rewording">Rewording…</string>
     <string name="wear_status_error">Error — tap to retry</string>
+    <!-- The keyboard went away mid-dictation; the audio is kept and the big button sends it (#363). -->
+    <string name="wear_status_interrupted">Interrupted · Tap to send</string>
 
     <!-- Content descriptions -->
     <string name="wear_cd_stop">Stop</string>
@@ -22,6 +24,8 @@
     <string name="wear_cd_resume">Resume</string>
     <string name="wear_cd_backspace">Backspace</string>
     <string name="wear_cd_enter">Enter</string>
+    <string name="wear_cd_resend">Send again</string>
+    <string name="wear_cd_discard">Discard</string>
 
     <!-- Errors -->
     <string name="wear_err_mic_grant">Grant mic in Dictate app</string>
@@ -35,6 +39,8 @@
     <string name="wear_err_quota">Quota reached</string>
     <string name="wear_err_unknown">Unknown error</string>
     <string name="wear_err_no_transport">No phone; sync key in app</string>
+    <!-- The phone took the audio and then stopped reporting back (#363). -->
+    <string name="wear_err_phone_silent">No answer from phone</string>
 
     <!-- Settings sections -->
     <string name="wear_sec_try">Try it</string>
@@ -45,6 +51,7 @@
     <string name="wear_try">Try dictation</string>
     <string name="wear_try_stop">Stop &amp; transcribe</string>
     <string name="wear_try_hint">Speak, then read it here</string>
+    <string name="wear_try_tap_cancel">Tap to cancel</string>
     <string name="wear_you_said">You said:</string>
 
     <!-- Setup: microphone -->

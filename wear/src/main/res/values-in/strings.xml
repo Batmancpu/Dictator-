@@ -51,4 +51,9 @@
     <string name="wear_err_bad_key">Kunci salah</string>
     <string name="wear_err_offline">Ponsel luring</string>
     <string name="wear_err_quota">Kuota habis</string>
+    <string name="wear_status_interrupted">Terputus · Ketuk untuk mengirim</string>
+    <string name="wear_cd_resend">Kirim lagi</string>
+    <string name="wear_cd_discard">Buang</string>
+    <string name="wear_err_phone_silent">Ponsel tidak menjawab</string>
+    <string name="wear_try_tap_cancel">Ketuk untuk batal</string>
 </resources>

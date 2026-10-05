@@ -51,4 +51,9 @@
     <string name="wear_err_bad_key">密钥错误</string>
     <string name="wear_err_offline">手机离线</string>
     <string name="wear_err_quota">配额用尽</string>
+    <string name="wear_status_interrupted">已中断 · 点按发送</string>
+    <string name="wear_cd_resend">重新发送</string>
+    <string name="wear_cd_discard">舍弃</string>
+    <string name="wear_err_phone_silent">手机无响应</string>
+    <string name="wear_try_tap_cancel">点按取消</string>
 </resources>

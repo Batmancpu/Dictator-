@@ -20,6 +20,7 @@ import dev.patrickgold.florisboard.dictate.provider.ProviderAccount
 import dev.patrickgold.florisboard.dictate.provider.ProviderRegistry
 import dev.patrickgold.florisboard.dictate.provider.chatModelFor
 import dev.patrickgold.florisboard.dictate.sync.DictateSyncedSettings
+import dev.patrickgold.florisboard.dictate.sync.DictateWearProtocol
 import dev.patrickgold.florisboard.dictate.sync.SyncedPrompt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -88,6 +89,8 @@ object PhoneWearSettingsResolver {
             systemPrompt = systemPrompt(prefs),
             autoApplyPrompts = autoApply,
             hapticFeedback = prefs.dictate.hapticFeedback.get(),
+            requestTimeoutSeconds = prefs.dictate.requestTimeout.get(),
+            tetherProtocol = DictateWearProtocol.TETHER_PROTOCOL,
         )
     }
 

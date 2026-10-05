@@ -51,4 +51,9 @@
     <string name="wear_err_bad_key">Грешен ключ</string>
     <string name="wear_err_offline">Телефон офлайн</string>
     <string name="wear_err_quota">Лимит достигнат</string>
+    <string name="wear_status_interrupted">Прекъснато · Докоснете за изпращане</string>
+    <string name="wear_cd_resend">Изпрати отново</string>
+    <string name="wear_cd_discard">Отхвърли</string>
+    <string name="wear_err_phone_silent">Телефонът не отговаря</string>
+    <string name="wear_try_tap_cancel">Докоснете за отказ</string>
 </resources>

@@ -1680,6 +1680,8 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__mappings_wholeword_summary">Alleen losstaande woorden vervangen, niet binnen langere woorden.</string>
     <string name="dictate__mappings_wholeword_title">Alleen heel woord</string>
     <string name="dictate__wear_standalone_summary">Stuur je API-sleutel naar het horloge zodat het zonder telefoon kan dicteren.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Dicteren via horloge</string>
+    <string name="dictate__wear_tether_notif_title">Transcriberen voor je horloge…</string>
     <string name="dictate__wear_standalone_title">Sleutel synchroniseren met horloge</string>
     <string name="emoji__search__hint">Emoji zoeken</string>
     <string name="emoji__row__open_panel">Alle emoji openen</string>

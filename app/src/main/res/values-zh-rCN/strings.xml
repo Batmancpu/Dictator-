@@ -1774,6 +1774,8 @@
     <string name="dictate__mappings_wholeword_summary">仅替换独立的字词，不替换较长词语中的匹配部分。</string>
     <string name="dictate__mappings_wholeword_title">仅整词匹配</string>
     <string name="dictate__wear_standalone_summary">将 API 密钥发送到手表，即使手机不在附近也能听写。</string>
+    <string name="dictate__wear_tether_notif_channel_name">手表听写</string>
+    <string name="dictate__wear_tether_notif_title">正在为手表转写…</string>
     <string name="dictate__wear_standalone_title">将密钥同步到手表</string>
     <string name="emoji__search__hint">搜索表情符号</string>
     <string name="emoji__row__open_panel">打开全部表情</string>

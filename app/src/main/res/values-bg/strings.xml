@@ -1780,6 +1780,8 @@
     <string name="dictate__mappings_wholeword_summary">Замяна само на самостоятелни думи, не на съвпадения вътре в по-дълги думи.</string>
     <string name="dictate__mappings_wholeword_title">Само цяла дума</string>
     <string name="dictate__wear_standalone_summary">Изпратете API ключа към часовника, за да диктува без телефона наблизо.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Диктовка от часовника</string>
+    <string name="dictate__wear_tether_notif_title">Транскрибиране за часовника…</string>
     <string name="dictate__wear_standalone_title">Синхронизиране на ключа с часовника</string>
     <string name="emoji__search__hint">Търсене на емоджи</string>
     <string name="emoji__row__open_panel">Отваряне на всички емоджита</string>

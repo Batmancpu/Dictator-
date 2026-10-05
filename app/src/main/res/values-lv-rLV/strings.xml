@@ -1726,6 +1726,8 @@
     <string name="dictate__mappings_wholeword_summary">Aizstāt tikai atsevišķus vārdus, nevis sakritības garāku vārdu iekšienē.</string>
     <string name="dictate__mappings_wholeword_title">Tikai vesels vārds</string>
     <string name="dictate__wear_standalone_summary">Nosūtiet API atslēgu pulkstenim, lai tas var diktēt bez tālruņa tuvumā.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Diktēšana no pulksteņa</string>
+    <string name="dictate__wear_tether_notif_title">Atšifrē pulkstenim…</string>
     <string name="dictate__wear_standalone_title">Sinhronizēt atslēgu ar pulksteni</string>
     <string name="emoji__search__hint">Meklēt emocijzīmes</string>
     <string name="emoji__row__open_panel">Atvērt visas emocijzīmes</string>

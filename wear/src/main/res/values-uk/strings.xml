@@ -51,4 +51,9 @@
     <string name="wear_err_bad_key">Невірний ключ</string>
     <string name="wear_err_offline">Телефон офлайн</string>
     <string name="wear_err_quota">Ліміт вичерпано</string>
+    <string name="wear_status_interrupted">Перервано · Торкніться, щоб надіслати</string>
+    <string name="wear_cd_resend">Надіслати знову</string>
+    <string name="wear_cd_discard">Видалити</string>
+    <string name="wear_err_phone_silent">Телефон не відповідає</string>
+    <string name="wear_try_tap_cancel">Торкніться, щоб скасувати</string>
 </resources>

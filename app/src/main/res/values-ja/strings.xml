@@ -1711,6 +1711,8 @@
     <string name="dictate__mappings_wholeword_summary">独立した単語のみを置き換え、長い単語の一部に一致するものは置き換えません。</string>
     <string name="dictate__mappings_wholeword_title">単語全体のみ</string>
     <string name="dictate__wear_standalone_summary">API キーを時計に送れば、近くにスマートフォンがなくても音声入力できます。</string>
+    <string name="dictate__wear_tether_notif_channel_name">ウォッチからの音声入力</string>
+    <string name="dictate__wear_tether_notif_title">ウォッチの音声を文字起こし中…</string>
     <string name="dictate__wear_standalone_title">キーを時計に同期</string>
     <string name="emoji__search__hint">絵文字を検索</string>
     <string name="emoji__row__open_panel">すべての絵文字を開く</string>

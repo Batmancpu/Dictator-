@@ -1658,6 +1658,8 @@
     <string name="dictate__mappings_wholeword_summary">Remplacer uniquement les mots isolés, pas les correspondances à l\'intérieur de mots plus longs.</string>
     <string name="dictate__mappings_wholeword_title">Mot entier uniquement</string>
     <string name="dictate__wear_standalone_summary">Envoyez votre clé API à la montre pour qu\'elle puisse dicter sans le téléphone.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Dictée depuis la montre</string>
+    <string name="dictate__wear_tether_notif_title">Transcription pour votre montre…</string>
     <string name="dictate__wear_standalone_title">Synchroniser la clé avec la montre</string>
     <string name="emoji__search__hint">Rechercher un emoji</string>
     <string name="emoji__row__open_panel">Ouvrir tous les émojis</string>

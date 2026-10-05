@@ -51,4 +51,9 @@
     <string name="wear_err_bad_key">Schlüssel falsch</string>
     <string name="wear_err_offline">Handy offline</string>
     <string name="wear_err_quota">Kontingent leer</string>
+    <string name="wear_status_interrupted">Unterbrochen · Zum Senden tippen</string>
+    <string name="wear_cd_resend">Erneut senden</string>
+    <string name="wear_cd_discard">Verwerfen</string>
+    <string name="wear_err_phone_silent">Keine Antwort vom Handy</string>
+    <string name="wear_try_tap_cancel">Zum Abbrechen tippen</string>
 </resources>

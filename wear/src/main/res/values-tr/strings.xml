@@ -51,4 +51,9 @@
     <string name="wear_err_bad_key">Anahtar hatalı</string>
     <string name="wear_err_offline">Telefon çevrimdışı</string>
     <string name="wear_err_quota">Kota doldu</string>
+    <string name="wear_status_interrupted">Kesildi · Göndermek için dokun</string>
+    <string name="wear_cd_resend">Yeniden gönder</string>
+    <string name="wear_cd_discard">Sil</string>
+    <string name="wear_err_phone_silent">Telefondan yanıt yok</string>
+    <string name="wear_try_tap_cancel">İptal için dokun</string>
 </resources>

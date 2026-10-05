@@ -51,4 +51,9 @@
     <string name="wear_err_bad_key">Sleutel fout</string>
     <string name="wear_err_offline">Telefoon offline</string>
     <string name="wear_err_quota">Quota bereikt</string>
+    <string name="wear_status_interrupted">Onderbroken · Tik om te versturen</string>
+    <string name="wear_cd_resend">Opnieuw versturen</string>
+    <string name="wear_cd_discard">Verwijderen</string>
+    <string name="wear_err_phone_silent">Geen antwoord van telefoon</string>
+    <string name="wear_try_tap_cancel">Tik om te annuleren</string>
 </resources>

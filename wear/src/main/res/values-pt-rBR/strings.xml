@@ -51,4 +51,9 @@
     <string name="wear_err_bad_key">Chave inválida</string>
     <string name="wear_err_offline">Sem conexão</string>
     <string name="wear_err_quota">Cota esgotada</string>
+    <string name="wear_status_interrupted">Interrompido · Toque para enviar</string>
+    <string name="wear_cd_resend">Enviar de novo</string>
+    <string name="wear_cd_discard">Descartar</string>
+    <string name="wear_err_phone_silent">O celular não responde</string>
+    <string name="wear_try_tap_cancel">Toque para cancelar</string>
 </resources>

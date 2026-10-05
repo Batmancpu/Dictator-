@@ -51,4 +51,9 @@
     <string name="wear_err_bad_key">Clau incorrecta</string>
     <string name="wear_err_offline">Sense connexió</string>
     <string name="wear_err_quota">Quota exhaurida</string>
+    <string name="wear_status_interrupted">Interromput · Toca per enviar</string>
+    <string name="wear_cd_resend">Torna a enviar</string>
+    <string name="wear_cd_discard">Descarta</string>
+    <string name="wear_err_phone_silent">El telèfon no respon</string>
+    <string name="wear_try_tap_cancel">Toca per cancel·lar</string>
 </resources>

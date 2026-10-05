@@ -1788,6 +1788,8 @@
     <string name="dictate__mappings_wholeword_summary">Заменять только отдельные слова, а не совпадения внутри более длинных слов.</string>
     <string name="dictate__mappings_wholeword_title">Только слово целиком</string>
     <string name="dictate__wear_standalone_summary">Отправьте свой ключ API на часы, чтобы диктовать без телефона рядом.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Диктовка с часов</string>
+    <string name="dictate__wear_tether_notif_title">Расшифровка для ваших часов…</string>
     <string name="dictate__wear_standalone_title">Синхронизировать ключ с часами</string>
     <string name="emoji__search__hint">Поиск эмодзи</string>
     <string name="emoji__row__open_panel">Открыть все эмодзи</string>

@@ -51,4 +51,9 @@
     <string name="wear_err_bad_key">Clé invalide</string>
     <string name="wear_err_offline">Tél. hors ligne</string>
     <string name="wear_err_quota">Quota atteint</string>
+    <string name="wear_status_interrupted">Interrompu · Appuyez pour envoyer</string>
+    <string name="wear_cd_resend">Renvoyer</string>
+    <string name="wear_cd_discard">Supprimer</string>
+    <string name="wear_err_phone_silent">Le tél. ne répond pas</string>
+    <string name="wear_try_tap_cancel">Appuyez pour annuler</string>
 </resources>
