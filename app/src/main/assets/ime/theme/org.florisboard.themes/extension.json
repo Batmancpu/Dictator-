@@ -13,6 +13,18 @@
   },
   "themes": [
     {
+      "id": "liquid_glass",
+      "label": "Liquid Glass",
+      "authors": [ "Mangoloads" ],
+      "isNight": true
+    },
+    {
+      "id": "liquid_glass_indian",
+      "label": "Liquid Glass Indian",
+      "authors": [ "Mangoloads" ],
+      "isNight": true
+    },
+    {
       "id": "dictate_glass",
       "label": "Dictate Glass",
       "authors": [ "DevEmperor" ],
