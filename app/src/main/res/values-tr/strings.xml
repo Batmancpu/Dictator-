@@ -2209,6 +2209,11 @@
     <string name="prefs__media__gif_setup__step3">Anahtarınızı kopyalayıp aşağıdaki alana yapıştırın.</string>
     <string name="prefs__media__gif_setup__open_klipy">KLIPY İş Ortağı Paneli\'ni aç</string>
     <string name="prefs__media__gif_setup__key_label">KLIPY API anahtarı</string>
+    <string name="prefs__media__gif_content_filter">Güvenli arama</string>
+    <string name="prefs__media__gif_content_filter__high">Katı</string>
+    <string name="prefs__media__gif_content_filter__medium">Orta</string>
+    <string name="prefs__media__gif_content_filter__low">Hafif</string>
+    <string name="prefs__media__gif_content_filter__off">Kapalı</string>
     <string name="prefs__media__gif_setup__privacy_note">Arama terimleriniz yalnızca GIF paneli açıkken KLIPY\'ye gönderilir — asla dikte sırasında değil.</string>
     <string name="gif__search_placeholder">KLIPY\'de ara</string>
     <string name="gif__powered_by">KLIPY tarafından desteklenir</string>

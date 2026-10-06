@@ -2184,6 +2184,11 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="prefs__media__gif_setup__step3">Salin kunci Anda dan tempel ke kolom di bawah.</string>
     <string name="prefs__media__gif_setup__open_klipy">Buka KLIPY Partner Panel</string>
     <string name="prefs__media__gif_setup__key_label">Kunci API KLIPY</string>
+    <string name="prefs__media__gif_content_filter">Penelusuran aman</string>
+    <string name="prefs__media__gif_content_filter__high">Ketat</string>
+    <string name="prefs__media__gif_content_filter__medium">Sedang</string>
+    <string name="prefs__media__gif_content_filter__low">Ringan</string>
+    <string name="prefs__media__gif_content_filter__off">Nonaktif</string>
     <string name="prefs__media__gif_setup__privacy_note">Istilah pencarian Anda hanya dikirim ke KLIPY saat panel GIF terbuka — tidak pernah selama pendiktean.</string>
     <string name="gif__search_placeholder">Cari di KLIPY</string>
     <string name="gif__powered_by">Didukung oleh KLIPY</string>

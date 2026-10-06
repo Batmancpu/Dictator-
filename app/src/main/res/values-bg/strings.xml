@@ -2230,6 +2230,11 @@
     <string name="prefs__media__gif_setup__step3">Копирайте ключа си и го поставете в полето по-долу.</string>
     <string name="prefs__media__gif_setup__open_klipy">Отворете KLIPY Partner Panel</string>
     <string name="prefs__media__gif_setup__key_label">Ключ за KLIPY API</string>
+    <string name="prefs__media__gif_content_filter">Безопасно търсене</string>
+    <string name="prefs__media__gif_content_filter__high">Строго</string>
+    <string name="prefs__media__gif_content_filter__medium">Умерено</string>
+    <string name="prefs__media__gif_content_filter__low">Леко</string>
+    <string name="prefs__media__gif_content_filter__off">Изключено</string>
     <string name="prefs__media__gif_setup__privacy_note">Търсените думи се изпращат до KLIPY само докато панелът с GIF е отворен — никога по време на диктовка.</string>
     <string name="gif__search_placeholder">Търсене в KLIPY</string>
     <string name="gif__powered_by">Задвижвано от KLIPY</string>

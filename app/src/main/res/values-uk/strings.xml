@@ -2077,6 +2077,11 @@
     <string name="prefs__media__gif_setup__step3">Скопіюйте ключ і вставте його в поле нижче.</string>
     <string name="prefs__media__gif_setup__open_klipy">Відкрити Партнерську панель KLIPY</string>
     <string name="prefs__media__gif_setup__key_label">Ключ API KLIPY</string>
+    <string name="prefs__media__gif_content_filter">Безпечний пошук</string>
+    <string name="prefs__media__gif_content_filter__high">Суворий</string>
+    <string name="prefs__media__gif_content_filter__medium">Помірний</string>
+    <string name="prefs__media__gif_content_filter__low">М’який</string>
+    <string name="prefs__media__gif_content_filter__off">Вимкнено</string>
     <string name="prefs__media__gif_setup__privacy_note">Ваші пошукові запити надсилаються до KLIPY лише коли відкрита панель GIF — ніколи під час диктування.</string>
     <string name="gif__search_placeholder">Пошук у KLIPY</string>
     <string name="gif__powered_by">На основі KLIPY</string>

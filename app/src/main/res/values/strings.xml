@@ -30,6 +30,11 @@
     <string name="prefs__media__gif_setup__open_klipy" comment="Button opening the KLIPY API-keys page">Open KLIPY Partner Panel</string>
     <string name="prefs__media__gif_setup__key_label" comment="Text field label">KLIPY API key</string>
     <string name="prefs__media__gif_setup__privacy_note" comment="Privacy note in the setup dialog">Your search terms are only sent to KLIPY while the GIF panel is open — never during dictation.</string>
+    <string name="prefs__media__gif_content_filter" comment="Title of the setting choosing how strictly GIF results are filtered for adult or offensive content (safe search)">Safe search</string>
+    <string name="prefs__media__gif_content_filter__high" comment="Safe-search level: the strictest filtering">Strict</string>
+    <string name="prefs__media__gif_content_filter__medium" comment="Safe-search level between strict and light">Moderate</string>
+    <string name="prefs__media__gif_content_filter__low" comment="Safe-search level: only the most explicit results are filtered">Light</string>
+    <string name="prefs__media__gif_content_filter__off" comment="Safe-search level: no filtering at all">Off</string>
     <string name="gif__search_placeholder" comment="Search field placeholder; KLIPY attribution requires the KLIPY name here">Search KLIPY</string>
     <string name="gif__powered_by" comment="Attribution shown in the GIF panel">Powered by KLIPY</string>
     <string name="gif__no_results" comment="Empty state when a search returns nothing">No GIFs found</string>

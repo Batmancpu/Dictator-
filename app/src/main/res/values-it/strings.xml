@@ -2013,6 +2013,11 @@
     <string name="prefs__media__gif_setup__step3">Copia la tua chiave e incollala nel campo qui sotto.</string>
     <string name="prefs__media__gif_setup__open_klipy">Apri KLIPY Partner Panel</string>
     <string name="prefs__media__gif_setup__key_label">Chiave API KLIPY</string>
+    <string name="prefs__media__gif_content_filter">Ricerca sicura</string>
+    <string name="prefs__media__gif_content_filter__high">Rigorosa</string>
+    <string name="prefs__media__gif_content_filter__medium">Moderata</string>
+    <string name="prefs__media__gif_content_filter__low">Leggera</string>
+    <string name="prefs__media__gif_content_filter__off">Disattivata</string>
     <string name="prefs__media__gif_setup__privacy_note">I tuoi termini di ricerca vengono inviati a KLIPY solo mentre il pannello GIF è aperto — mai durante la dettatura.</string>
     <string name="gif__search_placeholder">Cerca su KLIPY</string>
     <string name="gif__powered_by">Con tecnologia KLIPY</string>

@@ -2130,6 +2130,11 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="prefs__media__gif_setup__step3">Kopieer je sleutel en plak deze in het veld hieronder.</string>
     <string name="prefs__media__gif_setup__open_klipy">Open KLIPY Partner Panel</string>
     <string name="prefs__media__gif_setup__key_label">KLIPY-API-sleutel</string>
+    <string name="prefs__media__gif_content_filter">Veilig zoeken</string>
+    <string name="prefs__media__gif_content_filter__high">Streng</string>
+    <string name="prefs__media__gif_content_filter__medium">Gemiddeld</string>
+    <string name="prefs__media__gif_content_filter__low">Licht</string>
+    <string name="prefs__media__gif_content_filter__off">Uit</string>
     <string name="prefs__media__gif_setup__privacy_note">Je zoektermen worden alleen naar KLIPY gestuurd terwijl het GIF-paneel open is — nooit tijdens het dicteren.</string>
     <string name="gif__search_placeholder">KLIPY doorzoeken</string>
     <string name="gif__powered_by">Mogelijk gemaakt door KLIPY</string>

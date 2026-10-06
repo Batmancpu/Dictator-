@@ -2092,6 +2092,11 @@
     <string name="prefs__media__gif_setup__step3">انسخ مفتاحك والصقه في الحقل أدناه.</string>
     <string name="prefs__media__gif_setup__open_klipy">افتح KLIPY Partner Panel</string>
     <string name="prefs__media__gif_setup__key_label">مفتاح KLIPY API</string>
+    <string name="prefs__media__gif_content_filter">البحث الآمن</string>
+    <string name="prefs__media__gif_content_filter__high">صارم</string>
+    <string name="prefs__media__gif_content_filter__medium">متوسط</string>
+    <string name="prefs__media__gif_content_filter__low">خفيف</string>
+    <string name="prefs__media__gif_content_filter__off">إيقاف</string>
     <string name="prefs__media__gif_setup__privacy_note">تُرسَل عبارات البحث إلى KLIPY فقط أثناء فتح لوحة GIF — ولا تُرسَل أبدًا أثناء الإملاء.</string>
     <string name="gif__search_placeholder">ابحث في KLIPY</string>
     <string name="gif__powered_by">مدعوم من KLIPY</string>

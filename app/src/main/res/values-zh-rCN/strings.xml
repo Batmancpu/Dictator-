@@ -2223,6 +2223,11 @@
     <string name="prefs__media__gif_setup__step3">复制你的密钥并粘贴到下方的字段中。</string>
     <string name="prefs__media__gif_setup__open_klipy">打开 KLIPY 合作伙伴面板</string>
     <string name="prefs__media__gif_setup__key_label">KLIPY API 密钥</string>
+    <string name="prefs__media__gif_content_filter">安全搜索</string>
+    <string name="prefs__media__gif_content_filter__high">严格</string>
+    <string name="prefs__media__gif_content_filter__medium">中等</string>
+    <string name="prefs__media__gif_content_filter__low">宽松</string>
+    <string name="prefs__media__gif_content_filter__off">关闭</string>
     <string name="prefs__media__gif_setup__privacy_note">只有在 GIF 面板打开时，你的搜索词才会发送给 KLIPY — 听写过程中绝不发送。</string>
     <string name="gif__search_placeholder">搜索 KLIPY</string>
     <string name="gif__powered_by">由 KLIPY 提供支持</string>

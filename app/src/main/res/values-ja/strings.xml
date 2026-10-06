@@ -2161,6 +2161,11 @@
     <string name="prefs__media__gif_setup__step3">キーをコピーして下のフィールドに貼り付けます。</string>
     <string name="prefs__media__gif_setup__open_klipy">KLIPY Partner Panel を開く</string>
     <string name="prefs__media__gif_setup__key_label">KLIPY API キー</string>
+    <string name="prefs__media__gif_content_filter">セーフサーチ</string>
+    <string name="prefs__media__gif_content_filter__high">厳しい</string>
+    <string name="prefs__media__gif_content_filter__medium">中程度</string>
+    <string name="prefs__media__gif_content_filter__low">弱い</string>
+    <string name="prefs__media__gif_content_filter__off">オフ</string>
     <string name="prefs__media__gif_setup__privacy_note">検索語が KLIPY に送信されるのは GIF パネルを開いている間だけです — 音声入力中に送信されることはありません。</string>
     <string name="gif__search_placeholder">KLIPY を検索</string>
     <string name="gif__powered_by">KLIPY 提供</string>

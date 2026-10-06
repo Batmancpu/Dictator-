@@ -2229,6 +2229,11 @@
     <string name="prefs__media__gif_setup__step3">Másold ki a kulcsot, és illeszd be az alábbi mezőbe.</string>
     <string name="prefs__media__gif_setup__open_klipy">KLIPY Partner Panel megnyitása</string>
     <string name="prefs__media__gif_setup__key_label">KLIPY API-kulcs</string>
+    <string name="prefs__media__gif_content_filter">Biztonságos keresés</string>
+    <string name="prefs__media__gif_content_filter__high">Szigorú</string>
+    <string name="prefs__media__gif_content_filter__medium">Mérsékelt</string>
+    <string name="prefs__media__gif_content_filter__low">Enyhe</string>
+    <string name="prefs__media__gif_content_filter__off">Ki</string>
     <string name="prefs__media__gif_setup__privacy_note">A keresési kifejezéseidet csak akkor küldjük el a KLIPY-nek, amíg a GIF-panel nyitva van — soha nem diktálás közben.</string>
     <string name="gif__search_placeholder">Keresés a KLIPY-ben</string>
     <string name="gif__powered_by">A KLIPY szolgáltatásával</string>

@@ -2249,6 +2249,11 @@
     <string name="prefs__media__gif_setup__step3">Skopiuj klucz i wklej go w pole poniżej.</string>
     <string name="prefs__media__gif_setup__open_klipy">Otwórz Panel Partnera KLIPY</string>
     <string name="prefs__media__gif_setup__key_label">Klucz API KLIPY</string>
+    <string name="prefs__media__gif_content_filter">Bezpieczne wyszukiwanie</string>
+    <string name="prefs__media__gif_content_filter__high">Ścisłe</string>
+    <string name="prefs__media__gif_content_filter__medium">Umiarkowane</string>
+    <string name="prefs__media__gif_content_filter__low">Łagodne</string>
+    <string name="prefs__media__gif_content_filter__off">Wyłączone</string>
     <string name="prefs__media__gif_setup__privacy_note">Twoje wyszukiwane hasła są wysyłane do KLIPY tylko wtedy, gdy panel GIFs jest otwarty — nigdy podczas dyktowania.</string>
     <string name="gif__search_placeholder">Szukaj w KLIPY</string>
     <string name="gif__powered_by">Obsługiwane przez KLIPY</string>

@@ -2176,6 +2176,11 @@
     <string name="prefs__media__gif_setup__step3">Nokopē savu atslēgu un ielīmē to laukā zemāk.</string>
     <string name="prefs__media__gif_setup__open_klipy">Atvērt KLIPY partneru paneli</string>
     <string name="prefs__media__gif_setup__key_label">KLIPY API atslēga</string>
+    <string name="prefs__media__gif_content_filter">Droša meklēšana</string>
+    <string name="prefs__media__gif_content_filter__high">Stingra</string>
+    <string name="prefs__media__gif_content_filter__medium">Mērena</string>
+    <string name="prefs__media__gif_content_filter__low">Viegla</string>
+    <string name="prefs__media__gif_content_filter__off">Izslēgta</string>
     <string name="prefs__media__gif_setup__privacy_note">Tavi meklēšanas vārdi tiek sūtīti uz KLIPY tikai tad, kad GIF panelis ir atvērts — nekad diktēšanas laikā.</string>
     <string name="gif__search_placeholder">Meklēt KLIPY</string>
     <string name="gif__powered_by">Nodrošina KLIPY</string>

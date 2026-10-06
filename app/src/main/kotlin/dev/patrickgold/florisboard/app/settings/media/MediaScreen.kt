@@ -48,6 +48,7 @@ import androidx.compose.material.icons.outlined.Gif
 import androidx.compose.material.icons.outlined.Keyboard
 import androidx.compose.material.icons.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.CircularProgressIndicator
@@ -87,6 +88,7 @@ import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.settings.search.settingsSearchAnchor
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.app.enumDisplayEntriesOf
+import dev.patrickgold.florisboard.dictate.gif.GifContentFilter
 import dev.patrickgold.florisboard.dictate.sticker.StickerCategory
 import dev.patrickgold.florisboard.dictate.sticker.StickerHistoryHelper
 import dev.patrickgold.florisboard.dictate.sticker.StickerImports
@@ -110,6 +112,7 @@ import dev.patrickgold.jetpref.datastore.ui.ListPreference
 import dev.patrickgold.jetpref.datastore.ui.Preference
 import dev.patrickgold.jetpref.datastore.ui.PreferenceGroup
 import dev.patrickgold.jetpref.datastore.ui.SwitchPreference
+import dev.patrickgold.jetpref.datastore.ui.listPrefEntries
 import dev.patrickgold.jetpref.material.ui.JetPrefAlertDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -287,6 +290,21 @@ fun MediaScreen() = FlorisScreen {
                     else -> stringRes(R.string.prefs__media__gif_setup__summary_set)
                 },
                 onClick = { gifSetupOpen = true },
+            )
+            // The safe-search level existed since the GIFs did, defaulted to strict, and was neither sent
+            // nor shown (#383). A row of its own: it is not part of setting up the key.
+            ListPreference(
+                prefs.gif.contentFilter,
+                icon = Icons.Outlined.Shield,
+                modifier = Modifier.settingsSearchAnchor("prefs__media__gif_content_filter"),
+                title = stringRes(R.string.prefs__media__gif_content_filter),
+                entries = listPrefEntries {
+                    entry(GifContentFilter.HIGH, stringRes(R.string.prefs__media__gif_content_filter__high))
+                    entry(GifContentFilter.MEDIUM, stringRes(R.string.prefs__media__gif_content_filter__medium))
+                    entry(GifContentFilter.LOW, stringRes(R.string.prefs__media__gif_content_filter__low))
+                    entry(GifContentFilter.OFF, stringRes(R.string.prefs__media__gif_content_filter__off))
+                },
+                enabledIf = { prefs.gif.enabled.isTrue() },
             )
         }
 

@@ -2248,6 +2248,11 @@
     <string name="prefs__media__gif_setup__step3">Zkopírujte svůj klíč a vložte jej do pole níže.</string>
     <string name="prefs__media__gif_setup__open_klipy">Otevřít KLIPY Partner Panel</string>
     <string name="prefs__media__gif_setup__key_label">Klíč KLIPY API</string>
+    <string name="prefs__media__gif_content_filter">Bezpečné vyhledávání</string>
+    <string name="prefs__media__gif_content_filter__high">Přísné</string>
+    <string name="prefs__media__gif_content_filter__medium">Střední</string>
+    <string name="prefs__media__gif_content_filter__low">Mírné</string>
+    <string name="prefs__media__gif_content_filter__off">Vypnuto</string>
     <string name="prefs__media__gif_setup__privacy_note">Hledané výrazy se odesílají do KLIPY jen po dobu, kdy je panel GIF otevřený — nikdy během diktování.</string>
     <string name="gif__search_placeholder">Hledat v KLIPY</string>
     <string name="gif__powered_by">Využívá KLIPY</string>

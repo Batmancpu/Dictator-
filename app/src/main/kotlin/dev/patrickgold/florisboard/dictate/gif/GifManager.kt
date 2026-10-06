@@ -38,6 +38,7 @@ object GifManager {
     val provider: GifProvider = KlipyGifProvider(
         apiKeyProvider = { prefs.gif.klipyApiKey.get() },
         customerIdProvider = { prefs.gif.customerId.get() },
+        contentFilterProvider = { prefs.gif.contentFilter.get() },
     )
 
     private val downloadClient: OkHttpClient by lazy {

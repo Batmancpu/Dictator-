@@ -2100,6 +2100,11 @@
     <string name="prefs__media__gif_setup__step3">Copia la teva clau i enganxa-la al camp de sota.</string>
     <string name="prefs__media__gif_setup__open_klipy">Obre el KLIPY Partner Panel</string>
     <string name="prefs__media__gif_setup__key_label">Clau de l\'API de KLIPY</string>
+    <string name="prefs__media__gif_content_filter">Cerca segura</string>
+    <string name="prefs__media__gif_content_filter__high">Estricta</string>
+    <string name="prefs__media__gif_content_filter__medium">Moderada</string>
+    <string name="prefs__media__gif_content_filter__low">Lleugera</string>
+    <string name="prefs__media__gif_content_filter__off">Desactivada</string>
     <string name="prefs__media__gif_setup__privacy_note">Els teus termes de cerca només s\'envien a KLIPY mentre el tauler de GIFs està obert — mai durant el dictat.</string>
     <string name="gif__search_placeholder">Cerca a KLIPY</string>
     <string name="gif__powered_by">Amb la tecnologia de KLIPY</string>

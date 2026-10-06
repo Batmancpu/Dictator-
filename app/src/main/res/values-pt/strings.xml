@@ -2210,6 +2210,11 @@
     <string name="prefs__media__gif_setup__step3">Copie a sua chave e cole-a no campo abaixo.</string>
     <string name="prefs__media__gif_setup__open_klipy">Abrir Painel de Parceiro KLIPY</string>
     <string name="prefs__media__gif_setup__key_label">Chave de API KLIPY</string>
+    <string name="prefs__media__gif_content_filter">Pesquisa segura</string>
+    <string name="prefs__media__gif_content_filter__high">Rigorosa</string>
+    <string name="prefs__media__gif_content_filter__medium">Moderada</string>
+    <string name="prefs__media__gif_content_filter__low">Ligeira</string>
+    <string name="prefs__media__gif_content_filter__off">Desativada</string>
     <string name="prefs__media__gif_setup__privacy_note">Os seus termos de pesquisa só são enviados para a KLIPY enquanto o painel de GIFs está aberto — nunca durante o ditado.</string>
     <string name="gif__search_placeholder">Pesquisar KLIPY</string>
     <string name="gif__powered_by">Com tecnologia KLIPY</string>
