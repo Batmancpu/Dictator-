@@ -373,6 +373,10 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "dictate__proxy_password",
             default = "",
         )
+        /**
+         * DEPRECATED: the app-wide switch, now [dev.patrickgold.florisboard.dictate.provider.ProviderAccount.trustUserCerts]
+         * per account (#383). Read once by the migrator, which turns it off; never for a live call.
+         */
         val trustUserCertificates = boolean(
             key = "dictate__trust_user_certificates",
             default = false,

@@ -1718,7 +1718,6 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__audio_source_voice_recognition_summary">Afgestemd op spraak met minder verwerking — probeer dit als de transcriptie onnauwkeurig is</string>
     <string name="dictate__audio_source_unprocessed">Onverwerkt (ruw)</string>
     <string name="dictate__audio_source_unprocessed_summary">Helemaal geen verwerking; valt terug op Spraakherkenning als je telefoon het niet ondersteunt</string>
-    <string name="dictate__security_group">Beveiliging</string>
     <string name="dictate__trust_user_certs_title">Gebruikerscertificaten vertrouwen</string>
     <string name="dictate__trust_user_certs_summary">Vertrouw CA-certificaten die je hebt geïnstalleerd, voor zelf-gehoste eindpunten achter een privé-CA.</string>
     <string name="dictate__stats_title">Statistieken</string>

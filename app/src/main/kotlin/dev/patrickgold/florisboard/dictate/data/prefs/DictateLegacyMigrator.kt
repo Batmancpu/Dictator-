@@ -360,6 +360,24 @@ object DictateLegacyMigrator {
     }
 
     /**
+     * Moves "Trust user certificates" from the app onto each account (issue #383).
+     *
+     * Every account that existed while the app-wide switch was on keeps trusting them, so nothing that
+     * worked stops working: someone behind a company's TLS-inspecting proxy needed it for every provider.
+     * What changes is the next account, which starts without and has to be switched on for itself.
+     * Idempotent: the old switch is turned off once its value has moved.
+     */
+    suspend fun migrateTrustUserCertsToAccountsIfNeeded() {
+        val prefs by FlorisPreferenceStore
+        if (!prefs.dictate.trustUserCertificates.get()) return
+        val keyring = prefs.dictate.providerAccounts.get()
+        prefs.dictate.providerAccounts.set(
+            keyring.copy(accounts = keyring.accounts.mapValues { (_, account) -> account.copy(trustUserCerts = true) }),
+        )
+        prefs.dictate.trustUserCertificates.set(false)
+    }
+
+    /**
      * One-time switch onto word learning (issues #318, #375), now the default.
      *
      * The same trade as the hold-to-record switch above, for the same reason: word learning shipped off,

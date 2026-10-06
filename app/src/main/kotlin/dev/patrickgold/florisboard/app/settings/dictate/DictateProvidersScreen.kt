@@ -765,6 +765,8 @@ internal fun ProviderEditorDialog(
     var customRealtime by remember { mutableStateOf(account.customRealtime) }
     // Wake-on-demand (#189): whether this endpoint sits in front of a machine that sleeps between jobs.
     var customWarmUp by remember { mutableStateOf(account.customWarmUp) }
+    // User-installed CAs, for this endpoint alone (#383).
+    var trustUserCerts by remember { mutableStateOf(account.trustUserCerts) }
     var pickerKind by remember { mutableStateOf<ModelKind?>(null) }
 
     // Effective preset to drive the model picker / connection test. Custom endpoints get a base-URL-only
@@ -833,6 +835,7 @@ internal fun ProviderEditorDialog(
                     customBaseUrl = baseUrl.trim(),
                     customRealtime = customRealtime,
                     customWarmUp = customWarmUp,
+                    trustUserCerts = trustUserCerts,
                     transcriptionModel = transcriptionModel.trim(),
                     chatModel = chatModel.trim(),
                     realtimeModel = realtimeModel.trim(),
@@ -977,12 +980,14 @@ internal fun ProviderEditorDialog(
                 apiKey.trim(),
                 transcriptionModel.trim(),
                 transcriptionViaChat,
+                trustUserCerts,
             ) {
                 ProviderCheckSection(
                     preset = effectivePreset,
                     apiKey = apiKey,
                     transcriptionModel = transcriptionModel,
                     transcriptionViaChat = transcriptionViaChat,
+                    trustUserCerts = trustUserCerts,
                     showTranscription = showTranscription,
                 )
             }
@@ -1127,6 +1132,29 @@ internal fun ProviderEditorDialog(
                     Switch(checked = customWarmUp, onCheckedChange = { customWarmUp = it })
                 }
             }
+            // Per account since #383: the app-wide switch it replaces also opened every cloud provider's
+            // traffic to whoever holds a certificate from the CA it was turned on for. Any account may need
+            // it, not only a server of the user's own — a company's TLS-inspecting proxy sits in front of all.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { trustUserCerts = !trustUserCerts }
+                    .padding(top = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                    Text(
+                        text = stringRes(R.string.dictate__trust_user_certs_title),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                    Text(
+                        text = stringRes(R.string.dictate__trust_user_certs_summary),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(checked = trustUserCerts, onCheckedChange = { trustUserCerts = it })
+            }
         }
         }
     }
@@ -1136,6 +1164,7 @@ internal fun ProviderEditorDialog(
             kind = kind,
             preset = effectivePreset,
             apiKey = apiKey,
+            trustUserCerts = trustUserCerts,
             current = if (kind == ModelKind.TRANSCRIPTION) transcriptionModel else chatModel,
             cachedModels = cachedModels,
             cachedAudioModels = cachedAudioModels,
@@ -1248,6 +1277,7 @@ private fun ProviderCheckSection(
     apiKey: String,
     transcriptionModel: String,
     transcriptionViaChat: Boolean,
+    trustUserCerts: Boolean,
     showTranscription: Boolean,
 ) {
     val scope = rememberCoroutineScope()
@@ -1288,7 +1318,7 @@ private fun ProviderCheckSection(
                     baseUrlOverride = preset.baseUrl,
                     proxy = prefs.dictate.dictateProxyConfig(),
                     useChatAudio = transcriptionViaChat,
-                    trustUserCerts = prefs.dictate.trustUserCertificates.get(),
+                    trustUserCerts = trustUserCerts,
                 )
                 checkOutcome(context, check(client))
             } catch (e: Exception) {

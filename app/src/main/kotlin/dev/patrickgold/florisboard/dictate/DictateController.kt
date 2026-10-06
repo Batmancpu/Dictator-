@@ -2030,7 +2030,7 @@ object DictateController {
                             proxy = prefs.dictate.dictateProxyConfig(),
                             // Single-call multimodal (issue #130): route audio through chat/completions.
                             useChatAudio = chatAudio,
-                            trustUserCerts = prefs.dictate.trustUserCertificates.get(),
+                            trustUserCerts = account.trustUserCerts,
                             timeoutSeconds = prefs.dictate.requestTimeout.get().toLong(),
                         ).transcribe(
                             request,
@@ -2047,7 +2047,7 @@ object DictateController {
                                 baseUrlOverride = baseUrlOverrideFor(account),
                                 proxy = prefs.dictate.dictateProxyConfig(),
                                 useChatAudio = chatAudio,
-                                trustUserCerts = prefs.dictate.trustUserCertificates.get(),
+                                trustUserCerts = account.trustUserCerts,
                                 timeoutSeconds = prefs.dictate.requestTimeout.get().toLong(),
                             ).transcribe(
                                 request.copy(audioFile = packedFrom!!),
@@ -3107,7 +3107,7 @@ object DictateController {
                         baseUrlOverride = baseUrlOverrideFor(account),
                         proxy = prefs.dictate.dictateProxyConfig(),
                         useChatAudio = false,
-                        trustUserCerts = prefs.dictate.trustUserCertificates.get(),
+                        trustUserCerts = account.trustUserCerts,
                         timeoutSeconds = prefs.dictate.requestTimeout.get().toLong(),
                     ).transcribe(request)
                 } catch (e: DictateApiException) {
@@ -3119,7 +3119,7 @@ object DictateController {
                             baseUrlOverride = baseUrlOverrideFor(account),
                             proxy = prefs.dictate.dictateProxyConfig(),
                             useChatAudio = false,
-                            trustUserCerts = prefs.dictate.trustUserCertificates.get(),
+                            trustUserCerts = account.trustUserCerts,
                             timeoutSeconds = prefs.dictate.requestTimeout.get().toLong(),
                         ).transcribe(request.copy(audioFile = toUpload))
                     } else {
@@ -4379,7 +4379,7 @@ object DictateController {
                     preset, apiKey,
                     baseUrlOverride = baseUrl,
                     proxy = prefs.dictate.dictateProxyConfig(),
-                    trustUserCerts = prefs.dictate.trustUserCertificates.get(),
+                    trustUserCerts = account.trustUserCerts,
                 ).listModels()
             }
         }
@@ -4431,7 +4431,7 @@ object DictateController {
             preset, apiKey,
             baseUrlOverride = baseUrlOverrideFor(account),
             proxy = prefs.dictate.dictateProxyConfig(),
-            trustUserCerts = prefs.dictate.trustUserCertificates.get(),
+            trustUserCerts = account.trustUserCerts,
             timeoutSeconds = prefs.dictate.requestTimeout.get().toLong(),
         )
         // Reasoning effort for reasoning models (issue #141); a per-prompt override wins over the global
