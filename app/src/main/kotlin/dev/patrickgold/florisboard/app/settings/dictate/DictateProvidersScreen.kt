@@ -947,9 +947,6 @@ internal fun ProviderEditorDialog(
                     ),
                     keyboardType = KeyboardType.Uri,
                 )
-            }
-            EditorField(
-                label = stringRes(R.string.dictate__api_key_title),
                 // An http:// address is allowed on purpose, for a server on the user's own network (#136).
                 // It sends the key and the recording as plain text, which nothing else on screen says,
                 // and the same address used on someone else's Wi-Fi may answer from someone else's
@@ -962,6 +959,9 @@ internal fun ProviderEditorDialog(
                         modifier = Modifier.padding(top = 4.dp),
                     )
                 }
+            }
+            EditorField(
+                label = stringRes(R.string.dictate__api_key_title),
                 value = apiKey,
                 onValueChange = { apiKey = it },
                 placeholder = stringRes(R.string.dictate__api_key_placeholder),

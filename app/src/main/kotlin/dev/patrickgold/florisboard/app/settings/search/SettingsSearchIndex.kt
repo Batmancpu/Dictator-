@@ -334,9 +334,9 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.prefs__media__emoji_suggestion_query_min_length, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__emoji_suggestion_query_min_length"),
         SettingsSearchEntry(R.string.prefs__media__emoji_suggestion_candidate_max_count, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__emoji_suggestion_candidate_max_count"),
         SettingsSearchEntry(R.string.prefs__media__gif_setup__title, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__gif_setup__title"),
-        SettingsSearchEntry(R.string.prefs__media__sticker_folder__title, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__sticker_folder__title"),
         // Hand-added (issue #383): a rerun of the generator would drop the entries added by hand since.
         SettingsSearchEntry(R.string.prefs__media__gif_content_filter, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__gif_content_filter"),
+        SettingsSearchEntry(R.string.prefs__media__sticker_folder__title, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__sticker_folder__title"),
         SettingsSearchEntry(R.string.prefs__media__sticker_add, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__sticker_add"),
         SettingsSearchEntry(R.string.prefs__media__sticker_import_source, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__sticker_import_source"),
         SettingsSearchEntry(R.string.prefs__media__sticker_packs, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__sticker_packs"),
