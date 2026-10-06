@@ -18,14 +18,9 @@ package dev.patrickgold.florisboard.ime.text.gestures
 
 import android.content.Context
 import androidx.collection.LruCache
-import androidx.collection.SparseArrayCompat
-import androidx.collection.set
 import dev.patrickgold.florisboard.ime.core.Subtype
-import dev.patrickgold.florisboard.ime.keyboard.KeyData
-import dev.patrickgold.florisboard.ime.text.key.KeyCode
 import dev.patrickgold.florisboard.ime.text.keyboard.TextKey
 import dev.patrickgold.florisboard.nlpManager
-import java.text.Normalizer
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.PI
@@ -36,20 +31,33 @@ import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-private fun TextKey.baseCode(): Int {
-    return (data as? KeyData)?.code ?: KeyCode.UNSPECIFIED
-}
-
 /**
  * Classifies gestures by comparing them with an "ideal gesture".
  *
  * Check out Étienne Desticourt's excellent write up at https://github.com/AnySoftKeyboard/AnySoftKeyboard/pull/1870
  */
-class StatisticalGlideTypingClassifier(context: Context) : GlideTypingClassifier {
-    private val nlpManager by context.nlpManager()
+class StatisticalGlideTypingClassifier internal constructor(
+    private val vocabulary: Vocabulary,
+) : GlideTypingClassifier {
+    constructor(context: Context) : this(NlpVocabulary(context))
+
+    /**
+     * Where the words to match a gesture against come from, and how common each one is. The app asks the
+     * NLP manager; a test hands in a fixed dictionary, so the classifier can be measured without a device.
+     */
+    interface Vocabulary {
+        fun words(subtype: Subtype): List<String>
+        fun frequency(subtype: Subtype, word: String): Double
+    }
+
+    private class NlpVocabulary(context: Context) : Vocabulary {
+        private val nlpManager by context.nlpManager()
+        override fun words(subtype: Subtype) = nlpManager.getListOfWords(subtype)
+        override fun frequency(subtype: Subtype, word: String) = nlpManager.getFrequencyForWord(subtype, word)
+    }
 
     private val gesture = Gesture()
-    private var keysByCharacter: SparseArrayCompat<TextKey> = SparseArrayCompat()
+    private var keyMap = GlideKeyMap(emptyList(), Locale.ROOT)
     private var words: List<String> = emptyList()
     private var keys: ArrayList<TextKey> = arrayListOf()
     private lateinit var pruner: Pruner
@@ -126,12 +134,9 @@ class StatisticalGlideTypingClassifier(context: Context) : GlideTypingClassifier
         // if only layout changed but not subtype
         val layoutChanged = layoutSubtype == subtype
 
-        keysByCharacter.clear()
         keys.clear()
-        keyViews.forEach {
-            keysByCharacter[it.baseCode()] = it
-            keys.add(it)
-        }
+        keys.addAll(keyViews)
+        keyMap = GlideKeyMap(keyViews, subtype.primaryLocale.base)
         layoutSubtype = subtype
         distanceThresholdSquared = (keyViews.first().visibleBounds.width / 4).toInt()
         distanceThresholdSquared *= distanceThresholdSquared
@@ -150,7 +155,7 @@ class StatisticalGlideTypingClassifier(context: Context) : GlideTypingClassifier
             return
         }
 
-        this.words = nlpManager.getListOfWords(subtype)
+        this.words = vocabulary.words(subtype)
 
         this.wordDataSubtype = subtype
         if (wordDataSubtype == layoutSubtype) {
@@ -181,7 +186,7 @@ class StatisticalGlideTypingClassifier(context: Context) : GlideTypingClassifier
             else -> prunerCache.get(currentSubtype)
         }
         if (cached == null) {
-            this.pruner = Pruner(PRUNING_LENGTH_THRESHOLD, this.words, keysByCharacter)
+            this.pruner = Pruner(PRUNING_LENGTH_THRESHOLD, this.words, keyMap)
             prunerCache.put(currentSubtype, this.pruner)
         } else {
             this.pruner = cached
@@ -218,43 +223,38 @@ class StatisticalGlideTypingClassifier(context: Context) : GlideTypingClassifier
         var remainingWords = pruner.pruneByExtremities(gesture, this.keys)
         val userGesture = gesture.resample(SAMPLING_POINTS)
         val normalizedUserGesture: Gesture = userGesture.normalizeByBoxSide()
-        remainingWords = pruner.pruneByLength(gesture, remainingWords, keysByCharacter, keys)
+        remainingWords = pruner.pruneByLength(gesture, remainingWords, keyMap, keys)
 
-        for (i in remainingWords.indices) {
-            val word = remainingWords[i]
-            val idealGestures = Gesture.generateIdealGestures(word, keysByCharacter)
-
-            for (idealGesture in idealGestures) {
+        for (word in remainingWords) {
+            // A word has one ideal path per way of swiping it (a doubled letter with or without its loop, a
+            // long-press letter through each key that offers it); it is as good as the best of them, and is
+            // ranked once — ranking every path separately let a worse path of a word stay in the list below
+            // its better one.
+            var bestMatch = 0.0f
+            for (idealGesture in Gesture.generateIdealGestures(word, keyMap)) {
                 val wordGesture = idealGesture.resample(SAMPLING_POINTS)
                 val normalizedGesture: Gesture = wordGesture.normalizeByBoxSide()
                 val shapeDistance = calcShapeDistance(normalizedGesture, normalizedUserGesture)
                 val locationDistance = calcLocationDistance(wordGesture, userGesture)
                 val shapeProbability = calcGaussianProbability(shapeDistance, 0.0f, SHAPE_STD)
                 val locationProbability = calcGaussianProbability(locationDistance, 0.0f, LOCATION_STD * radius)
-                val frequency = 255f * nlpManager.getFrequencyForWord(currentSubtype!!, word).toFloat()
-                val confidence = 1.0f / (shapeProbability * locationProbability * frequency)
+                bestMatch = max(bestMatch, shapeProbability * locationProbability)
+            }
+            val frequency = 255f * vocabulary.frequency(currentSubtype!!, word).toFloat()
+            val confidence = 1.0f / (bestMatch * frequency)
 
-                var candidateDistanceSortedIndex = 0
-                var duplicateIndex = Int.MAX_VALUE
-
-                while (candidateDistanceSortedIndex < candidateWeights.size
-                    && candidateWeights[candidateDistanceSortedIndex] <= confidence
-                ) {
-                    if (candidates[candidateDistanceSortedIndex].contentEquals(word)) duplicateIndex =
-                        candidateDistanceSortedIndex
-                    candidateDistanceSortedIndex++
-                }
-                if (candidateDistanceSortedIndex < maxSuggestionCount && candidateDistanceSortedIndex <= duplicateIndex) {
-                    if (duplicateIndex < Int.MAX_VALUE) {
-                        candidateWeights.removeAt(duplicateIndex)
-                        candidates.removeAt(duplicateIndex)
-                    }
-                    candidateWeights.add(candidateDistanceSortedIndex, confidence)
-                    candidates.add(candidateDistanceSortedIndex, word)
-                    if (candidateWeights.size > maxSuggestionCount) {
-                        candidateWeights.removeAt(maxSuggestionCount)
-                        candidates.removeAt(maxSuggestionCount)
-                    }
+            var candidateDistanceSortedIndex = 0
+            while (candidateDistanceSortedIndex < candidateWeights.size
+                && candidateWeights[candidateDistanceSortedIndex] <= confidence
+            ) {
+                candidateDistanceSortedIndex++
+            }
+            if (candidateDistanceSortedIndex < maxSuggestionCount) {
+                candidateWeights.add(candidateDistanceSortedIndex, confidence)
+                candidates.add(candidateDistanceSortedIndex, word)
+                if (candidateWeights.size > maxSuggestionCount) {
+                    candidateWeights.removeAt(maxSuggestionCount)
+                    candidates.removeAt(maxSuggestionCount)
                 }
             }
         }
@@ -307,7 +307,7 @@ class StatisticalGlideTypingClassifier(context: Context) : GlideTypingClassifier
          */
         private val lengthThreshold: Double,
         words: List<String>,
-        keysByCharacter: SparseArrayCompat<TextKey>,
+        keyMap: GlideKeyMap,
     ) {
 
         /** A tree that provides fast access to words based on their first and last letter.  */
@@ -325,7 +325,9 @@ class StatisticalGlideTypingClassifier(context: Context) : GlideTypingClassifier
             userGesture: Gesture,
             keys: Iterable<TextKey>,
         ): ArrayList<String> {
-            val remainingWords = ArrayList<String>()
+            // A word whose first or last letter has more than one key is filed under each of them, and two of
+            // those keys can both be among the closest — it is still one candidate.
+            val remainingWords = LinkedHashSet<String>()
             val startX = userGesture.getFirstX()
             val startY = userGesture.getFirstY()
             val endX = userGesture.getLastX()
@@ -341,7 +343,7 @@ class StatisticalGlideTypingClassifier(context: Context) : GlideTypingClassifier
                     }
                 }
             }
-            return remainingWords
+            return ArrayList(remainingWords)
         }
 
         /**
@@ -355,7 +357,7 @@ class StatisticalGlideTypingClassifier(context: Context) : GlideTypingClassifier
         fun pruneByLength(
             userGesture: Gesture,
             words: ArrayList<String>,
-            keysByCharacter: SparseArrayCompat<TextKey>,
+            keyMap: GlideKeyMap,
             keys: List<TextKey>,
         ): ArrayList<String> {
             val remainingWords = ArrayList<String>()
@@ -364,49 +366,23 @@ class StatisticalGlideTypingClassifier(context: Context) : GlideTypingClassifier
             val radius = min(key.visibleBounds.height, key.visibleBounds.width)
             val userLength = userGesture.getLength()
             for (word in words) {
-                val idealGestures = Gesture.generateIdealGestures(word, keysByCharacter)
-                for (idealGesture in idealGestures) {
-                    val wordIdealLength = getCachedIdealLength(word, idealGesture)
-                    if (abs(userLength - wordIdealLength) < lengthThreshold * radius) {
-                        remainingWords.add(word)
-                    }
+                // Kept once if any way of swiping it is about as long as the swipe. It used to be added once per
+                // path that passed, and measured against the length of the first path only.
+                if (idealLengths(word, keyMap).any { abs(userLength - it) < lengthThreshold * radius }) {
+                    remainingWords.add(word)
                 }
             }
             return remainingWords
         }
 
-        private val cachedIdealLength = ConcurrentHashMap<String, Float>()
-        private fun getCachedIdealLength(word: String, idealGesture: Gesture): Float {
-            return cachedIdealLength.getOrPut(word) { idealGesture.getLength() }
+        private val cachedIdealLengths = ConcurrentHashMap<String, FloatArray>()
+        private fun idealLengths(word: String, keyMap: GlideKeyMap): FloatArray {
+            return cachedIdealLengths.getOrPut(word) {
+                Gesture.generateIdealGestures(word, keyMap).map { it.getLength() }.toFloatArray()
+            }
         }
 
         companion object {
-            private fun getFirstKeyLastKey(
-                word: String,
-                keysByCharacter: SparseArrayCompat<TextKey>,
-            ): Pair<Int, Int>? {
-                // Lowercase first (keyboard keys are lowercase): a capitalised word like "Baum" would
-                // otherwise miss the key lookup (B vs b) and be pruned out entirely (issue #127).
-                val firstLetter = Character.toLowerCase(word[0])
-                val lastLetter = Character.toLowerCase(word[word.length - 1])
-                val firstBaseChar = Normalizer.normalize(firstLetter.toString(), Normalizer.Form.NFD)[0]
-                val lastBaseChar = Normalizer.normalize(lastLetter.toString(), Normalizer.Form.NFD)[0]
-                return when {
-                    keysByCharacter.indexOfKey(firstBaseChar.code) < 0 || keysByCharacter.indexOfKey(lastBaseChar.code) < 0 -> {
-                        null
-                    }
-                    else -> {
-                        val firstKey = keysByCharacter[firstBaseChar.code]
-                        val lastKey = keysByCharacter[lastBaseChar.code]
-                        if (firstKey != null && lastKey != null) {
-                            firstKey.baseCode() to lastKey.baseCode()
-                        } else {
-                            null
-                        }
-                    }
-                }
-            }
-
             /**
              * Finds a chosen number of keys closest to a given point on the keyboard.
              *
@@ -432,16 +408,22 @@ class StatisticalGlideTypingClassifier(context: Context) : GlideTypingClassifier
                 }
 
                 return keyDistances.entries.sortedWith { c1, c2 -> c1.value.compareTo(c2.value) }.take(n)
-                    .map { it.key.baseCode() }
+                    .map { it.key.glideCode() }
             }
         }
 
         init {
             synchronized(wordTree) {
                 for (word in words) {
-                    val keyPair = getFirstKeyLastKey(word, keysByCharacter)
-                    keyPair?.let {
-                        wordTree.getOrPut(keyPair) { arrayListOf() }.add(word)
+                    if (word.isEmpty()) continue
+                    // Under every key its first and last letter can be swiped from — the same keys its ideal path
+                    // starts and ends on (issue #426). This used to strip the accent instead, so `állatkert` sat
+                    // under `a` while its swipe starts on `á`, and a word ending in `ß` or `ł` sat nowhere.
+                    // [GlideKeyMap] lower-cases, so a capitalised noun is filed like any other word (issue #127).
+                    for (first in keyMap.keysFor(word.first())) {
+                        for (last in keyMap.keysFor(word.last())) {
+                            wordTree.getOrPut(first.glideCode() to last.glideCode()) { arrayListOf() }.add(word)
+                        }
                     }
                 }
             }
@@ -457,24 +439,52 @@ class StatisticalGlideTypingClassifier(context: Context) : GlideTypingClassifier
             // TODO: Find out optimal max size
             private const val MAX_SIZE = 500
 
-            fun generateIdealGestures(word: String, keysByCharacter: SparseArrayCompat<TextKey>): List<Gesture> {
+            /**
+             * At most this many ways of swiping one word are scored. Only a letter offered by more than one key
+             * multiplies them — Hungarian `ő` through `o` or `ö` (issue #426) — so this bounds the rare word with
+             * four of them; such a word is then tried with each letter through its first key, and through its
+             * second, rather than every mixture.
+             */
+            private const val MAX_KEY_PATHS = 8
+
+            fun generateIdealGestures(word: String, keyMap: GlideKeyMap): List<Gesture> {
+                // A letter this layout cannot type is left out of the path, as the finger leaves it out.
+                val letters = ArrayList<Char>(word.length)
+                val options = ArrayList<List<TextKey>>(word.length)
+                for (c in word) {
+                    val keys = keyMap.keysFor(c)
+                    if (keys.isEmpty()) continue
+                    letters.add(Character.toLowerCase(c))
+                    options.add(keys)
+                }
+                if (options.all { it.size == 1 }) {
+                    return idealGesturesAlong(letters, options.map { it[0] })
+                }
+                val combinations = options.fold(1) { n, keys -> (n * keys.size).coerceAtMost(MAX_KEY_PATHS + 1) }
+                val paths = if (combinations <= MAX_KEY_PATHS) {
+                    options.fold(listOf(emptyList<TextKey>())) { paths, keys ->
+                        paths.flatMap { path -> keys.map { path + it } }
+                    }
+                } else {
+                    (0 until options.maxOf { it.size }).map { j -> options.map { it[min(j, it.size - 1)] } }
+                }
+                return paths.flatMap { idealGesturesAlong(letters, it) }
+            }
+
+            /**
+             * The path through [keys], the key for each of [letters]; and a second one with a loop on every doubled
+             * letter, if the word has any.
+             */
+            private fun idealGesturesAlong(letters: List<Char>, keys: List<TextKey>): List<Gesture> {
                 val idealGesture = Gesture()
                 val idealGestureWithLoops = Gesture()
                 var previousLetter = '\u0000'
                 var hasLoops = false
 
                 // Add points for each key
-                for (c in word) {
-                    val lc = Character.toLowerCase(c)
-                    var key = keysByCharacter[lc.code]
-                    if (key == null) {
-                        // Try finding the base character instead, e.g., the "e" key instead of "é"
-                        val baseCharacter: Char = Normalizer.normalize(lc.toString(), Normalizer.Form.NFD)[0]
-                        key = keysByCharacter[baseCharacter.code]
-                        if (key == null) {
-                            continue
-                        }
-                    }
+                for (i in letters.indices) {
+                    val lc = letters[i]
+                    val key = keys[i]
                     val visibleBoundsCenter = key.visibleBounds.center
 
                     // We adda little loop on  the key for duplicate letters
