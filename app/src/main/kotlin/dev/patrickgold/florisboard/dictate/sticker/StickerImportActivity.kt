@@ -18,6 +18,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
+import dev.patrickgold.florisboard.dictate.acceptsSharedUri
 import kotlinx.coroutines.launch
 
 /**
@@ -42,7 +43,8 @@ class StickerImportActivity : ComponentActivity() {
             finish()
             return
         }
-        val sources = StickerWriter.sharedUris(intent)
+        // Only what another app can honestly share: not a file:// path and not one of our own Uris (#383).
+        val sources = StickerWriter.sharedUris(intent).filter { acceptsSharedUri(it) }
         val folder = prefs.sticker.folderUri.get()
 
         if (sources.isEmpty()) {
