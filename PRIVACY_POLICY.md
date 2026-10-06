@@ -48,11 +48,13 @@ existed: we have no server in your path and no data about you.
 - **Dictate Cloud is the one exception**, it is entirely optional, it is never
   switched on without a purchase you make yourself, and section 4 says exactly
   what it does.
-- Your API keys, prompts, and settings are stored **only on your device** — and,
-  if you use Android's own backup, in that backup, end-to-end encrypted
-  (section 2.6).
+- Your API keys, prompts, and settings are stored **only on your device**. The
+  two exceptions are Android's own backup, if you use it, where they are
+  end-to-end encrypted (section 2.6), and your watch, if you use the Wear OS app
+  (section 3.5).
 - The App contains **no advertising, no tracking, no telemetry, and no
-  crash-reporting SDKs**.
+  crash-reporting SDKs**. Section 2.8 names the one library that reported usage
+  statistics until version 6.3.0, and that the App now switches off.
 - As a keyboard, the App **does not log your keystrokes or collect what you type**
   in other apps. It only processes audio that you explicitly record by pressing
   the dictation button.
@@ -149,6 +151,16 @@ ask a prompt to reword, which goes to your chosen provider like any other
 rewording. You can switch the service off at any time in Android's accessibility
 settings.
 
+### 2.8 Scanning and translating text
+**Scan text** reads printed text from a photo you take or pick, and **the
+translate bar** translates what you type. Both run entirely on your phone. The
+photo and the text are never uploaded. The translation models are downloaded once,
+when you ask for a language (section 3.4).
+
+Scan text uses Google's ML Kit library, which on its own reports usage statistics
+about the feature to Google. The App switches that reporting off. Versions up to
+and including 6.3.0 did not, and sent those statistics.
+
 ---
 
 ## 3. Third-party services you choose
@@ -168,18 +180,35 @@ Built-in providers the App can be configured to use include:
 | OpenAI | https://openai.com/policies/privacy-policy |
 | Groq | https://groq.com/privacy-policy/ |
 | OpenRouter | https://openrouter.ai/privacy |
+| Google Gemini | https://policies.google.com/privacy and the Gemini API terms, https://ai.google.dev/gemini-api/terms |
 | Together AI | https://www.together.ai/privacy |
 | DeepInfra | https://deepinfra.com/privacy |
 | Mistral AI | https://mistral.ai/terms/#privacy-policy |
+| Scaleway | https://www.scaleway.com/en/privacy-policy/ |
+| OVHcloud | https://www.ovhcloud.com/en-ie/personal-data-protection/ |
 | xAI (Grok) | https://x.ai/legal/privacy-policy |
 | DeepSeek | https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html |
+| SiliconFlow | https://docs.siliconflow.cn/cn/legals/privacy-policy (in Chinese) |
 | Anthropic | https://www.anthropic.com/legal/privacy |
 | Deepgram | https://deepgram.com/privacy |
 | AssemblyAI | https://www.assemblyai.com/legal/privacy-policy |
 | ElevenLabs | https://elevenlabs.io/privacy |
 | Soniox | https://soniox.com/privacy |
+| Microsoft Azure Speech | https://privacy.microsoft.com/privacystatement |
 | Ollama (local) | Runs on your own device/server — no third party involved |
 | On-device recognition | Runs entirely on your phone — no third party involved |
+
+A few of them differ in ways worth knowing before you choose:
+
+- **Google Gemini:** under Google's free tier, Google may use what you send to
+  improve its products, and human reviewers may read it. Under its paid tier it
+  does not. Which tier applies depends on your Google account, not on the App.
+- **SiliconFlow** is operated in mainland China, and what you send to it is
+  processed there.
+- **Scaleway and OVHcloud** are European providers and process in the EU.
+  **Soniox** and **OpenRouter** offer EU regions, which you can choose in the App.
+- **Microsoft Azure Speech** uses your own Speech resource: the audio goes to the
+  address and the Azure region of the resource you enter.
 
 You may also configure a **custom OpenAI-compatible endpoint**. If you do, your
 data is sent to whichever server you specify, and you are responsible for that
@@ -200,6 +229,39 @@ sent to KLIPY unless you open the panel and search.
 Purchases of Dictate Cloud credit are processed by **Google**, who is the seller
 and an independent controller for the payment. We never see your payment details.
 See https://policies.google.com/privacy.
+
+### 3.4 Downloads from GitHub
+Some files the App needs are too large to ship inside it. It downloads them from
+the releases of its own repository on **GitHub** (a Microsoft company):
+
+- on-device recognition models and offline translation models, when you tap to
+  download one;
+- the word lists for swipe typing and suggestions, and the Chinese Pinyin pack,
+  when you add a keyboard language or first type in it;
+- the community prompt library, each time you open it.
+
+These are plain file downloads. Nothing about you, your dictations or your typing
+is sent with them. As with any download, GitHub sees your IP address and which
+file was requested. See
+https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement.
+
+### 3.5 The Wear OS watch app
+If you use Dictate on a Wear OS watch, your phone sends the watch what it needs to
+dictate:
+
+- your chosen providers and models, the style prompt, your custom words and the
+  rewording prompts;
+- **your API keys** for those providers, so that the watch can also dictate
+  without the phone. You can switch this off in the App's Wear OS settings, on
+  the phone or on the watch, and the watch then always goes through the phone.
+
+On the watch, the recording goes to your phone, which transcribes it as described
+above. Without the phone, and with the keys on the watch, the watch sends it
+straight to your provider instead.
+
+Phone and watch exchange all of this through Google Play services. That happens
+over Bluetooth, and through Google's servers when Bluetooth is not available.
+Google states that this route is end-to-end encrypted.
 
 ---
 
@@ -442,7 +504,8 @@ requirements.
 The AI providers you choose may operate servers in other countries (for example
 the United States). When you send audio or text to a provider, that data may be
 processed in the country where the provider operates, under that provider's
-policies.
+policies. SiliconFlow processes in mainland China. Scaleway and OVHcloud, and the
+EU regions of Soniox and OpenRouter, keep processing in the EU (section 3.1).
 
 For Dictate Cloud, the transfer arrangements are set out in section 4.3.
 
