@@ -1055,33 +1055,8 @@ internal fun ProviderEditorDialog(
                         ?: stringRes(R.string.dictate__model_placeholder),
                     onBrowse = { pickerKind = ModelKind.CHAT },
                 )
-                // Wake-on-demand (#189): a GPU box that sleeps between jobs only starts waking when
-                // something reaches it, so the first rewording otherwise pays for the whole boot. Offered
-                // only for endpoints of the user's own — nowhere else is there a machine to wake.
-                if (isCustom) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { customWarmUp = !customWarmUp }
-                            .padding(top = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                            Text(
-                                text = stringRes(R.string.dictate__providers_custom_warm_up),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                            Text(
-                                text = stringRes(R.string.dictate__providers_custom_warm_up_summary),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        Switch(checked = customWarmUp, onCheckedChange = { customWarmUp = it })
-                    }
-                }
             }
-            // Single-call multimodal (issue #130): kept at the bottom; when on, this one model transcribes
+            // Single-call multimodal (issue #130): kept below the models; when on, this one model transcribes
             // and formats in a single request and the rewording field above is folded into it. Offered for
             // any provider with a chat endpoint, which is the prerequisite for input_audio.
             //
@@ -1109,6 +1084,35 @@ internal fun ProviderEditorDialog(
                         checked = transcriptionViaChat,
                         onCheckedChange = { transcriptionViaChat = it },
                     )
+                }
+            }
+            // Wake-on-demand (#189): a machine that sleeps between jobs, or a server that unloads its model
+            // when idle, only starts coming back once something reaches it, so the first request otherwise
+            // pays for the whole wake-up. Since #446 it is woken for whichever job it does — when a
+            // recording starts if it transcribes, when a rewording is certain if it rewords — so it belongs
+            // to the server rather than to either model, and sits below both. That also keeps it in sight
+            // when single-call folds the two into one request. Offered only for endpoints of the user's
+            // own — nowhere else is there a machine to wake.
+            if (isCustom) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { customWarmUp = !customWarmUp }
+                        .padding(top = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                        Text(
+                            text = stringRes(R.string.dictate__providers_custom_warm_up),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        Text(
+                            text = stringRes(R.string.dictate__providers_custom_warm_up_summary),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    Switch(checked = customWarmUp, onCheckedChange = { customWarmUp = it })
                 }
             }
         }

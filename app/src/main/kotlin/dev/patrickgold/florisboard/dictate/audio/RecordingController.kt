@@ -156,8 +156,9 @@ class RecordingController(private val context: Context) {
                     // Write under the lock so a concurrent rotate() sees a consistent raf/pcmBytes and the
                     // frame lands in the correct segment file (never split across a rotation).
                     synchronized(fileLock) {
-                        runCatching { raf?.write(buf, 0, n) }
-                        pcmBytes += n
+                        // Counted only once written: the header is built from this, and a frame lost to a
+                        // full disk would otherwise be announced as data the file does not contain.
+                        runCatching { raf?.write(buf, 0, n) }.onSuccess { pcmBytes += n }
                     }
                     val framePeak = framePeak(buf, n)
                     if (framePeak > peak) peak = framePeak

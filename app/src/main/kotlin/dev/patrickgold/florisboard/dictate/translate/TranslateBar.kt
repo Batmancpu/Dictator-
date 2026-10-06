@@ -128,6 +128,7 @@ fun TranslateBar(modifier: Modifier = Modifier) {
                 icon = Icons.Outlined.Translate,
                 focused = focused,
                 onTap = { offset -> controller.focus(offset) },
+                onPaste = { keyboardManager.pasteIntoField() },
                 onClear = { controller.clear() },
                 modifier = Modifier.fillMaxWidth(),
             )

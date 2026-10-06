@@ -90,6 +90,12 @@ fun ClipboardScreen() = FlorisScreen {
                 title = stringRes(R.string.pref__clipboard__suggestion_enabled__label),
                 summary = stringRes(R.string.pref__clipboard__suggestion_enabled__summary),
             )
+            SwitchPreference(
+                prefs.clipboard.suggestionShowExtracted,
+                modifier = Modifier.settingsSearchAnchor("pref__clipboard__suggestion_show_extracted__label"),
+                title = stringRes(R.string.pref__clipboard__suggestion_show_extracted__label),
+                enabledIf = { prefs.clipboard.suggestionEnabled isEqualTo true },
+            )
             DialogSliderPreference(
                 prefs.clipboard.suggestionTimeout,
                 modifier = Modifier.settingsSearchAnchor("pref__clipboard__suggestion_timeout__label"),

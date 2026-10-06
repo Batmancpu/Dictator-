@@ -80,6 +80,18 @@ fun QuickAction.keyData(): KeyData {
 }
 
 /**
+ * One complete tap with no finger behind it: what a screen reader's double-tap runs (issue #159).
+ *
+ * The same down and up a real tap sends, back to back, so the mic starts or stops exactly as it does
+ * under a finger and the overflow panel closes by the same rules — rather than a second path that has
+ * to be kept in step with the first.
+ */
+fun QuickAction.performAsTap(context: Context) {
+    onPointerDown(context)
+    onPointerUp(context)
+}
+
+/**
  * Runs this action as another button's long press (issue #385).
  *
  * One complete down-up, the same way the globe key's hold reaches the input method picker: a hold is

@@ -58,6 +58,7 @@ import dev.patrickgold.florisboard.ime.nlp.ClipboardSuggestionCandidate
 import dev.patrickgold.florisboard.ime.nlp.EmojiSuggestionCandidate
 import dev.patrickgold.florisboard.ime.nlp.NlpManager
 import dev.patrickgold.florisboard.ime.nlp.SuggestionCandidate
+import dev.patrickgold.florisboard.ime.nlp.math.MathSuggestionCandidate
 import kotlinx.coroutines.launch
 import org.florisboard.lib.android.showShortToast
 import dev.patrickgold.florisboard.ime.theme.FlorisImeUi
@@ -240,6 +241,9 @@ fun CandidatesRow(modifier: Modifier = Modifier) {
                             candidateItem is ClipboardSuggestionCandidate -> {
                                 nlpManager.removeSuggestion(subtypeManager.activeSubtype, candidateItem)
                             }
+                            // An answer is not a word. Falling through to the branch below put "600" into
+                            // the personal dictionary, where it went on being suggested long after the sum.
+                            candidateItem is MathSuggestionCandidate -> false
                             // A word the keyboard picked up by itself is already in the vocabulary, so the
                             // gesture means the opposite there: forget it (issue #318). Without this, the
                             // only way to take back something it learned would be the settings screen —
@@ -304,7 +308,12 @@ private fun CandidateItem(
 ) = with(LocalDensity.current) {
     var isPressed by remember { mutableStateOf(false) }
 
-    val elementName = if (candidate is ClipboardSuggestionCandidate) {
+    // The answer to a sum wears the clipboard chip's pill (issue #440), the same element the selection
+    // counter already borrows: it is an offer that stands in for the words for a moment, not one of them,
+    // and the pill's icon rule is also what puts air between the calculator and the number.
+    val isPill = candidate is ClipboardSuggestionCandidate || candidate is MathSuggestionCandidate
+
+    val elementName = if (isPill) {
         FlorisImeUi.SmartbarCandidateClip
     } else {
         FlorisImeUi.SmartbarCandidateWord
@@ -327,8 +336,6 @@ private fun CandidateItem(
     val currentOnLongPress by rememberUpdatedState(onLongPress)
     val currentLongPressDelay by rememberUpdatedState(longPressDelay)
 
-    val isClip = candidate is ClipboardSuggestionCandidate
-
     // The chip is the pill: background, shape, margin and padding all come off [elementName], and the
     // dismiss button below is a child of it so it sits *inside* the pill the way Desh's does. What the
     // finger commits is only the inner row — the press gesture must not cover the button, because
@@ -344,16 +351,16 @@ private fun CandidateItem(
         // The clipboard chip has to read as one thing: icon, label and × sit next to each other and the
         // group is centred (issue #346). Words keep the default, because a word is centred in its own
         // cell by the weight on the column below.
-        horizontalArrangement = if (isClip) Arrangement.Center else Arrangement.Start,
+        horizontalArrangement = if (isPill) Arrangement.Center else Arrangement.Start,
     ) {
         Row(
-            // `fill = false` for the clip, and that is the whole of what used to push its icon to the far
-            // edge of the strip: a filled weight forces the chip's row out to the width it was offered, so
-            // in the classic display mode the icon ended up against the left edge with the text centred a
-            // finger's width away, looking like two unrelated things. Words still fill — a word is meant
-            // to be centred in its third — and the scrolling modes never weighted this at all.
+            // `fill = false` for the pills, and that is the whole of what used to push the clip's icon to
+            // the far edge of the strip: a filled weight forces the chip's row out to the width it was
+            // offered, so in the classic display mode the icon ended up against the left edge with the text
+            // centred a finger's width away, looking like two unrelated things. Words still fill — a word is
+            // meant to be centred in its third — and the scrolling modes never weighted this at all.
             modifier = when {
-                isClip -> Modifier.weight(1f, fill = false)
+                isPill -> Modifier.weight(1f, fill = false)
                 displayMode == CandidatesDisplayMode.CLASSIC -> Modifier.weight(1f)
                 else -> Modifier
             }
@@ -396,7 +403,7 @@ private fun CandidateItem(
                 }
             }
             SnyggColumn(
-                modifier = if (!isClip && displayMode == CandidatesDisplayMode.CLASSIC) {
+                modifier = if (!isPill && displayMode == CandidatesDisplayMode.CLASSIC) {
                     Modifier.weight(1f)
                 } else {
                     Modifier

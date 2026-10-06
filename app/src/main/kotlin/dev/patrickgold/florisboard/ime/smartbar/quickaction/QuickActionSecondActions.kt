@@ -80,8 +80,11 @@ data class QuickActionSecondActions(val pairs: List<QuickActionSecondAction> = e
      * Runs on every read rather than only on the picker, because a restored backup and a
      * hand-edited datastore reach the same field, and the rules here are not cosmetic:
      *
-     * - a **repeating** host would silently lose its hold-to-repeat, since the input event dispatcher
-     *   enters the repeat loop only when the long press declines the press;
+     * - a host that is **held for its repeat** — the arrows, Delete — would silently lose it, since the
+     *   input event dispatcher enters the repeat loop only when the long press declines the press. Undo
+     *   and Redo repeat as well, but nobody holds them for it (issue #433): ten undos a second cannot be
+     *   stopped at the step one wanted. Paired, they trade the repeat for the second action, which is
+     *   what someone who pairs Undo with Redo asks for — HeliBoard's toolbar puts Redo on a held Undo;
      * - the **mic** as a host would fight `DictateHoldTouch`, which owns that whole gesture for
      *   push-to-talk, file transcription and the local model;
      * - a **chain** (A holds B, B holds C) has no button left to explain it.
@@ -125,9 +128,12 @@ data class QuickActionSecondActions(val pairs: List<QuickActionSecondAction> = e
 
         private val KnownActionCodes: Set<Int> = KnownActions.map { it.keyData().code }.toSet()
 
-        /** The actions that may carry a second one. See [sanitized] for why these two are out. */
+        /** The repeating actions whose repeat is the point of holding them. See [sanitized]. */
+        val HeldForRepeatCodes: Set<Int> = RepeatableKeyCodes - setOf(KeyCode.UNDO, KeyCode.REDO)
+
+        /** The actions that may carry a second one. See [sanitized] for why these are out. */
         val EligibleHosts: List<QuickAction> = KnownActions.filterNot {
-            it.keyData().code in RepeatableKeyCodes || it.keyData().code == KeyCode.IME_UI_MODE_DICTATE
+            it.keyData().code in HeldForRepeatCodes || it.keyData().code == KeyCode.IME_UI_MODE_DICTATE
         }
 
         private val EligibleHostCodes: Set<Int> = EligibleHosts.map { it.keyData().code }.toSet()

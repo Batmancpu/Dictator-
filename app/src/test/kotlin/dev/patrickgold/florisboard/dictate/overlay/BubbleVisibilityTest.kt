@@ -39,6 +39,8 @@ class BubbleVisibilityTest {
     private fun shown(
         state: DictateController.UiState = DictateController.UiState.Idle,
         focused: Boolean = false,
+        keyboardRequired: Boolean = false,
+        keyboardShown: Boolean = false,
         enabled: Boolean = true,
         hiddenByOwnKeyboard: Boolean = false,
         recognitionActive: Boolean = false,
@@ -47,6 +49,8 @@ class BubbleVisibilityTest {
     ) = BubbleVisibility.shouldShow(
         enabled = enabled,
         focused = focused,
+        keyboardRequired = keyboardRequired,
+        keyboardShown = keyboardShown,
         state = state,
         hiddenByOwnKeyboard = hiddenByOwnKeyboard,
         recognitionActive = recognitionActive,
@@ -110,5 +114,37 @@ class BubbleVisibilityTest {
         assertFalse(shown(state = recording, allowedInApp = false))
         assertFalse(shown(state = transcribing, allowedInApp = false))
         assertFalse(shown(focused = true, allowedInApp = false))
+    }
+
+    /**
+     * "Only while the keyboard is open" (#439): WhatsApp focuses its composer the moment a chat is opened,
+     * so the focused field that is enough by default is exactly what must not be enough here.
+     */
+    @Test
+    fun `with the keyboard required a focused field waits for the keyboard`() {
+        assertFalse(shown(focused = true, keyboardRequired = true))
+        assertTrue(shown(focused = true, keyboardRequired = true, keyboardShown = true))
+        // The default is untouched: a keyboard is not needed, and not having one changes nothing.
+        assertTrue(shown(focused = true))
+    }
+
+    /**
+     * It narrows the reason to appear, not what keeps the button up: closing the keyboard in the middle of
+     * a recording keeps the stop button.
+     */
+    @Test
+    fun `with the keyboard required work in flight still pins the button`() {
+        assertTrue(shown(state = recording, keyboardRequired = true))
+        assertTrue(shown(state = transcribing, keyboardRequired = true))
+        assertTrue(shown(state = rewording, keyboardRequired = true))
+        // A resting state is no work in flight, so it waits for the keyboard like anything else.
+        assertFalse(shown(state = failed, focused = true, keyboardRequired = true))
+    }
+
+    /** A keyboard on screen is a condition, not a reason: the suppressors still win over it. */
+    @Test
+    fun `a keyboard on screen does not beat the suppressors`() {
+        assertFalse(shown(focused = true, keyboardRequired = true, keyboardShown = true, hiddenByOwnKeyboard = true))
+        assertFalse(shown(focused = true, keyboardRequired = true, keyboardShown = true, allowedInApp = false))
     }
 }

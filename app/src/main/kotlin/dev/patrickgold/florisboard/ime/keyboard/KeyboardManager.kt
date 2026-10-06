@@ -38,6 +38,7 @@ import dev.patrickgold.florisboard.dictate.translate.TranslateBarController
 import dev.patrickgold.florisboard.editorInstance
 import dev.patrickgold.florisboard.extensionManager
 import dev.patrickgold.florisboard.ime.ImeUiMode
+import dev.patrickgold.florisboard.ime.clipboard.provider.ItemType
 import dev.patrickgold.florisboard.ime.core.DisplayLanguageNamesIn
 import dev.patrickgold.florisboard.ime.core.Subtype
 import dev.patrickgold.florisboard.ime.core.SubtypePreset
@@ -54,6 +55,7 @@ import dev.patrickgold.florisboard.ime.input.InputShiftState
 import dev.patrickgold.florisboard.ime.input.RepeatableKeyCodes
 import dev.patrickgold.florisboard.ime.nlp.BreakIteratorGroup
 import dev.patrickgold.florisboard.ime.nlp.ClipboardSuggestionCandidate
+import dev.patrickgold.florisboard.ime.nlp.NlpManager
 import dev.patrickgold.florisboard.ime.nlp.PunctuationRule
 import dev.patrickgold.florisboard.ime.nlp.SuggestionCandidate
 import dev.patrickgold.florisboard.ime.nlp.WordOrigin
@@ -96,6 +98,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.florisboard.lib.android.AndroidKeyguardManager
@@ -327,15 +330,95 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         )
         val candidates = nlpManager.suggestionsFor(subtypeManager.activeSubtype, content)
         fieldCandidatesFor = field
-        nlpManager.showFieldCandidates(candidates)
+        // The copied text is offered in the translate bar (issue #433), by the app field's own rule: copy,
+        // open the bar, paste is how translating something starts. Not in the searches, whose results
+        // are already on screen — and the clipboard search lists the clip itself.
+        val clipSpot = if (state.first == InternalField.TRANSLATE) {
+            NlpManager.FieldClipSpot(isBlank = field.text.isBlank(), isAtWordBoundary = content.currentWordText.isEmpty())
+        } else {
+            null
+        }
+        nlpManager.showFieldCandidates(candidates, clipSpot)
     }
 
     /** A candidate tapped while a field has the keys: it goes into that field, never into the app. */
     private fun commitIntoField(field: InternalField, candidate: SuggestionCandidate) {
         val current = fieldText(field) ?: return
         fieldAutoCorrection = null
-        setFieldText(field, current.replaceWord(candidate.text.toString()))
+        val next = if (candidate is ClipboardSuggestionCandidate) {
+            // The clip offered in the translate bar (issue #433): written at the cursor like a paste, and
+            // retired the way the app's chip is once taken — before the strip is rebuilt for the new text.
+            runBlocking { candidate.sourceProvider?.notifySuggestionAccepted(subtypeManager.activeSubtype, candidate) }
+            current.insert(textForField(field, candidate.clipboardItem.stringRepresentation()))
+        } else {
+            current.replaceWord(candidate.text.toString())
+        }
+        setFieldText(field, next)
         reevaluateInputShiftState()
+    }
+
+    /**
+     * The copied text written into the field that has the keys (issue #433) — by the Paste key or action,
+     * or the field's own long-press menu. Paste used to fall through to the app while a field had the
+     * keys: into the text the translate bar keeps its translation in, which took the field away from the
+     * bar, and with no other way in there was no getting a copied text into the bar at all.
+     */
+    fun pasteIntoField() {
+        val field = activeInternalField() ?: return
+        val text = pastableText() ?: return
+        val current = fieldText(field) ?: return
+        fieldAutoCorrection = null
+        setFieldText(field, current.insert(textForField(field, text)))
+        reevaluateInputShiftState()
+    }
+
+    /** Whether there is a copied text for [pasteIntoField] to write. */
+    fun canPasteIntoField(): Boolean = pastableText() != null
+
+    /** The clip as text, if it is text and may be pasted — not on a locked device, like the Paste action. */
+    private fun pastableText(): String? {
+        val keyguard = appContext.systemService(AndroidKeyguardManager::class)
+        if (keyguard.isDeviceLocked || keyguard.isKeyguardLocked) return null
+        val clip = clipboardManager.primaryClip?.takeIf { it.type == ItemType.TEXT } ?: return null
+        return clip.stringRepresentation().takeIf { it.isNotBlank() }
+    }
+
+    /**
+     * [text] as [field] can hold it: line breaks only in the translate bar, and only where the app's field
+     * takes them ([translateKeepsLineBreaks]). Everywhere else a break becomes a space, as a one-line text
+     * field does with a pasted paragraph.
+     */
+    private fun textForField(field: InternalField, text: String): String =
+        if (field == InternalField.TRANSLATE && translateKeepsLineBreaks()) {
+            text.replace("\r\n", "\n")
+        } else {
+            text.replace(Regex("""\s*\R\s*"""), " ")
+        }
+
+    /**
+     * Whether Enter in the translate bar breaks the line in the bar's own text (issue #433) rather than
+     * finishing the translation and doing the app's Enter.
+     *
+     * Where the app's Enter would itself only break the line — a multi-line field without an Enter action,
+     * as a chat's message field usually is — the break is part of what is being written. It goes into the
+     * bar and is translated with it, and every line stays open to editing until the message is sent.
+     * Where Enter is an action (send, search, go), finishing and running it is the only way the bar can do
+     * that, so it stays [TranslateBarController.submit]; Shift+Enter still breaks the line there, as
+     * [performTranslateEnter] lets it do in the app.
+     */
+    private fun translateKeepsLineBreaks(): Boolean {
+        val info = editorInstance.activeInfo
+        if (!info.inputAttributes.flagTextMultiLine) return false
+        if (info.imeOptions.flagNoEnterAction) return true
+        return when (info.imeOptions.action) {
+            ImeOptions.Action.DONE,
+            ImeOptions.Action.GO,
+            ImeOptions.Action.NEXT,
+            ImeOptions.Action.PREVIOUS,
+            ImeOptions.Action.SEARCH,
+            ImeOptions.Action.SEND -> inputEventDispatcher.isPressed(KeyCode.SHIFT)
+            else -> true
+        }
     }
 
     /**
@@ -741,9 +824,10 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         when (candidate) {
             is ClipboardSuggestionCandidate -> editorInstance.commitClipboardItem(candidate.clipboardItem)
             // Written behind the cursor verbatim, not over the current word (issue #329). What stands
-            // in front of it is the sum the user typed, and "150 * 4 = " must keep every character of
-            // itself — commitCompletion would treat the trailing token as something to replace.
-            is MathSuggestionCandidate -> editorInstance.commitText(candidate.result)
+            // in front of it is the sum the user typed, and "150 * 4" must keep every character of
+            // itself — commitCompletion would treat the trailing token as something to replace. The
+            // completion brings its own "=" when none was typed yet (issue #440).
+            is MathSuggestionCandidate -> editorInstance.commitText(candidate.completion)
             else -> editorInstance.commitCompletion(candidate)
         }
     }
@@ -1531,10 +1615,12 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
      * it reach the app. Returns `true` when the key was consumed.
      *
      * One handler for all five fields, so the cursor, a marked stretch, the Backspace swipe and the
-     * space-bar glide behave the same in each. They differ in three keys:
-     * - **Enter** — the translate bar finishes its translation and then does the app's own Enter (in a
-     *   chat that sends the translated message); the GIF search runs its search; the other searches
-     *   swallow it, because their results are already filtered and a newline would land in the app.
+     * space-bar glide behave the same in each. Paste and Select all act on the field too (issue #433).
+     * They differ in three keys:
+     * - **Enter** — the translate bar breaks the line in its own text where the app's Enter would only
+     *   break the line, and elsewhere finishes its translation and then does the app's own Enter (in a
+     *   search field that searches); the GIF search runs its search; the other searches swallow it,
+     *   because their results are already filtered and a newline would land in the app.
      * - **Backspace on an empty field** — a search closes, a common "back out" gesture; the translate bar
      *   lets it through to the app, where the last translation stands.
      * - **Space** autocorrects only in the translate bar: the searches match emoji names, file names and
@@ -1562,12 +1648,31 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         when (data.code) {
             KeyCode.SPACE -> if (!translating || !autoCorrectTranslateWord()) setFieldText(field, current.insert(" "))
             KeyCode.ENTER -> {
-                when (field) {
-                    InternalField.TRANSLATE -> translateBar.submit { performTranslateEnter() }
-                    InternalField.GIF_SEARCH -> submitGifSearch(current.text)
+                when {
+                    field == InternalField.TRANSLATE && translateKeepsLineBreaks() -> {
+                        setFieldText(field, current.insert("\n"))
+                        reevaluateInputShiftState()
+                    }
+                    field == InternalField.TRANSLATE -> translateBar.submit { performTranslateEnter() }
+                    field == InternalField.GIF_SEARCH -> submitGifSearch(current.text)
                     else -> Unit
                 }
                 return true
+            }
+            KeyCode.CLIPBOARD_PASTE -> {
+                pasteIntoField()
+                return true
+            }
+            KeyCode.CLIPBOARD_SELECT_ALL -> {
+                // A toggle, as it is in the app (issue #152): everything marked, or nothing.
+                setFieldText(field, if (current.selection != null) FieldText(current.text, current.cursor) else current.selectAll())
+                return true
+            }
+            KeyCode.UNDO, KeyCode.REDO -> {
+                // Both act on the app's text, where the bar's translation stands, so the keys go back to the
+                // app first, as after a tap into it; a tap on the bar starts a new translation (issue #433).
+                if (translating) translateBar.unfocus()
+                return false
             }
             KeyCode.DELETE, KeyCode.DELETE_WORD -> {
                 if (current.text.isEmpty()) {

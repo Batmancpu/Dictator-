@@ -623,6 +623,7 @@
     <string name="pref__clipboard__sync_to_system_clipboard__label">Sincronizza con gli appunti di sistema</string>
     <string name="pref__clipboard__trim_on_copy__label" comment="Preference title, keep short">Rifila durante la copia</string>
     <string name="pref__clipboard__trim_on_copy__summary" comment="Preference summary, keep short (one line)">Rimuove spazi e a capo alle estremità</string>
+    <string name="pref__clipboard__suggestion_show_extracted__label" comment="Preference title (switch) in the group Clipboard suggestions, keep short (one line): whether the links, email addresses and phone numbers found inside a copied text are also offered as suggestions of their own, next to the whole text">Link, e-mail e numeri</string>
     <string name="pref__clipboard__group_clipboard_history__label">Cronologia appunti</string>
     <string name="pref__clipboard__enable_clipboard_history__label">Attiva la cronologia degli appunti</string>
     <string name="pref__clipboard__enable_clipboard_history__summary">Conserva gli elementi degli appunti per un accesso rapido</string>
@@ -1010,10 +1011,16 @@
     <string name="dictate__floating_button_disclosure_continue">Apri impostazioni</string>
     <string name="dictate__floating_button_mic_title">Accesso al microfono</string>
     <string name="dictate__floating_button_mic_summary">Necessario per registrare la tua voce · tocca per concedere</string>
-    <string name="dictate__floating_button_show_with_keyboard_title">Mostra con la tastiera Dictate</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_on">Il pulsante compare anche mentre la tastiera Dictate è attiva.</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_off">Nascosto mentre la tastiera Dictate è attiva, poiché ha già un tasto microfono.</string>
+    <string name="dictate__floating_button_show_when_title">Quando mostrarlo</string>
+    <string name="dictate__floating_button_show_when_field">Appena si seleziona un campo di testo</string>
+    <string name="dictate__floating_button_show_when_keyboard">Solo con la tastiera aperta</string>
+    <string name="dictate__floating_button_show_when_dictate_keyboard">Anche con la tastiera Dictate</string>
     <string name="dictate__action_continue_recording">Continua registrazione</string>
+    <string name="dictate__a11y_mic_hold_local">Trascrivi sul dispositivo</string>
+    <string name="smartbar__a11y_show_actions">Mostra azioni</string>
+    <string name="smartbar__a11y_show_suggestions">Mostra suggerimenti</string>
+    <string name="smartbar__a11y_show_more_actions">Mostra altre azioni</string>
+    <string name="smartbar__a11y_hide_more_actions">Nascondi altre azioni</string>
     <string name="dictate__floating_button_auto_dim_summary_off">Resta sempre completamente visibile.</string>
     <string name="dictate__floating_button_auto_dim_summary_on">Si riduce a un puntino dopo alcuni secondi; tocca per ripristinare.</string>
     <string name="dictate__floating_button_auto_dim_title">Attenua quando inattivo</string>
@@ -1278,7 +1285,7 @@
     <string name="dictate__providers_field_realtime_model">Modello in tempo reale</string>
     <string name="dictate__providers_custom_realtime">Streaming in tempo reale</string>
     <string name="dictate__providers_custom_realtime_summary">Questo server usa il protocollo realtime di OpenAI su /v1/realtime</string>
-    <string name="dictate__providers_custom_warm_up">Sveglia prima di riformulare</string>
+    <string name="dictate__providers_custom_warm_up">Sveglia in anticipo</string>
     <string name="dictate__providers_custom_warm_up_summary">Contatta il server in anticipo, così una macchina in pausa fa in tempo ad avviarsi</string>
     <string name="dictate__providers_realtime_model_default">Predefinito</string>
     <string name="dictate__instant_recording_title">Registrazione istantanea</string>
@@ -1556,6 +1563,8 @@
     <string name="dictate__mappings_wholeword_summary">Sostituisci solo parole isolate, non le corrispondenze all\'interno di parole più lunghe.</string>
     <string name="dictate__mappings_wholeword_title">Solo parola intera</string>
     <string name="dictate__wear_standalone_summary">Invia la tua chiave API all\'orologio così può dettare senza il telefono vicino.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Dettatura dall’orologio</string>
+    <string name="dictate__wear_tether_notif_title">Trascrizione per il tuo orologio…</string>
     <string name="dictate__wear_standalone_title">Sincronizza chiave con l\'orologio</string>
     <string name="emoji__search__hint">Cerca emoji</string>
     <string name="emoji__row__open_panel">Apri tutte le emoji</string>

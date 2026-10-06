@@ -11,6 +11,7 @@
 package net.devemperor.dictate.wear.transcribe
 
 import android.content.Context
+import android.os.SystemClock
 import android.util.Log
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.Wearable
@@ -20,14 +21,20 @@ import dev.patrickgold.florisboard.dictate.provider.ProviderConfig
 import dev.patrickgold.florisboard.dictate.provider.TranscriptionRequest
 import dev.patrickgold.florisboard.dictate.sync.DictateSyncedSettings
 import dev.patrickgold.florisboard.dictate.sync.DictateWearProtocol
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import net.devemperor.dictate.wear.R
 import net.devemperor.dictate.wear.sync.WearSettingsStore
 import net.devemperor.dictate.wear.sync.WearSyncClient
 import java.io.File
+import java.util.UUID
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * Turns a recorded `.wav` into text, choosing the transport automatically (#106) so the watch works
@@ -46,15 +53,16 @@ object WearTranscription {
     class Unavailable(message: String) : Exception(message)
 
     /**
-     * @param onRewording invoked (on a background thread) when the watch is about to **standalone-reword**
-     * the transcript, so the UI can show a "Rewording…" state. Not fired for tethered dictations (the
-     * phone rewords those) or when nothing will be reworded.
+     * @param onRewording invoked when the transcript is in and rewording starts — the watch's own
+     * (standalone) or, from a phone on protocol 1, the phone's — so the UI can show "Rewording…". Not
+     * fired when nothing will be reworded. May come from a background thread.
      */
     suspend fun transcribe(context: Context, audio: File, onRewording: () -> Unit = {}): String {
         val settings = WearSettingsStore.current()
         val phoneNode = WearSyncClient.findPhoneNodeId(context)
         Log.i(TAG, "transcribe: phoneNode=${phoneNode != null}, canStandalone=${settings.canStandalone}, " +
-            "provider=${settings.transcriptionProviderId}, model=${settings.model}, bytes=${audio.length()}")
+            "provider=${settings.transcriptionProviderId}, model=${settings.model}, bytes=${audio.length()}, " +
+            "protocol=${settings.tetherProtocol}")
 
         if (phoneNode != null) {
             // Phone in range: tether through it. Fall back to a direct call ONLY when the tether transport
@@ -62,7 +70,13 @@ object WearTranscription {
             // with a definitive status (bad key / quota / no speech), which we surface as-is so we don't
             // silently re-run and double-charge the request.
             val response = try {
-                tetherWithRetry(context, phoneNode, audio)
+                tetherWithRetry(context, phoneNode, audio, settings, onRewording)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: PhoneSilent) {
+                // The phone took the audio and then went quiet. It may still be at work, so a direct call now
+                // could pay for the same dictation twice; the audio is kept for a retry instead (#363).
+                throw e
             } catch (e: Exception) {
                 Log.w(TAG, "tether transport failed (${e.message}); standalone=${settings.canStandalone}", e)
                 return if (settings.canStandalone) standalone(settings, audio, onRewording) else throw e
@@ -83,6 +97,7 @@ object WearTranscription {
             ProviderConfig(
                 baseUrl = settings.baseUrl,
                 apiKey = settings.apiKey,
+                timeoutSeconds = settings.timeoutSeconds(),
                 transcriptionApi = settings.transcriptionApi,
             )
         )
@@ -115,6 +130,7 @@ object WearTranscription {
             ProviderConfig(
                 baseUrl = settings.rewordingBaseUrl,
                 apiKey = settings.rewordingApiKey,
+                timeoutSeconds = settings.timeoutSeconds(),
                 transcriptionApi = settings.rewordingApi,
             )
         )
@@ -137,16 +153,26 @@ object WearTranscription {
      * often than a phone's Wi-Fi does, and a single hiccup while opening the channel or streaming the audio
      * used to fail the whole dictation (#218). Definitive answers from the phone (bad key, quota, no speech)
      * are returned immediately and never retried, so a request is never paid for twice.
+     *
+     * Nor is a phone that went quiet after taking the audio ([PhoneSilent]): that is not a hiccup, and
+     * sending the audio again had the phone transcribe it again — three times two minutes of silence and
+     * up to three bills for one dictation (#363).
      */
     private suspend fun tetherWithRetry(
         context: Context,
         nodeId: String,
         audio: File,
+        settings: DictateSyncedSettings,
+        onRewording: () -> Unit,
     ): DictateWearProtocol.TranscribeResponse {
         var last: Exception? = null
         repeat(TETHER_ATTEMPTS) { attempt ->
             try {
-                return tether(context, nodeId, audio)
+                return tether(context, nodeId, audio, settings, onRewording)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: PhoneSilent) {
+                throw e
             } catch (e: Exception) {
                 last = e
                 Log.w(TAG, "tether attempt ${attempt + 1}/$TETHER_ATTEMPTS failed: ${e.message}")
@@ -157,23 +183,58 @@ object WearTranscription {
     }
 
     /** Stream the audio to the phone and await its structured response over the Data Layer. */
-    private suspend fun tether(context: Context, nodeId: String, audio: File): DictateWearProtocol.TranscribeResponse {
+    private suspend fun tether(
+        context: Context,
+        nodeId: String,
+        audio: File,
+        settings: DictateSyncedSettings,
+        onRewording: () -> Unit,
+    ): DictateWearProtocol.TranscribeResponse {
+        // Name the request when the phone understands names (#363): then its answer cannot be mistaken for
+        // the late answer to an earlier dictation, and the phone can be told to stop.
+        val requestId = if (settings.tetherProtocol >= DictateWearProtocol.TETHER_PROTOCOL) {
+            UUID.randomUUID().toString()
+        } else {
+            ""
+        }
+        val named = requestId.isNotEmpty()
+        val responsePath = if (named) DictateWearProtocol.responsePath(requestId) else DictateWearProtocol.PATH_TRANSCRIBE_RESPONSE
+        val progressPath = if (named) DictateWearProtocol.progressPath(requestId) else null
         val messageClient = Wearable.getMessageClient(context)
         val result = CompletableDeferred<DictateWearProtocol.TranscribeResponse>()
+        val lastHeardMs = AtomicLong(SystemClock.elapsedRealtime())
+        val rewording = AtomicBoolean(false)
         val listener = MessageClient.OnMessageReceivedListener { event ->
-            if (event.path == DictateWearProtocol.PATH_TRANSCRIBE_RESPONSE) {
-                result.complete(DictateWearProtocol.parseTranscribeResponse(event.data))
+            when (event.path) {
+                responsePath -> result.complete(DictateWearProtocol.parseTranscribeResponse(event.data))
+                progressPath -> {
+                    lastHeardMs.set(SystemClock.elapsedRealtime())
+                    if (event.data.firstOrNull() == DictateWearProtocol.STAGE_REWORDING && rewording.compareAndSet(false, true)) {
+                        onRewording()
+                    }
+                }
             }
         }
         messageClient.addListener(listener).await()
         try {
             val channelClient = Wearable.getChannelClient(context)
-            val channel = channelClient.openChannel(nodeId, DictateWearProtocol.PATH_TRANSCRIBE_REQUEST).await()
+            val path = if (named) DictateWearProtocol.requestPath(requestId) else DictateWearProtocol.PATH_TRANSCRIBE_REQUEST
+            val channel = channelClient.openChannel(nodeId, path).await()
             try {
                 val output = channelClient.getOutputStream(channel).await()
                 output.use { os -> audio.inputStream().use { it.copyTo(os) } }
-                Log.i(TAG, "tether: audio sent to $nodeId, awaiting response…")
-                val response = withTimeout(TRANSCRIBE_TIMEOUT_MS) { result.await() }
+                Log.i(TAG, "tether: audio sent to $nodeId as ${requestId.ifEmpty { "an unnamed request" }}, awaiting response…")
+                lastHeardMs.set(SystemClock.elapsedRealtime())
+                val response = try {
+                    if (named) awaitWhileHeard(result, lastHeardMs) else awaitFixed(result)
+                } catch (e: CancellationException) {
+                    if (named) callOff(context, nodeId, requestId)
+                    throw e
+                }
+                if (response == null) {
+                    if (named) callOff(context, nodeId, requestId)
+                    throw PhoneSilent(context.getString(R.string.wear_err_phone_silent))
+                }
                 Log.i(TAG, "tether: response status=${response.status}, len=${response.text.length}")
                 return response
             } finally {
@@ -183,6 +244,53 @@ object WearTranscription {
             messageClient.removeListener(listener)
         }
     }
+
+    /**
+     * Waits for the answer as long as the phone keeps reporting that it is at work (#363). A phone on
+     * protocol 1 sends a sign of life every few seconds, so silence means it is gone — out of range, its
+     * process killed — and the user learns that within [PHONE_SILENCE_MS] rather than after minutes, while
+     * a provider that is merely slow is never cut off.
+     */
+    private suspend fun awaitWhileHeard(
+        result: CompletableDeferred<DictateWearProtocol.TranscribeResponse>,
+        lastHeardMs: AtomicLong,
+    ): DictateWearProtocol.TranscribeResponse? {
+        while (true) {
+            withTimeoutOrNull(SILENCE_CHECK_MS) { result.await() }?.let { return it }
+            val silentMs = SystemClock.elapsedRealtime() - lastHeardMs.get()
+            if (silentMs > PHONE_SILENCE_MS) {
+                Log.w(TAG, "tether: nothing from the phone for ${silentMs / 1000} s, giving up")
+                return null
+            }
+        }
+    }
+
+    /** A protocol-0 phone says nothing until it answers, so all the watch can do is wait a fixed time. */
+    private suspend fun awaitFixed(
+        result: CompletableDeferred<DictateWearProtocol.TranscribeResponse>,
+    ): DictateWearProtocol.TranscribeResponse? =
+        withTimeoutOrNull(LEGACY_TRANSCRIBE_TIMEOUT_MS) { result.await() }
+
+    /**
+     * Tells the phone to drop a request nobody will read, so its provider call is not paid to the end.
+     * Runs while the dictation is being cancelled, hence [NonCancellable]; best effort and short.
+     */
+    private suspend fun callOff(context: Context, nodeId: String, requestId: String) {
+        withContext(NonCancellable) {
+            withTimeoutOrNull(CALL_OFF_TIMEOUT_MS) {
+                runCatching {
+                    Wearable.getMessageClient(context)
+                        .sendMessage(nodeId, DictateWearProtocol.cancelPath(requestId), ByteArray(0))
+                        .await()
+                }
+            }
+        }
+        Log.i(TAG, "tether: called off $requestId")
+    }
+
+    /** The phone's Request timeout, so the watch's own calls give up when the phone's would (#363). */
+    private fun DictateSyncedSettings.timeoutSeconds(): Long =
+        requestTimeoutSeconds.takeIf { it > 0 }?.toLong() ?: ProviderConfig.DEFAULT_TIMEOUT_SECONDS
 
     /** Maps the phone's status to the transcript, or throws a [TetherResultError] carrying a short reason. */
     private fun DictateWearProtocol.TranscribeResponse.toTranscriptOrThrow(context: Context): String = when (status) {
@@ -199,7 +307,16 @@ object WearTranscription {
     /** A definitive phone-side failure with a ready-to-show short reason (no standalone fallback). */
     class TetherResultError(message: String) : Exception(message)
 
-    private const val TRANSCRIBE_TIMEOUT_MS = 120_000L
+    /** The phone took the audio and then stopped answering. Not retried, not handed to standalone (#363). */
+    class PhoneSilent(message: String) : Exception(message)
+
+    /** How long a protocol-1 phone may stay silent before the watch stops waiting for it. */
+    private const val PHONE_SILENCE_MS = 30_000L
+    private const val SILENCE_CHECK_MS = 1_000L
+    private const val CALL_OFF_TIMEOUT_MS = 3_000L
+
+    /** The whole wait for a protocol-0 phone, which cannot say whether it is still at work. */
+    private const val LEGACY_TRANSCRIBE_TIMEOUT_MS = 120_000L
 
     /** Retries for the watch↔phone transport (not for definitive phone answers). */
     private const val TETHER_ATTEMPTS = 3

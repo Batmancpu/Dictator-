@@ -30,7 +30,8 @@
         android:roundIcon="@mipmap/app_icon_round"
         android:label="@string/wear_app_name"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.DeviceDefault">
+        android:theme="@android:style/Theme.DeviceDefault"
+        android:usesCleartextTraffic="true"><!-- the phone syncs its own server's address, http:// on a LAN included (#136), and a standalone watch has to be able to reach it too -->
 
         <!-- Wear OS standalone: the watch app works without a phone-side companion installed.
              Tethered transcription is still preferred when a paired phone with Dictate is reachable. -->

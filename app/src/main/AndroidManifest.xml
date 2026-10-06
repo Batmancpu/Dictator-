@@ -130,6 +130,13 @@
             </intent-filter>
         </service>
 
+        <!-- Keeps the process from being frozen while it transcribes for the watch (issue #363). A short
+             service needs no permission beyond FOREGROUND_SERVICE and no Play Console declaration. -->
+        <service
+            android:name="dev.patrickgold.florisboard.dictate.wear.WearTetherService"
+            android:foregroundServiceType="shortService"
+            android:exported="false"/>
+
         <!-- Keeps on-device model downloads running when the app is left (issue #207); shows an ongoing
              progress notification. Not exported: only started internally by LocalModelDownloads. -->
         <service

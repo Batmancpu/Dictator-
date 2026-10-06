@@ -146,6 +146,18 @@ enum class TranscriptionApi {
     AZURE_FAST_TRANSCRIPTION,
 
     /**
+     * xAI Grok Voice Transcribe (issue #435): one `multipart/form-data` POST to `stt` with a Bearer key,
+     * the transcript in `text`.
+     *
+     * Not [OPENAI_MULTIPART] under another path, for three reasons that each change the request: the
+     * vocabulary travels as repeated `keyterm` fields rather than a free-text `prompt`, which the
+     * endpoint does not have; `language` only switches on number formatting — recognition is
+     * multilingual regardless — and needs `format=true` beside it; and the `file` part has to come
+     * **last**, because xAI streams the upload and may ignore fields that arrive after it.
+     */
+    XAI_STT,
+
+    /**
      * On-device transcription (issue #104): no network call at all. Handled by
      * [dev.patrickgold.florisboard.dictate.provider.LocalTranscriptionProvider] (sherpa-onnx), not by
      * [OpenAiCompatibleClient]; this value only marks a provider preset as local so the dictation flow

@@ -14,6 +14,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.SystemClock
 import android.provider.Settings
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
@@ -24,6 +25,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -32,6 +34,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -55,9 +59,15 @@ import androidx.wear.compose.material.VignettePosition
 import dev.patrickgold.florisboard.dictate.sync.DictateSyncedSettings
 import net.devemperor.dictate.wear.R
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.devemperor.dictate.wear.audio.WearAudioRecorder
+import net.devemperor.dictate.wear.ime.WearKeyboardPrefs
+import net.devemperor.dictate.wear.ime.WearRecordingInfo
+import net.devemperor.dictate.wear.ime.rememberElapsedLabel
 import net.devemperor.dictate.wear.sync.WearSettingsStore
 import net.devemperor.dictate.wear.sync.WearSyncClient
 import net.devemperor.dictate.wear.transcribe.WearTranscription
@@ -84,6 +94,9 @@ class WearSettingsActivity : ComponentActivity() {
     private var demoState by mutableStateOf(DemoState.IDLE)
     private var demoResult by mutableStateOf<String?>(null)
     private var demoError by mutableStateOf<String?>(null)
+    /** When the wait for the demo's text began, for the seconds shown while it lasts (#363). */
+    private var demoWaitSince by mutableStateOf(0L)
+    private var demoJob: Job? = null
 
     private val recorder by lazy { WearAudioRecorder(applicationContext) }
 
@@ -106,6 +119,13 @@ class WearSettingsActivity : ComponentActivity() {
         val versionCode = pkgInfo?.longVersionCode ?: 0L
 
         setContent {
+            // The display stays on while the demo listens or waits, like the keyboard (#363).
+            val view = LocalView.current
+            val holdScreen = demoState != DemoState.IDLE
+            DisposableEffect(view, holdScreen) {
+                view.keepScreenOn = holdScreen
+                onDispose { view.keepScreenOn = false }
+            }
             WearDictateTheme {
                 val synced by WearSettingsStore.settings.collectAsState()
                 var phoneConnected by remember { mutableStateOf<Boolean?>(null) }
@@ -120,6 +140,7 @@ class WearSettingsActivity : ComponentActivity() {
                     micGranted = micGranted,
                     imeEnabled = imeEnabled,
                     demoState = demoState,
+                    demoWaitSince = demoWaitSince,
                     demoResult = demoResult,
                     demoError = demoError,
                     phoneConnected = phoneConnected,
@@ -158,6 +179,18 @@ class WearSettingsActivity : ComponentActivity() {
         refreshImeState()
         // Opening (or returning to) settings should always reconcile with the phone, as requested.
         syncFromPhone()
+    }
+
+    /**
+     * Leaving the screen mid-recording ends the recording (#363). It used to run on, microphone open,
+     * until the activity was destroyed. A wait for text carries on and shows its result on return.
+     */
+    override fun onStop() {
+        super.onStop()
+        if (demoState == DemoState.RECORDING) {
+            recorder.cancel()
+            demoState = DemoState.IDLE
+        }
     }
 
     override fun onDestroy() {
@@ -219,9 +252,16 @@ class WearSettingsActivity : ComponentActivity() {
         }
         when (demoState) {
             DemoState.RECORDING -> stopDemoAndTranscribe()
-            DemoState.TRANSCRIBING -> Unit
+            DemoState.TRANSCRIBING -> cancelDemo()
             DemoState.IDLE -> startDemo()
         }
+    }
+
+    /** A tap while the demo waits calls the request off (#363); a phone on protocol 1 stops on it too. */
+    private fun cancelDemo() {
+        demoJob?.cancel()
+        demoJob = null
+        demoState = DemoState.IDLE
     }
 
     private fun startDemo() {
@@ -237,10 +277,12 @@ class WearSettingsActivity : ComponentActivity() {
 
     private fun stopDemoAndTranscribe() {
         demoState = DemoState.TRANSCRIBING
-        lifecycleScope.launch {
+        demoWaitSince = SystemClock.elapsedRealtime()
+        demoJob = lifecycleScope.launch {
             val outcome = runCatching {
                 withContext(Dispatchers.IO) {
-                    val audio = recorder.stop()
+                    // Runs to the end even if cancelled meanwhile, so its file is always deleted below.
+                    val audio = withContext(NonCancellable) { recorder.stop() }
                     try {
                         WearTranscription.transcribe(applicationContext, audio)
                     } finally {
@@ -248,6 +290,9 @@ class WearSettingsActivity : ComponentActivity() {
                     }
                 }
             }
+            // Called off with a tap: nothing to show, the state is already back to idle.
+            if (!isActive) return@launch
+            demoJob = null
             val text = outcome.getOrNull()
             when {
                 outcome.isFailure ->
@@ -275,6 +320,7 @@ private fun SettingsScreen(
     micGranted: Boolean,
     imeEnabled: Boolean,
     demoState: DemoState,
+    demoWaitSince: Long,
     demoResult: String?,
     demoError: String?,
     phoneConnected: Boolean?,
@@ -312,7 +358,9 @@ private fun SettingsScreen(
             item {
                 val label = when (demoState) {
                     DemoState.RECORDING -> "■  " + stringResource(R.string.wear_try_stop)
-                    DemoState.TRANSCRIBING -> stringResource(R.string.wear_status_transcribing)
+                    // The seconds of the wait, which used to be a label and nothing else (#363).
+                    DemoState.TRANSCRIBING -> stringResource(R.string.wear_status_transcribing) + "  " +
+                        rememberElapsedLabel(WearRecordingInfo(startedAtMs = demoWaitSince))
                     DemoState.IDLE -> "🎤  " + stringResource(R.string.wear_try)
                 }
                 Chip(
@@ -322,6 +370,7 @@ private fun SettingsScreen(
                     label = { Text(label) },
                     secondaryLabel = when (demoState) {
                         DemoState.IDLE -> { { Text(stringResource(R.string.wear_try_hint)) } }
+                        DemoState.TRANSCRIBING -> { { Text(stringResource(R.string.wear_try_tap_cancel)) } }
                         else -> null
                     },
                 )
@@ -407,6 +456,20 @@ private fun SettingsScreen(
                     label = { Text(stringResource(R.string.wear_reword)) },
                     secondaryLabel = { Text(if (reword) stringResource(R.string.wear_reword_on) else stringResource(R.string.wear_reword_off)) },
                     toggleControl = { Switch(checked = reword) },
+                )
+            }
+
+            // --- Auto-send: send/search as soon as a dictation lands (#294); a watch setting, off by default ---
+            item {
+                val context = LocalContext.current
+                var autoSend by remember { mutableStateOf(WearKeyboardPrefs.autoSend(context)) }
+                ToggleChip(
+                    checked = autoSend,
+                    onCheckedChange = { autoSend = it; WearKeyboardPrefs.setAutoSend(context, it) },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(R.string.wear_auto_send)) },
+                    secondaryLabel = { Text(stringResource(if (autoSend) R.string.wear_auto_send_on else R.string.wear_auto_send_off)) },
+                    toggleControl = { Switch(checked = autoSend) },
                 )
             }
 

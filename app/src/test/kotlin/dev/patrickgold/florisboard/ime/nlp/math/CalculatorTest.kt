@@ -26,9 +26,12 @@ class CalculatorTest {
     private val de = Locale.GERMANY
     private val en = Locale.US
 
-    private fun de(text: String) = Calculator.evaluateTrailing(text, de)
+    private fun de(text: String) = Calculator.evaluateTrailing(text, de)?.result
 
-    private fun en(text: String) = Calculator.evaluateTrailing(text, en)
+    private fun en(text: String) = Calculator.evaluateTrailing(text, en)?.result
+
+    /** What a tap on the answer writes behind the cursor. */
+    private fun tap(text: String, locale: Locale = en) = Calculator.evaluateTrailing(text, locale)?.completion
 
     // ── The arithmetic ───────────────────────────────────────────────────────────────────────────
 
@@ -120,9 +123,16 @@ class CalculatorTest {
     // ── When there is no suggestion ──────────────────────────────────────────────────────────────
 
     @Test
-    fun `stays quiet without a trailing equals sign`() {
-        assertNull(en("150 * 4"))
+    fun `stays quiet once the answer is written`() {
         assertNull(en("150 * 4 = 600"))
+        assertNull(en("2+3=5"))
+    }
+
+    @Test
+    fun `stays quiet on a sum that is not finished yet`() {
+        assertNull(en("2+"))
+        assertNull(en("2 + 3 +"))
+        assertNull(en("(2+3"))
     }
 
     @Test
@@ -200,5 +210,86 @@ class CalculatorTest {
     @Test
     fun `starts after the previous result`() {
         assertEquals("10", en("150 * 4 = 600 und 5+5="))
+    }
+
+    // ── Without an equals sign (issue #440) ──────────────────────────────────────────────────────
+
+    @Test
+    fun `answers a sum before the equals sign is typed`() {
+        assertEquals("5", en("2+3"))
+        assertEquals("600", en("150 * 4"))
+        assertEquals("10", en("(2+3)*2"))
+        assertEquals("3,5", de("1,5+2"))
+    }
+
+    @Test
+    fun `allows a trailing space before the equals sign`() {
+        assertEquals("5", en("2 + 3 "))
+    }
+
+    @Test
+    fun `carries on from the answer just written`() {
+        assertEquals("6", en("2+3=5 + 1"))
+    }
+
+    @Test
+    fun `takes a tight minus or slash for a date, a range or a phone number`() {
+        assertNull(en("2026-10-01"))
+        assertNull(en("10/1/2026"))
+        assertNull(en("9-5"))
+        assertNull(en("555-1234"))
+        assertNull(en("+1-555-1234"))
+        assertNull(en("24/7"))
+    }
+
+    @Test
+    fun `takes a minus or slash with a space beside it for arithmetic`() {
+        assertEquals("7", en("10 - 3"))
+        assertEquals("4", en("8 / 2"))
+        assertEquals("7", en("10−3"))
+    }
+
+    @Test
+    fun `lets the equals sign settle a tight minus or slash`() {
+        assertEquals("7", en("10-3="))
+        assertEquals("4", en("8/2="))
+    }
+
+    @Test
+    fun `stays quiet on a bare number without an equals sign`() {
+        assertNull(en("42"))
+        assertNull(en("-42"))
+        assertNull(en("+49 170 1234567"))
+    }
+
+    @Test
+    fun `stays quiet on digits glued to a word without an equals sign`() {
+        assertNull(en("abc5+5"))
+        assertNull(en("mc2"))
+        assertNull(de("am 3. 4+4"))
+    }
+
+    // ── What a tap writes (issue #440) ───────────────────────────────────────────────────────────
+
+    @Test
+    fun `a tap completes the sum instead of replacing it`() {
+        assertEquals("=5", tap("2+3"))
+        assertEquals("=3,5", tap("1,5+2", de))
+    }
+
+    @Test
+    fun `a tap follows the spacing the sum was written in`() {
+        assertEquals(" = 5", tap("2 + 3"))
+        assertEquals("= 5", tap("2 + 3 "))
+    }
+
+    @Test
+    fun `a tap after the equals sign adds only the answer`() {
+        assertEquals("5", tap("2+3="))
+        assertEquals(" 5", tap("2 + 3 ="))
+        assertEquals("5", tap("2 + 3 = "))
+        // The space before the equals sign is the only one there is, and it still says how the line is
+        // being written.
+        assertEquals(" 5", tap("2+3 ="))
     }
 }

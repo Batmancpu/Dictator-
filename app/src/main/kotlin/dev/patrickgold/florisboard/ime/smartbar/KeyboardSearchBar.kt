@@ -34,7 +34,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,6 +46,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,8 +62,10 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.PopupProperties
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.ime.input.LocalInputFeedbackController
 import dev.patrickgold.florisboard.ime.keyboard.FlorisImeSizing
@@ -107,6 +114,7 @@ fun KeyboardSearchBar(
             icon = icon,
             focused = true,
             onTap = { keyboardManager.placeFieldCursor(it) },
+            onPaste = { keyboardManager.pasteIntoField() },
             onClear = onClear,
             modifier = Modifier.weight(1f),
         )
@@ -126,6 +134,10 @@ fun KeyboardSearchBar(
  * ([focused] false, the translate bar after a tap into the app) it keeps its text and shows no cursor;
  * a tap on it hands [onTap] the offset under the finger.
  *
+ * Held, it does what holding a text field does: the cursor goes under the finger, and a copied text is
+ * offered to paste (issue #433) — [onPaste] writes it. A line break, which only the translate bar can
+ * hold, shows as ↵ on the one line.
+ *
  * [modifier] sizes the pill; the pill brings its own inset and background.
  */
 @Composable
@@ -135,6 +147,7 @@ fun KeyboardFieldInput(
     icon: ImageVector,
     focused: Boolean,
     onTap: (Int) -> Unit,
+    onPaste: () -> Unit,
     onClear: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -146,6 +159,17 @@ fun KeyboardFieldInput(
     val density = LocalDensity.current
     val scroll = rememberScrollState()
     var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
+    var pasteOffered by remember { mutableStateOf(false) }
+    val currentText by rememberUpdatedState(text)
+    val currentOnTap by rememberUpdatedState(onTap)
+
+    /** A hold at [offset]: the cursor goes there, and the paste is offered if there is anything to paste. */
+    fun hold(offset: Int) {
+        currentOnTap(offset)
+        if (!keyboardManager.canPasteIntoField()) return
+        inputFeedbackController.keyLongPress(TextKeyData.UNSPECIFIED)
+        pasteOffered = true
+    }
 
     Row(
         modifier = modifier
@@ -154,9 +178,14 @@ fun KeyboardFieldInput(
             .clip(RoundedCornerShape(50))
             .background(if (focused) Color(0x33808080) else Color(0x1A808080))
             // A tap beside the text — on the icon, in the empty end of the field — puts the cursor last.
-            .clickable(indication = null, interactionSource = null) {
-                inputFeedbackController.keyPress(TextKeyData.UNSPECIFIED)
-                onTap(text.length)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        inputFeedbackController.keyPress(TextKeyData.UNSPECIFIED)
+                        currentOnTap(currentText.length)
+                    },
+                    onLongPress = { hold(currentText.length) },
+                )
             }
             .padding(start = 12.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -186,20 +215,27 @@ fun KeyboardFieldInput(
                     modifier = Modifier
                         .horizontalScroll(scroll)
                         .pointerInput(text) {
-                            detectTapGestures { position ->
-                                inputFeedbackController.keyPress(TextKeyData.UNSPECIFIED)
-                                layout?.let { onTap(it.getOffsetForPosition(position)) }
-                            }
+                            detectTapGestures(
+                                onTap = { position ->
+                                    inputFeedbackController.keyPress(TextKeyData.UNSPECIFIED)
+                                    layout?.let { onTap(it.getOffsetForPosition(position)) }
+                                },
+                                onLongPress = { position ->
+                                    layout?.let { hold(it.getOffsetForPosition(position)) }
+                                },
+                            )
                         },
                     contentAlignment = Alignment.CenterStart,
                 ) {
+                    // One character for one, so every offset into the text is the same offset on screen.
+                    val line = text.replace('\n', LineBreakGlyph)
                     // A stretch marked by the Backspace swipe is shown the way a text field shows one.
                     val marked = selection?.let { it.first.coerceIn(0, text.length) until it.last.coerceIn(0, text.length) }
                     val shown = if (marked == null || marked.isEmpty()) {
-                        AnnotatedString(text)
+                        AnnotatedString(line)
                     } else {
                         buildAnnotatedString {
-                            append(text)
+                            append(line)
                             addStyle(SpanStyle(background = style.foreground().copy(alpha = 0.3f)), marked.first, marked.last + 1)
                         }
                     }
@@ -251,8 +287,27 @@ fun KeyboardFieldInput(
                 )
             }
         }
+        // Not focusable: a focusable menu raised by the keyboard hides the keyboard (#284).
+        DropdownMenu(
+            expanded = pasteOffered,
+            onDismissRequest = { pasteOffered = false },
+            offset = DpOffset(x = 24.dp, y = 0.dp),
+            properties = PopupProperties(focusable = false),
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringRes(R.string.quick_action__clipboard_paste)) },
+                leadingIcon = { Icon(Icons.Default.ContentPaste, contentDescription = null) },
+                onClick = {
+                    pasteOffered = false
+                    onPaste()
+                },
+            )
+        }
     }
 }
+
+/** How a line break in a field's one line is drawn — one character, like the break it stands for. */
+private const val LineBreakGlyph = '↵'
 
 /**
  * Where the cursor at [offset] is drawn. Clamped to the text *this layout* was made from, which trails

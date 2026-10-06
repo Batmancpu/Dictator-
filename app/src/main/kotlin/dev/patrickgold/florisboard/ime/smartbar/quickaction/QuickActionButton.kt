@@ -57,6 +57,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.material3.Icon
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.BlendMode
@@ -77,7 +78,15 @@ import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.onLongClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import dev.patrickgold.compose.tooltip.PlainTooltip
+import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.dictate.DictateController
 import dev.patrickgold.florisboard.dictate.ui.DictateHoldTargets
@@ -118,6 +127,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.florisboard.lib.snygg.ui.SnyggText
+import org.florisboard.lib.compose.stringRes
 
 /**
  * How long the mic must be held before it becomes push-to-talk rather than a tap (#235).
@@ -530,6 +540,14 @@ fun QuickActionButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val isEnabled = type == QuickActionBarType.EDITOR_TILE || evaluator.evaluateEnabled(action.keyData())
+    // The hold has a state of its own (issue #436): a greyed-out Copy still has to reach the Paste it
+    // carries, and a greyed-out second action must not run just because its host is live.
+    val isSecondEnabled = secondAction != null && evaluator.evaluateEnabled(secondAction.keyData())
+    // Read by the running gesture rather than keyed into it. A hold changes the very state these come
+    // from — pasting over a selection greys out the Copy under the finger — and a restarted gesture
+    // never releases the press it had begun, so the key stayed drawn as pressed.
+    val tapEnabled by rememberUpdatedState(isEnabled)
+    val holdEnabled by rememberUpdatedState(isSecondEnabled)
     val elementName = when (type) {
         QuickActionBarType.INTERACTIVE_BUTTON -> FlorisImeUi.SmartbarActionKey
         QuickActionBarType.INTERACTIVE_TILE -> FlorisImeUi.SmartbarActionTile
@@ -568,6 +586,57 @@ fun QuickActionButton(
     val ptt by DictateController.pushToTalkVisuals.collectAsState()
     val isDictateKey = action.keyData().code == KeyCode.IME_UI_MODE_DICTATE
     val holdingMic = isDictateKey && ptt.phase.isHolding
+
+    // What a screen reader reads for this button and runs on its double-tap (issue #159). The gesture
+    // below is raw pointer input, which a screen reader cannot reach: without this the button was skipped
+    // by swipe navigation and a double-tap on it did nothing — the mic included, which left a blind user
+    // no way to dictate at all. The mic is named after what a tap on it does *now*, the way its icon
+    // changes, rather than given a state description: TalkBack reads a focused node's state out the moment
+    // it changes, which here is the moment the microphone opens — straight into the recording.
+    val a11yName = when {
+        isDictateKey && dictateState is DictateController.UiState.Recording ->
+            stringRes(R.string.dictate__legacy_stop)
+        isDictateKey && (dictateState is DictateController.UiState.Transcribing ||
+            dictateState is DictateController.UiState.Rewording) -> stringRes(R.string.action__cancel)
+        else -> action.computeDisplayName(evaluator)
+    }
+    // The hold, as the screen reader's long-press: the mic's own shortcuts where they apply, the same ones
+    // a finger gets, and otherwise the second action this button carries. Push-to-talk has no counterpart
+    // here — a recording that lasts as long as a finger stays down is not something a double-tap can hold.
+    val micHoldFile = isDictateKey && DictateController.canStartRecording()
+    val micHoldLocal = isDictateKey && !micHoldFile && prefs.dictate.longPressSendLocalModel.get() &&
+        DictateController.canLongPressLocal()
+    val a11yHoldName = when {
+        micHoldFile -> stringRes(R.string.dictate__import_menu)
+        micHoldLocal -> stringRes(R.string.dictate__a11y_mic_hold_local)
+        secondAction != null && isSecondEnabled -> secondAction.computeDisplayName(evaluator)
+        else -> null
+    }
+    val a11yModifier = Modifier.semantics(mergeDescendants = true) {
+        contentDescription = a11yName
+        // The actions editor's tiles are dragged, never tapped.
+        if (type == QuickActionBarType.EDITOR_TILE) return@semantics
+        role = Role.Button
+        if (isEnabled) {
+            onClick {
+                action.performAsTap(context)
+                true
+            }
+        }
+        if (a11yHoldName != null) {
+            onLongClick(a11yHoldName) {
+                when {
+                    micHoldFile -> DictateController.startFileTranscription(context)
+                    micHoldLocal -> DictateController.holdForLocalModel(context)
+                    else -> secondAction?.performAsSecondAction(context)
+                }
+                true
+            }
+        }
+        // A greyed-out button that still carries a live second action stays reachable for that (#436).
+        if (!isEnabled && a11yHoldName == null) disabled()
+    }
+
     // Where the key actually is on screen — the popups are anchored to this rather than to their own
     // placeholder, which sits wherever the parent puts a zero-size child.
     var micKeyBounds by remember { mutableStateOf<IntRect?>(null) }
@@ -641,14 +710,18 @@ fun QuickActionButton(
             },
             clickAndSemanticsModifier = Modifier
                 .aspectRatio(1f)
+                .then(a11yModifier)
                 .indication(interactionSource, LocalIndication.current)
                 // secondAction belongs in the keys: without it a pairing changed in settings would
                 // only take hold once the keyboard is rebuilt, which reads as the feature not working.
-                .pointerInput(action, isEnabled, secondAction) {
+                .pointerInput(action, secondAction) {
                     awaitEachGesture {
                         val down = awaitFirstDown()
                         down.consume()
-                        if (isEnabled && type != QuickActionBarType.EDITOR_TILE) {
+                        // Decided where the finger lands: a press that began on a greyed-out action
+                        // does not become a tap because the action came alive while it was held.
+                        val canTap = tapEnabled
+                        if ((canTap || holdEnabled) && type != QuickActionBarType.EDITOR_TILE) {
                             val press = PressInteraction.Press(down.position)
                             inputFeedbackController.keyPress(TextKeyData.UNSPECIFIED)
                             interactionSource.tryEmit(press)
@@ -656,8 +729,12 @@ fun QuickActionButton(
                             // gesture — see DictateHoldTouch for why nothing here may outlive a press.
                             action.onPointerDown(context) onLongPress@{
                                 val second = secondAction ?: return@onLongPress false
-                                inputFeedbackController.keyLongPress(TextKeyData.UNSPECIFIED)
-                                second.performAsSecondAction(context)
+                                // A greyed-out second action still takes the hold, so the tap it
+                                // stands for does not run in its place on release.
+                                if (holdEnabled) {
+                                    inputFeedbackController.keyLongPress(TextKeyData.UNSPECIFIED)
+                                    second.performAsSecondAction(context)
+                                }
                                 true
                             }
 
@@ -724,6 +801,7 @@ fun QuickActionButton(
                                 // handing that one over would leave the key held with nobody to release it.
                                 handleUpOrCancel(
                                     waitForUpOrRealCancellation(), press, interactionSource, action, context,
+                                    canTap,
                                 )
                             }
                         }
@@ -905,18 +983,23 @@ private suspend fun AwaitPointerEventScope.waitForUpOrRealCancellation(): Pointe
     }
 }
 
-/** Finishes a pointer gesture: a non-null [up] is a normal release (click), null is a cancellation. */
+/**
+ * Finishes a pointer gesture: a non-null [up] is a normal release (click), null is a cancellation.
+ * Without [canTap] the press was taken only for its second action (issue #436), so even a normal
+ * release withdraws the key instead of running it.
+ */
 private fun handleUpOrCancel(
     up: PointerInputChange?,
     press: PressInteraction.Press,
     interactionSource: MutableInteractionSource,
     action: QuickAction,
     context: Context,
+    canTap: Boolean,
 ) {
     if (up != null) {
         up.consume()
         interactionSource.tryEmit(PressInteraction.Release(press))
-        action.onPointerUp(context)
+        if (canTap) action.onPointerUp(context) else action.onPointerCancel(context)
     } else {
         interactionSource.tryEmit(PressInteraction.Cancel(press))
         action.onPointerCancel(context)

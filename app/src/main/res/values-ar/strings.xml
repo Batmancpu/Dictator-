@@ -620,6 +620,7 @@
     <string name="pref__clipboard__trim_on_copy__label" comment="Preference title, keep short">اقتصاص عند النسخ</string>
     <string name="pref__clipboard__trim_on_copy__summary" comment="Preference summary, keep short (one line)">إزالة المسافات وفواصل الأسطر من الطرفين</string>
     <string name="pref__clipboard__suggestion_enabled__summary" comment="Preference summary">اقتراح المحتويات المنسوخة في سجل الحافظة</string>
+    <string name="pref__clipboard__suggestion_show_extracted__label" comment="Preference title (switch) in the group Clipboard suggestions, keep short (one line): whether the links, email addresses and phone numbers found inside a copied text are also offered as suggestions of their own, next to the whole text">الروابط والبريد الإلكتروني والأرقام</string>
     <string name="pref__clipboard__suggestion_timeout__label" comment="Preference title; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__summary` and is the first part">تحديد حجم مخصص لاقتراحات الحافظة إلى</string>
     <string name="pref__clipboard__suggestion_timeout__summary" comment="Preference summary; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__label` and is the second part">العناصر التي تم نسخها خلال آخر {v}</string>
     <string name="pref__clipboard__group_clipboard_history__label">سجل الحافظة</string>
@@ -1085,10 +1086,16 @@
     <string name="dictate__floating_button_disclosure_continue">فتح الإعدادات</string>
     <string name="dictate__floating_button_mic_title">الوصول إلى الميكروفون</string>
     <string name="dictate__floating_button_mic_summary">مطلوب لتسجيل صوتك · اضغط للمنح</string>
-    <string name="dictate__floating_button_show_with_keyboard_title">الإظهار مع لوحة مفاتيح Dictate</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_on">يظهر الزر أيضًا أثناء نشاط لوحة مفاتيح Dictate.</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_off">مخفي أثناء نشاط لوحة مفاتيح Dictate، لأنها تحتوي بالفعل على زر ميكروفون.</string>
+    <string name="dictate__floating_button_show_when_title">متى يظهر</string>
+    <string name="dictate__floating_button_show_when_field">بمجرد تحديد حقل نصي</string>
+    <string name="dictate__floating_button_show_when_keyboard">فقط عند فتح لوحة المفاتيح</string>
+    <string name="dictate__floating_button_show_when_dictate_keyboard">مع لوحة مفاتيح Dictate أيضًا</string>
     <string name="dictate__action_continue_recording">متابعة التسجيل</string>
+    <string name="dictate__a11y_mic_hold_local">تفريغ على الجهاز</string>
+    <string name="smartbar__a11y_show_actions">إظهار الإجراءات</string>
+    <string name="smartbar__a11y_show_suggestions">إظهار الاقتراحات</string>
+    <string name="smartbar__a11y_show_more_actions">إظهار المزيد من الإجراءات</string>
+    <string name="smartbar__a11y_hide_more_actions">إخفاء الإجراءات الإضافية</string>
     <string name="dictate__floating_button_auto_dim_summary_off">يظل مرئيًا بالكامل دائمًا.</string>
     <string name="dictate__floating_button_auto_dim_summary_on">يتقلص إلى نقطة صغيرة بعد بضع ثوانٍ؛ انقر لاستعادته.</string>
     <string name="dictate__floating_button_auto_dim_title">تعتيم عند الخمول</string>
@@ -1353,7 +1360,7 @@
     <string name="dictate__providers_field_realtime_model">النموذج الفوري</string>
     <string name="dictate__providers_custom_realtime">البث في الوقت الفعلي</string>
     <string name="dictate__providers_custom_realtime_summary">يدعم هذا الخادم بروتوكول OpenAI الفوري على ‎/v1/realtime</string>
-    <string name="dictate__providers_custom_warm_up">التنبيه قبل إعادة الصياغة</string>
+    <string name="dictate__providers_custom_warm_up">التنبيه مبكرًا</string>
     <string name="dictate__providers_custom_warm_up_summary">يتصل بالخادم مبكرًا ليتاح لجهاز نائم وقت للإقلاع</string>
     <string name="dictate__providers_realtime_model_default">افتراضي</string>
     <string name="dictate__instant_recording_title">تسجيل فوري</string>
@@ -1635,6 +1642,8 @@
     <string name="dictate__mappings_wholeword_summary">الاستبدال فقط للكلمات المستقلة، وليس للمطابقات داخل كلمات أطول.</string>
     <string name="dictate__mappings_wholeword_title">الكلمات الكاملة فقط</string>
     <string name="dictate__wear_standalone_summary">أرسل مفتاح API إلى الساعة لتتمكن من الإملاء دون وجود الهاتف قريبًا.</string>
+    <string name="dictate__wear_tether_notif_channel_name">الإملاء من الساعة</string>
+    <string name="dictate__wear_tether_notif_title">جارٍ النسخ لساعتك…</string>
     <string name="dictate__wear_standalone_title">مزامنة المفتاح مع الساعة</string>
     <string name="emoji__search__hint">البحث عن رمز تعبيري</string>
     <string name="emoji__row__open_panel">فتح كل الرموز التعبيرية</string>

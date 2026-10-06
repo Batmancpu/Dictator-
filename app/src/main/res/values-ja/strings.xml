@@ -708,6 +708,7 @@
     <string name="pref__clipboard__trim_on_copy__label" comment="Preference title, keep short">コピー時にトリミング</string>
     <string name="pref__clipboard__trim_on_copy__summary" comment="Preference summary, keep short (one line)">前後の空白と改行を取り除きます</string>
     <string name="pref__clipboard__suggestion_enabled__summary" comment="Preference summary">以前にコピーしたクリップボードコンテンツを提案します</string>
+    <string name="pref__clipboard__suggestion_show_extracted__label" comment="Preference title (switch) in the group Clipboard suggestions, keep short (one line): whether the links, email addresses and phone numbers found inside a copied text are also offered as suggestions of their own, next to the whole text">リンク・メール・電話番号</string>
     <string name="pref__clipboard__suggestion_timeout__label" comment="Preference title; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__summary` and is the first part">クリップボード候補を制限する</string>
     <string name="pref__clipboard__suggestion_timeout__summary" comment="Preference summary; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__label` and is the second part">過去{v}秒以内にコピーされたアイテム</string>
     <string name="pref__clipboard__group_clipboard_history__label">クリップボード履歴</string>
@@ -1159,10 +1160,16 @@
     <string name="dictate__floating_button_disclosure_continue">設定を開く</string>
     <string name="dictate__floating_button_mic_title">マイクへのアクセス</string>
     <string name="dictate__floating_button_mic_summary">音声の録音に必要です · タップして許可</string>
-    <string name="dictate__floating_button_show_with_keyboard_title">Dictate キーボードでも表示</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_on">Dictate キーボードが有効なときもボタンが表示されます。</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_off">Dictate キーボードにはマイクキーがあるため、有効なときは非表示になります。</string>
+    <string name="dictate__floating_button_show_when_title">表示するタイミング</string>
+    <string name="dictate__floating_button_show_when_field">テキスト欄を選択したとき</string>
+    <string name="dictate__floating_button_show_when_keyboard">キーボード表示中のみ</string>
+    <string name="dictate__floating_button_show_when_dictate_keyboard">Dictate キーボードでも表示</string>
     <string name="dictate__action_continue_recording">録音を続ける</string>
+    <string name="dictate__a11y_mic_hold_local">端末で文字起こし</string>
+    <string name="smartbar__a11y_show_actions">アクションを表示</string>
+    <string name="smartbar__a11y_show_suggestions">候補を表示</string>
+    <string name="smartbar__a11y_show_more_actions">その他のアクションを表示</string>
+    <string name="smartbar__a11y_hide_more_actions">その他のアクションを非表示</string>
     <string name="dictate__floating_button_auto_dim_summary_off">常に完全に表示されたままです。</string>
     <string name="dictate__floating_button_auto_dim_summary_on">数秒後に小さな点に縮小します。タップで元に戻ります。</string>
     <string name="dictate__floating_button_auto_dim_title">操作がないとき薄くする</string>
@@ -1427,7 +1434,7 @@
     <string name="dictate__providers_field_realtime_model">リアルタイムモデル</string>
     <string name="dictate__providers_custom_realtime">リアルタイム ストリーミング</string>
     <string name="dictate__providers_custom_realtime_summary">このサーバーは /v1/realtime で OpenAI のリアルタイム プロトコルに対応しています</string>
-    <string name="dictate__providers_custom_warm_up">推敲の前に起こす</string>
+    <string name="dictate__providers_custom_warm_up">早めに起こす</string>
     <string name="dictate__providers_custom_warm_up_summary">早めにサーバーへ接続し、休止中のマシンが起動する時間を稼ぎます</string>
     <string name="dictate__providers_realtime_model_default">デフォルト</string>
     <string name="dictate__instant_recording_title">即時録音</string>
@@ -1704,6 +1711,8 @@
     <string name="dictate__mappings_wholeword_summary">独立した単語のみを置き換え、長い単語の一部に一致するものは置き換えません。</string>
     <string name="dictate__mappings_wholeword_title">単語全体のみ</string>
     <string name="dictate__wear_standalone_summary">API キーを時計に送れば、近くにスマートフォンがなくても音声入力できます。</string>
+    <string name="dictate__wear_tether_notif_channel_name">ウォッチからの音声入力</string>
+    <string name="dictate__wear_tether_notif_title">ウォッチの音声を文字起こし中…</string>
     <string name="dictate__wear_standalone_title">キーを時計に同期</string>
     <string name="emoji__search__hint">絵文字を検索</string>
     <string name="emoji__row__open_panel">すべての絵文字を開く</string>

@@ -44,6 +44,9 @@ class TranslationEngineService : Service() {
     /** The directions of the route last used, by id. Anything else is freed before a new load. */
     private val loaded = LinkedHashMap<String, Long>()
 
+    /** One request per keystroke, one engine call per changed line (issue #433). */
+    private val lines = LineTranslator()
+
     override fun onCreate() {
         super.onCreate()
         thread = HandlerThread("bergamot").apply { start() }
@@ -98,13 +101,15 @@ class TranslationEngineService : Service() {
         }
         if (engine == 0L) engine = BergamotNative.createEngine(0)
         val models = load(route)
-        val input = arrayOf(text.toByteArray())
-        val output = if (models.size == 1) {
-            BergamotNative.translate(engine, models[0], input)
-        } else {
-            BergamotNative.pivot(engine, models[0], models[1], input)
+        return lines.translate(route.joinToString("+") { it.id }, text) { missing ->
+            val input = Array(missing.size) { missing[it].toByteArray() }
+            val output = if (models.size == 1) {
+                BergamotNative.translate(engine, models[0], input)
+            } else {
+                BergamotNative.pivot(engine, models[0], models[1], input)
+            }
+            output.map { it.toString(Charsets.UTF_8) }
         }
-        return output.first().toString(Charsets.UTF_8)
     }
 
     private fun load(route: List<TranslationDirection>): List<Long> {

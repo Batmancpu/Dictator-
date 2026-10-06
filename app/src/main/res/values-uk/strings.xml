@@ -621,6 +621,7 @@
     <string name="pref__clipboard__trim_on_copy__label" comment="Preference title, keep short">Обрізати під час копіювання</string>
     <string name="pref__clipboard__trim_on_copy__summary" comment="Preference summary, keep short (one line)">Прибирає пробіли та переноси з країв</string>
     <string name="pref__clipboard__suggestion_enabled__summary" comment="Preference summary">Пропонувати раніше скопійований вміст буфера обміну</string>
+    <string name="pref__clipboard__suggestion_show_extracted__label" comment="Preference title (switch) in the group Clipboard suggestions, keep short (one line): whether the links, email addresses and phone numbers found inside a copied text are also offered as suggestions of their own, next to the whole text">Посилання, пошта й номери</string>
     <string name="pref__clipboard__suggestion_timeout__label" comment="Preference title; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__summary` and is the first part">Обмежити пропозиції буфера обміну до</string>
     <string name="pref__clipboard__suggestion_timeout__summary" comment="Preference summary; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__label` and is the second part">Елементи, скопійовані за останні {v} с</string>
     <string name="pref__clipboard__group_clipboard_history__label">Історія буфера обміну</string>
@@ -1072,10 +1073,16 @@
     <string name="dictate__floating_button_disclosure_continue">Відкрити налаштування</string>
     <string name="dictate__floating_button_mic_title">Доступ до мікрофона</string>
     <string name="dictate__floating_button_mic_summary">Потрібен для запису вашого голосу · торкніться, щоб надати</string>
-    <string name="dictate__floating_button_show_with_keyboard_title">Показувати з клавіатурою Dictate</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_on">Кнопка також з’являється, коли активна клавіатура Dictate.</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_off">Прихована, коли активна клавіатура Dictate, оскільки вона вже має клавішу мікрофона.</string>
+    <string name="dictate__floating_button_show_when_title">Коли показувати</string>
+    <string name="dictate__floating_button_show_when_field">Щойно вибрано текстове поле</string>
+    <string name="dictate__floating_button_show_when_keyboard">Лише з відкритою клавіатурою</string>
+    <string name="dictate__floating_button_show_when_dictate_keyboard">Також із клавіатурою Dictate</string>
     <string name="dictate__action_continue_recording">Продовжити запис</string>
+    <string name="dictate__a11y_mic_hold_local">Транскрибувати на пристрої</string>
+    <string name="smartbar__a11y_show_actions">Показати дії</string>
+    <string name="smartbar__a11y_show_suggestions">Показати пропозиції</string>
+    <string name="smartbar__a11y_show_more_actions">Показати більше дій</string>
+    <string name="smartbar__a11y_hide_more_actions">Приховати додаткові дії</string>
     <string name="dictate__floating_button_auto_dim_summary_off">Завжди повністю видимий.</string>
     <string name="dictate__floating_button_auto_dim_summary_on">Через кілька секунд стискається до маленької крапки; торкніться, щоб відновити.</string>
     <string name="dictate__floating_button_auto_dim_title">Згасати при бездіяльності</string>
@@ -1340,7 +1347,7 @@
     <string name="dictate__providers_field_realtime_model">Модель у реальному часі</string>
     <string name="dictate__providers_custom_realtime">Потокова передача в реальному часі</string>
     <string name="dictate__providers_custom_realtime_summary">Цей сервер підтримує протокол OpenAI realtime за адресою /v1/realtime</string>
-    <string name="dictate__providers_custom_warm_up">Будити перед переформулюванням</string>
+    <string name="dictate__providers_custom_warm_up">Будити завчасно</string>
     <string name="dictate__providers_custom_warm_up_summary">Завчасно звертається до сервера, щоб приспана машина встигла запуститися</string>
     <string name="dictate__providers_realtime_model_default">За замовчуванням</string>
     <string name="dictate__instant_recording_title">Миттєвий запис</string>
@@ -1620,6 +1627,8 @@
     <string name="dictate__mappings_wholeword_summary">Замінювати лише окремі слова, а не збіги всередині довших слів.</string>
     <string name="dictate__mappings_wholeword_title">Лише ціле слово</string>
     <string name="dictate__wear_standalone_summary">Надішліть свій ключ API на годинник, щоб диктувати без телефона поруч.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Диктування з годинника</string>
+    <string name="dictate__wear_tether_notif_title">Розшифровка для вашого годинника…</string>
     <string name="dictate__wear_standalone_title">Синхронізувати ключ із годинником</string>
     <string name="emoji__search__hint">Пошук емодзі</string>
     <string name="emoji__row__open_panel">Відкрити всі емодзі</string>

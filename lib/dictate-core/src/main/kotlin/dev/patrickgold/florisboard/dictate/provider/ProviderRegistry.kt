@@ -632,15 +632,58 @@ object ProviderRegistry {
         supportsRealtime = false,
     )
 
+    /**
+     * xAI — Grok for rewording, and since issue #435 Grok Voice Transcribe for dictation as well.
+     *
+     * Asked for when grok-voice-transcribe-2.0 came out (2026-09-18): xAI reports it first for accuracy
+     * among 32 streaming models on Artificial Analysis, and it is cheap — $0.10 per hour of audio as a file and $0.20
+     * streamed (pricing page, read 2026-09-29), against $0.27 an hour for gpt-transcribe and $1.02 for
+     * OpenAI's streaming. The same key already served rewording, so for anyone with an xAI account this
+     * is dictation without a second one.
+     *
+     * Chat stays the plain OpenAI shape it always was. Transcription does not: `POST {baseUrl}stt` has
+     * fields of its own and no `prompt` ([TranscriptionApi.XAI_STT]), and streaming is a WebSocket on the
+     * same path with raw PCM in and Deepgram-like finality flags out ([RealtimeApi.XAI]).
+     *
+     * **No data-residency region, on purpose.** xAI has a US endpoint (`us.api.x.ai`), but it serves
+     * "none of the image generation, video generation, or voice APIs" (regional-endpoints page, read
+     * 2026-09-29), so offering it here would move rewording and break dictation.
+     *
+     * Errors come flat — `{"code":"invalid-argument","error":"Incorrect API key provided. …"}` — with the
+     * sentence in `error` as a string, and a wrong key is a **400**, not a 401. Both measured without a key
+     * of our own on 2026-09-29, against `stt`, `models` and `chat/completions` alike; the client's error
+     * parser reads the shape, and the sentence is what classifies it.
+     */
     val XAI = ProviderPreset(
         id = "xai",
         displayName = "xAI (Grok)",
         baseUrl = "https://api.x.ai/v1/",
-        capabilities = CHAT_ONLY,
+        capabilities = CHAT_AND_STT,
+        transcriptionApi = TranscriptionApi.XAI_STT,
+        // The live catalog is what the chat picker lives on. Whether it lists the transcription models too
+        // is not documented, so the id below is curated; the picker's name filter sorts one in if it does.
         supportsDynamicModels = true,
         // Not the console root: the login carries `return_to`, so the deep link is still there once the
         // sign-in is done, and `default` is the team slug xAI's own quickstart uses (2026-09-21).
         apiKeyUrl = "https://console.x.ai/team/default/api-keys",
+        // Model ids from the speech-to-text guide, read 2026-09-29: 2.0 is "our best transcription model"
+        // and the default when none is sent. 1.0 is the original and is announced for deprecation, so it
+        // is not offered — the model field still takes it typed in, for anyone who pinned it.
+        defaultTranscriptionModel = "grok-voice-transcribe-2.0",
+        curatedTranscriptionModels = listOf("grok-voice-transcribe-2.0"),
+        // Documented, read 2026-09-29: wav, mp3, ogg, opus, flac, aac, mp4, m4a, and mkv with MP3, AAC or
+        // FLAC inside. WebM is Matroska too, but it carries Opus or Vorbis, which that clause leaves out,
+        // so it is transcoded rather than hoped for; AMR is not named at all. Unmeasured — the list to
+        // re-check first once there is a key to ask with (tools/probe-xai-stt.py).
+        acceptedAudioContainers = setOf(
+            AudioContainer.WAV, AudioContainer.MP3, AudioContainer.OGG,
+            AudioContainer.FLAC, AudioContainer.AAC, AudioContainer.M4A,
+        ),
+        // Realtime: wss /v1/stt, the same model on the same key.
+        supportsRealtime = true,
+        realtimeApi = RealtimeApi.XAI,
+        defaultRealtimeModel = "grok-voice-transcribe-2.0",
+        curatedRealtimeModels = listOf("grok-voice-transcribe-2.0"),
     )
 
     val DEEPSEEK = ProviderPreset(
@@ -937,12 +980,15 @@ object ProviderRegistry {
      *  - Azure 300 MB, from the MAI-Transcribe page's prerequisites (read 2026-09-09). The Fast
      *    Transcription API it travels allows 500 MB in general; the model's own page is the stricter
      *    of the two and is the one that governs a MAI request.
+     *  - xAI 500 MB (speech-to-text guide, read 2026-09-29; a larger file is a 413). Taken as decimal
+     *    megabytes, the lower of the two readings, since nobody has measured which one xAI means.
      */
     fun maxUploadBytes(providerId: String): Long = when (providerId) {
         "openai", "cloud", "groq", "openrouter", "scaleway" -> 25L * 1024 * 1024
         "gemini" -> 15L * 1024 * 1024
         "siliconflow" -> 50L * 1024 * 1024
         "azure" -> 300L * 1024 * 1024
+        "xai" -> 500L * 1000 * 1000
         "elevenlabs" -> 3L * 1024 * 1024 * 1024
         "deepgram", "ovhcloud" -> 2L * 1024 * 1024 * 1024
         "assemblyai" -> 2252L * 1024 * 1024

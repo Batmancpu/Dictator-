@@ -114,6 +114,7 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.pref__clipboard__strip_tracking_params__label, R.string.settings__clipboard__title, Routes.Settings.Clipboard, anchor = "pref__clipboard__strip_tracking_params__label"),
         SettingsSearchEntry(R.string.pref__clipboard__trim_on_copy__label, R.string.settings__clipboard__title, Routes.Settings.Clipboard, anchor = "pref__clipboard__trim_on_copy__label",
             keywordsRes = R.string.settings__search__keywords__trim_on_copy),
+        SettingsSearchEntry(R.string.pref__clipboard__suggestion_show_extracted__label, R.string.settings__clipboard__title, Routes.Settings.Clipboard, anchor = "pref__clipboard__suggestion_show_extracted__label"),
         SettingsSearchEntry(R.string.pref__clipboard__suggestion_timeout__label, R.string.settings__clipboard__title, Routes.Settings.Clipboard, anchor = "pref__clipboard__suggestion_timeout__label"),
         SettingsSearchEntry(R.string.pref__clipboard__group_clipboard_history__label, R.string.settings__clipboard__title, Routes.Settings.Clipboard),
         SettingsSearchEntry(R.string.pref__clipboard__enable_clipboard_history__label, R.string.settings__clipboard__title, Routes.Settings.Clipboard, anchor = "pref__clipboard__enable_clipboard_history__label"),
@@ -133,7 +134,8 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.dictate__floating_button_permission_group, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title),
         SettingsSearchEntry(R.string.dictate__floating_button_service_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_service_title"),
         SettingsSearchEntry(R.string.dictate__floating_button_mic_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_mic_title"),
-        SettingsSearchEntry(R.string.dictate__floating_button_show_with_keyboard_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_show_with_keyboard_title"),
+        // Hand-added (#439): replaces the "Show with Dictate keyboard" row; the generator is lossy.
+        SettingsSearchEntry(R.string.dictate__floating_button_show_when_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_show_when_title"),
         SettingsSearchEntry(R.string.dictate__floating_button_apps_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_apps_title"),
         SettingsSearchEntry(R.string.dictate__floating_button_design_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_design_title"),
         SettingsSearchEntry(R.string.dictate__floating_button_size_title, R.string.dictate__floating_button_title, Routes.Settings.DictateFloatingButton, parentRes = R.string.dictate__title, anchor = "dictate__floating_button_size_title"),

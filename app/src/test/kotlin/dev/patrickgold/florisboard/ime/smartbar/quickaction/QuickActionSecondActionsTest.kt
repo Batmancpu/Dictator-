@@ -29,17 +29,25 @@ private val SETTINGS = key(TextKeyData.SETTINGS)
 private val EDITING = key(TextKeyData.IME_UI_MODE_EDITING)
 private val ARROW_LEFT = key(TextKeyData.ARROW_LEFT)
 private val UNDO = key(TextKeyData.UNDO)
+private val REDO = key(TextKeyData.REDO)
 private val MIC = key(TextKeyData.IME_UI_MODE_DICTATE)
 
 class QuickActionSecondActionsTest : FunSpec({
-    // The rules that make a pairing safe rather than merely tidy. A repeating host would silently
-    // lose its hold-to-repeat (the dispatcher runs the repeat loop only when the long press declines),
-    // and the mic's whole gesture belongs to DictateHoldTouch.
+    // The rules that make a pairing safe rather than merely tidy. A host held for its repeat would
+    // silently lose it (the dispatcher runs the repeat loop only when the long press declines), and the
+    // mic's whole gesture belongs to DictateHoldTouch.
     context("eligible hosts") {
-        test("no repeating action may host a second one") {
+        test("no action held for its repeat may host a second one") {
             QuickActionSecondActions.EligibleHosts.filter {
-                it.keyData().code in RepeatableKeyCodes
+                it.keyData().code in QuickActionSecondActions.HeldForRepeatCodes
             } shouldBe emptyList()
+        }
+
+        test("undo and redo may, trading their repeat for it (issue #433)") {
+            val hosts = QuickActionSecondActions.EligibleHosts.map { it.keyData().code }
+            hosts.contains(KeyCode.UNDO) shouldBe true
+            hosts.contains(KeyCode.REDO) shouldBe true
+            RepeatableKeyCodes - QuickActionSecondActions.HeldForRepeatCodes shouldBe setOf(KeyCode.UNDO, KeyCode.REDO)
         }
 
         test("the mic is never a host, but is a legal second action") {
@@ -71,7 +79,7 @@ class QuickActionSecondActionsTest : FunSpec({
             Triple("a pair is kept", pairing(COPY to CUT), pairing(COPY to CUT)),
             Triple("an action may not hold itself", pairing(COPY to COPY), pairing()),
             Triple("a repeating host is dropped", pairing(ARROW_LEFT to CUT), pairing()),
-            Triple("a repeating host is dropped (undo)", pairing(UNDO to CUT), pairing()),
+            Triple("undo may host, redo on hold (issue #433)", pairing(UNDO to REDO), pairing(UNDO to REDO)),
             Triple("the mic may not host", pairing(MIC to CUT), pairing()),
             Triple("a repeating second action is fine", pairing(COPY to ARROW_LEFT), pairing(COPY to ARROW_LEFT)),
             Triple("the mic as a second action is fine", pairing(EDITING to MIC), pairing(EDITING to MIC)),

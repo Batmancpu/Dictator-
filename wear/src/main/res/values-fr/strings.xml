@@ -51,4 +51,18 @@
     <string name="wear_err_bad_key">Clé invalide</string>
     <string name="wear_err_offline">Tél. hors ligne</string>
     <string name="wear_err_quota">Quota atteint</string>
+    <string name="wear_status_interrupted">Interrompu · Appuyez pour envoyer</string>
+    <string name="wear_cd_resend">Renvoyer</string>
+    <string name="wear_cd_discard">Supprimer</string>
+    <string name="wear_err_phone_silent">Le tél. ne répond pas</string>
+    <string name="wear_try_tap_cancel">Appuyez pour annuler</string>
+    <string name="wear_err_not_inserted">Non inséré · Appuyez pour insérer</string>
+    <string name="wear_cd_send">Envoyer</string>
+    <string name="wear_cd_search">Rechercher</string>
+    <string name="wear_cd_go">Aller</string>
+    <string name="wear_cd_done">OK</string>
+    <string name="wear_cd_close">Fermer</string>
+    <string name="wear_auto_send">Envoi auto</string>
+    <string name="wear_auto_send_on">Envoie dès la dictée finie</string>
+    <string name="wear_auto_send_off">Demande d’abord avec ✓</string>
 </resources>

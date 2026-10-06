@@ -412,10 +412,20 @@ class NlpManager(context: Context) {
     @Volatile
     private var fieldCandidates: List<SuggestionCandidate>? = null
 
+    /**
+     * Where the cursor of a field that offers the copied text stands — the translate bar (issue #433) —
+     * so the clip is shown by the same rule as in the app's field. `null` for every other field.
+     */
+    data class FieldClipSpot(val isBlank: Boolean, val isAtWordBoundary: Boolean)
+
+    @Volatile
+    private var fieldClipSpot: FieldClipSpot? = null
+
     val isFieldMode: Boolean get() = fieldCandidates != null
 
-    fun showFieldCandidates(candidates: List<SuggestionCandidate>?) {
+    fun showFieldCandidates(candidates: List<SuggestionCandidate>?, clipSpot: FieldClipSpot? = null) {
         fieldCandidates = candidates
+        fieldClipSpot = clipSpot.takeIf { candidates != null }
         scope.launch { assembleCandidates() }
     }
 
@@ -650,29 +660,48 @@ class NlpManager(context: Context) {
     }
 
     /**
-     * The answer to a sum the user just finished typing, or an empty list (issue #329).
+     * The answer to a sum standing at the cursor, or an empty list (issues #329, #440).
      *
-     * Ahead of both the clipboard and the word suggestions in [assembleCandidates], because typing `=`
-     * is an expressed intent and a clipboard offer is a guess. Never in a password field: the strip is
-     * the one place a keyboard shows back what is being typed, and there it must not.
+     * Ahead of both the clipboard and the word suggestions in [assembleCandidates], because a sum is what
+     * the user is writing right now and a clipboard offer is a guess. It only borrows the strip: nothing
+     * is dismissed or marked used, so the clip and the words are back by themselves with the first
+     * character that is not part of the sum. Never in a password field: the strip is the one place a
+     * keyboard shows back what is being typed, and there it must not.
      */
     private fun mathCandidates(): List<SuggestionCandidate> {
         if (!prefs.suggestion.mathSuggestions.get()) return emptyList()
         val state = keyboardManager.activeState
         if (state.keyVariation == KeyVariation.PASSWORD) return emptyList()
         if (editorInstance.activeInfo.isRawInputEditor) return emptyList()
-        val result = Calculator.evaluateTrailing(
+        val answer = Calculator.evaluateTrailing(
             textBeforeCursor = editorInstance.activeContent.textBeforeSelection,
             locale = subtypeManager.activeSubtype.primaryLocale.base,
         ) ?: return emptyList()
-        return listOf(MathSuggestionCandidate(result))
+        return listOf(MathSuggestionCandidate(result = answer.result, completion = answer.completion))
     }
 
     private fun assembleCandidates() {
         runBlocking {
             fieldCandidates?.let { field ->
-                // No clipboard offer and no sum here: both read the app's field, not the one being typed in.
-                val shown = if (isSuggestionOn()) field else emptyList()
+                // No sum here: it reads the app's field, not the one being typed in. The copied text is
+                // offered only where the field asks for it, and only as text — a picture has no place in it.
+                val spot = fieldClipSpot
+                val shown = when {
+                    !isSuggestionOn() -> emptyList()
+                    spot == null -> field
+                    else -> chooseStripCandidates(
+                        words = field,
+                        clip = clipboardSuggestionProvider.suggest(
+                            subtype = Subtype.DEFAULT,
+                            content = editorInstance.activeContent,
+                            maxCandidateCount = 8,
+                            allowPossiblyOffensive = true,
+                            isPrivateSession = keyboardManager.activeState.isIncognitoMode,
+                        ).filter { (it as? ClipboardSuggestionCandidate)?.clipboardItem?.type == ItemType.TEXT },
+                        isFieldBlank = spot.isBlank,
+                        isAtWordBoundary = spot.isAtWordBoundary,
+                    )
+                }
                 activeCandidates = shown
                 autoExpandCollapseSmartbarActions(shown, null)
                 return@runBlocking
@@ -801,6 +830,7 @@ class NlpManager(context: Context) {
         // call before reaching it; now that the clip is offered as a fallback too, the work is memoised
         // per copy so it is paid once instead of per character.
         private var cachedForItem: ClipboardItem? = null
+        private var cachedWithExtracted = true
         private var cachedCandidates: List<SuggestionCandidate> = emptyList()
 
         override val providerId = "org.florisboard.nlp.providers.clipboard"
@@ -831,12 +861,14 @@ class NlpManager(context: Context) {
                 return emptyList()
             }
             // Identity, not equality: the primary clip is one instance per copy, and the same instance
-            // always yields the same chips.
-            if (cachedForItem === currentItem) return cachedCandidates
+            // always yields the same chips — as long as the extraction switch has not been flipped since,
+            // which a trip to the settings within the suggestion timeout can easily do.
+            val showExtracted = prefs.clipboard.suggestionShowExtracted.get()
+            if (cachedForItem === currentItem && cachedWithExtracted == showExtracted) return cachedCandidates
 
             val candidates = buildList {
                 add(ClipboardSuggestionCandidate(currentItem, sourceProvider = this@ClipboardSuggestionProvider, context = context))
-                if (currentItem.isSensitive) {
+                if (currentItem.isSensitive || !showExtracted) {
                     return@buildList
                 }
                 if (currentItem.type == ItemType.TEXT) {
@@ -869,6 +901,7 @@ class NlpManager(context: Context) {
                 }
             }
             cachedForItem = currentItem
+            cachedWithExtracted = showExtracted
             cachedCandidates = candidates
             return candidates
         }

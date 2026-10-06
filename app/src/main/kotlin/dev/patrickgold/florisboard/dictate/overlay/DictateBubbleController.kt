@@ -59,6 +59,7 @@ import dev.patrickgold.florisboard.dictate.DictateController
 import dev.patrickgold.florisboard.dictate.importer.TranscribeShareActivity
 import dev.patrickgold.florisboard.dictate.recognition.RecognitionBridge
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonDesign
+import dev.patrickgold.florisboard.dictate.DictateFloatingButtonShowWhen
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonSize
 import dev.patrickgold.florisboard.dictate.data.prompts.PromptModel
 import dev.patrickgold.florisboard.dictate.data.prompts.PromptsDatabaseHelper
@@ -221,7 +222,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
     /** Inputs that decide whether the bubble is shown and how it looks, combined from prefs + service. */
     private data class Inputs(
         val enabled: Boolean,
-        val showWithDictateKeyboard: Boolean,
+        val showWhen: DictateFloatingButtonShowWhen,
         val focused: Boolean,
         val dictateKeyboardActive: Boolean,
         val state: DictateController.UiState,
@@ -252,12 +253,12 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         scope.launch {
             val base = combine(
                 prefs.dictate.floatingButtonEnabled.asFlow(),
-                prefs.dictate.floatingButtonShowWithDictateKeyboard.asFlow(),
+                prefs.dictate.floatingButtonShowWhen.asFlow(),
                 DictateAccessibilityService.editableFocused,
                 DictateAccessibilityService.dictateKeyboardActive,
                 DictateController.state,
-            ) { enabled, showWithKeyboard, focused, dictateKeyboard, state ->
-                Inputs(enabled, showWithKeyboard, focused, dictateKeyboard, state)
+            ) { enabled, showWhen, focused, dictateKeyboard, state ->
+                Inputs(enabled, showWhen, focused, dictateKeyboard, state)
             }
             val emissions = combine(
                 base,
@@ -287,7 +288,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
                 Surroundings(emission, recogActive, screenOn, appAllowed)
             }.collect { (emission, recogActive, screenOn, appAllowed) ->
                 val (inputs, design, size, imeVisible, accent) = emission
-                val (enabled, showWithKeyboard, focused, dictateKeyboard, state) = inputs
+                val (enabled, showWhen, focused, dictateKeyboard, state) = inputs
                 if (design != currentDesign || size.scale != sizeScale || accent != accentColor) {
                     currentDesign = design
                     sizeScale = size.scale
@@ -300,13 +301,15 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
                 // dictation keeps the bubble hidden, while a bubble-driven one — which opens no IME window —
                 // still keeps it shown.
                 val dictateKeyboardShown = dictateKeyboard && imeVisible
-                val hiddenByOwnKeyboard = dictateKeyboardShown && !showWithKeyboard
+                val hiddenByOwnKeyboard = dictateKeyboardShown && !showWhen.besideDictateKeyboard
                 // The rule itself lives in [BubbleVisibility], where it can be asked without a phone. Note
                 // that a bubble is *removed* rather than faded: alpha or GONE is a request to a compositor
                 // we do not control, and that compositor is exactly the part behaving unexpectedly here.
                 val show = BubbleVisibility.shouldShow(
                     enabled = enabled,
                     focused = focused,
+                    keyboardRequired = showWhen.keyboardRequired,
+                    keyboardShown = imeVisible,
                     state = state,
                     hiddenByOwnKeyboard = hiddenByOwnKeyboard,
                     recognitionActive = recogActive,

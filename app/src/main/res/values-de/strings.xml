@@ -690,6 +690,7 @@
     <string name="pref__clipboard__trim_on_copy__summary" comment="Preference summary, keep short (one line)">Entfernt Leerzeichen und Umbrüche an den Enden</string>
     <string name="pref__clipboard__suggestion_enabled__label" comment="Preference title">Vorschläge aus der Zwischenablage</string>
     <string name="pref__clipboard__suggestion_enabled__summary" comment="Preference summary">Zuvor kopierte Inhalte vorschlagen</string>
+    <string name="pref__clipboard__suggestion_show_extracted__label" comment="Preference title (switch) in the group Clipboard suggestions, keep short (one line): whether the links, email addresses and phone numbers found inside a copied text are also offered as suggestions of their own, next to the whole text">Links, E-Mails und Nummern</string>
     <string name="pref__clipboard__suggestion_timeout__label" comment="Preference title; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__summary` and is the first part">Beschränkung für die Vorschläge der Zwischenablage</string>
     <string name="pref__clipboard__suggestion_timeout__summary" comment="Preference summary; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__label` and is the second part">Elemente, kopiert in den letzten {v} s</string>
     <string name="pref__clipboard__group_clipboard_history__label">Zwischenablageverlauf</string>
@@ -1162,9 +1163,10 @@
     <string name="dictate__floating_button_disclosure_continue">Einstellungen öffnen</string>
     <string name="dictate__floating_button_mic_title">Mikrofon-Zugriff</string>
     <string name="dictate__floating_button_mic_summary">Nötig, um deine Stimme aufzunehmen · tippen, um zu erlauben</string>
-    <string name="dictate__floating_button_show_with_keyboard_title">Mit Dictate-Tastatur anzeigen</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_on">Der Button erscheint auch, während die Dictate-Tastatur aktiv ist.</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_off">Ausgeblendet, während die Dictate-Tastatur aktiv ist, da diese bereits eine Mikrofontaste hat.</string>
+    <string name="dictate__floating_button_show_when_title">Wann anzeigen</string>
+    <string name="dictate__floating_button_show_when_field">Sobald ein Textfeld ausgewählt ist</string>
+    <string name="dictate__floating_button_show_when_keyboard">Nur bei geöffneter Tastatur</string>
+    <string name="dictate__floating_button_show_when_dictate_keyboard">Auch mit der Dictate-Tastatur</string>
     <string name="dictate__floating_button_apps_title">App-Sichtbarkeit</string>
     <string name="dictate__floating_button_apps_summary_all">In jeder App</string>
     <string name="dictate__floating_button_apps_summary_only">Nur in {n} Apps</string>
@@ -1264,6 +1266,11 @@
     <string name="dictate__action_dismiss">Verwerfen</string>
     <string name="dictate__interrupted_recording">Unterbrochen ({time})</string>
     <string name="dictate__action_continue_recording">Weiter aufnehmen</string>
+    <string name="dictate__a11y_mic_hold_local">Auf dem Gerät transkribieren</string>
+    <string name="smartbar__a11y_show_actions">Aktionen anzeigen</string>
+    <string name="smartbar__a11y_show_suggestions">Vorschläge anzeigen</string>
+    <string name="smartbar__a11y_show_more_actions">Weitere Aktionen anzeigen</string>
+    <string name="smartbar__a11y_hide_more_actions">Weitere Aktionen ausblenden</string>
     <string name="dictate__action_yes">Ja</string>
     <string name="dictate__action_no">Nein, danke</string>
     <string name="dictate__promo_rate_message">Gefällt dir Dictate?</string>
@@ -1484,7 +1491,7 @@
     <string name="dictate__providers_field_realtime_model">Echtzeit-Modell</string>
     <string name="dictate__providers_custom_realtime">Echtzeit-Streaming</string>
     <string name="dictate__providers_custom_realtime_summary">Dieser Server spricht das OpenAI-Realtime-Protokoll unter /v1/realtime</string>
-    <string name="dictate__providers_custom_warm_up">Vor dem Umformulieren wecken</string>
+    <string name="dictate__providers_custom_warm_up">Früh wecken</string>
     <string name="dictate__providers_custom_warm_up_summary">Stupst den Server früh an, damit eine schlafende Maschine hochfahren kann</string>
     <string name="dictate__providers_realtime_model_default">Standard</string>
     <string name="dictate__instant_recording_title">Sofortaufnahme</string>
@@ -1742,12 +1749,14 @@
     <string name="dictate__mappings_wholeword_summary">Nur eigenständige Wörter ersetzen, keine Treffer innerhalb längerer Wörter.</string>
     <string name="dictate__mappings_wholeword_title">Nur ganzes Wort</string>
     <string name="dictate__wear_standalone_summary">Sende deinen API-Key an die Uhr, damit sie auch ohne Handy in der Nähe diktieren kann.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Diktat von der Uhr</string>
+    <string name="dictate__wear_tether_notif_title">Transkribiere für deine Uhr…</string>
     <string name="dictate__wear_standalone_title">Schlüssel mit Uhr synchronisieren</string>
     <string name="emoji__search__hint">Emoji suchen</string>
     <string name="emoji__row__open_panel">Alle Emojis öffnen</string>
     <string name="emoji__search__no_results">Keine passenden Emojis</string>
     <string name="pref__suggestion__math_suggestions__label" comment="Preference title">Rechner in der Vorschlagsleiste</string>
-    <string name="pref__suggestion__math_suggestions__summary" comment="Preference summary">Rechenaufgabe und = eintippen, das Ergebnis wird vorgeschlagen</string>
+    <string name="pref__suggestion__math_suggestions__summary" comment="Preference summary">Rechenaufgabe eintippen, das Ergebnis wird vorgeschlagen</string>
     <string name="pref__suggestion__api30_inline_suggestions_enabled__label">Autofill-Vorschläge des Systems</string>
     <string name="pref__suggestion__block_possibly_offensive__summary">Verhindert, dass möglicherweise anstößige Wörter beim Tippen vorgeschlagen werden</string>
     <string name="quick_action__dictate_reinsert">Verlauf</string>

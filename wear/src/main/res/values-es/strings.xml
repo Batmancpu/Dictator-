@@ -51,4 +51,18 @@
     <string name="wear_err_bad_key">Clave errónea</string>
     <string name="wear_err_offline">Sin conexión</string>
     <string name="wear_err_quota">Cuota agotada</string>
+    <string name="wear_status_interrupted">Interrumpido · Toca para enviar</string>
+    <string name="wear_cd_resend">Enviar de nuevo</string>
+    <string name="wear_cd_discard">Descartar</string>
+    <string name="wear_err_phone_silent">El teléfono no responde</string>
+    <string name="wear_try_tap_cancel">Toca para cancelar</string>
+    <string name="wear_err_not_inserted">No insertado · Toca para insertar</string>
+    <string name="wear_cd_send">Enviar</string>
+    <string name="wear_cd_search">Buscar</string>
+    <string name="wear_cd_go">Ir</string>
+    <string name="wear_cd_done">Listo</string>
+    <string name="wear_cd_close">Cerrar</string>
+    <string name="wear_auto_send">Envío automático</string>
+    <string name="wear_auto_send_on">Envía justo tras dictar</string>
+    <string name="wear_auto_send_off">Pregunta antes con ✓</string>
 </resources>

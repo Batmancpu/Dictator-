@@ -75,6 +75,7 @@ import dev.patrickgold.jetpref.datastore.model.collectAsState
 import dev.patrickgold.jetpref.material.ui.JetPrefAlertDialog
 import org.florisboard.lib.compose.rippleClickable
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonDesign
+import dev.patrickgold.florisboard.dictate.DictateFloatingButtonShowWhen
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonSize
 import kotlinx.coroutines.launch
 import org.florisboard.lib.color.ColorMappings
@@ -178,13 +179,26 @@ fun DictateFloatingButtonScreen() = FlorisScreen {
         }
 
         if (enabled && serviceEnabled) {
-            SwitchPreference(
-                prefs.dictate.floatingButtonShowWithDictateKeyboard,
+            // When it appears (issue #439), one choice where there used to be two switches about keyboards.
+            ListPreference(
+                prefs.dictate.floatingButtonShowWhen,
                 icon = Icons.Default.Keyboard,
-                modifier = Modifier.settingsSearchAnchor("dictate__floating_button_show_with_keyboard_title"),
-                title = stringRes(R.string.dictate__floating_button_show_with_keyboard_title),
-                summaryOn = stringRes(R.string.dictate__floating_button_show_with_keyboard_summary_on),
-                summaryOff = stringRes(R.string.dictate__floating_button_show_with_keyboard_summary_off),
+                modifier = Modifier.settingsSearchAnchor("dictate__floating_button_show_when_title"),
+                title = stringRes(R.string.dictate__floating_button_show_when_title),
+                entries = listPrefEntries {
+                    entry(
+                        DictateFloatingButtonShowWhen.FIELD_SELECTED,
+                        stringRes(R.string.dictate__floating_button_show_when_field),
+                    )
+                    entry(
+                        DictateFloatingButtonShowWhen.KEYBOARD_OPEN,
+                        stringRes(R.string.dictate__floating_button_show_when_keyboard),
+                    )
+                    entry(
+                        DictateFloatingButtonShowWhen.ALSO_WITH_DICTATE_KEYBOARD,
+                        stringRes(R.string.dictate__floating_button_show_when_dictate_keyboard),
+                    )
+                },
             )
 
             // Where it may appear at all (issue #392), directly under the other "where" switch: a

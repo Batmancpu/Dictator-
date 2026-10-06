@@ -18,7 +18,7 @@ import io.kotest.matchers.shouldBe
 class TranslationInsertionTest : FunSpec({
 
     /** Applies [edit] to [before] the way the editor does: delete before the cursor, then write. */
-    fun apply(before: String, edit: Edit) = before.dropLast(edit.deleteBefore) + edit.text
+    fun apply(before: String, edit: Edit?) = before.dropLast(edit!!.deleteBefore) + edit.text
 
     test("the first result goes where the cursor is, a space away from the word in front of it") {
         TranslationInsertion.edit("", null, "Hello") shouldBe Edit(0, "Hello")
@@ -32,7 +32,7 @@ class TranslationInsertionTest : FunSpec({
         val first = TranslationInsertion.edit(field, null, "I'm")
         val afterFirst = apply(field, first)
         afterFirst shouldBe "Hi I'm"
-        val second = TranslationInsertion.edit(afterFirst, first.text, "I'm coming")
+        val second = TranslationInsertion.edit(afterFirst, first!!.text, "I'm coming")
         second shouldBe Edit(4, " I'm coming")
         apply(afterFirst, second) shouldBe "Hi I'm coming"
     }
@@ -42,10 +42,22 @@ class TranslationInsertionTest : FunSpec({
         TranslationInsertion.edit("Hi", null, "") shouldBe Edit(0, "")
     }
 
-    test("text the field no longer ends with is left alone") {
+    test("text the field no longer ends with is left alone, and nothing is written after it") {
         // The user moved the cursor, or the app rewrote what was there: deleting eleven characters now
-        // would eat the user's own words, so the new result starts where the cursor is instead.
-        TranslationInsertion.edit("Hi I'm coming soon", " I'm coming", "I'll be") shouldBe Edit(0, " I'll be")
-        TranslationInsertion.edit("Somewhere else", " I'm coming", "") shouldBe Edit(0, "")
+        // would eat the user's own words. Writing the new result at the cursor instead is what #433 saw:
+        // the whole translation a second time.
+        TranslationInsertion.edit("Hi I'm coming soon", " I'm coming", "I'll be") shouldBe null
+        TranslationInsertion.edit("Somewhere else", " I'm coming", "") shouldBe null
+    }
+
+    test("a paste behind the result takes the field away (issue #433)") {
+        val written = TranslationInsertion.edit("", null, "Hello")!!.text
+        TranslationInsertion.edit("HelloKopiertext", written, "Hello world") shouldBe null
+    }
+
+    test("a line break in the result is replaced with it like any other character") {
+        val first = TranslationInsertion.edit("Hi\n", null, "Hello\nHow")
+        apply("Hi\n", first) shouldBe "Hi\nHello\nHow"
+        TranslationInsertion.edit("Hi\nHello\nHow", first!!.text, "Hello\nHow are you") shouldBe Edit(9, "Hello\nHow are you")
     }
 })

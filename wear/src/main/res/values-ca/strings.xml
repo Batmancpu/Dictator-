@@ -51,4 +51,18 @@
     <string name="wear_err_bad_key">Clau incorrecta</string>
     <string name="wear_err_offline">Sense connexió</string>
     <string name="wear_err_quota">Quota exhaurida</string>
+    <string name="wear_status_interrupted">Interromput · Toca per enviar</string>
+    <string name="wear_cd_resend">Torna a enviar</string>
+    <string name="wear_cd_discard">Descarta</string>
+    <string name="wear_err_phone_silent">El telèfon no respon</string>
+    <string name="wear_try_tap_cancel">Toca per cancel·lar</string>
+    <string name="wear_err_not_inserted">No inserit · Toca per inserir</string>
+    <string name="wear_cd_send">Envia</string>
+    <string name="wear_cd_search">Cerca</string>
+    <string name="wear_cd_go">Ves</string>
+    <string name="wear_cd_done">Fet</string>
+    <string name="wear_cd_close">Tanca</string>
+    <string name="wear_auto_send">Envia automàticament</string>
+    <string name="wear_auto_send_on">Envia just després de dictar</string>
+    <string name="wear_auto_send_off">Pregunta primer amb ✓</string>
 </resources>

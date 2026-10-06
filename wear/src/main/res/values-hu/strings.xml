@@ -51,4 +51,18 @@
     <string name="wear_err_bad_key">Rossz kulcs</string>
     <string name="wear_err_offline">Telefon offline</string>
     <string name="wear_err_quota">Kvóta elérve</string>
+    <string name="wear_status_interrupted">Megszakítva · Koppints a küldéshez</string>
+    <string name="wear_cd_resend">Újraküldés</string>
+    <string name="wear_cd_discard">Elvetés</string>
+    <string name="wear_err_phone_silent">Nincs válasz a telefontól</string>
+    <string name="wear_try_tap_cancel">Koppints a megszakításhoz</string>
+    <string name="wear_err_not_inserted">Nincs beillesztve · Koppints a beillesztéshez</string>
+    <string name="wear_cd_send">Küldés</string>
+    <string name="wear_cd_search">Keresés</string>
+    <string name="wear_cd_go">Ugrás</string>
+    <string name="wear_cd_done">Kész</string>
+    <string name="wear_cd_close">Bezárás</string>
+    <string name="wear_auto_send">Automatikus küldés</string>
+    <string name="wear_auto_send_on">Diktálás után azonnal küld</string>
+    <string name="wear_auto_send_off">Előbb ✓-val kérdez</string>
 </resources>

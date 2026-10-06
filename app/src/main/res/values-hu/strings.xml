@@ -747,6 +747,7 @@
     <string name="pref__clipboard__trim_on_copy__label" comment="Preference title, keep short">Vágás másoláskor</string>
     <string name="pref__clipboard__trim_on_copy__summary" comment="Preference summary, keep short (one line)">Eltávolítja a széleken lévő szóközöket és sortöréseket</string>
     <string name="pref__clipboard__suggestion_enabled__summary" comment="Preference summary">Javasolja a vágólap korábban másolt tartalmát</string>
+    <string name="pref__clipboard__suggestion_show_extracted__label" comment="Preference title (switch) in the group Clipboard suggestions, keep short (one line): whether the links, email addresses and phone numbers found inside a copied text are also offered as suggestions of their own, next to the whole text">Hivatkozások, e-mailek, számok</string>
     <string name="pref__clipboard__num_history_grid_columns__label">Rácsoszlopok száma</string>
     <string name="pref__clipboard__suggestion_timeout__label" comment="Preference title; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__summary` and is the first part">Korlátozza a vágólapjavaslatokat a következőkre:</string>
     <string name="pref__clipboard__suggestion_timeout__summary" comment="Preference summary; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__label` and is the second part">Az utolsó {v} másodpercben másolt elemek</string>
@@ -1226,10 +1227,16 @@
     <string name="dictate__floating_button_disclosure_continue">Beállítások megnyitása</string>
     <string name="dictate__floating_button_mic_title">Mikrofon-hozzáférés</string>
     <string name="dictate__floating_button_mic_summary">A hangod rögzítéséhez szükséges · koppints az engedélyezéshez</string>
-    <string name="dictate__floating_button_show_with_keyboard_title">Megjelenítés a Dictate billentyűzettel</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_on">A gomb akkor is megjelenik, amikor a Dictate billentyűzet aktív.</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_off">Elrejtve, amíg a Dictate billentyűzet aktív, mivel annak már van mikrofongombja.</string>
+    <string name="dictate__floating_button_show_when_title">Mikor jelenjen meg</string>
+    <string name="dictate__floating_button_show_when_field">Amint egy szövegmező ki van választva</string>
+    <string name="dictate__floating_button_show_when_keyboard">Csak nyitott billentyűzetnél</string>
+    <string name="dictate__floating_button_show_when_dictate_keyboard">A Dictate billentyűzettel is</string>
     <string name="dictate__action_continue_recording">Felvétel folytatása</string>
+    <string name="dictate__a11y_mic_hold_local">Átírás az eszközön</string>
+    <string name="smartbar__a11y_show_actions">Műveletek megjelenítése</string>
+    <string name="smartbar__a11y_show_suggestions">Javaslatok megjelenítése</string>
+    <string name="smartbar__a11y_show_more_actions">További műveletek megjelenítése</string>
+    <string name="smartbar__a11y_hide_more_actions">További műveletek elrejtése</string>
     <string name="dictate__floating_button_auto_dim_summary_off">Mindig teljesen látható marad.</string>
     <string name="dictate__floating_button_auto_dim_summary_on">Néhány másodperc után apró ponttá zsugorodik; koppintson a visszaállításhoz.</string>
     <string name="dictate__floating_button_auto_dim_title">Elhalványítás tétlenségkor</string>
@@ -1494,7 +1501,7 @@
     <string name="dictate__providers_field_realtime_model">Valós idejű modell</string>
     <string name="dictate__providers_custom_realtime">Valós idejű streamelés</string>
     <string name="dictate__providers_custom_realtime_summary">Ez a kiszolgáló az OpenAI realtime protokollt használja a /v1/realtime végponton</string>
-    <string name="dictate__providers_custom_warm_up">Ébresztés újrafogalmazás előtt</string>
+    <string name="dictate__providers_custom_warm_up">Korai ébresztés</string>
     <string name="dictate__providers_custom_warm_up_summary">Korán megszólítja a kiszolgálót, hogy az alvó gépnek legyen ideje elindulni</string>
     <string name="dictate__providers_realtime_model_default">Alapértelmezett</string>
     <string name="dictate__instant_recording_title">Azonnali felvétel</string>
@@ -1772,6 +1779,8 @@
     <string name="dictate__mappings_wholeword_summary">Csak önálló szavakat cserél, a hosszabb szavakon belüli egyezéseket nem.</string>
     <string name="dictate__mappings_wholeword_title">Csak egész szó</string>
     <string name="dictate__wear_standalone_summary">Küldd el az API-kulcsod az órának, hogy telefon nélkül is diktálhasson.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Diktálás az óráról</string>
+    <string name="dictate__wear_tether_notif_title">Átírás az órádnak…</string>
     <string name="dictate__wear_standalone_title">Kulcs szinkronizálása az órára</string>
     <string name="emoji__search__hint">Emoji keresése</string>
     <string name="emoji__row__open_panel">Összes emodzsi megnyitása</string>

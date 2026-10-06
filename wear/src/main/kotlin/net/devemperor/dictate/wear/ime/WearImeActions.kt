@@ -35,12 +35,15 @@ enum class WearDictationState {
     RECORDING,
     TRANSCRIBING,
     REWORDING,
+    /** The dictation is in a field that sends or searches; a ✓ triggers that, the X leaves it (#294). */
+    READY,
     ERROR,
 }
 
 /**
  * Timing of the current recording, mirroring `DictateController.UiState.Recording` on the phone so the
- * watch can show the same m:ss elapsed counter across pause/resume segments.
+ * watch can show the same m:ss elapsed counter across pause/resume segments — and, once the recording
+ * stops, of the wait for its text (#363), the way the phone counts it since #355.
  */
 data class WearRecordingInfo(
     val startedAtMs: Long = 0L,

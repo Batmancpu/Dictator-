@@ -51,4 +51,18 @@
     <string name="wear_err_bad_key">Zły klucz</string>
     <string name="wear_err_offline">Telefon offline</string>
     <string name="wear_err_quota">Limit wyczerpany</string>
+    <string name="wear_status_interrupted">Przerwano · Dotknij, aby wysłać</string>
+    <string name="wear_cd_resend">Wyślij ponownie</string>
+    <string name="wear_cd_discard">Odrzuć</string>
+    <string name="wear_err_phone_silent">Telefon nie odpowiada</string>
+    <string name="wear_try_tap_cancel">Dotknij, aby anulować</string>
+    <string name="wear_err_not_inserted">Nie wstawiono · Dotknij, aby wstawić</string>
+    <string name="wear_cd_send">Wyślij</string>
+    <string name="wear_cd_search">Szukaj</string>
+    <string name="wear_cd_go">Przejdź</string>
+    <string name="wear_cd_done">Gotowe</string>
+    <string name="wear_cd_close">Zamknij</string>
+    <string name="wear_auto_send">Wysyłaj automatycznie</string>
+    <string name="wear_auto_send_on">Wysyła od razu po dyktowaniu</string>
+    <string name="wear_auto_send_off">Najpierw pyta przez ✓</string>
 </resources>

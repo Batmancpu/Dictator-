@@ -64,17 +64,25 @@ object BubbleVisibility {
      * in another app and carried in here is exactly the moment the promise would otherwise break. The
      * recording itself is untouched: it belongs to the microphone foreground service, not to this window,
      * so it keeps running and gets its button back on the way out (#293).
+     *
+     * [keyboardRequired] is the "only while a keyboard is open" choice (#439), and [keyboardShown] an
+     * input-method window being on screen — any keyboard, not only ours. With that choice, [focused] is
+     * no longer enough by itself: a messenger focuses its composer the moment a chat is opened, long before
+     * anyone means to type into it. It narrows only the reason to *appear*, not [pinsBubble] — closing the
+     * keyboard in the middle of a recording must not take the stop button away with it.
      */
     fun shouldShow(
         enabled: Boolean,
         focused: Boolean,
+        keyboardRequired: Boolean,
+        keyboardShown: Boolean,
         state: DictateController.UiState,
         hiddenByOwnKeyboard: Boolean,
         recognitionActive: Boolean,
         screenOn: Boolean,
         allowedInApp: Boolean,
     ): Boolean = enabled &&
-        (focused || pinsBubble(state)) &&
+        ((focused && (keyboardShown || !keyboardRequired)) || pinsBubble(state)) &&
         !hiddenByOwnKeyboard &&
         !recognitionActive &&
         screenOn &&

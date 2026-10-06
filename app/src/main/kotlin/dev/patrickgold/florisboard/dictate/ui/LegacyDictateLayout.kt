@@ -96,6 +96,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -612,6 +614,17 @@ private fun LegacyRecordRow(
     }
     // Realtime streaming (#128): tapping the record button ends the live stream — hint that with a send glyph.
     val realtime = recording != null && DictateController.isRealtimeRecording()
+    // What a screen reader reads for the record key (#159). Its visible text is the timer while recording
+    // and the status while busy, neither of which says what a tap does. Stop and cancel are named as on the
+    // Smartbar mic.
+    val recordA11yName = stringRes(
+        when {
+            recording != null -> R.string.dictate__legacy_stop
+            busy -> R.string.action__cancel
+            else -> R.string.dictate__legacy_record
+        },
+    )
+    val recordA11yHoldName = stringRes(R.string.dictate__import_menu)
 
     Row(
         modifier = modifier,
@@ -684,11 +697,13 @@ private fun LegacyRecordRow(
                         Modifier.combinedClickable(
                             interactionSource = interaction,
                             indication = ripple(),
+                            onLongClickLabel = recordA11yHoldName,
                             onClick = { feedback.keyPress(); DictateController.onMicClick(context) },
                             onLongClick = { feedback.keyPress(); DictateController.startFileTranscription(context) },
                         )
                     },
-                ),
+                )
+                .semantics { contentDescription = recordA11yName },
             contentAlignment = Alignment.Center,
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {

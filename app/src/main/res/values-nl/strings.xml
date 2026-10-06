@@ -664,6 +664,7 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="pref__clipboard__trim_on_copy__label" comment="Preference title, keep short">Bijsnijden bij kopiëren</string>
     <string name="pref__clipboard__trim_on_copy__summary" comment="Preference summary, keep short (one line)">Verwijdert spaties en regeleinden aan de uiteinden</string>
     <string name="pref__clipboard__suggestion_enabled__summary" comment="Preference summary">Eerder gekopieerde klembordinhoud voorstellen</string>
+    <string name="pref__clipboard__suggestion_show_extracted__label" comment="Preference title (switch) in the group Clipboard suggestions, keep short (one line): whether the links, email addresses and phone numbers found inside a copied text are also offered as suggestions of their own, next to the whole text">Links, e-mails en nummers</string>
     <string name="pref__clipboard__num_history_grid_columns__label">Aantal kolommen</string>
     <string name="pref__clipboard__suggestion_timeout__label" comment="Preference title; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__summary` and is the first part">Beperk klembordsuggesties tot</string>
     <string name="pref__clipboard__suggestion_timeout__summary" comment="Preference summary; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__label` and is the second part">Items gekopieerd in de laatste {v} s</string>
@@ -1127,10 +1128,16 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__floating_button_disclosure_continue">Instellingen openen</string>
     <string name="dictate__floating_button_mic_title">Microfoontoegang</string>
     <string name="dictate__floating_button_mic_summary">Vereist om je stem op te nemen · tik om toe te staan</string>
-    <string name="dictate__floating_button_show_with_keyboard_title">Tonen bij Dictate-toetsenbord</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_on">De knop verschijnt ook terwijl het Dictate-toetsenbord actief is.</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_off">Verborgen terwijl het Dictate-toetsenbord actief is, omdat dat al een microfoontoets heeft.</string>
+    <string name="dictate__floating_button_show_when_title">Wanneer tonen</string>
+    <string name="dictate__floating_button_show_when_field">Zodra een tekstveld is geselecteerd</string>
+    <string name="dictate__floating_button_show_when_keyboard">Alleen bij geopend toetsenbord</string>
+    <string name="dictate__floating_button_show_when_dictate_keyboard">Ook bij het Dictate-toetsenbord</string>
     <string name="dictate__action_continue_recording">Opname voortzetten</string>
+    <string name="dictate__a11y_mic_hold_local">Transcriberen op apparaat</string>
+    <string name="smartbar__a11y_show_actions">Acties tonen</string>
+    <string name="smartbar__a11y_show_suggestions">Suggesties tonen</string>
+    <string name="smartbar__a11y_show_more_actions">Meer acties tonen</string>
+    <string name="smartbar__a11y_hide_more_actions">Extra acties verbergen</string>
     <string name="dictate__floating_button_auto_dim_summary_off">Blijft altijd volledig zichtbaar.</string>
     <string name="dictate__floating_button_auto_dim_summary_on">Krimpt na enkele seconden tot een klein puntje; tik om te herstellen.</string>
     <string name="dictate__floating_button_auto_dim_title">Vervagen bij inactiviteit</string>
@@ -1395,7 +1402,7 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__providers_field_realtime_model">Realtimemodel</string>
     <string name="dictate__providers_custom_realtime">Realtime streamen</string>
     <string name="dictate__providers_custom_realtime_summary">Deze server spreekt het OpenAI-realtimeprotocol op /v1/realtime</string>
-    <string name="dictate__providers_custom_warm_up">Wekken vóór herformuleren</string>
+    <string name="dictate__providers_custom_warm_up">Vroeg wekken</string>
     <string name="dictate__providers_custom_warm_up_summary">Benadert de server vroeg, zodat een slapende machine kan opstarten</string>
     <string name="dictate__providers_realtime_model_default">Standaard</string>
     <string name="dictate__instant_recording_title">Direct opnemen</string>
@@ -1673,6 +1680,8 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__mappings_wholeword_summary">Alleen losstaande woorden vervangen, niet binnen langere woorden.</string>
     <string name="dictate__mappings_wholeword_title">Alleen heel woord</string>
     <string name="dictate__wear_standalone_summary">Stuur je API-sleutel naar het horloge zodat het zonder telefoon kan dicteren.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Dicteren via horloge</string>
+    <string name="dictate__wear_tether_notif_title">Transcriberen voor je horloge…</string>
     <string name="dictate__wear_standalone_title">Sleutel synchroniseren met horloge</string>
     <string name="emoji__search__hint">Emoji zoeken</string>
     <string name="emoji__row__open_panel">Alle emoji openen</string>

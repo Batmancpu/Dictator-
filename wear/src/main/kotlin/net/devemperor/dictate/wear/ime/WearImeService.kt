@@ -16,7 +16,9 @@ import android.inputmethodservice.InputMethodService
 import android.os.SystemClock
 import android.util.Log
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.content.ContextCompat
@@ -33,6 +35,8 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -72,8 +76,26 @@ class WearImeService :
     // Short, human-readable reason shown on the voice page when a dictation fails, so problems are
     // diagnosable on the wrist without a logcat round-trip.
     private val errorMessage = mutableStateOf<String?>(null)
-    /** Audio of a failed dictation, kept so the user can re-send it instead of losing it (#218). */
-    private var retainedAudio: File? = null
+    /**
+     * Audio of a failed or interrupted dictation, kept so the user can re-send it instead of losing it
+     * (#218). State, because the voice page offers to send it again or throw it away.
+     */
+    private val retainedAudio = mutableStateOf<File?>(null)
+    /** A finished dictation the field did not take (#294), kept to insert again without transcribing. */
+    private val retainedText = mutableStateOf<String?>(null)
+    /** In [WearDictationState.READY]: the text that went in, and the field action the ✓ triggers. */
+    private val readyText = mutableStateOf<String?>(null)
+    private val readyAction = mutableIntStateOf(EditorInfo.IME_ACTION_DONE)
+
+    /** The transcription in flight, so the user can cancel it (#363). */
+    private var transcribeJob: Job? = null
+    /**
+     * Bumped whenever a transcription starts or is abandoned. A callback or result that arrives for an
+     * older one — the phone's "rewording" signal, the text of a cancelled request — is dropped.
+     */
+    private var dictationGeneration = 0
+    /** The generation whose field went away mid-wait: its audio is kept, its text never typed. */
+    private var interruptedGeneration = 0
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private val recorder by lazy { WearAudioRecorder(applicationContext) }
@@ -90,7 +112,17 @@ class WearImeService :
         WearSettingsStore.load(applicationContext)
     }
 
-    override fun onStartInputView(info: android.view.inputmethod.EditorInfo?, restarting: Boolean) {
+    override fun onStartInput(attribute: EditorInfo?, restarting: Boolean) {
+        super.onStartInput(attribute, restarting)
+        // What kind of field this is decides whether Enter sends and whether a dictation may close the
+        // keyboard (#294); logged because "the text never arrived" reports hinge on it.
+        attribute?.let {
+            Log.i(TAG, "field: ${it.packageName} inputType=0x${Integer.toHexString(it.inputType)} " +
+                "imeOptions=0x${Integer.toHexString(it.imeOptions)} restarting=$restarting")
+        }
+    }
+
+    override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         // Opening the keyboard is a good moment to reconcile with the phone: read the latest replicated
         // settings DataItem (accent/provider/key/prompt) and nudge a republish. The cached copy is used
@@ -128,9 +160,43 @@ class WearImeService :
                     dictationState = dictationState.value,
                     recordingInfo = recordingInfo.value,
                     errorMessage = errorMessage.value,
+                    canResend = retainedAudio.value != null || retainedText.value != null,
+                    readyText = readyText.value,
+                    readyAction = readyAction.intValue,
                     peakProvider = { recorder.maxAmplitude() },
                 )
             }
+        }
+    }
+
+    /**
+     * The keyboard is going away while it listens — swiped down, the field left, another app opened. Until
+     * #363 the recording simply ran on, microphone open, until the keyboard was next used. Now it stops, and
+     * like the phone's keyboard does when it is collapsed mid-recording, the audio is kept and offered on
+     * the next open rather than thrown away or typed into whatever field happens to be focused by then.
+     */
+    override fun onFinishInputView(finishingInput: Boolean) {
+        super.onFinishInputView(finishingInput)
+        when (dictationState.value) {
+            WearDictationState.RECORDING -> interruptRecording()
+            // Closed instead of confirmed: the text stays in the field, unsent, as the user chose.
+            WearDictationState.READY -> leaveReady()
+            else -> Unit
+        }
+    }
+
+    /**
+     * The field itself is gone, so a transcription still in flight has nowhere to land. It is called off
+     * (the phone stops paying for it) and its audio kept to send again. A keyboard merely hidden over the
+     * same field keeps transcribing, and the text still lands there.
+     */
+    override fun onFinishInput() {
+        super.onFinishInput()
+        when (dictationState.value) {
+            WearDictationState.TRANSCRIBING, WearDictationState.REWORDING -> interruptTranscription()
+            // A ✓ for a field that is gone would act on whatever field comes next.
+            WearDictationState.READY -> leaveReady()
+            else -> Unit
         }
     }
 
@@ -139,14 +205,17 @@ class WearImeService :
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
         store.clear()
         if (recorder.isRecording) recorder.cancel()
-        discardRetainedAudio()
+        abandonTranscription()
+        discardRetained()
         scope.cancel()
     }
 
     private val actions = WearImeActions(
         commitText = { text -> ic()?.commitText(text, 1) },
         deleteBackward = { ic()?.deleteSurroundingText(1, 0) },
-        performEnter = { ic()?.commitText("\n", 1) },
+        // The field's action if it has one (send, search, …), a line break otherwise — what Enter does on
+        // any keyboard. Committing "\n" never triggered the action, so WhatsApp could not send (#294).
+        performEnter = { sendKeyChar('\n') },
         toggleDictation = { toggleDictation() },
         togglePause = { togglePause() },
         cancelDictation = { cancelDictation() },
@@ -162,10 +231,12 @@ class WearImeService :
     private fun toggleDictation() {
         when (dictationState.value) {
             WearDictationState.RECORDING -> stopAndTranscribe()
-            // Ignore taps while transcription/rewording is in flight.
+            // Ignore taps while transcription/rewording is in flight; the X below cancels it.
             WearDictationState.TRANSCRIBING, WearDictationState.REWORDING -> Unit
-            // A failure with kept audio: the button re-sends that recording rather than discarding it.
-            WearDictationState.ERROR if retainedAudio != null -> retryTranscription()
+            WearDictationState.READY -> finishWith(readyAction.intValue)
+            // A failure with kept text or audio: the button tries that again rather than discarding it.
+            WearDictationState.ERROR if retainedText.value != null -> insertRetainedText()
+            WearDictationState.ERROR if retainedAudio.value != null -> retryTranscription()
             else -> startRecording()
         }
     }
@@ -180,7 +251,9 @@ class WearImeService :
         }
         val result = runCatching { recorder.start() }
         if (result.isSuccess) {
-            discardRetainedAudio() // a new recording supersedes the kept one
+            // A new recording supersedes the kept one, and anything an older dictation still delivers.
+            dictationGeneration++
+            discardRetained()
             errorMessage.value = null
             recordingInfo.value = WearRecordingInfo(startedAtMs = SystemClock.elapsedRealtime())
             dictationState.value = WearDictationState.RECORDING
@@ -204,20 +277,30 @@ class WearImeService :
         }
     }
 
-    /** Discard an in-progress recording without transcribing. */
+    /**
+     * The X: throws away whatever is under way — the recording, the wait for its text (#363), or the
+     * audio kept from a failed one — and goes back to the start. Under a finished dictation (#294) it
+     * closes the keyboard without the action: the text is already in the field and stays there.
+     */
     private fun cancelDictation() {
+        if (dictationState.value == WearDictationState.READY) {
+            leaveReady()
+            requestHideSelf(0)
+            return
+        }
         if (recorder.isRecording) recorder.cancel()
-        discardRetainedAudio()
+        abandonTranscription()
+        discardRetained()
+        errorMessage.value = null
         recordingInfo.value = WearRecordingInfo()
         dictationState.value = WearDictationState.IDLE
     }
 
     private fun stopAndTranscribe() {
         WearHaptics.short(this) // recording stopped (#166)
-        scope.launch {
-            val audio = withContext(Dispatchers.IO) { recorder.stop() }
-            transcribeAudio(audio)
-        }
+        // The stop itself runs to the end even if the transcription is cancelled during it, so the file it
+        // writes is always handed over and deleted, never left behind.
+        transcribe { withContext(NonCancellable + Dispatchers.IO) { recorder.stop() } }
     }
 
     /**
@@ -226,25 +309,81 @@ class WearImeService :
      * of everything the user just said.
      */
     private fun retryTranscription() {
-        val audio = retainedAudio ?: return
-        retainedAudio = null
-        scope.launch { transcribeAudio(audio) }
+        val audio = retainedAudio.value ?: return
+        retainedAudio.value = null
+        transcribe { audio }
     }
 
-    private suspend fun transcribeAudio(audio: File) {
-        // Show the spinner immediately; keep the network call off the main thread so the IME never blocks
-        // long enough to trigger an ANR ("Dictate isn't responding").
+    /**
+     * Into the transcribing state at once — spinner, and the seconds counting from now (#363) — then the
+     * work, off the main thread so the IME never blocks long enough to trigger an ANR.
+     */
+    private fun transcribe(audioSource: suspend () -> File) {
+        val generation = ++dictationGeneration
+        errorMessage.value = null
+        recordingInfo.value = WearRecordingInfo(startedAtMs = SystemClock.elapsedRealtime())
         dictationState.value = WearDictationState.TRANSCRIBING
+        transcribeJob = scope.launch {
+            // The X can reach the recorder before its stop does, and then there is no file to hand over.
+            val audio = runCatching { audioSource() }.getOrElse { e ->
+                Log.w(TAG, "No audio to transcribe", e)
+                if (generation == dictationGeneration) fail(e.shortReason())
+                return@launch
+            }
+            transcribeAudio(audio, generation)
+        }
+    }
+
+    /** Drops the transcription in flight: its job tells the phone to stop, and its text is never typed. */
+    private fun abandonTranscription() {
+        dictationGeneration++
+        transcribeJob?.cancel()
+        transcribeJob = null
+    }
+
+    /** Stops a recording whose keyboard went away, keeping its audio to send later. */
+    private fun interruptRecording() {
+        val generation = ++dictationGeneration
+        fail(getString(R.string.wear_status_interrupted))
+        scope.launch {
+            val audio = runCatching { withContext(NonCancellable + Dispatchers.IO) { recorder.stop() } }.getOrNull()
+            when {
+                // A new dictation, or the X, came in while the recorder was stopping.
+                generation != dictationGeneration -> audio?.delete()
+                audio != null -> retainedAudio.value = audio
+                // Nothing was saved, so there is nothing to offer: back to the start, not a dead "Tap to send".
+                else -> {
+                    errorMessage.value = null
+                    dictationState.value = WearDictationState.IDLE
+                }
+            }
+        }
+    }
+
+    /**
+     * Calls off a transcription whose field went away. The state says so at once; the audio is handed
+     * back by [transcribeAudio] once the job has told the phone to stop.
+     */
+    private fun interruptTranscription() {
+        val job = transcribeJob ?: return
+        transcribeJob = null
+        interruptedGeneration = dictationGeneration
+        fail(getString(R.string.wear_status_interrupted))
+        job.cancel()
+    }
+
+    private suspend fun transcribeAudio(audio: File, generation: Int) {
         run {
             val outcome = runCatching {
                 withContext(Dispatchers.IO) {
                     WearTranscription.transcribe(
                         applicationContext,
                         audio,
-                        // Fired when the watch starts standalone rewording → show "Rewording…". The
-                        // transcript is ready at this point, so buzz "transcription done" (#166).
+                        // Fired when rewording starts, on the watch or on the phone → show "Rewording…".
+                        // The transcript is ready at this point, so buzz "transcription done" (#166).
                         onRewording = {
                             scope.launch {
+                                if (generation != dictationGeneration || generation == interruptedGeneration) return@launch
                                 dictationState.value = WearDictationState.REWORDING
                                 WearHaptics.double(applicationContext)
                             }
@@ -252,13 +391,24 @@ class WearImeService :
                     )
                 }
             }
+            if (generation != dictationGeneration) {
+                // Cancelled with the X, or superseded by a new recording: the dictation is gone.
+                audio.delete()
+                return
+            }
+            if (generation == interruptedGeneration) {
+                // Its field went away mid-wait; the state already says so, and the audio waits for a resend.
+                retainedAudio.value = audio
+                return
+            }
+            transcribeJob = null
             val text = outcome.getOrNull()
             when {
                 outcome.isFailure -> {
                     val e = outcome.exceptionOrNull()
                     Log.e(TAG, "Dictation failed", e)
                     // Keep the audio so the user can re-send it with a tap instead of losing the dictation.
-                    retainedAudio = audio
+                    retainedAudio.value = audio
                     val reason = e?.shortReason() ?: getString(R.string.wear_err_transcribe_failed)
                     fail(getString(R.string.wear_err_tap_to_retry, reason))
                 }
@@ -275,21 +425,72 @@ class WearImeService :
                     } else {
                         WearHaptics.double(applicationContext)
                     }
-                    ic()?.commitText(text, 1)
-                    recordingInfo.value = WearRecordingInfo()
-                    dictationState.value = WearDictationState.IDLE
-                    // Dictation is the primary action — once the text is in, get out of the way so the
-                    // user sees their field again instead of a keyboard stuck open over it.
-                    requestHideSelf(0)
+                    deliver(text)
                 }
             }
         }
     }
 
-    /** Drops any kept failed-dictation audio. */
-    private fun discardRetainedAudio() {
-        retainedAudio?.let { runCatching { it.delete() } }
-        retainedAudio = null
+    /**
+     * Puts a finished dictation into the field and decides how the keyboard leaves it (#294).
+     *
+     * A field without an action to finish with gets the text and the keyboard out of the way, so the user
+     * sees it again. A field that sends, searches or goes cannot be left like that: the watch keyboard
+     * covers it, apps such as WhatsApp offer no send button of their own there, and Samsung Browser's
+     * search field is discarded as soon as the keyboard closes — the dictation used to land and vanish.
+     * So the keyboard either takes the action itself (auto-send) or shows the text with a ✓ for it.
+     */
+    private fun deliver(text: String) {
+        recordingInfo.value = WearRecordingInfo()
+        // commitText answers false (or there is no connection at all) when the field went away meanwhile;
+        // the text is kept to insert again rather than vibrating "done" over nothing.
+        if (ic()?.commitText(text, 1) != true) {
+            Log.w(TAG, "the field did not take the dictation, keeping it")
+            retainedText.value = text
+            fail(getString(R.string.wear_err_not_inserted))
+            return
+        }
+        val action = currentInputEditorInfo?.dictationAction()
+        when {
+            action == null -> {
+                dictationState.value = WearDictationState.IDLE
+                requestHideSelf(0)
+            }
+            isSendingAction(action) && WearKeyboardPrefs.autoSend(this) -> finishWith(action)
+            else -> {
+                readyText.value = text
+                readyAction.intValue = action
+                dictationState.value = WearDictationState.READY
+            }
+        }
+    }
+
+    /** The ✓, or auto-send: the field's own action, as its own keyboard's action key would trigger it. */
+    private fun finishWith(action: Int) {
+        Log.i(TAG, "finishing the field with action $action")
+        ic()?.performEditorAction(action)
+        leaveReady()
+        requestHideSelf(0)
+    }
+
+    private fun leaveReady() {
+        readyText.value = null
+        dictationState.value = WearDictationState.IDLE
+    }
+
+    /** Tries again to put a dictation the field did not take into whatever field is open now. */
+    private fun insertRetainedText() {
+        val text = retainedText.value ?: return
+        retainedText.value = null
+        errorMessage.value = null
+        deliver(text)
+    }
+
+    /** Drops any kept failed-dictation audio or text. */
+    private fun discardRetained() {
+        retainedAudio.value?.let { runCatching { it.delete() } }
+        retainedAudio.value = null
+        retainedText.value = null
     }
 
     private fun fail(reason: String) {

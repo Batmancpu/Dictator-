@@ -746,6 +746,7 @@
     <string name="pref__clipboard__trim_on_copy__label" comment="Preference title, keep short">Oříznout při kopírování</string>
     <string name="pref__clipboard__trim_on_copy__summary" comment="Preference summary, keep short (one line)">Odstraní mezery a zalomení řádků na koncích</string>
     <string name="pref__clipboard__suggestion_enabled__summary" comment="Preference summary">Navrhnout obsah dříve zkopírovaný do schránky</string>
+    <string name="pref__clipboard__suggestion_show_extracted__label" comment="Preference title (switch) in the group Clipboard suggestions, keep short (one line): whether the links, email addresses and phone numbers found inside a copied text are also offered as suggestions of their own, next to the whole text">Odkazy, e-maily a čísla</string>
     <string name="pref__clipboard__num_history_grid_columns__label">Počet sloupců mřížky</string>
     <string name="pref__clipboard__suggestion_timeout__label" comment="Preference title; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__summary` and is the first part">Omezit návrhy ze schránky na</string>
     <string name="pref__clipboard__suggestion_timeout__summary" comment="Preference summary; Translators: This should form a sentence together with `pref__clipboard__suggestion_timeout__label` and is the second part">Položky zkopírované v posledních {v} s</string>
@@ -1243,10 +1244,16 @@
     <string name="dictate__floating_button_disclosure_continue">Otevřít nastavení</string>
     <string name="dictate__floating_button_mic_title">Přístup k mikrofonu</string>
     <string name="dictate__floating_button_mic_summary">Vyžadováno k nahrávání hlasu · klepnutím povolíte</string>
-    <string name="dictate__floating_button_show_with_keyboard_title">Zobrazit s klávesnicí Dictate</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_on">Tlačítko se zobrazí i během aktivní klávesnice Dictate.</string>
-    <string name="dictate__floating_button_show_with_keyboard_summary_off">Skryté, když je aktivní klávesnice Dictate, protože ta už má klávesu mikrofonu.</string>
+    <string name="dictate__floating_button_show_when_title">Kdy zobrazit</string>
+    <string name="dictate__floating_button_show_when_field">Jakmile je vybráno textové pole</string>
+    <string name="dictate__floating_button_show_when_keyboard">Jen při otevřené klávesnici</string>
+    <string name="dictate__floating_button_show_when_dictate_keyboard">I s klávesnicí Dictate</string>
     <string name="dictate__action_continue_recording">Pokračovat v nahrávání</string>
+    <string name="dictate__a11y_mic_hold_local">Přepsat v zařízení</string>
+    <string name="smartbar__a11y_show_actions">Zobrazit akce</string>
+    <string name="smartbar__a11y_show_suggestions">Zobrazit návrhy</string>
+    <string name="smartbar__a11y_show_more_actions">Zobrazit další akce</string>
+    <string name="smartbar__a11y_hide_more_actions">Skrýt další akce</string>
     <string name="dictate__floating_button_auto_dim_summary_off">Zůstává vždy plně viditelné.</string>
     <string name="dictate__floating_button_auto_dim_summary_on">Po několika sekundách se zmenší na malou tečku; klepnutím obnovíte.</string>
     <string name="dictate__floating_button_auto_dim_title">Ztlumit při nečinnosti</string>
@@ -1511,7 +1518,7 @@
     <string name="dictate__providers_field_realtime_model">Model v reálném čase</string>
     <string name="dictate__providers_custom_realtime">Streamování v reálném čase</string>
     <string name="dictate__providers_custom_realtime_summary">Tento server používá protokol OpenAI realtime na /v1/realtime</string>
-    <string name="dictate__providers_custom_warm_up">Probudit před přeformulováním</string>
+    <string name="dictate__providers_custom_warm_up">Probudit včas</string>
     <string name="dictate__providers_custom_warm_up_summary">Ozve se serveru včas, aby měl spící stroj čas naběhnout</string>
     <string name="dictate__providers_realtime_model_default">Výchozí</string>
     <string name="dictate__instant_recording_title">Okamžité nahrávání</string>
@@ -1791,6 +1798,8 @@
     <string name="dictate__mappings_wholeword_summary">Nahradit pouze samostatná slova, nikoli shody uvnitř delších slov.</string>
     <string name="dictate__mappings_wholeword_title">Pouze celá slova</string>
     <string name="dictate__wear_standalone_summary">Odešlete svůj API klíč do hodinek, aby mohly diktovat i bez telefonu poblíž.</string>
+    <string name="dictate__wear_tether_notif_channel_name">Diktování z hodinek</string>
+    <string name="dictate__wear_tether_notif_title">Přepisuji pro hodinky…</string>
     <string name="dictate__wear_standalone_title">Synchronizovat klíč do hodinek</string>
     <string name="emoji__search__hint">Hledat emoji</string>
     <string name="emoji__row__open_panel">Otevřít všechna emodži</string>

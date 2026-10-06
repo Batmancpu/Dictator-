@@ -352,8 +352,13 @@ class DictateAccessibilityService : AccessibilityService() {
         )
         // Show the bubble whenever there is somewhere to dictate: either an editable field holds focus, or a
         // soft keyboard is physically out (covers apps whose fields don't report an accessible editable focus).
+        // The keyboard is asked first because it is already known and settles the question without IPC. When
+        // the user wants the button only with a keyboard up (#439), a field alone cannot bring it, so the
+        // app's tree is not fetched to find one — the bubble controller applies the same rule over its flows,
+        // which is what reacts to the setting itself; this one only spares the node fetch.
         val imeShown = isImeWindowShown()
-        val focused = !blocked && (focusedEditableNode() != null || imeShown)
+        val keyboardRequired = prefs.dictate.floatingButtonShowWhen.get().keyboardRequired
+        val focused = !blocked && (imeShown || (!keyboardRequired && focusedEditableNode() != null))
         if (_editableFocused.value != focused) {
             _editableFocused.value = focused
             flogDebug { "editable field focused = $focused" }
@@ -751,14 +756,39 @@ class DictateAccessibilityService : AccessibilityService() {
      * abandoned. `getSurroundingText` asks the app's own editor instead, and arrived with API 33, which
      * is the same floor the write path already has.
      */
-    private fun readBeforeCursor(sentLength: Int): String? {
+    private fun readBeforeCursor(sentLength: Int): String? = readBeforeSelection(sentLength + VERIFY_WINDOW_PAD)
+
+    /** Up to [length] characters in front of the selection, through the input connection; null if unreadable. */
+    private fun readBeforeSelection(length: Int): String? {
         if (!inputConnectionUsable()) return null
         val connection = inputMethod?.currentInputConnection ?: return null
         return runCatching {
-            val window = connection.getSurroundingText(sentLength + VERIFY_WINDOW_PAD, 0, 0) ?: return null
+            val window = connection.getSurroundingText(length, 0, 0) ?: return null
             val text = window.text ?: return null
             val end = window.selectionStart.coerceIn(0, text.length)
             text.subSequence(0, end).toString()
+        }.getOrNull()
+    }
+
+    /**
+     * Up to [length] characters in front of the cursor of the field a dictation would go into, or null when
+     * they cannot be told — what a dictation is spaced against (issue #443).
+     *
+     * Same precedence as the commit itself: the input connection first, because the editor has no notion
+     * of a placeholder and reports the real caret; the node only without one, and only with a caret it
+     * actually reports. A node showing its hint is an empty field, which is a fact. A caret of -1 is not,
+     * and guessing "the end" there would space a dictation against text it may not be next to.
+     */
+    private fun textBeforeCursorOfFocused(length: Int): String? {
+        readBeforeSelection(length)?.let { return it }
+        val node = dictationTarget() ?: return null
+        return runCatching {
+            if (!node.refresh()) return null
+            val text = node.editableText()
+            if (text.isEmpty()) return ""
+            val caret = minOf(node.textSelectionStart, node.textSelectionEnd)
+            if (caret < 0 || caret > text.length) return null
+            text.substring(0, caret).takeLast(length)
         }.getOrNull()
     }
 
@@ -1026,14 +1056,14 @@ class DictateAccessibilityService : AccessibilityService() {
     private var lastPreviewMs = 0L
 
     /** Returns whether the field took the new tail, so callers only advance [previewShown] when it did. */
-    private fun applyPreviewDiff(old: String, new: String): Boolean {
+    private fun applyPreviewDiff(old: String, new: String, verify: Boolean = false): Boolean {
         if (old == new) return true
         val cp = old.commonPrefixWith(new).length
         if (cp < old.length) deleteLastTextFromFocused(old.substring(cp))
         if (cp >= new.length) return true
         // Streaming writes a tail many times a second; a read-back per update would double the IPC and
-        // fight the app's own rendering. The final commit is verified instead.
-        return commitTextIntoFocused(new.substring(cp), verify = false)
+        // fight the app's own rendering. The final commit is verified instead — see the caller.
+        return commitTextIntoFocused(new.substring(cp), verify = verify)
     }
 
     /**
@@ -1061,8 +1091,17 @@ class DictateAccessibilityService : AccessibilityService() {
         lastPreviewMs = now
     }
 
+    /**
+     * The finished realtime transcript, unthrottled and **verified** like a batch insert.
+     *
+     * The comment in [applyPreviewDiff] always promised that the final commit is the verified one, but it
+     * went through that same unverified write. Over the floating button that write is the whole dictation
+     * — the preview is always held back there — so an input connection that swallowed it (seen in AOSP
+     * Messaging, issue #443's investigation) ended in a green check over an unchanged field, while a batch
+     * dictation into the same field noticed and recovered through the node.
+     */
     private fun commitPreviewFinalOnFocused(finalText: String): Boolean {
-        val landed = applyPreviewDiff(previewShown, finalText)   // no throttle — final result always lands
+        val landed = applyPreviewDiff(previewShown, finalText, verify = true)
         previewShown = ""
         lastPreviewMs = 0L
         return landed
@@ -1459,6 +1498,9 @@ class DictateAccessibilityService : AccessibilityService() {
 
         /** Selects the whole focused field; false when the service is unavailable. */
         fun selectAll(): Boolean = instance?.selectAllInFocused() ?: false
+
+        /** Text in front of the focused field's cursor; null when it cannot be read or there is no service. */
+        fun textBeforeCursor(length: Int): String? = instance?.textBeforeCursorOfFocused(length)
 
         /** Presses Enter / the editor action on the focused field; false when unavailable. */
         fun performEnter(): Boolean = instance?.performEnterOnFocused() ?: false
