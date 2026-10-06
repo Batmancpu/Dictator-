@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+ reads these rules and ignores backup_rules.xml (#383). Until now it was pointed at
+  backup_rules.xml itself, whose <full-backup-content> root is the wrong format here.
+
+  The intent is the same as there: the settings (API keys included, a decision stated in the privacy
+  policy), the keyboard's own files and the user dictionary. Never the dictation history, its audio or
+  the clipboard, which are left out by not being listed.
+
+  The cloud backup only runs when it is end-to-end encrypted with the screen lock, which is what the
+  privacy policy says of it.
+-->
+<data-extraction-rules>
+    <cloud-backup disableIfNoEncryptionCapabilities="true">
+        <include domain="root" path="jetpref_datastore" />
+        <include domain="file" path="ime" />
+        <include domain="database" path="floris_user_dictionary" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="root" path="jetpref_datastore" />
+        <include domain="file" path="ime" />
+        <include domain="database" path="floris_user_dictionary" />
+    </device-transfer>
+</data-extraction-rules>
