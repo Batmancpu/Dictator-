@@ -124,6 +124,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">Ласкаво просимо до {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name} не ввімкнено в системі, тому він не буде доступним як метод вводу в меню вибору методу вводу. Натисніть сюди, щоб виправити це.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name} не вибрано як стандартний метод вводу. Натисніть сюди, щоб виправити це.</string>
+    <string name="dictate__settings_unreadable_card">Не вдалося прочитати ваші налаштування, тому Dictate запустився зі стандартними значеннями. Торкніться тут, щоб повернути їх.</string>
+    <string name="dictate__settings_unreadable_title">Відновити?</string>
+    <string name="dictate__settings_unreadable_message">Під час запуску Dictate не зміг прочитати свій файл налаштувань. Він зберіг файл недоторканим і запустився зі стандартними значеннями. «Відновити» повертає ваших постачальників, ключі, промпти й налаштування такими, якими вони були. «Видалити» стирає старий файл.</string>
+    <string name="dictate__settings_restore_failed">Старі налаштування досі не вдається прочитати.</string>
     <string name="settings__search__title" comment="Title of the settings search screen">Пошук у налаштуваннях</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Пошук у налаштуваннях…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">Останні пошуки</string>

@@ -125,6 +125,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">{app_name}へようこそ</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name}がシステムで有効になっていないため、入力方法として使用できません。この問題を解決するには、ここをタップしてください。</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name}は、デフォルトの入力方法として選択されていません。この問題を解決するには、ここをタップしてください。</string>
+    <string name="dictate__settings_unreadable_card">設定を読み込めなかったため、Dictate は初期設定で起動しました。ここをタップすると元に戻せます。</string>
+    <string name="dictate__settings_unreadable_title">設定を復元しますか？</string>
+    <string name="dictate__settings_unreadable_message">起動時に Dictate は設定ファイルを読み込めませんでした。ファイルはそのまま保管し、初期設定で起動しています。「復元」でプロバイダー、キー、プロンプト、設定を元どおりに戻せます。「削除」で古いファイルを削除します。</string>
+    <string name="dictate__settings_restore_failed">古い設定はまだ読み込めません。</string>
     <string name="settings__search__title" comment="Title of the settings search screen">設定を検索</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">設定を検索…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">最近の検索</string>

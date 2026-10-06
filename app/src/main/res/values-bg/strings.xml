@@ -132,6 +132,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">Добре дошли във {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">Клавиатурата {app_name} не е активна в системата и не е достъпна като метод за въвеждане. Докоснете тук, за да промените.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">Клавиатурата {app_name} не е избрана като подразбиран метод за въвеждане. Докоснете, за да направите промяната.</string>
+    <string name="dictate__settings_unreadable_card">Настройките ви не можаха да бъдат прочетени, затова Dictate стартира със стандартните. Докоснете тук, за да ги върнете.</string>
+    <string name="dictate__settings_unreadable_title">Възстановяване?</string>
+    <string name="dictate__settings_unreadable_message">При стартиране Dictate не успя да прочете файла с настройките си. Запази го непокътнат и стартира със стандартните настройки. „Възстановяване“ връща доставчиците, ключовете, подканите и настройките ви такива, каквито бяха. „Изтриване“ премахва стария файл.</string>
+    <string name="dictate__settings_restore_failed">Старите настройки все още не могат да бъдат прочетени.</string>
     <string name="settings__search__title" comment="Title of the settings search screen">Търсене в настройките</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Търсене в настройките…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">Скорошни търсения</string>

@@ -125,6 +125,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">Us donem la benvinguda a {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name} no està habilitat en el sistema i, per tant, no estarà disponible com a mètode d\'entrada en el selector d\'entrada. Feu clic aquí per a resoldre aquest problema.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name} no està seleccionat com a mètode d\'entrada per defecte. Feu clic aquí per a resoldre aquest problema.</string>
+    <string name="dictate__settings_unreadable_card">No s’ha pogut llegir la teva configuració, així que el Dictate ha començat amb els valors per defecte. Toca aquí per recuperar-la.</string>
+    <string name="dictate__settings_unreadable_title">Restaurar ajustos?</string>
+    <string name="dictate__settings_unreadable_message">En iniciar-se, el Dictate no ha pogut llegir el seu fitxer de configuració. L’ha conservat intacte i ha començat amb els valors per defecte. «Restaura» recupera els teus proveïdors, claus, prompts i ajustos tal com eren. «Suprimeix» elimina el fitxer antic.</string>
+    <string name="dictate__settings_restore_failed">La configuració antiga encara no es pot llegir.</string>
     <string name="settings__search__title" comment="Title of the settings search screen">Cerca la configuració</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Cerca la configuració…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">Cerques recents</string>

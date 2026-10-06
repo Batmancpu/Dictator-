@@ -46,7 +46,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -54,6 +59,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.LocalNavController
+import dev.patrickgold.florisboard.app.PreferenceRecovery
 import dev.patrickgold.florisboard.app.Routes
 import dev.patrickgold.florisboard.dictate.data.stats.DictateStats
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
@@ -65,7 +71,10 @@ import androidx.compose.material.icons.filled.AudioFile
 import androidx.compose.material3.IconButton
 import dev.patrickgold.florisboard.dictate.importer.TranscribeShareActivity
 import dev.patrickgold.jetpref.datastore.ui.Preference
+import dev.patrickgold.jetpref.material.ui.JetPrefAlertDialog
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
+import org.florisboard.lib.android.showLongToast
 import org.florisboard.lib.compose.FlorisErrorCard
 import org.florisboard.lib.compose.FlorisIconButton
 import org.florisboard.lib.compose.FlorisWarningCard
@@ -106,6 +115,44 @@ fun HomeScreen() = FlorisScreen {
                 text = stringRes(R.string.settings__home__ime_not_selected),
                 onClick = { InputMethodUtils.showImePicker(context) },
             )
+        }
+
+        // Settings that could not be read at start were kept instead of written over (#383). This is the
+        // way back to them, offered until they are restored or discarded.
+        val settingsUnreadable by PreferenceRecovery.pending.collectAsState()
+        var showRecoveryDialog by remember { mutableStateOf(false) }
+        val recoveryScope = rememberCoroutineScope()
+        if (settingsUnreadable) {
+            FlorisErrorCard(
+                modifier = Modifier.padding(8.dp),
+                showIcon = false,
+                text = stringRes(R.string.dictate__settings_unreadable_card),
+                onClick = { showRecoveryDialog = true },
+            )
+        }
+        if (showRecoveryDialog) {
+            JetPrefAlertDialog(
+                title = stringRes(R.string.dictate__settings_unreadable_title),
+                confirmLabel = stringRes(R.string.action__restore),
+                onConfirm = {
+                    showRecoveryDialog = false
+                    recoveryScope.launch {
+                        PreferenceRecovery.restore(context).onFailure {
+                            context.showLongToast(R.string.dictate__settings_restore_failed)
+                        }
+                    }
+                },
+                // Delete, not Discard: several translations of Discard read the same as Cancel beside it.
+                neutralLabel = stringRes(R.string.action__delete),
+                onNeutral = {
+                    showRecoveryDialog = false
+                    PreferenceRecovery.discard(context)
+                },
+                dismissLabel = stringRes(R.string.action__cancel),
+                onDismiss = { showRecoveryDialog = false },
+            ) {
+                Text(stringRes(R.string.dictate__settings_unreadable_message))
+            }
         }
 
         // Passive dictation-stats summary (issue #142): appears once the user has dictated, taps through

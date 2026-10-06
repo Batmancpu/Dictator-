@@ -127,6 +127,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">Bem-vindo a {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name} não está ativo no sistema, logo não pode ser utilizado como método de introdução no seletor. Toque aqui para resolver esta situação.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name} não está selecionado como método de introdução padrão. Toque aqui para resolver esta situação.</string>
+    <string name="dictate__settings_unreadable_card">Não foi possível ler as suas definições, por isso o Dictate iniciou com os valores predefinidos. Toque aqui para as recuperar.</string>
+    <string name="dictate__settings_unreadable_title">Restaurar?</string>
+    <string name="dictate__settings_unreadable_message">Ao iniciar, o Dictate não conseguiu ler o seu ficheiro de definições. Guardou-o intacto e iniciou com os valores predefinidos. «Restaurar» recupera os seus fornecedores, chaves, prompts e definições tal como estavam. «Eliminar» apaga o ficheiro antigo.</string>
+    <string name="dictate__settings_restore_failed">As definições antigas continuam sem poder ser lidas.</string>
     <string name="settings__search__title" comment="Title of the settings search screen">Pesquisar nas definições</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Pesquisar nas definições…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">Pesquisas recentes</string>

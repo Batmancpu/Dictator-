@@ -132,6 +132,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">欢迎使用{app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name}没有在系统中被启用，因此在输入法选择界面中不会出现。点击这里解决这一问题。</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name}没有被设置为默认输入法。点击这里解决这一问题。</string>
+    <string name="dictate__settings_unreadable_card">无法读取你的设置，因此 Dictate 已使用默认值启动。点按此处即可恢复。</string>
+    <string name="dictate__settings_unreadable_title">恢复设置？</string>
+    <string name="dictate__settings_unreadable_message">Dictate 启动时无法读取其设置文件。它已原样保留该文件，并使用默认值启动。“还原”会将你的服务商、密钥、提示词和设置恢复原样。“删除”会移除旧文件。</string>
+    <string name="dictate__settings_restore_failed">仍然无法读取旧设置。</string>
     <string name="settings__search__title" comment="Title of the settings search screen">搜索设置</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">搜索设置…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">最近搜索</string>

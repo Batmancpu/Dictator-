@@ -132,6 +132,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">Üdvözli a {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">A {app_name} nincs engedélyezve a rendszerben, így nem lesz elérhető beviteli módként a bevitelválasztóban. A probléma megoldásához kattintson ide.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">Nem a {app_name} az alapértelmezett beviteli mód. A probléma megoldásához kattintson ide.</string>
+    <string name="dictate__settings_unreadable_card">A beállításaidat nem sikerült beolvasni, ezért a Dictate az alapértékekkel indult. Koppints ide a visszaállításukhoz.</string>
+    <string name="dictate__settings_unreadable_title">Visszaállítás?</string>
+    <string name="dictate__settings_unreadable_message">Induláskor a Dictate nem tudta beolvasni a beállításfájlját. Érintetlenül megőrizte, és az alapértékekkel indult. A „Helyreállítás” visszahozza a szolgáltatóidat, kulcsaidat, utasításaidat és beállításaidat úgy, ahogy voltak. A „Törlés” eltávolítja a régi fájlt.</string>
+    <string name="dictate__settings_restore_failed">A régi beállításokat továbbra sem lehet beolvasni.</string>
     <string name="settings__search__title" comment="Title of the settings search screen">Keresés a beállításokban</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Keresés a beállításokban…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">Legutóbbi keresések</string>

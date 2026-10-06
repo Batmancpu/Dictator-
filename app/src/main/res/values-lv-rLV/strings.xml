@@ -125,6 +125,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">Laipni lūgts {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name} nav iespējots sistēmas iestatījumos, tādēļ tā nebūs pieejama kā ievades avots atlasītājā. Klikšķināt šeit, lai atrisinātu to.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name} nav atlasīts kā noklusējuma ievades veids. Klikšķināt šeit, lai to novērstu.</string>
+    <string name="dictate__settings_unreadable_card">Jūsu iestatījumus neizdevās nolasīt, tāpēc Dictate sāka darbu ar noklusējuma vērtībām. Pieskarieties šeit, lai tos atgūtu.</string>
+    <string name="dictate__settings_unreadable_title">Atjaunot?</string>
+    <string name="dictate__settings_unreadable_message">Palaišanas laikā Dictate nevarēja nolasīt savu iestatījumu failu. Tas saglabāja failu neskartu un sāka darbu ar noklusējuma vērtībām. “Atjaunot” atgriež jūsu pakalpojumu sniedzējus, atslēgas, uzvednes un iestatījumus tādus, kādi tie bija. “Izdzēst” noņem veco failu.</string>
+    <string name="dictate__settings_restore_failed">Vecos iestatījumus joprojām nevar nolasīt.</string>
     <string name="settings__search__title" comment="Title of the settings search screen">Meklēt iestatījumos</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Meklēt iestatījumos…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">Nesenie meklējumi</string>

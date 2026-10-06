@@ -129,6 +129,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">{app_name} Uygulamasına Hoş Geldiniz</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name} sistemde etkin değil ve bu nedenle giriş yöntemi seçicisinde bir giriş yöntemi olarak kullanılamayacak. Bu sorunu çözmek için buraya tıklayın.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name} varsayılan giriş yöntemi olarak seçilmemiş. Bu sorunu çözmek için buraya tıklayın.</string>
+    <string name="dictate__settings_unreadable_card">Ayarlarınız okunamadı, bu yüzden Dictate varsayılan ayarlarla başladı. Geri getirmek için buraya dokunun.</string>
+    <string name="dictate__settings_unreadable_title">Geri yüklensin mi?</string>
+    <string name="dictate__settings_unreadable_message">Dictate başlarken ayar dosyasını okuyamadı. Dosyayı olduğu gibi sakladı ve varsayılan ayarlarla başladı. “Geri Yükle” sağlayıcılarınızı, anahtarlarınızı, komutlarınızı ve ayarlarınızı eskisi gibi geri getirir. “Sil” eski dosyayı kaldırır.</string>
+    <string name="dictate__settings_restore_failed">Eski ayarlar hâlâ okunamıyor.</string>
     <string name="settings__search__title" comment="Title of the settings search screen">Ayarlarda ara</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Ayarlarda ara…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">Son aramalar</string>

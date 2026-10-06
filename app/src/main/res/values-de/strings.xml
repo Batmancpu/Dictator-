@@ -124,6 +124,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">Willkommen bei {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name} ist in deinem System nicht aktiviert und kann daher nicht als Eingabemethode ausgewählt werden. Hier klicken, um dieses Problem zu lösen.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name} ist nicht als Standard-Eingabemethode ausgewählt. Hier klicken, um dieses Problem zu lösen.</string>
+    <string name="dictate__settings_unreadable_card">Deine Einstellungen ließen sich nicht lesen, deshalb ist Dictate mit den Standardwerten gestartet. Tippe hier, um sie zurückzuholen.</string>
+    <string name="dictate__settings_unreadable_title">Wiederherstellen?</string>
+    <string name="dictate__settings_unreadable_message">Beim Start konnte Dictate seine Einstellungsdatei nicht lesen. Es hat sie unverändert aufbewahrt und mit den Standardwerten begonnen. „Wiederherstellen“ holt deine Anbieter, Schlüssel, Prompts und Einstellungen so zurück, wie sie waren. „Entfernen“ löscht die alte Datei.</string>
+    <string name="dictate__settings_restore_failed">Die alten Einstellungen lassen sich immer noch nicht lesen.</string>
     <string name="settings__search__title" comment="Title of the settings search screen">Einstellungen durchsuchen</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Einstellungen durchsuchen…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">Letzte Suchen</string>
