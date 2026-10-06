@@ -740,7 +740,7 @@ private suspend fun rewordWith(context: Context, promptBody: String, transcript:
         autoFormatting = false,
         languageName = DictateLanguages.englishNameFor(prefs.dictate.activeInputLanguage.get()),
         systemPrompt = null,
-        autoApplyPrompts = listOf(DictateRewording.Prompt(promptBody, requiresSelection = true)),
+        autoApplyPrompts = listOf(DictateRewording.Prompt(promptBody)),
     )
 }
 

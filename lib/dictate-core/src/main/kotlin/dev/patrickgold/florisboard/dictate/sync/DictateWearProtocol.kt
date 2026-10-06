@@ -223,5 +223,9 @@ data class DictateSyncedSettings(
 @Serializable
 data class SyncedPrompt(
     val instruction: String,
+    /**
+     * No longer read: every automatic prompt works on the dictation ([DictateRewording]). Still sent, and
+     * true for every automatic prompt that is not a snippet, for watches that read it.
+     */
     val requiresSelection: Boolean = false,
 )

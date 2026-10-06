@@ -2365,8 +2365,13 @@ object DictateController {
         } else {
             // Normal dictation: auto-formatting + auto-apply prompts, then the prompts the user queued by
             // tapping the prompt row while recording, in tap order; then commit. [alreadyFormatted] skips
-            // the rewording pass (single-call multimodal #130 already returns finished text).
-            val processed = if (alreadyFormatted) text else postProcessTranscript(appContext, text)
+            // the rewording pass (single-call multimodal #130 already returns finished text) except for
+            // the automatic snippets, which the single call leaves out.
+            val processed = if (alreadyFormatted) {
+                appendAutoApplySnippets(appContext, text)
+            } else {
+                postProcessTranscript(appContext, text)
+            }
             applyPendingPrompts(appContext, processed)
         }
         // Paragraph splitting (issue #225): break a long *pure* transcript into paragraphs at sentence
@@ -4414,25 +4419,47 @@ object DictateController {
             }
         }
 
-        // 2) Auto-apply prompts, in POS order; each operates on the running text if it needs input.
+        // 2) Auto-apply prompts, in POS order, each on the running text whatever its stored "requires
+        // selection" says (see promptRequiresSelection). A snippet is no instruction: it is appended, as one
+        // tapped while recording is, with the space two dictations get between them, and the next prompt
+        // sees it as part of the text.
         val autoApply = withContext(Dispatchers.IO) {
             promptsDb(context).getAll().filter { it.autoApply }
         }
         for (p in autoApply) {
             val instruction = p.prompt.orEmpty()
             if (instruction.isBlank()) continue
+            val snippet = p.snippetBody()
+            if (snippet != null) {
+                text += context.transcriptSeparatorBefore(text, snippet) + snippet
+                continue
+            }
             _state.value = UiState.Rewording(p.name ?: context.getString(R.string.dictate__status_rewording))
             text = rewordOrKeep(text) {
-                requestReword(instruction, if (p.requiresSelection) text else null, p.reasoningEffort, p.reasoningEffortCustom)
+                requestReword(instruction, text, p.reasoningEffort, p.reasoningEffortCustom)
             }
         }
         return text
     }
 
     /**
+     * The automatic snippets, appended in order to a transcript the single call (#130) already finished.
+     * That call takes the automatic prompts as instructions, and a snippet is none, so it is left out there
+     * ([buildChatAudioInstruction]) and added here — what [postProcessTranscript] does on the two-call path.
+     */
+    private suspend fun appendAutoApplySnippets(context: Context, text: String): String {
+        if (!prefs.dictate.rewordingEnabled.get() || text.isBlank()) return text
+        val snippets = withContext(Dispatchers.IO) {
+            promptsDb(context).getAll().filter { it.autoApply }.mapNotNull { it.snippetBody() }
+        }
+        return snippets.fold(text) { acc, snippet -> acc + context.transcriptSeparatorBefore(acc, snippet) + snippet }
+    }
+
+    /**
      * Applies the prompts the user queued by tapping the always-on prompt row while recording (ROW
      * layout), in tap order, to the finished [text]. Each step is best-effort (a failing prompt keeps
-     * the text so far). `[snippet]` prompts are appended literally; everything else runs through the
+     * the text so far). `[snippet]` prompts are appended as written, behind a space where two dictations
+     * would get one ([TranscriptJoin.separatorBefore]); everything else runs through the
      * rewording model (operating on the running text when the prompt requires a selection). Clears the
      * queue (so the highlights disappear) regardless of outcome.
      */
@@ -4446,9 +4473,11 @@ object DictateController {
         for (p in queued) {
             val raw = p.prompt.orEmpty()
             if (raw.isBlank()) continue
-            // Snippet shortcut: text wrapped in [...] is appended literally (no network call).
-            if (raw.length >= 2 && raw.startsWith("[") && raw.endsWith("]")) {
-                result += raw.substring(1, raw.length - 1)
+            // Snippet shortcut: text wrapped in [...] is appended literally (no network call), with the
+            // space two dictations get between them.
+            val snippet = p.snippetBody()
+            if (snippet != null) {
+                result += context.transcriptSeparatorBefore(result, snippet) + snippet
                 continue
             }
             _state.value = UiState.Rewording(p.name ?: context.getString(R.string.dictate__status_rewording))
@@ -4513,12 +4542,13 @@ object DictateController {
     /**
      * Whether this dictation is bound to end in a rewording, which is what makes waking the server at the
      * start of the recording worthwhile rather than presumptuous: auto-formatting or an auto-apply prompt
-     * means the chain runs on its own once the transcript lands. Read from the cached prompt list, so this
-     * costs nothing on the recording path.
+     * means the chain runs on its own once the transcript lands. An automatic snippet does not count: it is
+     * appended without a request. Read from the cached prompt list, so this costs nothing on the recording
+     * path.
      */
     private fun rewordingWillFollow(): Boolean =
         prefs.dictate.rewordingEnabled.get() &&
-            (prefs.dictate.autoFormattingEnabled.get() || _prompts.value.any { it.autoApply })
+            (prefs.dictate.autoFormattingEnabled.get() || _prompts.value.any { it.autoApply && it.snippetBody() == null })
 
     private suspend fun requestReword(
         instruction: String,
@@ -4642,8 +4672,10 @@ object DictateController {
             if (prefs.dictate.autoFormattingEnabled.get()) {
                 parts.add(DictatePromptDefaults.AUTO_FORMATTING_PROMPT)
             }
+            // Snippets stay out: they are no instruction, and [appendAutoApplySnippets] adds them to the
+            // finished text afterwards.
             val autoApply = withContext(Dispatchers.IO) {
-                promptsDb(context).getAll().filter { it.autoApply }
+                promptsDb(context).getAll().filter { it.autoApply && it.snippetBody() == null }
             }
             autoApply.forEach { p -> p.prompt?.takeIf { it.isNotBlank() }?.let { parts.add(it) } }
         }

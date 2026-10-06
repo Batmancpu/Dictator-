@@ -111,7 +111,7 @@ object PhoneTranscriber {
         val autoApply = withContext(Dispatchers.IO) {
             PromptsDatabaseHelper.getInstance(context).getAll()
                 .filter { it.autoApply }
-                .mapNotNull { p -> p.prompt?.takeIf { it.isNotBlank() }?.let { DictateRewording.Prompt(it, p.requiresSelection) } }
+                .mapNotNull { p -> p.prompt?.takeIf { it.isNotBlank() }?.let { DictateRewording.Prompt(it) } }
         }
         val languageName = DictateLanguages.englishNameFor(prefs.dictate.activeInputLanguage.get())
         val systemPrompt = when (prefs.dictate.systemPromptSelection.get()) {

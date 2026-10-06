@@ -88,6 +88,7 @@ import dev.patrickgold.florisboard.dictate.DictateReasoningEffort
 import dev.patrickgold.florisboard.dictate.data.prompts.PromptLibraryContribution
 import dev.patrickgold.florisboard.dictate.data.prompts.PromptModel
 import dev.patrickgold.florisboard.dictate.data.prompts.PromptsDatabaseHelper
+import dev.patrickgold.florisboard.dictate.data.prompts.promptRequiresSelection
 import dev.patrickgold.florisboard.dictate.data.prompts.snippetBodyOf
 import dev.patrickgold.florisboard.dictate.snippet.SnippetTriggers
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
@@ -620,8 +621,10 @@ private fun PromptEditorDialog(
 
     // "Requires selection" has no meaning for a snippet: it is written verbatim, the selection is never
     // read. Clear it the moment the brackets appear rather than saving a flag that quietly does nothing.
-    LaunchedEffect(isSnippet) {
-        if (isSnippet) requiresSelection = false
+    // An automatic prompt is the opposite case: it always works on the dictation, so the switch is set
+    // and locked while "Apply automatically" is on (see [promptRequiresSelection]).
+    LaunchedEffect(isSnippet, autoApply) {
+        requiresSelection = promptRequiresSelection(text.trim(), requiresSelection, autoApply)
     }
 
     JetPrefAlertDialog(
@@ -728,8 +731,9 @@ private fun PromptEditorDialog(
                 onCheckedChange = { requiresSelection = it },
                 // A snippet is inserted verbatim and never looks at a selection, so the switch would be
                 // a promise the prompt cannot keep — it is cleared and locked while the brackets are
-                // there, and selectable again the moment they are gone.
-                enabled = !isSnippet,
+                // there, and selectable again the moment they are gone. An automatic prompt keeps it
+                // set and locked, because off it would only ever see its own instruction.
+                enabled = !isSnippet && !autoApply,
             )
             SwitchRow(
                 title = stringRes(R.string.dictate__prompt_auto_apply_title),
