@@ -217,7 +217,10 @@ object DictateController {
 
     /** Why an audio file is being kept for a one-tap re-send (drives the unified resend chip copy/tint). */
     enum class RetainReason {
-        /** A transcription/rewording failed; the kept audio can be retried (in-memory, cache file). */
+        /**
+         * A transcription/rewording failed, or the user stopped one that was still waiting (#437); the kept
+         * audio can be retried (in-memory, cache file).
+         */
         FAILED,
 
         /** The keyboard closed mid-recording; the finalized audio was persisted to survive process death. */
@@ -650,6 +653,26 @@ object DictateController {
      */
     private var inFlightAudio: File? = null
 
+    /**
+     * What a tap on the stop button keeps of the transcription in flight (#437), shaped as the resend chip
+     * wants it: the recording, whether it was a live prompt, its length, and the history row a resend has to
+     * finish, i.e. the entry a replay came from or the row this request wrote when it sent the audio (#358).
+     * The on-device engine's recording counts too. There is nothing to rescue it to, but a stop keeps it.
+     *
+     * Null while nothing would be kept. That is the case for a password or incognito field, which never
+     * keeps anything (#383), and also for the first moment of a request, until it has asked the field.
+     */
+    private var inFlightResend: RetainedAudio? = null
+
+    /**
+     * A transcription that was cancelled but may still be unwinding. Cancelling interrupts a network wait at
+     * once, but not the audio work around it (speed-up, packing, the on-device engine), which runs on to its
+     * end and then deletes its scratch files. Those have fixed names, so the next request waits for it rather
+     * than lose its own copies to that cleanup. A resend tapped right after a stop (#437) is the case this
+     * exists for.
+     */
+    private var unwindingTranscribeJob: Job? = null
+
     /** Recorded seconds of [inFlightAudio], so a rescued dictation still counts for the right length. */
     private var inFlightSeconds = 0L
 
@@ -893,8 +916,9 @@ object DictateController {
         when (_state.value) {
             is UiState.Recording -> stopAndTranscribe(context)
             // Tapping the mic while transcribing or rewording aborts it (the button shows a stop icon,
-            // see the ComputingEvaluator) — e.g. after accidentally sending a prompt (issue #192).
-            is UiState.Transcribing -> cancelTranscription()
+            // see the ComputingEvaluator) — e.g. after accidentally sending a prompt (issue #192). A
+            // transcription keeps its recording for a resend (#437).
+            is UiState.Transcribing -> stopTranscription(context)
             is UiState.Rewording -> cancelRewording()
             else -> {
                 outputTarget = target
@@ -1286,8 +1310,7 @@ object DictateController {
      */
     fun resendRecognition(context: Context): Boolean {
         if (!hasRetainedAudio()) return false
-        outputTarget = OutputTarget.RECOGNITION_SERVICE
-        sendRetainedAudio(context)
+        sendRetainedAudio(context, OutputTarget.RECOGNITION_SERVICE)
         return true
     }
 
@@ -1401,9 +1424,11 @@ object DictateController {
     }
 
     /**
-     * Aborts an in-flight transcription (stop button shown on the mic while transcribing). Cancels the
-     * network coroutine, drops the audio (handled in the job's finally) and returns to idle. No-op
-     * outside the transcribing state, so a tap can never interrupt a rewording request.
+     * Abandons an in-flight transcription and returns to idle, without keeping its recording: for callers
+     * that hand the recording on themselves ([cancelAndTranscribeLocal]) or have nobody left to give it to
+     * ([cancelRecognition]). The stop button is [stopTranscription]. The audio is dropped in the job's
+     * finally, but the history row written when it was sent (#358) stays. No-op outside the transcribing
+     * state, so this can never interrupt a rewording request.
      */
     fun cancelTranscription() {
         if (_state.value !is UiState.Transcribing) return
@@ -1413,10 +1438,71 @@ object DictateController {
             abandonPendingSegments(segmentContext)
             return
         }
-        transcribeJob?.cancel()
-        transcribeJob = null
-        _pendingPrompts.value = emptyList()
+        abandonTranscribeJob()
         _state.value = UiState.Idle
+    }
+
+    /** Cancels the transcription job and forgets what it was carrying. Leaves the state to the caller. */
+    private fun abandonTranscribeJob() {
+        transcribeJob?.cancel()
+        unwindingTranscribeJob = transcribeJob
+        transcribeJob = null
+        // Cleared here, not left to the job's finally: that runs only once the job has unwound, and by then a
+        // request started in the meantime may have set them for itself.
+        inFlightAudio = null
+        inFlightHistoryId = null
+        inFlightResend = null
+        _pendingPrompts.value = emptyList()
+    }
+
+    /**
+     * The stop button while a transcription is in flight (#437). The request is given up, the recording is
+     * not: it stays on a chip that sends it again, the same resend chip a failure gets, and with the same
+     * history row behind it, so a resend finishes that entry instead of adding a second one.
+     *
+     * Stopping used to end in plain idle. The row written when the audio was sent (#358) did survive, but
+     * nothing said so, and with the history off nothing survived at all. A stop looked exactly like a
+     * discard, and someone who stopped a request that hung through a phone call took it for one.
+     *
+     * The recording is not kept when the field is a password or incognito field, which never keeps anything
+     * (#383), or when the resend button is switched off. That switch hides the chip, so with it off a
+     * recording that is in the history gets a notice pointing there, and one that is not is dropped as before.
+     */
+    fun stopTranscription(context: Context) {
+        if (_state.value !is UiState.Transcribing) return
+        if (segmentedActive && realtimeContext != null) {
+            cancelTranscription()
+            return
+        }
+        // Read before the cancel, which clears it.
+        val resend = inFlightResend?.takeIf { it.file.exists() && it.file.length() > 0L }
+        val kept = resend?.takeIf { prefs.dictate.resendButton.get() }
+        // Claimed before the cancel. The job's finally deletes its recording unless the resend chip holds it,
+        // and this is what makes the chip hold it. A rename or a copy would do the same, but a copy of a long
+        // dictation is tens of megabytes on the main thread.
+        if (kept != null) {
+            if (retained?.file != kept.file) discardRetainedAudio()
+            retained = kept
+        }
+        abandonTranscribeJob()
+        // Straight from Transcribing to where the stop ends, never through Idle. An observer that sees
+        // Transcribing → Idle reads a finished dictation: the floating button flashed its green check and then
+        // no longer counted the chip as its own (seen on the emulator). The success buzz listens for the same
+        // transition.
+        val appContext = context.applicationContext
+        _state.value = when {
+            kept != null -> UiState.Error(
+                message = appContext.getString(R.string.dictate__transcription_stopped),
+                action = ErrorAction.RESEND,
+                // The user's own decision, not a failure: themed like "no speech detected", not red.
+                neutral = true,
+            )
+            resend?.historyId != null -> UiState.Error(
+                message = appContext.getString(R.string.dictate__transcription_stopped_in_history),
+                neutral = true,
+            )
+            else -> UiState.Idle
+        }
     }
 
     /**
@@ -1595,8 +1681,8 @@ object DictateController {
      * True while a cloud transcription is in flight that could still be handed to the on-device model
      * (issue #270): the request is waiting on a network we cannot hurry, and its recording is still here.
      *
-     * The stop button's ordinary tap cancels — and cancelling throws the recording away. This is the same
-     * button, held, doing the opposite: keeping the dictation and finishing it here.
+     * The stop button's ordinary tap gives up on the request and keeps the recording for later (#437). This
+     * is the same button, held, finishing the dictation here and now instead.
      */
     fun canCancelToLocalModel(): Boolean =
         _state.value is UiState.Transcribing && inFlightAudio != null
@@ -1803,7 +1889,10 @@ object DictateController {
                 return
             }
             scope.launch {
-                recordFailedHistory(appContext, audioFile, account.providerId, historyProviderName, model, historyLanguage, recordedSeconds, historySource)
+                recordFailedHistory(
+                    appContext, audioFile, account.providerId, historyProviderName, model, historyLanguage,
+                    recordedSeconds, historySource, sensitive = isSensitiveDictationField(appContext),
+                )
                 if (audioFile.exists()) audioFile.delete()
             }
         }
@@ -1838,9 +1927,13 @@ object DictateController {
         // this attempt has no row until it writes one, and a rescue in the meantime must not be handed the
         // last dictation's (#358).
         inFlightHistoryId = adoptHistoryId
+        // Nothing for a stop to keep until the job has asked the field (#437).
+        inFlightResend = null
         // Live prompt is consumed by this transcription only (the next recording is normal again).
         val live = livePromptArmed
         livePromptArmed = false
+        val unwinding = unwindingTranscribeJob
+        unwindingTranscribeJob = null
         val coroutineScheduledNanos = SystemClock.elapsedRealtimeNanos()
         transcribeJob = scope.launch {
             var keepAudio = false
@@ -1848,6 +1941,9 @@ object DictateController {
             // The history row written when the audio went out (#358), waiting to become the finished
             // dictation. Null while there is none: history off, a sensitive field, or a replay.
             var pendingHistoryId: Long? = adoptHistoryId
+            // A password or incognito field (#383), asked once below. True until then, so nothing is kept
+            // for a field nobody has asked about.
+            var sensitiveField = true
             // Which engine a failure belongs to (#354). Starts as the configured one and flips when the
             // offline fallback takes over, so an error can name where it actually happened.
             var ranOnDevice = localEngine
@@ -1866,6 +1962,17 @@ object DictateController {
             var convertedFrom: File? = null
             try {
                 logLatency(latencyTrace, "coroutineStarted", coroutineScheduledNanos)
+                // A request that was stopped may still be unwinding its audio work; see [unwindingTranscribeJob].
+                unwinding?.join()
+                // Asked once, before anything leaves the phone, and by the field the dictation is for. A stop
+                // comes later, often from another app (#437), and the history rows below are decided now too.
+                sensitiveField = isSensitiveDictationField(appContext)
+                if (!sensitiveField) {
+                    inFlightResend = RetainedAudio(
+                        audioFile, RetainReason.FAILED, live, recordedSeconds,
+                        historyId = pendingHistoryId ?: replayHistoryId,
+                    )
+                }
                 reconcileActiveLanguage() // correct a stale active language before it's read for the request
                 // Local Silero VAD pass before spending an upload. Two purposes, both skipped for picked
                 // files / resends (gate=false) and while long-form dictation runs its own segment-cutting:
@@ -1928,10 +2035,12 @@ object DictateController {
                 if (replayHistoryId == null && pendingHistoryId == null) {
                     pendingHistoryId = recordFailedHistory(
                         appContext, audioFile, account.providerId, historyProviderName,
-                        model, historyLanguage, recordedSeconds, historySource,
+                        model, historyLanguage, recordedSeconds, historySource, sensitiveField,
                     )
                 }
                 inFlightHistoryId = pendingHistoryId
+                // A stop from here on hands the resend chip this row, so a resend finishes it.
+                inFlightResend = inFlightResend?.copy(historyId = pendingHistoryId ?: replayHistoryId)
                 // Time compression (issue #272): send the speech faster than it was spoken, at unchanged
                 // pitch, so a provider that bills by duration bills less. Whatever the file was before —
                 // the recording or the trimmed copy — is what gets sped up.
@@ -2118,11 +2227,11 @@ object DictateController {
                 logLatency(latencyTrace, "finalizeCompleted", finalizeStartedNanos)
                 outcome = "success"
             } catch (c: CancellationException) {
-                // User aborted via the stop button: discard quietly (state set by cancelTranscription),
-                // never show an error. The cache file is dropped in the finally block — but the row
+                // Stopped or abandoned: never an error here, the state is the canceller's to set. The row
                 // written when the audio was sent (#358) stays, with its own copy, so giving up on a wait
                 // is no longer the same as giving up on the dictation. That was the whole reason nobody
-                // could use the stop button to escape a hanging request.
+                // could use the stop button to escape a hanging request. The stop button also keeps the
+                // cache file for its resend chip (#437), which is why the finally asks before deleting it.
                 outcome = "cancelled"
                 throw c
             } catch (e: DictateApiException) {
@@ -2136,7 +2245,7 @@ object DictateController {
                 // time (#358) is already saying exactly this — it only ever had to be left alone. Left
                 // ahead of the retain below so the chip is handed the row either of them produced.
                 if (replayHistoryId == null && pendingHistoryId == null) {
-                    pendingHistoryId = recordFailedHistory(appContext, audioFile, account.providerId, historyProviderName, model, historyLanguage, recordedSeconds, historySource)
+                    pendingHistoryId = recordFailedHistory(appContext, audioFile, account.providerId, historyProviderName, model, historyLanguage, recordedSeconds, historySource, sensitiveField)
                 }
                 // Exportable failures (too large / bad format) keep the audio regardless of the resend
                 // pref, so it can be saved instead of lost (issue #144).
@@ -2156,7 +2265,7 @@ object DictateController {
                 val stage = stageOf(_state.value)
                 _pendingPrompts.value = emptyList()
                 if (replayHistoryId == null && pendingHistoryId == null) {
-                    pendingHistoryId = recordFailedHistory(appContext, audioFile, account.providerId, historyProviderName, model, historyLanguage, recordedSeconds, historySource)
+                    pendingHistoryId = recordFailedHistory(appContext, audioFile, account.providerId, historyProviderName, model, historyLanguage, recordedSeconds, historySource, sensitiveField)
                 }
                 keepAudio = retainFailedAudio(
                     audioFile, live, recordedSeconds,
@@ -2170,10 +2279,17 @@ object DictateController {
                 )
             } finally {
                 // The request is over, however it ended: there is nothing left for a held button to rescue,
-                // and no row of this attempt left for a next one to continue (#358).
-                inFlightAudio = null
-                inFlightHistoryId = null
-                if (!keepAudio) audioFile.delete()
+                // no row of this attempt left for a next one to continue (#358), and nothing for a stop to
+                // keep. Only while they are still this request's, though: a cancel clears them itself, and a
+                // request started since then has set them for itself.
+                if (transcribeJob == null || transcribeJob === coroutineContext[Job]) {
+                    inFlightAudio = null
+                    inFlightHistoryId = null
+                    inFlightResend = null
+                }
+                // A recording the resend chip holds is the chip's: a stop handed it over (#437), or this
+                // was a resend of it and it stays offered until a resend succeeds or the user drops it.
+                if (!keepAudio && retained?.file != audioFile) audioFile.delete()
                 // Drop the derived upload copies — trimmed (#232) and/or sped up (#272); the original
                 // audioFile is the one history keeps.
                 if (uploadFile !== audioFile) runCatching { uploadFile.delete() }
@@ -3317,8 +3433,13 @@ object DictateController {
      * prompt) and re-credits the recorded seconds towards the nudges. No-op unless we are idle/showing
      * one of the resend chips and a usable file exists. Interrupted audio is claimed (its persisted
      * marker cleared) up front, so a crash mid-transcription cannot re-offer the same recording.
+     *
+     * [target] is the surface the tap came from: the floating button passes OVERLAY, the voice-input view
+     * RECOGNITION_SERVICE, and the keyboard's chips pass nothing and claim the keyboard (#409). Inheriting
+     * the latch was wrong as soon as the floating button could resend a dictation the keyboard had started
+     * (#437): its text went to the keyboard's editor, which was not on screen.
      */
-    fun sendRetainedAudio(context: Context) {
+    fun sendRetainedAudio(context: Context, target: OutputTarget? = null) {
         if (_state.value !is UiState.Error && _state.value !is UiState.Interrupted &&
             _state.value !is UiState.Idle
         ) return
@@ -3328,6 +3449,7 @@ object DictateController {
             _state.value = UiState.Idle
             return
         }
+        if (target != null) outputTarget = target else claimKeyboardOutput()
         if (r.reason == RetainReason.INTERRUPTED) scope.launch { clearInterruptedAudioPref() }
         livePromptArmed = r.wasLive
         // A user-initiated resend of already-captured audio is sent as-is (no silence gate — issue #93).
@@ -3789,11 +3911,14 @@ object DictateController {
         language: String,
         recordedSeconds: Long,
         source: String,
+        // [isSensitiveDictationField], asked by the caller: the request asks it once for everything it
+        // decides, and for the floating button every ask is a round trip to another app.
+        sensitive: Boolean,
     ): Long? {
         // Gated only on the master history switch: a failed dictation has no text, so its audio is the ONLY
         // recovery path — we keep it even when "keep audio" (which governs successful dictations) is off.
         if (!prefs.dictate.historyEnabled.get()) return null
-        if (isSensitiveDictationField(appContext)) return null
+        if (sensitive) return null
         if (!audioFile.exists() || audioFile.length() == 0L) return null
         return DictateHistoryStore.record(
             context = appContext,

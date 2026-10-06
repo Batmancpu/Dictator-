@@ -1230,6 +1230,8 @@
     <string name="dictate__floating_button_snap_summary_on">Pēc vilkšanas poga pieķeras tuvākajai malai.</string>
     <string name="dictate__floating_button_snap_title">Pieķerties malai</string>
     <string name="dictate__interrupted_recording">Pārtraukts ({time})</string>
+    <string name="dictate__transcription_stopped">Apturēts, ieraksts saglabāts</string>
+    <string name="dictate__transcription_stopped_in_history">Apturēts, ieraksts ir Vēsturē</string>
     <string name="dictate__providers_summary_both">Transkripcija: {transcription} · Pārformulēšana: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Saglabā jūsu pēdējo diktātu, lai peldošā poga to varētu atsaukt un klasiskais izkārtojums — ievietot atkārtoti.</string>
     <string name="dictate__remember_last_dictation_title">Atcerēties pēdējo diktātu</string>

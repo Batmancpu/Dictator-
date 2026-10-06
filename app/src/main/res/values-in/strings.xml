@@ -1240,6 +1240,8 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__floating_button_snap_summary_on">Tombol menempel ke sisi terdekat setelah Anda menyeretnya.</string>
     <string name="dictate__floating_button_snap_title">Tempel ke tepi</string>
     <string name="dictate__interrupted_recording">Terputus ({time})</string>
+    <string name="dictate__transcription_stopped">Dihentikan, rekaman disimpan</string>
+    <string name="dictate__transcription_stopped_in_history">Dihentikan, rekaman ada di Riwayat</string>
     <string name="dictate__providers_summary_both">Transkripsi: {transcription} · Penyusunan ulang: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Menyimpan dikte terakhir Anda agar tombol mengambang dapat membatalkannya dan tata letak klasik dapat menyisipkannya kembali.</string>
     <string name="dictate__remember_last_dictation_title">Ingat dikte terakhir</string>

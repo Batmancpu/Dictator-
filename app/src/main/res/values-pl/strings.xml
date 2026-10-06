@@ -1302,6 +1302,8 @@
     <string name="dictate__floating_button_snap_summary_on">Po przeciągnięciu przycisk przyczepia się do najbliższej krawędzi.</string>
     <string name="dictate__floating_button_snap_title">Przyciągaj do krawędzi</string>
     <string name="dictate__interrupted_recording">Przerwano ({time})</string>
+    <string name="dictate__transcription_stopped">Zatrzymano, nagranie zachowane</string>
+    <string name="dictate__transcription_stopped_in_history">Zatrzymano, nagranie jest w Historii</string>
     <string name="dictate__providers_summary_both">Transkrypcja: {transcription} · Przeredagowanie: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Zachowuje ostatnie dyktowanie, aby pływający przycisk mógł je cofnąć, a klasyczny układ wstawić ponownie.</string>
     <string name="dictate__remember_last_dictation_title">Zapamiętaj ostatnie dyktowanie</string>

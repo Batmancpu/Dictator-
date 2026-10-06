@@ -1163,6 +1163,8 @@
     <string name="dictate__floating_button_snap_summary_on">Le bouton se cale sur le côté le plus proche après l’avoir déplacé.</string>
     <string name="dictate__floating_button_snap_title">Aligner sur le bord</string>
     <string name="dictate__interrupted_recording">Interrompu ({time})</string>
+    <string name="dictate__transcription_stopped">Arrêté, enregistrement conservé</string>
+    <string name="dictate__transcription_stopped_in_history">Arrêté, enregistrement dans l’Historique</string>
     <string name="dictate__providers_summary_both">Transcription : {transcription} · Reformulation : {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Conserve votre dernière dictée pour que le bouton flottant puisse l’annuler et que la disposition classique puisse la réinsérer.</string>
     <string name="dictate__remember_last_dictation_title">Mémoriser la dernière dictée</string>

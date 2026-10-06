@@ -1269,6 +1269,8 @@
     <string name="dictate__action_resend">Erneut versuchen</string>
     <string name="dictate__action_dismiss">Verwerfen</string>
     <string name="dictate__interrupted_recording">Unterbrochen ({time})</string>
+    <string name="dictate__transcription_stopped">Gestoppt, Aufnahme behalten</string>
+    <string name="dictate__transcription_stopped_in_history">Gestoppt, Aufnahme im Verlauf</string>
     <string name="dictate__action_continue_recording">Weiter aufnehmen</string>
     <string name="dictate__a11y_mic_hold_local">Auf dem Gerät transkribieren</string>
     <string name="smartbar__a11y_show_actions">Aktionen anzeigen</string>

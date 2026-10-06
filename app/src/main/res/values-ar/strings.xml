@@ -1143,6 +1143,8 @@
     <string name="dictate__floating_button_snap_summary_on">يلتصق الزر بأقرب جانب بعد سحبه.</string>
     <string name="dictate__floating_button_snap_title">الالتصاق بالحافة</string>
     <string name="dictate__interrupted_recording">تمت المقاطعة ({time})</string>
+    <string name="dictate__transcription_stopped">تم الإيقاف، التسجيل محفوظ</string>
+    <string name="dictate__transcription_stopped_in_history">تم الإيقاف، التسجيل في السجل</string>
     <string name="dictate__providers_summary_both">النسخ: {transcription} · إعادة الصياغة: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">يحتفظ بآخر إملاء لك حتى يتمكن الزر العائم من التراجع عنه والتخطيط الكلاسيكي من إدراجه مجددًا.</string>
     <string name="dictate__remember_last_dictation_title">تذكّر آخر إملاء</string>

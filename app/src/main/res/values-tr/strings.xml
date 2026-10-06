@@ -1264,6 +1264,8 @@
     <string name="dictate__floating_button_snap_summary_on">Sürükledikten sonra düğme en yakın kenara yapışır.</string>
     <string name="dictate__floating_button_snap_title">Kenara yapıştır</string>
     <string name="dictate__interrupted_recording">Kesildi ({time})</string>
+    <string name="dictate__transcription_stopped">Durduruldu, kayıt saklandı</string>
+    <string name="dictate__transcription_stopped_in_history">Durduruldu, kayıt Geçmiş’te</string>
     <string name="dictate__providers_summary_both">Yazıya dökme: {transcription} · Yeniden ifade: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Son diktenizi saklar; böylece yüzen düğme geri alabilir, klasik düzen yeniden ekleyebilir.</string>
     <string name="dictate__remember_last_dictation_title">Son dikteyi hatırla</string>

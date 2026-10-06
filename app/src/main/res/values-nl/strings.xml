@@ -1185,6 +1185,8 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__floating_button_snap_summary_on">De knop klikt na het slepen vast aan de dichtstbijzijnde zijde.</string>
     <string name="dictate__floating_button_snap_title">Aan rand vastklikken</string>
     <string name="dictate__interrupted_recording">Onderbroken ({time})</string>
+    <string name="dictate__transcription_stopped">Gestopt, opname bewaard</string>
+    <string name="dictate__transcription_stopped_in_history">Gestopt, opname staat in Geschiedenis</string>
     <string name="dictate__providers_summary_both">Transcriptie: {transcription} · Herformulering: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Bewaart je laatste dictaat zodat de zwevende knop het ongedaan kan maken en de klassieke lay-out het opnieuw kan invoegen.</string>
     <string name="dictate__remember_last_dictation_title">Laatste dictaat onthouden</string>

@@ -1217,6 +1217,8 @@
     <string name="dictate__floating_button_snap_summary_on">ドラッグ後、ボタンは最も近い端に吸着します。</string>
     <string name="dictate__floating_button_snap_title">端に吸着</string>
     <string name="dictate__interrupted_recording">中断されました ({time})</string>
+    <string name="dictate__transcription_stopped">停止しました。録音は保持済み</string>
+    <string name="dictate__transcription_stopped_in_history">停止しました。録音は履歴にあります</string>
     <string name="dictate__providers_summary_both">文字起こし: {transcription} · 言い換え: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">直前の音声入力を保持し、フローティングボタンで取り消したり、クラシックレイアウトで再挿入したりできるようにします。</string>
     <string name="dictate__remember_last_dictation_title">最後の音声入力を記憶</string>

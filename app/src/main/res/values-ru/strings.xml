@@ -1291,6 +1291,8 @@
     <string name="dictate__floating_button_snap_summary_on">После перетаскивания кнопка прилипает к ближайшему краю.</string>
     <string name="dictate__floating_button_snap_title">Прилипать к краю</string>
     <string name="dictate__interrupted_recording">Прервано ({time})</string>
+    <string name="dictate__transcription_stopped">Остановлено, запись сохранена</string>
+    <string name="dictate__transcription_stopped_in_history">Остановлено, запись в Истории</string>
     <string name="dictate__providers_summary_both">Расшифровка: {transcription} · Переформулирование: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Сохраняет последнюю диктовку, чтобы плавающая кнопка могла её отменить, а классическая раскладка — вставить снова.</string>
     <string name="dictate__remember_last_dictation_title">Запоминать последнюю диктовку</string>

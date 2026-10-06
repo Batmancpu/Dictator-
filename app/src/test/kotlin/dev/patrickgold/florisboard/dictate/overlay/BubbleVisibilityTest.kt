@@ -147,4 +147,38 @@ class BubbleVisibilityTest {
         assertFalse(shown(focused = true, keyboardRequired = true, keyboardShown = true, hiddenByOwnKeyboard = true))
         assertFalse(shown(focused = true, keyboardRequired = true, keyboardShown = true, allowedInApp = false))
     }
+
+    private fun reports(
+        state: DictateController.UiState = failed,
+        previous: DictateController.UiState = transcribing,
+        startedHere: Boolean = false,
+        wasShown: Boolean = true,
+        keyboardShown: Boolean = false,
+    ) = BubbleVisibility.reportsEnd(state, previous, startedHere, wasShown, keyboardShown)
+
+    /**
+     * The case from #437: a dictation started in the keyboard, the user left for another app while it was
+     * sent, and the button showed the spinner. The failure used to end in silence, because only a dictation
+     * the button started itself was reported.
+     */
+    @Test
+    fun `a keyboard dictation left for another app is reported where it was watched`() {
+        assertTrue(reports())
+        assertTrue(reports(previous = rewording))
+        // Before #437 this was the only case.
+        assertTrue(reports(startedHere = true, wasShown = false, keyboardShown = true))
+    }
+
+    @Test
+    fun `a keyboard dictation is not reported twice or where nobody watched`() {
+        // The keyboard is on screen and says it with its own chip.
+        assertFalse(reports(keyboardShown = true))
+        // The button was not on screen while it ran, so there was no spinner to explain.
+        assertFalse(reports(wasShown = false))
+        // An error straight from a recording happens with the keyboard in front of the user.
+        assertFalse(reports(previous = recording))
+        // Only an ending is reported.
+        assertFalse(reports(state = DictateController.UiState.Idle))
+        assertFalse(reports(state = transcribing, previous = recording))
+    }
 }

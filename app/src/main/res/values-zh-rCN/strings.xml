@@ -1280,6 +1280,8 @@
     <string name="dictate__floating_button_snap_summary_on">拖动后按钮会吸附到最近的一侧。</string>
     <string name="dictate__floating_button_snap_title">吸附到边缘</string>
     <string name="dictate__interrupted_recording">已中断（{time}）</string>
+    <string name="dictate__transcription_stopped">已停止，录音已保留</string>
+    <string name="dictate__transcription_stopped_in_history">已停止，录音在历史中</string>
     <string name="dictate__providers_summary_both">转写：{transcription} · 改写：{rewording}</string>
     <string name="dictate__remember_last_dictation_summary">保留你最近一次的听写，以便悬浮按钮可以撤销它、经典布局可以重新插入它。</string>
     <string name="dictate__remember_last_dictation_title">记住上次听写</string>

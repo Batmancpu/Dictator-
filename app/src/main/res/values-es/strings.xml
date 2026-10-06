@@ -1267,6 +1267,8 @@
     <string name="dictate__floating_button_snap_summary_on">El botón se ajusta al lado más cercano al arrastrarlo.</string>
     <string name="dictate__floating_button_snap_title">Ajustar al borde</string>
     <string name="dictate__interrupted_recording">Interrumpido ({time})</string>
+    <string name="dictate__transcription_stopped">Detenido, grabación guardada</string>
+    <string name="dictate__transcription_stopped_in_history">Detenido, grabación en el Historial</string>
     <string name="dictate__providers_summary_both">Transcripción: {transcription} · Reformulación: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Conserva tu último dictado para que el botón flotante pueda deshacerlo y el diseño clásico pueda volver a insertarlo.</string>
     <string name="dictate__remember_last_dictation_title">Recordar último dictado</string>

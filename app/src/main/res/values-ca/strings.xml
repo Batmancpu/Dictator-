@@ -1155,6 +1155,8 @@
     <string name="dictate__floating_button_snap_summary_on">El botó s’ajusta al costat més proper després d’arrossegar-lo.</string>
     <string name="dictate__floating_button_snap_title">Ajusta a la vora</string>
     <string name="dictate__interrupted_recording">Interromput ({time})</string>
+    <string name="dictate__transcription_stopped">Aturat, enregistrament conservat</string>
+    <string name="dictate__transcription_stopped_in_history">Aturat, enregistrament a l’Historial</string>
     <string name="dictate__providers_summary_both">Transcripció: {transcription} · Reformulació: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Conserva l\'últim dictat perquè el botó flotant el pugui desfer i la disposició clàssica el pugui tornar a inserir.</string>
     <string name="dictate__remember_last_dictation_title">Recorda l’últim dictat</string>

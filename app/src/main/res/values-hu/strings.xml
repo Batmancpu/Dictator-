@@ -1284,6 +1284,8 @@
     <string name="dictate__floating_button_snap_summary_on">Húzás után a gomb a legközelebbi oldalhoz illeszkedik.</string>
     <string name="dictate__floating_button_snap_title">Illesztés a szélhez</string>
     <string name="dictate__interrupted_recording">Megszakítva ({time})</string>
+    <string name="dictate__transcription_stopped">Leállítva, felvétel megőrizve</string>
+    <string name="dictate__transcription_stopped_in_history">Leállítva, felvétel az Előzményekben</string>
     <string name="dictate__providers_summary_both">Átírás: {transcription} · Átfogalmazás: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Megőrzi az utolsó diktálást, hogy a lebegő gomb visszavonhassa, a klasszikus elrendezés pedig újra beszúrhassa.</string>
     <string name="dictate__remember_last_dictation_title">Utolsó diktálás megjegyzése</string>

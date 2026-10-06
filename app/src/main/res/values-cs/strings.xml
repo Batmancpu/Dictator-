@@ -1301,6 +1301,8 @@
     <string name="dictate__floating_button_snap_summary_on">Tlačítko se po přetažení přichytí k nejbližší straně.</string>
     <string name="dictate__floating_button_snap_title">Přichytit k okraji</string>
     <string name="dictate__interrupted_recording">Přerušeno ({time})</string>
+    <string name="dictate__transcription_stopped">Zastaveno, nahrávka zachována</string>
+    <string name="dictate__transcription_stopped_in_history">Zastaveno, nahrávka je v Historii</string>
     <string name="dictate__providers_summary_both">Přepis: {transcription} · Přeformulování: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Uchová poslední diktát, aby jej plovoucí tlačítko mohlo vrátit zpět a klasické rozvržení znovu vložit.</string>
     <string name="dictate__remember_last_dictation_title">Zapamatovat poslední diktování</string>
