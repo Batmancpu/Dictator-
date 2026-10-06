@@ -53,8 +53,7 @@ existed: we have no server in your path and no data about you.
   end-to-end encrypted (section 2.6), and your watch, if you use the Wear OS app
   (section 3.5).
 - The App contains **no advertising, no tracking, no telemetry, and no
-  crash-reporting SDKs**. Section 2.8 names the one library that reported usage
-  statistics until version 6.3.0, and that the App now switches off.
+  crash-reporting SDKs**.
 - As a keyboard, the App **does not log your keystrokes or collect what you type**
   in other apps. It only processes audio that you explicitly record by pressing
   the dictation button.
@@ -158,8 +157,7 @@ photo and the text are never uploaded. The translation models are downloaded onc
 when you ask for a language (section 3.4).
 
 Scan text uses Google's ML Kit library, which on its own reports usage statistics
-about the feature to Google. The App switches that reporting off. Versions up to
-and including 6.3.0 did not, and sent those statistics.
+about the feature to Google. The App switches that reporting off.
 
 ---
 
