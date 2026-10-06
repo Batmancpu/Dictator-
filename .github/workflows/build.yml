@@ -51,8 +51,15 @@ jobs:
       - name: Fetch Sherpa ONNX Libraries
         run: ./tools/fetch-sherpa-onnx.sh
 
+      - name: Calculate Update-Safe Version Code
+        run: |
+          BASE_VERSION_CODE=$(grep '^projectVersionCode=' gradle.properties | cut -d= -f2)
+          CI_VERSION_CODE=$((BASE_VERSION_CODE * 100000 + GITHUB_RUN_NUMBER))
+          echo "CI_VERSION_CODE=$CI_VERSION_CODE" >> "$GITHUB_ENV"
+          echo "Building versionCode=$CI_VERSION_CODE from upstream base=$BASE_VERSION_CODE and run=$GITHUB_RUN_NUMBER"
+
       - name: Build APK
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug -PprojectVersionCode="${CI_VERSION_CODE}"
 
       - name: Publish to GitHub Releases
         uses: softprops/action-gh-release@v2
@@ -64,4 +71,3 @@ jobs:
           files: app/build/outputs/apk/debug/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
