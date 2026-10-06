@@ -1387,6 +1387,7 @@
     <string name="dictate__model_default_summary">Výchozí poskytovatele</string>
     <string name="dictate__custom_server_title">Vlastní server</string>
     <string name="dictate__base_url_title">Základní URL</string>
+    <string name="dictate__base_url_cleartext_warning">Nešifrováno: klíč API a vaše nahrávky putují jako prostý text. Ve vlastní síti je to v pořádku, ale v jakékoli jiné Wi-Fi je může přečíst někdo jiný.</string>
     <string name="dictate__base_url_placeholder">https://vas-server/v1/</string>
     <string name="dictate__base_url_required">Vyžadováno pro vlastního poskytovatele</string>
     <string name="dictate__value_not_set">Nenastaveno</string>

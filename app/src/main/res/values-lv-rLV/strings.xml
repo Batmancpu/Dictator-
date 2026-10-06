@@ -1316,6 +1316,7 @@
     <string name="dictate__model_default_summary">Pakalpojuma sniedzēja noklusējums</string>
     <string name="dictate__custom_server_title">Pielāgots serveris</string>
     <string name="dictate__base_url_title">Bāzes URL</string>
+    <string name="dictate__base_url_cleartext_warning">Nešifrēts: API atslēga un jūsu ieraksti tiek sūtīti kā vienkāršs teksts. Savā tīklā tas ir kārtībā, bet jebkurā citā Wi-Fi tīklā tos var nolasīt kāds cits.</string>
     <string name="dictate__base_url_placeholder">https://your-server/v1/</string>
     <string name="dictate__base_url_required">Nepieciešams pielāgotajam pakalpojuma sniedzējam</string>
     <string name="dictate__value_not_set">Nav iestatīts</string>

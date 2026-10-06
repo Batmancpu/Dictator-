@@ -1154,6 +1154,7 @@
     <string name="dictate__model_default_summary">Predefinito del fornitore</string>
     <string name="dictate__custom_server_title">Server personalizzato</string>
     <string name="dictate__base_url_title">URL di base</string>
+    <string name="dictate__base_url_cleartext_warning">Non cifrato: la chiave API e le tue registrazioni viaggiano in chiaro. Sulla tua rete va bene, ma su qualsiasi altra Wi-Fi qualcun altro potrebbe leggerle.</string>
     <string name="dictate__base_url_placeholder">https://il-tuo-server/v1/</string>
     <string name="dictate__base_url_required">Obbligatorio per il fornitore personalizzato</string>
     <string name="dictate__value_not_set">Non impostato</string>

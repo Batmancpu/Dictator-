@@ -1175,6 +1175,7 @@
     <string name="dictate__model_default_summary">Padrão do provedor</string>
     <string name="dictate__custom_server_title">Servidor personalizado</string>
     <string name="dictate__base_url_title">URL base</string>
+    <string name="dictate__base_url_cleartext_warning">Sem criptografia: a chave de API e suas gravações trafegam como texto simples. Tudo bem na sua própria rede, mas em qualquer outro Wi-Fi outra pessoa poderia lê-las.</string>
     <string name="dictate__base_url_placeholder">https://seu-servidor/v1/</string>
     <string name="dictate__base_url_required">Obrigatório para o provedor personalizado</string>
     <string name="dictate__value_not_set">Não configurado</string>

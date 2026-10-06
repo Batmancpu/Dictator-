@@ -1271,6 +1271,7 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__model_default_summary">Standaard van de aanbieder</string>
     <string name="dictate__custom_server_title">Aangepaste server</string>
     <string name="dictate__base_url_title">Basis-URL</string>
+    <string name="dictate__base_url_cleartext_warning">Niet versleuteld: de API-sleutel en je opnames gaan als platte tekst over het netwerk. Prima op je eigen netwerk, maar op elk ander wifi-netwerk kan iemand anders ze lezen.</string>
     <string name="dictate__base_url_placeholder">https://jouw-server/v1/</string>
     <string name="dictate__base_url_required">Vereist voor de aangepaste aanbieder</string>
     <string name="dictate__value_not_set">Niet ingesteld</string>

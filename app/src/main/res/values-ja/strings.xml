@@ -1303,6 +1303,7 @@
     <string name="dictate__model_default_summary">プロバイダーの既定</string>
     <string name="dictate__custom_server_title">カスタムサーバー</string>
     <string name="dictate__base_url_title">ベースURL</string>
+    <string name="dictate__base_url_cleartext_warning">暗号化されていません: API キーと録音は平文で送信されます。自分のネットワーク内なら問題ありませんが、他の Wi-Fi では第三者に読まれるおそれがあります。</string>
     <string name="dictate__base_url_placeholder">https://your-server/v1/</string>
     <string name="dictate__base_url_required">カスタムプロバイダーには必須です</string>
     <string name="dictate__value_not_set">未設定</string>

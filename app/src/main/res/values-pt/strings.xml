@@ -1351,6 +1351,7 @@
     <string name="dictate__model_default_summary">Predefinição do fornecedor</string>
     <string name="dictate__custom_server_title">Servidor personalizado</string>
     <string name="dictate__base_url_title">URL base</string>
+    <string name="dictate__base_url_cleartext_warning">Sem encriptação: a chave de API e as suas gravações circulam como texto simples. Na sua própria rede não há problema, mas em qualquer outra rede Wi-Fi outra pessoa pode lê-las.</string>
     <string name="dictate__base_url_placeholder">https://o-seu-servidor/v1/</string>
     <string name="dictate__base_url_required">Obrigatório para o fornecedor personalizado</string>
     <string name="dictate__value_not_set">Não configurado</string>

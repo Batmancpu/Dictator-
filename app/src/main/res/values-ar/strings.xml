@@ -1229,6 +1229,7 @@
     <string name="dictate__model_default_summary">الافتراضي للمزوّد</string>
     <string name="dictate__custom_server_title">خادم مخصّص</string>
     <string name="dictate__base_url_title">عنوان URL الأساسي</string>
+    <string name="dictate__base_url_cleartext_warning">غير مشفّر: يُرسَل مفتاح API وتسجيلاتك كنص عادي. لا بأس بذلك على شبكتك الخاصة، لكن على أي شبكة Wi-Fi أخرى قد يقرؤها شخص آخر.</string>
     <string name="dictate__base_url_placeholder">https://your-server/v1/</string>
     <string name="dictate__base_url_required">مطلوب للمزوّد المخصّص</string>
     <string name="dictate__value_not_set">غير مضبوط</string>

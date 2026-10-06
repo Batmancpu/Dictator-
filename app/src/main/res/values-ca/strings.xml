@@ -1241,6 +1241,7 @@
     <string name="dictate__model_default_summary">Per defecte del proveïdor</string>
     <string name="dictate__custom_server_title">Servidor personalitzat</string>
     <string name="dictate__base_url_title">URL base</string>
+    <string name="dictate__base_url_cleartext_warning">Sense xifrar: la clau d’API i les teves gravacions viatgen com a text pla. A la teva pròpia xarxa no passa res, però en qualsevol altra wifi algú altre les podria llegir.</string>
     <string name="dictate__base_url_placeholder">https://el-teu-servidor/v1/</string>
     <string name="dictate__base_url_required">Necessari per al proveïdor personalitzat</string>
     <string name="dictate__value_not_set">Sense configurar</string>

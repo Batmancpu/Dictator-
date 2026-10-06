@@ -1326,6 +1326,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__model_default_summary">Bawaan penyedia</string>
     <string name="dictate__custom_server_title">Server kustom</string>
     <string name="dictate__base_url_title">URL dasar</string>
+    <string name="dictate__base_url_cleartext_warning">Tidak dienkripsi: kunci API dan rekaman Anda dikirim sebagai teks biasa. Aman di jaringan Anda sendiri, tetapi di Wi-Fi lain orang lain bisa membacanya.</string>
     <string name="dictate__base_url_placeholder">https://your-server/v1/</string>
     <string name="dictate__base_url_required">Diperlukan untuk penyedia kustom</string>
     <string name="dictate__value_not_set">Belum diatur</string>

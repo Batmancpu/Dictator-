@@ -1353,6 +1353,7 @@
     <string name="dictate__model_default_summary">Predeterminado del proveedor</string>
     <string name="dictate__custom_server_title">Servidor personalizado</string>
     <string name="dictate__base_url_title">URL base</string>
+    <string name="dictate__base_url_cleartext_warning">Sin cifrar: la clave de API y tus grabaciones viajan como texto sin cifrar. En tu propia red no pasa nada, pero en cualquier otra wifi alguien más podría leerlas.</string>
     <string name="dictate__base_url_placeholder">https://tu-servidor/v1/</string>
     <string name="dictate__base_url_required">Obligatorio para el proveedor personalizado</string>
     <string name="dictate__value_not_set">Sin configurar</string>

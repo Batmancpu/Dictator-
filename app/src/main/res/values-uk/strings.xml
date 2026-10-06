@@ -1216,6 +1216,7 @@
     <string name="dictate__model_default_summary">За замовчуванням постачальника</string>
     <string name="dictate__custom_server_title">Власний сервер</string>
     <string name="dictate__base_url_title">Базовий URL</string>
+    <string name="dictate__base_url_cleartext_warning">Без шифрування: ключ API і ваші записи передаються відкритим текстом. У власній мережі це нормально, але в будь-якій іншій мережі Wi-Fi їх може прочитати хтось інший.</string>
     <string name="dictate__base_url_placeholder">https://ваш-сервер/v1/</string>
     <string name="dictate__base_url_required">Обов\'язково для власного постачальника</string>
     <string name="dictate__value_not_set">Не задано</string>

@@ -950,6 +950,18 @@ internal fun ProviderEditorDialog(
             }
             EditorField(
                 label = stringRes(R.string.dictate__api_key_title),
+                // An http:// address is allowed on purpose, for a server on the user's own network (#136).
+                // It sends the key and the recording as plain text, which nothing else on screen says,
+                // and the same address used on someone else's Wi-Fi may answer from someone else's
+                // machine (#383).
+                if (baseUrl.trim().startsWith("http://", ignoreCase = true)) {
+                    Text(
+                        text = stringRes(R.string.dictate__base_url_cleartext_warning),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(top = 4.dp),
+                    )
+                }
                 value = apiKey,
                 onValueChange = { apiKey = it },
                 placeholder = stringRes(R.string.dictate__api_key_placeholder),

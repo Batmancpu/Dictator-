@@ -1370,6 +1370,7 @@
     <string name="dictate__model_default_summary">Szolgáltató alapértelmezett</string>
     <string name="dictate__custom_server_title">Egyéni szerver</string>
     <string name="dictate__base_url_title">Alap-URL</string>
+    <string name="dictate__base_url_cleartext_warning">Titkosítatlan: az API-kulcs és a felvételeid egyszerű szövegként utaznak. A saját hálózatodon ez rendben van, de bármely más Wi-Fi-n valaki más is elolvashatja őket.</string>
     <string name="dictate__base_url_placeholder">https://your-server/v1/</string>
     <string name="dictate__base_url_required">Az egyéni szolgáltatóhoz szükséges</string>
     <string name="dictate__value_not_set">Nincs beállítva</string>

@@ -1366,6 +1366,7 @@
     <string name="dictate__model_default_summary">服务商默认</string>
     <string name="dictate__custom_server_title">自定义服务器</string>
     <string name="dictate__base_url_title">基础 URL</string>
+    <string name="dictate__base_url_cleartext_warning">未加密：API 密钥和你的录音以明文传输。在你自己的网络中没有问题，但在其他任何 Wi-Fi 上都可能被他人读取。</string>
     <string name="dictate__base_url_placeholder">https://your-server/v1/</string>
     <string name="dictate__base_url_required">自定义服务商必填</string>
     <string name="dictate__value_not_set">未设置</string>

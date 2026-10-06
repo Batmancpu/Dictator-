@@ -1388,6 +1388,7 @@
     <string name="dictate__model_default_summary">Domyślny dostawcy</string>
     <string name="dictate__custom_server_title">Serwer niestandardowy</string>
     <string name="dictate__base_url_title">Bazowy adres URL</string>
+    <string name="dictate__base_url_cleartext_warning">Bez szyfrowania: klucz API i Twoje nagrania są przesyłane jako zwykły tekst. W Twojej własnej sieci to w porządku, ale w każdej innej sieci Wi-Fi ktoś inny może je odczytać.</string>
     <string name="dictate__base_url_placeholder">https://twoj-serwer/v1/</string>
     <string name="dictate__base_url_required">Wymagane dla dostawcy niestandardowego</string>
     <string name="dictate__value_not_set">Nie ustawiono</string>

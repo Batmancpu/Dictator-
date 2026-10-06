@@ -1350,6 +1350,7 @@
     <string name="dictate__model_default_summary">Sağlayıcı varsayılanı</string>
     <string name="dictate__custom_server_title">Özel sunucu</string>
     <string name="dictate__base_url_title">Temel URL</string>
+    <string name="dictate__base_url_cleartext_warning">Şifrelenmemiş: API anahtarı ve kayıtlarınız düz metin olarak iletilir. Kendi ağınızda sorun değil, ancak başka herhangi bir Wi-Fi ağında bunları başkası okuyabilir.</string>
     <string name="dictate__base_url_placeholder">https://your-server/v1/</string>
     <string name="dictate__base_url_required">Özel sağlayıcı için gereklidir</string>
     <string name="dictate__value_not_set">Ayarlanmadı</string>

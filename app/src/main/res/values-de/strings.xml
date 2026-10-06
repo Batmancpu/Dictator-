@@ -1298,6 +1298,7 @@
     <string name="dictate__model_default_summary">Anbieter-Standard</string>
     <string name="dictate__custom_server_title">Benutzerdefinierter Server</string>
     <string name="dictate__base_url_title">Basis-URL</string>
+    <string name="dictate__base_url_cleartext_warning">Unverschlüsselt: API-Schlüssel und Aufnahmen gehen als Klartext über das Netz. Im eigenen Netz ist das in Ordnung, in jedem anderen WLAN könnte sie jemand mitlesen.</string>
     <string name="dictate__base_url_placeholder">https://dein-server/v1/</string>
     <string name="dictate__base_url_required">Erforderlich für den benutzerdefinierten Anbieter</string>
     <string name="dictate__value_not_set">Nicht gesetzt</string>

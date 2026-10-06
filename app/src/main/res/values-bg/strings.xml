@@ -1371,6 +1371,7 @@
     <string name="dictate__model_default_summary">По подразбиране на доставчика</string>
     <string name="dictate__custom_server_title">Персонализиран сървър</string>
     <string name="dictate__base_url_title">Базов URL</string>
+    <string name="dictate__base_url_cleartext_warning">Без криптиране: API ключът и записите ви се предават като обикновен текст. В собствената ви мрежа това е наред, но в чужда Wi-Fi мрежа някой друг може да ги прочете.</string>
     <string name="dictate__base_url_placeholder">https://your-server/v1/</string>
     <string name="dictate__base_url_required">Задължителен за персонализирания доставчик</string>
     <string name="dictate__value_not_set">Не е зададено</string>

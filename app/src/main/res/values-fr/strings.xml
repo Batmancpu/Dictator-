@@ -1249,6 +1249,7 @@
     <string name="dictate__model_default_summary">Par défaut du fournisseur</string>
     <string name="dictate__custom_server_title">Serveur personnalisé</string>
     <string name="dictate__base_url_title">URL de base</string>
+    <string name="dictate__base_url_cleartext_warning">Non chiffré : la clé d’API et vos enregistrements circulent en clair. Sans risque sur votre propre réseau, mais sur tout autre Wi-Fi, quelqu’un d’autre pourrait les lire.</string>
     <string name="dictate__base_url_placeholder">https://votre-serveur/v1/</string>
     <string name="dictate__base_url_required">Requis pour le fournisseur personnalisé</string>
     <string name="dictate__value_not_set">Non défini</string>
