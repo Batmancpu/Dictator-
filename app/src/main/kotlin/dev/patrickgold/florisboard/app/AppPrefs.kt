@@ -387,6 +387,9 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
          * think for longer than that before it answers. Uploads are not capped by this: while bytes are
          * moving, every one of them starts the clock again.
          *
+         * It also ends the automatic retries: once a request has been going this long, it fails rather
+         * than starting another attempt, which the resend chip leaves to the user (#438).
+         *
          * The file import ignores anything lower than its own, more generous limits — a screen with a
          * cancel button on it is not the place to give up early.
          */

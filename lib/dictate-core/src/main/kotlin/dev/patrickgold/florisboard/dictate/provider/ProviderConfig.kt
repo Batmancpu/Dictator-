@@ -44,6 +44,9 @@ data class ProviderConfig(
      * audio on a mobile connection, and then a model reading ten minutes of speech. Worse, a timeout
      * counts as retryable, so the same bytes went up four times before the failure appeared.
      *
+     * It is also how long a request goes on being retried: once it has been going for one call's budget,
+     * no further attempt starts (#438).
+     *
      * Null keeps the old behaviour: the call budget is [timeoutSeconds]. Only the file import raises
      * it, and only because it runs on a screen with visible progress and a cancel button.
      */
