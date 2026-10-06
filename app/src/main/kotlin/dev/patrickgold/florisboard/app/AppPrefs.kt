@@ -54,7 +54,6 @@ import dev.patrickgold.florisboard.ime.keyboard.DoubleSpaceAction
 import dev.patrickgold.florisboard.ime.keyboard.IncognitoMode
 import dev.patrickgold.florisboard.ime.keyboard.SpaceBarMode
 import dev.patrickgold.florisboard.ime.landscapeinput.LandscapeInputUiMode
-import dev.patrickgold.florisboard.ime.media.emoji.EmojiHairStyle
 import dev.patrickgold.florisboard.ime.media.emoji.EmojiHistory
 import dev.patrickgold.florisboard.ime.media.emoji.EmojiSkinTone
 import dev.patrickgold.florisboard.ime.media.emoji.EmojiSuggestionType
@@ -915,13 +914,8 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "dictate__legacy_imported",
             default = false,
         )
-        // Guard for the one-time injection of the live-prompt Smartbar action into arrangements that
-        // were saved before the action existed (otherwise upgrading users never see it).
-        val livePromptActionMigrated = boolean(
-            key = "dictate__live_prompt_action_migrated",
-            default = false,
-        )
-        // Same one-time injection for the AI prompt-panel Smartbar action (DICTATE_PROMPTS).
+        // Guard for the one-time injection of the AI prompt-panel Smartbar action (DICTATE_PROMPTS) into
+        // arrangements saved before it existed.
         val promptsActionMigrated = boolean(
             key = "dictate__prompts_action_migrated",
             default = false,
@@ -1105,10 +1099,6 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         val preferredSkinTone = enum(
             key = "emoji__preferred_skin_tone",
             default = EmojiSkinTone.DEFAULT,
-        )
-        val preferredHairStyle = enum(
-            key = "emoji__preferred_hair_style",
-            default = EmojiHairStyle.DEFAULT,
         )
         val historyEnabled = boolean(
             key = "emoji__history_enabled",
