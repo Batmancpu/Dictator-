@@ -5,6 +5,10 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+concurrency:
+  group: dictate-android-build-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
@@ -29,27 +33,28 @@ jobs:
       - name: Configure Persistent Keystore
         run: |
           if [ ! -f "signing.keystore" ]; then
-            keytool -genkey -v -keystore signing.keystore \
-              -storepass android -alias androiddebugkey -keypass android \
-              -keyalg RSA -keysize 2048 -validity 10000 \
-              -dname "CN=Android Debug,O=Android,C=US"
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add -f signing.keystore
-            git commit -m "Add permanent debug keystore [skip ci]"
-            git pull --rebase origin ${{ github.ref_name }} || true
-            git push origin HEAD:${{ github.ref_name }}
+            echo "signing.keystore is missing; refusing to generate a new key because that would break APK updates."
+            exit 1
           fi
           mkdir -p ~/.android
           cp signing.keystore ~/.android/debug.keystore
+
+      - name: Install Android Build Dependencies
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager             "platform-tools"             "platforms;android-36"             "build-tools;36.0.0"             "cmake;4.1.2"             "ndk;29.0.14206865"
 
       - name: Grant Execute Permissions
         run: |
           chmod +x gradlew
           chmod +x tools/fetch-sherpa-onnx.sh
+          chmod +x tools/bergamot/build-android.sh
 
       - name: Fetch Sherpa ONNX Libraries
         run: ./tools/fetch-sherpa-onnx.sh
+
+      - name: Build Bergamot Translation Library
+        run: ./tools/bergamot/build-android.sh arm64-v8a
 
       - name: Calculate Update-Safe Version Code
         run: |
