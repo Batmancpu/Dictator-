@@ -1113,6 +1113,12 @@ class DictateAccessibilityService : AccessibilityService() {
         lastPreviewMs = 0L
     }
 
+    /**
+     * Whether the field a dictation goes into is a password field (#383), so that it stays out of the
+     * history. The node says so itself; a field this service cannot name answers no.
+     */
+    private fun focusedFieldIsPasswordNow(): Boolean = dictationTarget()?.isPassword == true
+
     /** The selected text in the focused editable field, or empty when nothing is selected. */
     private fun selectedTextOfFocused(): String {
         val node = dictationTarget() ?: return ""
@@ -1495,6 +1501,9 @@ class DictateAccessibilityService : AccessibilityService() {
 
         /** The full text of the focused field, or empty when the service is unavailable. */
         fun fullText(): String = instance?.fullTextOfFocused() ?: ""
+
+        /** Whether the focused field is a password field; false when the service is unavailable. */
+        fun focusedFieldIsPassword(): Boolean = instance?.focusedFieldIsPasswordNow() ?: false
 
         /** Selects the whole focused field; false when the service is unavailable. */
         fun selectAll(): Boolean = instance?.selectAllInFocused() ?: false

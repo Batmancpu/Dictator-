@@ -211,7 +211,12 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
         super.handleStartInputView(editorInfo, isRestart)
         val keyboardMode = when (editorInfo.inputAttributes.type) {
             InputAttributes.Type.NUMBER -> {
-                activeState.keyVariation = KeyVariation.NORMAL
+                // A PIN or a card code is a password too (#383). NORMAL here made the dictation history
+                // log it, the one thing in the NUMBER class that reads keyVariation.
+                activeState.keyVariation = when (editorInfo.inputAttributes.variation) {
+                    InputAttributes.Variation.PASSWORD -> KeyVariation.PASSWORD
+                    else -> KeyVariation.NORMAL
+                }
                 KeyboardMode.NUMERIC
             }
             InputAttributes.Type.PHONE -> {

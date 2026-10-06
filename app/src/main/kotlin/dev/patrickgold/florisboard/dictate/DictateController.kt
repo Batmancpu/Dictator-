@@ -1241,16 +1241,27 @@ object DictateController {
      * the normal pipeline but latch [OutputTarget.RECOGNITION_SERVICE], so the finished text is handed back
      * to the calling app through the recognition callback instead of being written into a field. Always
      * plain batch (no realtime/segmented) — see [openRealtimeSession] / [isSegmentedMode].
+     *
+     * [sensitiveField] keeps the dictation out of the history (#383). Only the voice IME can say so, because
+     * it is the one entry point that sees the caller's field.
      */
-    fun startRecognition(context: Context) {
+    fun startRecognition(context: Context, sensitiveField: Boolean = false) {
         // Busy with another dictation → ignore; the service will time out and report an error.
         if (_state.value is UiState.Recording ||
             _state.value is UiState.Transcribing ||
             _state.value is UiState.Rewording
         ) return
         outputTarget = OutputTarget.RECOGNITION_SERVICE
+        recognitionFieldSensitive = sensitiveField
         startRecording(context)
     }
+
+    /**
+     * Whether the field the current voice-input request is for must stay out of the history: set by
+     * [startRecognition], kept for a resend of the same request.
+     */
+    @Volatile
+    private var recognitionFieldSensitive = false
 
     /** Stops the recognition recording and transcribes it; the result flows to the recognition callback. */
     fun stopRecognition(context: Context) {
@@ -2301,7 +2312,7 @@ object DictateController {
             // This branch never went through commitOutput, so it never saw the insert-failure check
             // either (issue #277) — a swallowed write finished as Idle, i.e. a green check.
             if (reportOverlayInsertFailure(appContext, landed, outputText)) {
-                rememberLastDictation(outputText)
+                rememberLastDictation(appContext, outputText)
                 recordHistory(appContext, outputText, originalForHistory, recordedSeconds, capture, reworded = isLive)
                 discardRetainedAudio()
                 return
@@ -2327,7 +2338,7 @@ object DictateController {
             // (Gemini's Compose box, WebViews). Don't flash a false green check — surface an error, and
             // put the text somewhere the user can actually reach.
             if (!committed && outputTarget == OutputTarget.OVERLAY && outputText.isNotEmpty()) {
-                rememberLastDictation(outputText)
+                rememberLastDictation(appContext, outputText)
                 if (capture?.isReplay != true) {
                     DictateStats.recordDictation(prefs, outputText, recordedSeconds)
                     if (recordedSeconds > 0L) creditAudioSeconds(recordedSeconds)
@@ -2344,7 +2355,7 @@ object DictateController {
             }
         }
         // Re-insert safety net (issue #111) + lifetime stats (issue #142) + history log (issue #140).
-        rememberLastDictation(dictated)
+        rememberLastDictation(appContext, dictated)
         lastDictationLead = lead
         if (capture?.isReplay != true) {
             DictateStats.recordDictation(prefs, dictated, recordedSeconds)
@@ -3634,9 +3645,13 @@ object DictateController {
      * can recover it after the field is cleared (rotation, context switch, host app refreshing its
      * state). No-op when the feature is off or the text is blank. Held until the next successful
      * dictation overwrites it; stored to a pref so it survives the IME process being killed.
+     *
+     * Not for a password or incognito field, for the history's reason (#383): the pref is a file on disk,
+     * and it goes into the platform backup with the rest of the settings.
      */
-    private suspend fun rememberLastDictation(text: String) {
+    private suspend fun rememberLastDictation(appContext: Context, text: String) {
         if (!prefs.dictate.rememberLastDictation.get() || text.isBlank()) return
+        if (isSensitiveDictationField(appContext)) return
         prefs.dictate.lastDictation.set(text)
     }
 
@@ -3815,16 +3830,24 @@ object DictateController {
     }
 
     /**
-     * True when the active in-keyboard field is a password field or in incognito mode, so a dictation into
-     * it must not be logged. Only meaningful for the IME target — the floating button injects into
-     * arbitrary apps via accessibility with no reliable field-sensitivity signal, so it is never gated here.
+     * True when the dictation is going into a password field or an incognito one, so it must not be
+     * logged or kept for re-insert.
+     *
+     * Every path is asked, because the privacy policy promises it of every path (#383). Until then only
+     * the keyboard was; the floating button was assumed to have no signal, though the accessibility node
+     * says `isPassword`. The voice IME passes its field's answer in [startRecognition]. An app asking
+     * Android's speech recognition says nothing about what the words are for, so that request is logged.
      */
-    private fun isSensitiveDictationField(context: Context): Boolean {
-        if (outputTarget != OutputTarget.IME) return false
-        return runCatching {
+    private suspend fun isSensitiveDictationField(context: Context): Boolean = when (outputTarget) {
+        OutputTarget.IME -> runCatching {
             val state = context.keyboardManager().value.activeState
             state.isIncognitoMode || state.keyVariation == KeyVariation.PASSWORD
         }.getOrDefault(false)
+        // Off the main thread like every other accessibility round trip (see [writeToSink]).
+        OutputTarget.OVERLAY -> withContext(Dispatchers.IO) {
+            runCatching { DictateAccessibilityService.focusedFieldIsPassword() }.getOrDefault(false)
+        }
+        OutputTarget.RECOGNITION_SERVICE -> recognitionFieldSensitive
     }
 
     /**

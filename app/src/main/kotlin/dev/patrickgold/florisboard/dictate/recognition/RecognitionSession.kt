@@ -40,6 +40,8 @@ import kotlinx.coroutines.launch
 class RecognitionSession(
     private val appContext: Context,
     private val host: Host,
+    /** The caller's field is a password or incognito field: keep the dictation out of the history (#383). */
+    private val sensitiveField: Boolean = false,
 ) {
     /** Receives lifecycle + result callbacks; the service maps these to its `RecognitionService.Callback`,
      *  the activity updates its UI and returns an activity result. Only [onResults]/[onError] are required. */
@@ -61,7 +63,7 @@ class RecognitionSession(
 
     fun start() {
         RecognitionBridge.register(this)
-        DictateController.startRecognition(appContext)
+        DictateController.startRecognition(appContext, sensitiveField)
         watchdog = scope.launch {
             val startedMs = System.currentTimeMillis()
             var speechStarted = false

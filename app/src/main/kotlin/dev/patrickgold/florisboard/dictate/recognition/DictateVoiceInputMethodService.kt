@@ -14,6 +14,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.inputmethodservice.InputMethodService
+import android.text.InputType
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -28,6 +29,7 @@ import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.dictate.DictateController
 import dev.patrickgold.florisboard.dictate.ui.AudioReactiveCloudOrbView
+import dev.patrickgold.florisboard.ime.keyboard.IncognitoMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -169,7 +171,8 @@ class DictateVoiceInputMethodService : InputMethodService() {
         showCapturing(R.string.dictate__voice_input_listening)
         val s = CoroutineScope(Dispatchers.Main + Job())
         scope = s
-        session = RecognitionSession(applicationContext, host).also { it.start() }
+        session = RecognitionSession(applicationContext, host, sensitiveField = keepsOutOfHistory(info))
+            .also { it.start() }
         s.launch { DictateController.audioLevel.collect { orb?.setLevel(it) } }
         s.launch { DictateController.state.collect { updateUi(it) } }
     }
@@ -177,6 +180,31 @@ class DictateVoiceInputMethodService : InputMethodService() {
     override fun onFinishInputView(finishing: Boolean) {
         endSession()
         super.onFinishInputView(finishing)
+    }
+
+    /**
+     * Whether the caller's field is one the keyboard would keep out of the history (#383): a password or
+     * PIN field, or an incognito one by the user's incognito setting. This is the one voice-input path
+     * that sees its field, so it applies the keyboard's rule.
+     */
+    private fun keepsOutOfHistory(info: EditorInfo?): Boolean {
+        if (info == null) return false
+        val variation = info.inputType and InputType.TYPE_MASK_VARIATION
+        val password = when (info.inputType and InputType.TYPE_MASK_CLASS) {
+            InputType.TYPE_CLASS_TEXT -> variation == InputType.TYPE_TEXT_VARIATION_PASSWORD ||
+                variation == InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD ||
+                variation == InputType.TYPE_TEXT_VARIATION_WEB_PASSWORD
+            InputType.TYPE_CLASS_NUMBER -> variation == InputType.TYPE_NUMBER_VARIATION_PASSWORD
+            else -> false
+        }
+        val incognito = when (prefs.suggestion.incognitoMode.get()) {
+            IncognitoMode.FORCE_OFF -> false
+            IncognitoMode.FORCE_ON -> true
+            IncognitoMode.DYNAMIC_ON_OFF ->
+                info.imeOptions and EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING != 0 ||
+                    prefs.suggestion.forceIncognitoModeFromDynamic.get()
+        }
+        return password || incognito
     }
 
     override fun onDestroy() {
