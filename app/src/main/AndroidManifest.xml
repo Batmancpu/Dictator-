@@ -405,6 +405,15 @@
                 tools:node="remove"/>
         </provider>
 
+        <!-- ML Kit's text recognition (Scan text, #390) runs on the phone, but it brings Google's
+             datatransport along, and that sends usage metrics to firebaselogging.googleapis.com
+             (developers.google.com/ml-kit/terms; measured on the emulator: a FIREBASE_ML_SDK event per
+             scan and an upload job). The app promises no telemetry. Without this registry the
+             transport finds no backend and drops the events instead of sending them. -->
+        <service
+            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+            tools:node="remove"/>
+
     </application>
 
 </manifest>
