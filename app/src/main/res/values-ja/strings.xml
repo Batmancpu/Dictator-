@@ -425,6 +425,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">文字レイアウトの上に数字行を表示します</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">ヒント付き数字行モード</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">ヒント付き記号モード</string>
+    <string name="settings__custom_symbols__title">カスタム記号</string>
+    <string name="pref__keyboard__custom_symbols__label">カスタム記号を使用</string>
+    <string name="custom_symbols__edit_key">キーを編集</string>
+    <string name="custom_symbols__key">記号</string>
+    <string name="custom_symbols__currency">言語の通貨</string>
+    <string name="custom_symbols__long_press">長押し時</string>
+    <string name="custom_symbols__add_placeholder">追加（例: ✔ ☑ ✅）</string>
+    <string name="custom_symbols__insert_as">挿入先</string>
+    <string name="custom_symbols__target_key">キー</string>
+    <string name="custom_symbols__target_long_press">長押し</string>
+    <string name="custom_symbols__palette_math">数学</string>
+    <string name="custom_symbols__palette_arrows">矢印</string>
+    <string name="custom_symbols__palette_currencies">通貨</string>
+    <string name="custom_symbols__palette_punctuation">句読点</string>
+    <string name="custom_symbols__palette_shapes">図形</string>
+    <string name="custom_symbols__palette_greek">ギリシャ文字</string>
+    <string name="custom_symbols__palette_scripts">上付き・下付き</string>
+    <string name="custom_symbols__reset_all">すべてのキーをリセット</string>
+    <string name="custom_symbols__reset_all_confirm">すべてのキーをデフォルトに戻しますか？</string>
+    <string name="custom_symbols__import_confirm">記号をこのファイルの内容で置き換えますか？</string>
+    <string name="custom_symbols__import_done">記号をインポートしました</string>
+    <string name="custom_symbols__import_invalid">記号ファイルではありません</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">ユーティリティキーを表示</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">スペースバーの横に設定可能なユーティリティキーを表示</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">ユーティリティキーのアクション</string>

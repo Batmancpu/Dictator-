@@ -57,6 +57,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.toSize
 import dev.patrickgold.florisboard.FlorisImeService
@@ -76,6 +77,9 @@ import dev.patrickgold.florisboard.ime.keyboard.KeyboardMode
 import dev.patrickgold.florisboard.ime.keyboard.SpaceBarMode
 import dev.patrickgold.florisboard.ime.popup.ExceptionsForKeyCodes
 import dev.patrickgold.florisboard.ime.popup.PopupUiController
+import dev.patrickgold.florisboard.ime.popup.LONG_LABEL_MAX_LINES
+import dev.patrickgold.florisboard.ime.popup.LONG_LABEL_ONE_LINE_RATIO
+import dev.patrickgold.florisboard.ime.popup.labelShrinkRatio
 import dev.patrickgold.florisboard.ime.popup.rememberPopupUiController
 import dev.patrickgold.florisboard.ime.text.gestures.GlideTypingGesture
 import dev.patrickgold.florisboard.ime.text.gestures.SwipeAction
@@ -306,7 +310,7 @@ fun TextKeyboardLayout(
                     val numeric = keyboard.mode == KeyboardMode.NUMERIC ||
                         keyboard.mode == KeyboardMode.PHONE || keyboard.mode == KeyboardMode.PHONE2 ||
                         keyboard.mode == KeyboardMode.NUMERIC_ADVANCED && keyType == KeyType.NUMERIC
-                    keyCode > KeyCode.SPACE && keyCode != KeyCode.CJK_SPACE && !numeric
+                    keyCode > KeyCode.SPACE && keyCode != KeyCode.CJK_SPACE && !numeric || key.isOwnMultiTextKey()
                 } else {
                     true
                 }
@@ -314,7 +318,8 @@ fun TextKeyboardLayout(
             isSuitableForExtendedPopup = { key ->
                 if (key is TextKey) {
                     val keyCode = key.computedData.code
-                    keyCode > KeyCode.SPACE && keyCode != KeyCode.CJK_SPACE || ExceptionsForKeyCodes.contains(keyCode)
+                    keyCode > KeyCode.SPACE && keyCode != KeyCode.CJK_SPACE || ExceptionsForKeyCodes.contains(keyCode) ||
+                        key.isOwnMultiTextKey()
                 } else {
                     true
                 }
@@ -391,14 +396,25 @@ private fun TextKeyButton(
                     }
                 }
             }
+            // Only a character key's label: the space bar's language name keeps ellipsizing as before.
+            val shrink = if (key.computedData.type == KeyType.CHARACTER && key.computedData.code != KeyCode.SPACE) {
+                labelShrinkRatio(customLabel)
+            } else {
+                null
+            }
             SnyggText(
                 modifier = Modifier
                     .wrapContentSize()
                     .align(if (isTelPadKey) BiasAlignment(-0.5f, 0f) else Alignment.Center),
+                maxLines = shrink?.let { LONG_LABEL_MAX_LINES },
+                autoSizeMinRatio = shrink,
+                autoSizeOneLineRatio = shrink?.let { LONG_LABEL_ONE_LINE_RATIO },
+                textAlign = shrink?.let { TextAlign.Center },
                 text = customLabel,
             )
         }
         key.hintedLabel?.let { hintedLabel ->
+            val shrink = labelShrinkRatio(hintedLabel)
             SnyggText(
                 elementName = FlorisImeUi.KeyHint.elementName,
                 attributes = attributes,
@@ -406,6 +422,8 @@ private fun TextKeyButton(
                 modifier = Modifier
                     .wrapContentSize()
                     .align(if (isTelPadKey) BiasAlignment(0.5f, 0f) else Alignment.TopEnd),
+                maxLines = shrink?.let { 1 },
+                autoSizeMinRatio = shrink,
                 text = hintedLabel,
             )
         }
@@ -437,6 +455,15 @@ private fun isTouchExplorationEnabled(context: Context): Boolean {
     val am = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as? AccessibilityManager
     return am?.isTouchExplorationEnabled == true
 }
+
+/**
+ * A key of the user's own symbol pages that types more than one code point — `->`, an emoji with its
+ * variation selector, an e-mail address (issue #342). Its code is [KeyCode.MULTIPLE_CODE_POINTS], below
+ * the space bar's, which the popup checks read as "not a character" and so gave it neither the preview
+ * nor its long presses. The built-in layouts' multi-code-point keys keep that behaviour.
+ */
+private fun TextKey.isOwnMultiTextKey(): Boolean =
+    ownPopupsOnly && computedData.code == KeyCode.MULTIPLE_CODE_POINTS
 
 private class TextKeyboardLayoutController(
     context: Context,

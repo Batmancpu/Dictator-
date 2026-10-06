@@ -350,6 +350,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Mostra una fila amb els números a la part superior del teclat</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Números suggerits a les tecles</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Símbols suggerits a les tecles</string>
+    <string name="settings__custom_symbols__title">Símbols personalitzats</string>
+    <string name="pref__keyboard__custom_symbols__label">Fes servir símbols personalitzats</string>
+    <string name="custom_symbols__edit_key">Edita la tecla</string>
+    <string name="custom_symbols__key">Símbol</string>
+    <string name="custom_symbols__currency">Moneda de l’idioma</string>
+    <string name="custom_symbols__long_press">En mantenir premut</string>
+    <string name="custom_symbols__add_placeholder">Afegeix, p. ex. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Insereix com a</string>
+    <string name="custom_symbols__target_key">Tecla</string>
+    <string name="custom_symbols__target_long_press">Mantenir premut</string>
+    <string name="custom_symbols__palette_math">Matemàtiques</string>
+    <string name="custom_symbols__palette_arrows">Fletxes</string>
+    <string name="custom_symbols__palette_currencies">Monedes</string>
+    <string name="custom_symbols__palette_punctuation">Puntuació</string>
+    <string name="custom_symbols__palette_shapes">Formes</string>
+    <string name="custom_symbols__palette_greek">Grec</string>
+    <string name="custom_symbols__palette_scripts">Superíndex i subíndex</string>
+    <string name="custom_symbols__reset_all">Restableix totes les tecles</string>
+    <string name="custom_symbols__reset_all_confirm">Vols restablir totes les tecles al valor per defecte?</string>
+    <string name="custom_symbols__import_confirm">Vols substituir els teus símbols pels d’aquest fitxer?</string>
+    <string name="custom_symbols__import_done">Símbols importats</string>
+    <string name="custom_symbols__import_invalid">Això no és un fitxer de símbols</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Mostra la tecla d\'utilitat</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Mostra una tecla d\'utilitat configurable al costat de la barra d\'espai</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Acció de la tecla d\'utilitat</string>

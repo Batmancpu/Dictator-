@@ -353,6 +353,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Mostra la riga dei numeri nella parte superiore della tastiera</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Barra numerica con suggerimenti</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Simboli suggeriti</string>
+    <string name="settings__custom_symbols__title">Simboli personalizzati</string>
+    <string name="pref__keyboard__custom_symbols__label">Usa simboli personalizzati</string>
+    <string name="custom_symbols__edit_key">Modifica tasto</string>
+    <string name="custom_symbols__key">Simbolo</string>
+    <string name="custom_symbols__currency">Valuta della lingua</string>
+    <string name="custom_symbols__long_press">Tenendo premuto</string>
+    <string name="custom_symbols__add_placeholder">Aggiungi, ad es. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Inserisci come</string>
+    <string name="custom_symbols__target_key">Tasto</string>
+    <string name="custom_symbols__target_long_press">Pressione lunga</string>
+    <string name="custom_symbols__palette_math">Matematica</string>
+    <string name="custom_symbols__palette_arrows">Frecce</string>
+    <string name="custom_symbols__palette_currencies">Valute</string>
+    <string name="custom_symbols__palette_punctuation">Punteggiatura</string>
+    <string name="custom_symbols__palette_shapes">Forme</string>
+    <string name="custom_symbols__palette_greek">Greco</string>
+    <string name="custom_symbols__palette_scripts">Apice e pedice</string>
+    <string name="custom_symbols__reset_all">Ripristina tutti i tasti</string>
+    <string name="custom_symbols__reset_all_confirm">Riportare tutti i tasti al valore predefinito?</string>
+    <string name="custom_symbols__import_confirm">Sostituire i tuoi simboli con quelli di questo file?</string>
+    <string name="custom_symbols__import_done">Simboli importati</string>
+    <string name="custom_symbols__import_invalid">Questo non è un file di simboli</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Mostra tasto funzionalità</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Mostra un tasto funzionalità configurabile vicino alla barra spaziatrice</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Azione del tasto di strumenti</string>

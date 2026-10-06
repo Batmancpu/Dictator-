@@ -335,6 +335,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">إظهار صف الأعداد فوق تخطيط الحروف</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">تلميحات صف الأعداد</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">تلميحات للرموز</string>
+    <string name="settings__custom_symbols__title">رموز مخصصة</string>
+    <string name="pref__keyboard__custom_symbols__label">استخدام رموز مخصصة</string>
+    <string name="custom_symbols__edit_key">تعديل المفتاح</string>
+    <string name="custom_symbols__key">الرمز</string>
+    <string name="custom_symbols__currency">عملة اللغة</string>
+    <string name="custom_symbols__long_press">عند الضغط المطوّل</string>
+    <string name="custom_symbols__add_placeholder">إضافة، مثل ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">إدراج كـ</string>
+    <string name="custom_symbols__target_key">مفتاح</string>
+    <string name="custom_symbols__target_long_press">ضغط مطوّل</string>
+    <string name="custom_symbols__palette_math">رياضيات</string>
+    <string name="custom_symbols__palette_arrows">أسهم</string>
+    <string name="custom_symbols__palette_currencies">عملات</string>
+    <string name="custom_symbols__palette_punctuation">علامات الترقيم</string>
+    <string name="custom_symbols__palette_shapes">أشكال</string>
+    <string name="custom_symbols__palette_greek">يونانية</string>
+    <string name="custom_symbols__palette_scripts">مرتفع ومنخفض</string>
+    <string name="custom_symbols__reset_all">إعادة تعيين كل المفاتيح</string>
+    <string name="custom_symbols__reset_all_confirm">إعادة كل المفاتيح إلى الوضع الافتراضي؟</string>
+    <string name="custom_symbols__import_confirm">استبدال رموزك بالرموز الموجودة في هذا الملف؟</string>
+    <string name="custom_symbols__import_done">تم استيراد الرموز</string>
+    <string name="custom_symbols__import_invalid">هذا ليس ملف رموز</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">عرض مفتاح الادوات</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">عرض مفتاح الأدوات القابل لتخصيص بجوار شريط المسافة</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">وظيفة مفتاح الادوات</string>

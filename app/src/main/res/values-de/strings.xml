@@ -366,6 +366,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Eine Zahlenreihe über dem Tastaturlayout anzeigen</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Angedeutete Zahlenreihe</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Angedeutete Symbole</string>
+    <string name="settings__custom_symbols__title">Eigene Symbole</string>
+    <string name="pref__keyboard__custom_symbols__label">Eigene Symbole verwenden</string>
+    <string name="custom_symbols__edit_key">Taste bearbeiten</string>
+    <string name="custom_symbols__key">Zeichen</string>
+    <string name="custom_symbols__currency">Währung der Sprache</string>
+    <string name="custom_symbols__long_press">Beim Gedrückthalten</string>
+    <string name="custom_symbols__add_placeholder">Hinzufügen, z. B. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Einfügen als</string>
+    <string name="custom_symbols__target_key">Taste</string>
+    <string name="custom_symbols__target_long_press">Gedrückthalten</string>
+    <string name="custom_symbols__palette_math">Mathe</string>
+    <string name="custom_symbols__palette_arrows">Pfeile</string>
+    <string name="custom_symbols__palette_currencies">Währungen</string>
+    <string name="custom_symbols__palette_punctuation">Satzzeichen</string>
+    <string name="custom_symbols__palette_shapes">Formen</string>
+    <string name="custom_symbols__palette_greek">Griechisch</string>
+    <string name="custom_symbols__palette_scripts">Hoch &amp; tief</string>
+    <string name="custom_symbols__reset_all">Alle Tasten zurücksetzen</string>
+    <string name="custom_symbols__reset_all_confirm">Alle Tasten auf ihren Standard zurücksetzen?</string>
+    <string name="custom_symbols__import_confirm">Deine Symbole durch die aus dieser Datei ersetzen?</string>
+    <string name="custom_symbols__import_done">Symbole importiert</string>
+    <string name="custom_symbols__import_invalid">Das ist keine Symbol-Datei</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Utility-Taste anzeigen</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Zeigt eine konfigurierbare Utility-Taste neben der Leertaste an</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Utility-Taste Aktion</string>

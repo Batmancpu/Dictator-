@@ -439,6 +439,28 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Tampilkan baris nomor di atas tata letak karakter</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Petunjuk baris nomor</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Simbol yang diisyaratkan</string>
+    <string name="settings__custom_symbols__title">Simbol khusus</string>
+    <string name="pref__keyboard__custom_symbols__label">Gunakan simbol khusus</string>
+    <string name="custom_symbols__edit_key">Edit tombol</string>
+    <string name="custom_symbols__key">Simbol</string>
+    <string name="custom_symbols__currency">Mata uang bahasa</string>
+    <string name="custom_symbols__long_press">Saat ditekan lama</string>
+    <string name="custom_symbols__add_placeholder">Tambah, mis. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Sisipkan sebagai</string>
+    <string name="custom_symbols__target_key">Tombol</string>
+    <string name="custom_symbols__target_long_press">Tekan lama</string>
+    <string name="custom_symbols__palette_math">Matematika</string>
+    <string name="custom_symbols__palette_arrows">Panah</string>
+    <string name="custom_symbols__palette_currencies">Mata uang</string>
+    <string name="custom_symbols__palette_punctuation">Tanda baca</string>
+    <string name="custom_symbols__palette_shapes">Bentuk</string>
+    <string name="custom_symbols__palette_greek">Yunani</string>
+    <string name="custom_symbols__palette_scripts">Superskrip &amp; subskrip</string>
+    <string name="custom_symbols__reset_all">Atur ulang semua tombol</string>
+    <string name="custom_symbols__reset_all_confirm">Kembalikan semua tombol ke bawaan?</string>
+    <string name="custom_symbols__import_confirm">Ganti simbol Anda dengan yang ada di file ini?</string>
+    <string name="custom_symbols__import_done">Simbol diimpor</string>
+    <string name="custom_symbols__import_invalid">Ini bukan file simbol</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Tampilkan tombol utilitas</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Menampilkan tombol utilitas yang dapat diatur di sebelah batang spasi</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Tindakan tombol utilitas</string>

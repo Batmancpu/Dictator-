@@ -443,6 +443,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Mostrar fila de números en la parte superior del teclado</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Fila de números sugeridos</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Símbolos sugeridos</string>
+    <string name="settings__custom_symbols__title">Símbolos personalizados</string>
+    <string name="pref__keyboard__custom_symbols__label">Usar símbolos personalizados</string>
+    <string name="custom_symbols__edit_key">Editar tecla</string>
+    <string name="custom_symbols__key">Símbolo</string>
+    <string name="custom_symbols__currency">Moneda del idioma</string>
+    <string name="custom_symbols__long_press">Al mantener pulsado</string>
+    <string name="custom_symbols__add_placeholder">Añadir, p. ej. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Insertar como</string>
+    <string name="custom_symbols__target_key">Tecla</string>
+    <string name="custom_symbols__target_long_press">Mantener pulsado</string>
+    <string name="custom_symbols__palette_math">Matemáticas</string>
+    <string name="custom_symbols__palette_arrows">Flechas</string>
+    <string name="custom_symbols__palette_currencies">Monedas</string>
+    <string name="custom_symbols__palette_punctuation">Puntuación</string>
+    <string name="custom_symbols__palette_shapes">Formas</string>
+    <string name="custom_symbols__palette_greek">Griego</string>
+    <string name="custom_symbols__palette_scripts">Superíndice y subíndice</string>
+    <string name="custom_symbols__reset_all">Restablecer todas las teclas</string>
+    <string name="custom_symbols__reset_all_confirm">¿Restablecer todas las teclas a su valor predeterminado?</string>
+    <string name="custom_symbols__import_confirm">¿Reemplazar tus símbolos por los de este archivo?</string>
+    <string name="custom_symbols__import_done">Símbolos importados</string>
+    <string name="custom_symbols__import_invalid">Esto no es un archivo de símbolos</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Mostrar teclas de utilidad</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Muestra una tecla de utilidad configurable junto a la barra espaciadora</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Acción de tecla de utilidad</string>

@@ -453,6 +453,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">在字母布局上方显示数字行</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">提示数字行</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">提示符号</string>
+    <string name="settings__custom_symbols__title">自定义符号</string>
+    <string name="pref__keyboard__custom_symbols__label">使用自定义符号</string>
+    <string name="custom_symbols__edit_key">编辑按键</string>
+    <string name="custom_symbols__key">符号</string>
+    <string name="custom_symbols__currency">语言的货币</string>
+    <string name="custom_symbols__long_press">长按时</string>
+    <string name="custom_symbols__add_placeholder">添加，例如 ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">插入为</string>
+    <string name="custom_symbols__target_key">按键</string>
+    <string name="custom_symbols__target_long_press">长按</string>
+    <string name="custom_symbols__palette_math">数学</string>
+    <string name="custom_symbols__palette_arrows">箭头</string>
+    <string name="custom_symbols__palette_currencies">货币</string>
+    <string name="custom_symbols__palette_punctuation">标点</string>
+    <string name="custom_symbols__palette_shapes">形状</string>
+    <string name="custom_symbols__palette_greek">希腊字母</string>
+    <string name="custom_symbols__palette_scripts">上标和下标</string>
+    <string name="custom_symbols__reset_all">重置所有按键</string>
+    <string name="custom_symbols__reset_all_confirm">将所有按键恢复为默认值？</string>
+    <string name="custom_symbols__import_confirm">用此文件中的符号替换你的符号？</string>
+    <string name="custom_symbols__import_done">符号已导入</string>
+    <string name="custom_symbols__import_invalid">这不是符号文件</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">显示功能键</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">在空格键旁边显示一个可配置的功能键</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">功能键操作</string>

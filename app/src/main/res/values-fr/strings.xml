@@ -379,6 +379,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Afficher une rangée de chiffres au dessus des caractères</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Rangée de chiffres suggérée</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Symbole suggéré</string>
+    <string name="settings__custom_symbols__title">Symboles personnalisés</string>
+    <string name="pref__keyboard__custom_symbols__label">Utiliser des symboles personnalisés</string>
+    <string name="custom_symbols__edit_key">Modifier la touche</string>
+    <string name="custom_symbols__key">Symbole</string>
+    <string name="custom_symbols__currency">Devise de la langue</string>
+    <string name="custom_symbols__long_press">Appui long</string>
+    <string name="custom_symbols__add_placeholder">Ajouter, p. ex. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Insérer comme</string>
+    <string name="custom_symbols__target_key">Touche</string>
+    <string name="custom_symbols__target_long_press">Appui long</string>
+    <string name="custom_symbols__palette_math">Maths</string>
+    <string name="custom_symbols__palette_arrows">Flèches</string>
+    <string name="custom_symbols__palette_currencies">Devises</string>
+    <string name="custom_symbols__palette_punctuation">Ponctuation</string>
+    <string name="custom_symbols__palette_shapes">Formes</string>
+    <string name="custom_symbols__palette_greek">Grec</string>
+    <string name="custom_symbols__palette_scripts">Exposant et indice</string>
+    <string name="custom_symbols__reset_all">Réinitialiser toutes les touches</string>
+    <string name="custom_symbols__reset_all_confirm">Remettre toutes les touches par défaut ?</string>
+    <string name="custom_symbols__import_confirm">Remplacer vos symboles par ceux de ce fichier ?</string>
+    <string name="custom_symbols__import_done">Symboles importés</string>
+    <string name="custom_symbols__import_invalid">Ce n’est pas un fichier de symboles</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Afficher la touche utilitaire</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Affiche une touche utilitaire configurable à côté de la barre d\'espace</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Action de la touche utilitaire</string>

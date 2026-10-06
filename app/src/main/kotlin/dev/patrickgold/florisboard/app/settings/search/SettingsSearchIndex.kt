@@ -294,6 +294,8 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.pref__keyboard__number_row__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__number_row__label"),
         SettingsSearchEntry(R.string.pref__keyboard__hinted_number_row_mode__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__hinted_number_row_mode__label"),
         SettingsSearchEntry(R.string.pref__keyboard__hinted_symbols_mode__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__hinted_symbols_mode__label"),
+        SettingsSearchEntry(R.string.settings__custom_symbols__title, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "settings__custom_symbols__title"),
+        SettingsSearchEntry(R.string.pref__keyboard__custom_symbols__label, R.string.settings__custom_symbols__title, Routes.Settings.CustomSymbols, parentRes = R.string.settings__keyboard__title, anchor = "pref__keyboard__custom_symbols__label"),
         SettingsSearchEntry(R.string.pref__keyboard__utility_key_enabled__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__utility_key_enabled__label"),
         SettingsSearchEntry(R.string.pref__keyboard__utility_key_action__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__utility_key_action__label"),
         SettingsSearchEntry(R.string.pref__keyboard__space_bar_mode__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__space_bar_mode__label"),

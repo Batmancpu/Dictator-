@@ -1501,6 +1501,14 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "keyboard__hinted_symbols_mode",
             default = KeyHintMode.SMART_PRIORITY,
         )
+        /**
+         * Whether both symbol pages are the user's own (issue #342), in every language. What is on them
+         * is not a preference but a file of its own, see [dev.patrickgold.florisboard.dictate.symbols.CustomSymbolsStore].
+         */
+        val customSymbolsEnabled = boolean(
+            key = "keyboard__custom_symbols_enabled",
+            default = false,
+        )
         val utilityKeyEnabled = boolean(
             key = "keyboard__utility_key_enabled",
             default = true,

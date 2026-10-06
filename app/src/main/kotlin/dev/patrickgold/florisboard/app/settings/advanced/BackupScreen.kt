@@ -49,6 +49,7 @@ import dev.patrickgold.florisboard.cacheManager
 import dev.patrickgold.florisboard.clipboardManager
 import dev.patrickgold.florisboard.dictate.data.history.DictateHistoryStore
 import dev.patrickgold.florisboard.dictate.data.prompts.PromptsDatabaseHelper
+import dev.patrickgold.florisboard.dictate.symbols.CustomSymbolsStore
 import dev.patrickgold.florisboard.ime.clipboard.provider.ClipboardFileStorage
 import dev.patrickgold.florisboard.ime.clipboard.provider.ItemType
 import dev.patrickgold.florisboard.lib.cache.CacheManager
@@ -104,6 +105,9 @@ object Backup {
     const val LEARNED_WORDS_JSON_NAME = "learned_words.json"
     const val LEARNED_BIGRAMS_JSON_NAME = "learned_bigrams.json"
     const val DICTIONARY_DIR = "dictionary"
+    // The user's own symbol pages (issue #342). A setting, so it travels with the preferences, but a file of
+    // its own beside them, as on the device; an archive without it is one whose every key was the default.
+    const val CUSTOM_SYMBOLS_JSON_NAME = "custom_symbols.json"
 
     fun defaultFileName(metadata: Metadata): String {
         return "backup_${metadata.packageName}_${metadata.versionCode}_${metadata.timestamp}.zip"
@@ -236,6 +240,12 @@ fun BackupScreen() = FlorisScreen {
                 RedactingWriter(fileBasedStorage)
             }
             FlorisPreferenceStore.export(writer).getOrThrow()
+            CustomSymbolsStore.backupText(context)?.let { text ->
+                workspace.inputDir.subDir("dictate").let { dir ->
+                    dir.mkdirs()
+                    dir.subFile(Backup.CUSTOM_SYMBOLS_JSON_NAME).writeText(text)
+                }
+            }
         }
         if (backupFilesSelector.dictatePrompts) {
             val prompts = PromptsDatabaseHelper.getInstance(context).getAll()

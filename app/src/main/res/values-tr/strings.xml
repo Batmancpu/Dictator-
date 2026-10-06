@@ -444,6 +444,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Karakter düzeninin üzerinde bir sayı satırı göster</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">İpuçlu sayı satırı</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">İpuçlu semboller</string>
+    <string name="settings__custom_symbols__title">Özel semboller</string>
+    <string name="pref__keyboard__custom_symbols__label">Özel sembolleri kullan</string>
+    <string name="custom_symbols__edit_key">Tuşu düzenle</string>
+    <string name="custom_symbols__key">Sembol</string>
+    <string name="custom_symbols__currency">Dilin para birimi</string>
+    <string name="custom_symbols__long_press">Basılı tutunca</string>
+    <string name="custom_symbols__add_placeholder">Ekle, ör. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Şu olarak ekle</string>
+    <string name="custom_symbols__target_key">Tuş</string>
+    <string name="custom_symbols__target_long_press">Basılı tutma</string>
+    <string name="custom_symbols__palette_math">Matematik</string>
+    <string name="custom_symbols__palette_arrows">Oklar</string>
+    <string name="custom_symbols__palette_currencies">Para birimleri</string>
+    <string name="custom_symbols__palette_punctuation">Noktalama</string>
+    <string name="custom_symbols__palette_shapes">Şekiller</string>
+    <string name="custom_symbols__palette_greek">Yunanca</string>
+    <string name="custom_symbols__palette_scripts">Üst ve alt simge</string>
+    <string name="custom_symbols__reset_all">Tüm tuşları sıfırla</string>
+    <string name="custom_symbols__reset_all_confirm">Tüm tuşlar varsayılana döndürülsün mü?</string>
+    <string name="custom_symbols__import_confirm">Sembolleriniz bu dosyadakilerle değiştirilsin mi?</string>
+    <string name="custom_symbols__import_done">Semboller içe aktarıldı</string>
+    <string name="custom_symbols__import_invalid">Bu bir sembol dosyası değil</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Yardımcı tuşu göster</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Ara çubuğunun yanında yapılandırılabilir bir yardımcı tuş gösterir</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Yardımcı tuş eylemi</string>

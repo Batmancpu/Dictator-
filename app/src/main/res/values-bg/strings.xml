@@ -453,6 +453,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Показва се ред с цифрите над първия ред</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Ред с цифрите в подсказка</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Символи в подсказка</string>
+    <string name="settings__custom_symbols__title">Собствени символи</string>
+    <string name="pref__keyboard__custom_symbols__label">Използване на собствени символи</string>
+    <string name="custom_symbols__edit_key">Редактиране на клавиш</string>
+    <string name="custom_symbols__key">Символ</string>
+    <string name="custom_symbols__currency">Валута на езика</string>
+    <string name="custom_symbols__long_press">При задържане</string>
+    <string name="custom_symbols__add_placeholder">Добавяне, напр. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Вмъкване като</string>
+    <string name="custom_symbols__target_key">Клавиш</string>
+    <string name="custom_symbols__target_long_press">Задържане</string>
+    <string name="custom_symbols__palette_math">Математика</string>
+    <string name="custom_symbols__palette_arrows">Стрелки</string>
+    <string name="custom_symbols__palette_currencies">Валути</string>
+    <string name="custom_symbols__palette_punctuation">Пунктуация</string>
+    <string name="custom_symbols__palette_shapes">Фигури</string>
+    <string name="custom_symbols__palette_greek">Гръцки</string>
+    <string name="custom_symbols__palette_scripts">Горен и долен индекс</string>
+    <string name="custom_symbols__reset_all">Нулиране на всички клавиши</string>
+    <string name="custom_symbols__reset_all_confirm">Връщане на всички клавиши по подразбиране?</string>
+    <string name="custom_symbols__import_confirm">Да се заменят ли символите ви с тези от файла?</string>
+    <string name="custom_symbols__import_done">Символите са импортирани</string>
+    <string name="custom_symbols__import_invalid">Това не е файл със символи</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Помощен клавиш</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Показва се помощен бутон до клавиша за интервал</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Действие на помощния клавиш</string>

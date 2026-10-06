@@ -19,6 +19,8 @@ package dev.patrickgold.florisboard.ime.keyboard
 import android.content.Context
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.appContext
+import dev.patrickgold.florisboard.dictate.symbols.CustomSymbolsLayout
+import dev.patrickgold.florisboard.dictate.symbols.CustomSymbolsStore
 import dev.patrickgold.florisboard.extensionManager
 import dev.patrickgold.florisboard.ime.core.Subtype
 import dev.patrickgold.florisboard.ime.popup.PopupMapping
@@ -57,6 +59,14 @@ data class CachedLayout(
     val name: ExtensionComponentName,
     val meta: LayoutArrangementComponent,
     val arrangement: LayoutArrangement,
+)
+
+/** Stands in for the extension's entry when a symbols page is the user's own (issue #342). */
+private val CustomSymbolsMeta = LayoutArrangementComponent(
+    id = "custom_symbols",
+    label = "Custom symbols",
+    authors = listOf(),
+    direction = "ltr",
 )
 
 private data class CachedPopupMapping(
@@ -170,6 +180,7 @@ class LayoutManager(context: Context) {
      * @param main The main layout type and name.
      * @param modifier The modifier (mod) layout type and name.
      * @param extension The extension layout type and name.
+     * @param customMain The user's own symbol page (issue #342), standing in for the [main] layout.
      * @return a [TextKeyboard] object, regardless of the specified LTNs or errors.
      */
     private suspend fun mergeLayouts(
@@ -179,11 +190,17 @@ class LayoutManager(context: Context) {
         modifier: LTN? = null,
         extension: LTN? = null,
         isSplit: Boolean = false,
+        customMain: LayoutArrangement? = null,
     ): TextKeyboard {
         val extendedPopupsDefault = loadPopupMappingAsync()
         val extendedPopups = loadPopupMappingAsync(subtype)
 
-        val mainLayoutResult = loadLayoutAsync(main, allowNullLTN = false).await()
+        val mainLayoutResult = if (customMain != null && main != null) {
+            Result.success(CachedLayout(main.type, main.name, CustomSymbolsMeta, customMain))
+        } else {
+            loadLayoutAsync(main, allowNullLTN = false).await()
+        }
+        fun mainKey(data: AbstractKeyData) = TextKey(data).also { it.ownPopupsOnly = customMain != null }
         val mainLayout = mainLayoutResult.onFailure {
             flogWarning { "$keyboardMode - main - $it" }
         }.getOrNull()
@@ -231,7 +248,7 @@ class LayoutManager(context: Context) {
             for (mainRowI in mainLayout.arrangement.indices) {
                 val mainRow = mainLayout.arrangement[mainRowI]
                 if (mainRowI + 1 < mainLayout.arrangement.size) {
-                    val rowArray = Array(mainRow.size) { TextKey(mainRow[it]) }
+                    val rowArray = Array(mainRow.size) { mainKey(mainRow[it]) }
                     computedArrangement.add(rowArray)
                 } else {
                     // merge main and mod here
@@ -239,7 +256,7 @@ class LayoutManager(context: Context) {
                     val firstModRow = modifierLayout.arrangement.firstOrNull()
                     for (modKey in (firstModRow ?: listOf())) {
                         if (modKey is TextKeyData && modKey.code == 0) {
-                            rowArray.addAll(mainRow.map { TextKey(it) })
+                            rowArray.addAll(mainRow.map { mainKey(it) })
                         } else {
                             rowArray.add(TextKey(modKey))
                         }
@@ -255,7 +272,7 @@ class LayoutManager(context: Context) {
             }
         } else if (mainLayout != null && modifierLayout == null) {
             for (mainRow in mainLayout.arrangement) {
-                val rowArray = Array(mainRow.size) { TextKey(mainRow[it]) }
+                val rowArray = Array(mainRow.size) { mainKey(mainRow[it]) }
                 computedArrangement.add(rowArray)
             }
         } else if (mainLayout == null && modifierLayout != null) {
@@ -381,6 +398,7 @@ class LayoutManager(context: Context) {
         var main: LTN? = null
         var modifier: LTN? = null
         var extension: LTN? = null
+        var customMain: LayoutArrangement? = null
 
         when (keyboardMode) {
             KeyboardMode.CHARACTERS -> {
@@ -409,10 +427,12 @@ class LayoutManager(context: Context) {
                 extension = LTN(LayoutType.NUMERIC_ROW, subtype.layoutMap.numericRow)
                 main = LTN(LayoutType.SYMBOLS, subtype.layoutMap.symbols)
                 modifier = LTN(LayoutType.SYMBOLS_MOD, extCoreLayout("default"))
+                customMain = customSymbolsPage(0)
             }
             KeyboardMode.SYMBOLS2 -> {
                 main = LTN(LayoutType.SYMBOLS2, subtype.layoutMap.symbols2)
                 modifier = LTN(LayoutType.SYMBOLS2_MOD, extCoreLayout("default"))
+                customMain = customSymbolsPage(1)
             }
             KeyboardMode.SMARTBAR_CLIPBOARD_CURSOR_ROW -> {
                 extension = LTN(LayoutType.EXTENSION, extCoreLayout("clipboard_cursor_row"))
@@ -425,7 +445,17 @@ class LayoutManager(context: Context) {
             }
         }
 
-        return@async mergeLayouts(keyboardMode, subtype, main, modifier, extension, isSplit)
+        return@async mergeLayouts(keyboardMode, subtype, main, modifier, extension, isSplit, customMain)
+    }
+
+    /**
+     * The user's own symbol [page] (issue #342), or null while they use the language's. It takes the
+     * page in every language, the digit row above page 1 staying the language's own. The letters take
+     * their long-press symbols from page 1 too, by position, as they do from the built-in page.
+     */
+    private fun customSymbolsPage(page: Int): LayoutArrangement? {
+        if (!prefs.keyboard.customSymbolsEnabled.get()) return null
+        return CustomSymbolsLayout.arrangement(CustomSymbolsStore.current(appContext), page)
     }
 
     /**

@@ -405,6 +405,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Rādīt ciparu rindu virs rakstzīmju izkārtojuma</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Slēpta ciparu rinda</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Slēptas rakstzīmes</string>
+    <string name="settings__custom_symbols__title">Pielāgoti simboli</string>
+    <string name="pref__keyboard__custom_symbols__label">Izmantot pielāgotus simbolus</string>
+    <string name="custom_symbols__edit_key">Rediģēt taustiņu</string>
+    <string name="custom_symbols__key">Simbols</string>
+    <string name="custom_symbols__currency">Valodas valūta</string>
+    <string name="custom_symbols__long_press">Turot nospiestu</string>
+    <string name="custom_symbols__add_placeholder">Pievienot, piem. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Ievietot kā</string>
+    <string name="custom_symbols__target_key">Taustiņš</string>
+    <string name="custom_symbols__target_long_press">Turot nospiestu</string>
+    <string name="custom_symbols__palette_math">Matemātika</string>
+    <string name="custom_symbols__palette_arrows">Bultas</string>
+    <string name="custom_symbols__palette_currencies">Valūtas</string>
+    <string name="custom_symbols__palette_punctuation">Pieturzīmes</string>
+    <string name="custom_symbols__palette_shapes">Formas</string>
+    <string name="custom_symbols__palette_greek">Grieķu</string>
+    <string name="custom_symbols__palette_scripts">Augšraksts un apakšraksts</string>
+    <string name="custom_symbols__reset_all">Atiestatīt visus taustiņus</string>
+    <string name="custom_symbols__reset_all_confirm">Atiestatīt visus taustiņus uz noklusējumu?</string>
+    <string name="custom_symbols__import_confirm">Aizstāt jūsu simbolus ar šī faila simboliem?</string>
+    <string name="custom_symbols__import_done">Simboli importēti</string>
+    <string name="custom_symbols__import_invalid">Šis nav simbolu fails</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Rādīt rīkpogu</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Tiek rādīta pielāgojama rīkpoga blakus atstarpes taustiņam</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Rīktaustiņa darbība</string>

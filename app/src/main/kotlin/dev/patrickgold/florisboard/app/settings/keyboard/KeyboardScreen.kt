@@ -70,6 +70,13 @@ fun KeyboardScreen() = FlorisScreen {
             summarySwitchDisabled = stringRes(R.string.state__disabled),
             entries = enumDisplayEntriesOf(KeyHintMode::class),
         )
+        // Next to the symbol hints, which page 1 feeds when it is the user's own (issue #342).
+        Preference(
+            modifier = Modifier.settingsSearchAnchor("settings__custom_symbols__title"),
+            title = stringRes(R.string.settings__custom_symbols__title),
+            summary = customSymbolsSummary(),
+            onClick = { navController.navigate(Routes.Settings.CustomSymbols) },
+        )
         SwitchPreference(
             prefs.keyboard.utilityKeyEnabled,
             modifier = Modifier.settingsSearchAnchor("pref__keyboard__utility_key_enabled__label"),

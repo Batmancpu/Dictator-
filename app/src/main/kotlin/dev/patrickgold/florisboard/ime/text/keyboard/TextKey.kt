@@ -54,6 +54,13 @@ class TextKey(override val data: AbstractKeyData) : Key(data) {
      */
     var isSplitSeamStart: Boolean = false
 
+    /**
+     * True for a key of the user's own symbol pages (issue #342), which offers exactly the long presses
+     * it was given. The language's popup mapping would add its own by label — accents on a letter the
+     * user put there, a second set of dashes on their `-` — to a list the user arranged by hand.
+     */
+    var ownPopupsOnly: Boolean = false
+
     // This should exclusively be set and used by the TextKeyboardLayout
     var computedDataOnDown: KeyData = TextKeyData.UNSPECIFIED
 
@@ -81,7 +88,7 @@ class TextKey(override val data: AbstractKeyData) : Key(data) {
             // nothing. A composed face carries only what its own layout entry declared.
             if ((keyboardMode == KeyboardMode.CHARACTERS || keyboardMode == KeyboardMode.NUMERIC_ADVANCED ||
                 keyboardMode == KeyboardMode.SYMBOLS || keyboardMode == KeyboardMode.SYMBOLS2) &&
-                computed !is ComposedMatraKeyData) {
+                computed !is ComposedMatraKeyData && !ownPopupsOnly) {
                 val computedLabel = computed.label.lowercase(evaluator.subtype.primaryLocale)
                 val extLabel = when (computed.groupId) {
                     KeyData.GROUP_ENTER -> {

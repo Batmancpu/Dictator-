@@ -375,6 +375,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Toon nummerrij boven de alfabettoetsen</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">nummer op de achterkant</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Symbolen achter</string>
+    <string name="settings__custom_symbols__title">Eigen symbolen</string>
+    <string name="pref__keyboard__custom_symbols__label">Eigen symbolen gebruiken</string>
+    <string name="custom_symbols__edit_key">Toets bewerken</string>
+    <string name="custom_symbols__key">Symbool</string>
+    <string name="custom_symbols__currency">Valuta van de taal</string>
+    <string name="custom_symbols__long_press">Bij lang indrukken</string>
+    <string name="custom_symbols__add_placeholder">Toevoegen, bijv. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Invoegen als</string>
+    <string name="custom_symbols__target_key">Toets</string>
+    <string name="custom_symbols__target_long_press">Lang indrukken</string>
+    <string name="custom_symbols__palette_math">Wiskunde</string>
+    <string name="custom_symbols__palette_arrows">Pijlen</string>
+    <string name="custom_symbols__palette_currencies">Valuta’s</string>
+    <string name="custom_symbols__palette_punctuation">Leestekens</string>
+    <string name="custom_symbols__palette_shapes">Vormen</string>
+    <string name="custom_symbols__palette_greek">Grieks</string>
+    <string name="custom_symbols__palette_scripts">Super- en subscript</string>
+    <string name="custom_symbols__reset_all">Alle toetsen herstellen</string>
+    <string name="custom_symbols__reset_all_confirm">Alle toetsen terugzetten naar de standaard?</string>
+    <string name="custom_symbols__import_confirm">Je symbolen vervangen door die uit dit bestand?</string>
+    <string name="custom_symbols__import_done">Symbolen geïmporteerd</string>
+    <string name="custom_symbols__import_invalid">Dit is geen symbolenbestand</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Toon functietoets</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Toont een instelbare functietoets naast de spatiebalk</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Functietoets actie</string>

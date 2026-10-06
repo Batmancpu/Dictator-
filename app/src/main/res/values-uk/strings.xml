@@ -334,6 +334,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Зображати рядок цифр над розкладкою</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Підказка в строці з цифрами</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Підказки симолів</string>
+    <string name="settings__custom_symbols__title">Власні символи</string>
+    <string name="pref__keyboard__custom_symbols__label">Використовувати власні символи</string>
+    <string name="custom_symbols__edit_key">Змінити клавішу</string>
+    <string name="custom_symbols__key">Символ</string>
+    <string name="custom_symbols__currency">Валюта мови</string>
+    <string name="custom_symbols__long_press">Під час утримання</string>
+    <string name="custom_symbols__add_placeholder">Додати, напр. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Вставити як</string>
+    <string name="custom_symbols__target_key">Клавіша</string>
+    <string name="custom_symbols__target_long_press">Утримання</string>
+    <string name="custom_symbols__palette_math">Математика</string>
+    <string name="custom_symbols__palette_arrows">Стрілки</string>
+    <string name="custom_symbols__palette_currencies">Валюти</string>
+    <string name="custom_symbols__palette_punctuation">Пунктуація</string>
+    <string name="custom_symbols__palette_shapes">Фігури</string>
+    <string name="custom_symbols__palette_greek">Грецька</string>
+    <string name="custom_symbols__palette_scripts">Верхній і нижній індекс</string>
+    <string name="custom_symbols__reset_all">Скинути всі клавіші</string>
+    <string name="custom_symbols__reset_all_confirm">Повернути всі клавіші до типових?</string>
+    <string name="custom_symbols__import_confirm">Замінити ваші символи символами з цього файлу?</string>
+    <string name="custom_symbols__import_done">Символи імпортовано</string>
+    <string name="custom_symbols__import_invalid">Це не файл символів</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Показати допоміжну клавішу</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Показує настроювану допоміжну клавішу поряд з пробілом</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Дія допоміжної клавіші</string>

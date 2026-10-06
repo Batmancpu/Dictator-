@@ -54,6 +54,9 @@ import dev.patrickgold.florisboard.dictate.data.prompts.PromptModel
 import dev.patrickgold.florisboard.dictate.data.prompts.PromptsDatabaseHelper
 import dev.patrickgold.florisboard.dictate.provider.ProviderAccounts
 import dev.patrickgold.florisboard.dictate.provider.hasNoSecrets
+import dev.patrickgold.florisboard.dictate.symbols.CustomSymbols
+import dev.patrickgold.florisboard.dictate.symbols.CustomSymbolsJson
+import dev.patrickgold.florisboard.dictate.symbols.CustomSymbolsStore
 import dev.patrickgold.florisboard.ime.clipboard.provider.ClipboardFileStorage
 import dev.patrickgold.florisboard.ime.clipboard.provider.ClipboardItem
 import dev.patrickgold.florisboard.ime.clipboard.provider.ItemType
@@ -203,6 +206,14 @@ fun RestoreScreen() = FlorisScreen {
                     fileBasedStorage
                 }
                 FlorisPreferenceStore.import(importStrategy, reader).getOrThrow()
+            }
+            // The symbol pages are one setting (issue #342): restored whole, never merged key by key. An
+            // archive without them had every key at its default, which only Erase takes literally.
+            val symbolsFile = workspace.outputDir.subDir("dictate").subFile(Backup.CUSTOM_SYMBOLS_JSON_NAME)
+            val restoredSymbols = symbolsFile.takeIf { it.exists() }?.readText()?.let(CustomSymbolsJson::decode)
+            when {
+                restoredSymbols != null -> CustomSymbolsStore.set(context, restoredSymbols)
+                shouldReset -> CustomSymbolsStore.set(context, CustomSymbols())
             }
         }
         if (restoreFilesSelector.dictatePrompts) {

@@ -18,16 +18,20 @@ package org.florisboard.lib.snygg.ui
 
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.foundation.text.modifiers.TextAutoSizeLayoutScope
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.isSpecified
@@ -76,11 +80,19 @@ fun SnyggText(
     // not against that. Use `Color.onAccent()` to pick it; null keeps the themed colour, which is right
     // everywhere else.
     color: Color? = null,
+    // Optional override for text wrapped over several lines inside a centred box — a long label on a
+    // user's own symbol key (issue #342) — where the themed alignment would leave the lines ragged.
+    textAlign: TextAlign? = null,
+    // With [autoSizeMinRatio] and a [maxLines] above one: the text stays on one line while it fits at this
+    // fraction of the themed size or more, and only wraps when it would have to get smaller than that
+    // (issue #342). Plain auto-size takes the largest size that fits in any number of lines, which breaks
+    // "mfg" into "mf" over "g".
+    autoSizeOneLineRatio: Float? = null,
     text: String,
 ) {
     ProvideSnyggStyle(elementName, attributes, selector) { style ->
         val themedSize = style.fontSize().scaledBy(fontSizeMultiplier)
-        val autoSize = autoSizeFor(themedSize, autoSizeMinRatio)
+        val autoSize = autoSizeFor(themedSize, autoSizeMinRatio, autoSizeOneLineRatio)
         Text(
             modifier = modifier
                 .snyggMargin(style)
@@ -107,7 +119,7 @@ fun SnyggText(
             fontFamily = style.fontFamily(LocalSnyggPreloadedCustomFontFamilies.current),
             letterSpacing = style.letterSpacing().finiteOrUnspecified(),
             lineHeight = style.lineHeight().finiteOrUnspecified(),
-            textAlign = style.textAlign(),
+            textAlign = textAlign ?: style.textAlign(),
             textDecoration = style.textDecorationLine(),
             maxLines = maxLines ?: style.textMaxLines(),
             overflow = overflow ?: style.textOverflow(),
@@ -134,15 +146,62 @@ private fun TextUnit.scaledBy(factor: Float): TextUnit {
  * because the theme resolved a size the arithmetic cannot use (the same malformed-theme case
  * [finiteOrUnspecified] exists for; a NaN bound would crash Compose on measure).
  */
-internal fun autoSizeFor(size: TextUnit, minRatio: Float?): TextAutoSize? {
+internal fun autoSizeFor(size: TextUnit, minRatio: Float?, oneLineRatio: Float? = null): TextAutoSize? {
     if (minRatio == null || minRatio <= 0f || minRatio >= 1f) return null
     val max = size.finiteOrUnspecified()
     if (!max.isSpecified) return null
     val min = (max * minRatio).finiteOrUnspecified()
     if (!min.isSpecified) return null
+    if (oneLineRatio != null && oneLineRatio > minRatio && oneLineRatio < 1f && max.isSp) {
+        return OneLineFirstAutoSize(maxFontSize = max, oneLineMinFontSize = max * oneLineRatio, minFontSize = min)
+    }
     // Half a point: fine enough that the shrink is never visible as a step, coarse enough to bound the
     // search Compose runs in the layout pass — this text is re-laid out on every keystroke.
     return TextAutoSize.StepBased(minFontSize = min, maxFontSize = max, stepSize = 0.5.sp)
+}
+
+/**
+ * Auto-size that shrinks a text on one line first and lets it wrap only below [oneLineMinFontSize]
+ * (issue #342): a short label stays whole, a long one — an e-mail address on a key — breaks over the
+ * lines its layout allows rather than shrinking to a sliver. Both searches are binary over half-point
+ * steps, since a size that fits keeps fitting as it gets smaller. Sizes in sp only.
+ */
+class OneLineFirstAutoSize(
+    private val maxFontSize: TextUnit,
+    private val oneLineMinFontSize: TextUnit,
+    private val minFontSize: TextUnit,
+) : TextAutoSize {
+    override fun TextAutoSizeLayoutScope.getFontSize(constraints: Constraints, text: AnnotatedString): TextUnit {
+        largestFitting(oneLineMinFontSize.value, maxFontSize.value) { size ->
+            val layout = performLayout(constraints, text, size.sp)
+            layout.lineCount == 1 && !layout.hasVisualOverflow
+        }?.let { return it.sp }
+        return (largestFitting(minFontSize.value, oneLineMinFontSize.value) { size ->
+            !performLayout(constraints, text, size.sp).hasVisualOverflow
+        } ?: minFontSize.value).sp
+    }
+
+    /** The largest half-point size in [low]..[high] that [fits], or null if not even [low] does. */
+    private inline fun largestFitting(low: Float, high: Float, fits: (Float) -> Boolean): Float? {
+        var lo = 0
+        var hi = ((high - low) / STEP).toInt()
+        if (!fits(low)) return null
+        while (lo < hi) {
+            val mid = (lo + hi + 1) / 2
+            if (fits(low + mid * STEP)) lo = mid else hi = mid - 1
+        }
+        return low + lo * STEP
+    }
+
+    override fun equals(other: Any?): Boolean = other is OneLineFirstAutoSize &&
+        other.maxFontSize == maxFontSize && other.oneLineMinFontSize == oneLineMinFontSize &&
+        other.minFontSize == minFontSize
+
+    override fun hashCode(): Int = (maxFontSize.hashCode() * 31 + oneLineMinFontSize.hashCode()) * 31 + minFontSize.hashCode()
+
+    private companion object {
+        const val STEP = 0.5f
+    }
 }
 
 @Preview

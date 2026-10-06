@@ -648,6 +648,29 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Show a number row above the character layout</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Hinted number row</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Hinted symbols</string>
+    <string name="settings__custom_symbols__title" comment="Screen and entry title: the user's own two symbol pages of the keyboard (issue #342)">Custom symbols</string>
+    <string name="pref__keyboard__custom_symbols__label" comment="Switch: the keyboard's symbol pages are the user's own instead of the language's">Use custom symbols</string>
+    <string name="custom_symbols__edit_key" comment="Dialog title when one key of the symbol page is tapped">Edit key</string>
+    <string name="custom_symbols__key" comment="Text field label: the symbol a tap on the key types">Symbol</string>
+    <string name="custom_symbols__currency" comment="Shown under the symbol field of a key that types whatever currency the active language uses">Currency of the language</string>
+    <string name="custom_symbols__long_press" comment="Section title: the symbols offered when the key is held down">On long press</string>
+    <string name="custom_symbols__add_placeholder" comment="Placeholder of the field that adds long-press symbols; keep the three example symbols with spaces between them">Add, e.g. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as" comment="Label before the choice where a symbol picked from the list below goes">Insert as</string>
+    <string name="custom_symbols__target_key" comment="Choice: a picked symbol becomes what the key types">Key</string>
+    <string name="custom_symbols__target_long_press" comment="Choice: a picked symbol is added to the long-press symbols">Long press</string>
+    <string name="custom_symbols__palette_math" comment="Symbol category, short">Math</string>
+    <string name="custom_symbols__palette_arrows" comment="Symbol category, short">Arrows</string>
+    <string name="custom_symbols__palette_currencies" comment="Symbol category, short">Currencies</string>
+    <string name="custom_symbols__palette_punctuation" comment="Symbol category, short">Punctuation</string>
+    <string name="custom_symbols__palette_shapes" comment="Symbol category, short: ticks, stars, geometric shapes">Shapes</string>
+    <string name="custom_symbols__palette_greek" comment="Symbol category, short: Greek letters">Greek</string>
+    <string name="custom_symbols__palette_scripts" comment="Symbol category, short: superscript and subscript digits">Super &amp; subscript</string>
+    <string name="custom_symbols__reset_all" comment="Menu entry and dialog title">Reset all keys</string>
+    <string name="custom_symbols__reset_all_confirm">Put every key back to its default?</string>
+    <string name="custom_symbols__import_confirm">Replace your symbols with the ones in this file?</string>
+    <string name="custom_symbols__import_done">Symbols imported</string>
+    <string name="custom_symbols__import_invalid">This is not a symbols file</string>
+    <string name="custom_symbols__export_filename" translatable="false">dictate-symbols.json</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Show utility key</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Shows a configurable utility key next to space bar</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Utility key action</string>

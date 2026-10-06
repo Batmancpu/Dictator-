@@ -341,6 +341,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Mostra uma linha numérica acima do layout de caracteres</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Sugerir linha de números</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Sugerir símbolos</string>
+    <string name="settings__custom_symbols__title">Símbolos personalizados</string>
+    <string name="pref__keyboard__custom_symbols__label">Usar símbolos personalizados</string>
+    <string name="custom_symbols__edit_key">Editar tecla</string>
+    <string name="custom_symbols__key">Símbolo</string>
+    <string name="custom_symbols__currency">Moeda do idioma</string>
+    <string name="custom_symbols__long_press">Ao manter pressionado</string>
+    <string name="custom_symbols__add_placeholder">Adicionar, ex. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Inserir como</string>
+    <string name="custom_symbols__target_key">Tecla</string>
+    <string name="custom_symbols__target_long_press">Manter pressionado</string>
+    <string name="custom_symbols__palette_math">Matemática</string>
+    <string name="custom_symbols__palette_arrows">Setas</string>
+    <string name="custom_symbols__palette_currencies">Moedas</string>
+    <string name="custom_symbols__palette_punctuation">Pontuação</string>
+    <string name="custom_symbols__palette_shapes">Formas</string>
+    <string name="custom_symbols__palette_greek">Grego</string>
+    <string name="custom_symbols__palette_scripts">Sobrescrito e subscrito</string>
+    <string name="custom_symbols__reset_all">Redefinir todas as teclas</string>
+    <string name="custom_symbols__reset_all_confirm">Redefinir todas as teclas para o padrão?</string>
+    <string name="custom_symbols__import_confirm">Substituir seus símbolos pelos deste arquivo?</string>
+    <string name="custom_symbols__import_done">Símbolos importados</string>
+    <string name="custom_symbols__import_invalid">Isto não é um arquivo de símbolos</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Mostrar tecla de utilidade</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Mostra uma tecla de utilidade configurável ao lado da barra de espaço</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Ação da tecla de utilidade</string>
