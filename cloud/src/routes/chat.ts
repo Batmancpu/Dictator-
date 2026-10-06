@@ -5,6 +5,9 @@ import { budgetAllows, logUsage, settleBudget, walletStub } from '../meter';
 import { NO_STORE, apiError, estimateTokens } from '../util';
 import { debitError, logRefusal } from './transcriptions';
 
+/** The largest rewording body read at all: far above what the input token limit lets through. */
+const MAX_CHAT_BODY_BYTES = 1024 * 1024;
+
 /**
  * `POST /v1/chat/completions` — the rewording.
  *
@@ -31,6 +34,23 @@ export async function handleChat(
     return apiError(401, 'No valid credit token.', 'invalid_token', 'invalid_request_error');
   }
   touch(env, session, ctx);
+
+  // Checked before `json()` reads the body into memory, for the transcription route's reason (#383).
+  // The token limit below allows a few dozen kilobytes of text; a body over a mebibyte cannot be
+  // within it, whatever it holds.
+  const declaredBytes = Number(request.headers.get('content-length'));
+  if (!Number.isFinite(declaredBytes) || declaredBytes <= 0) {
+    return apiError(411, 'A Content-Length is required.', 'length_required', 'invalid_request_error');
+  }
+  if (declaredBytes > MAX_CHAT_BODY_BYTES) {
+    logRefusal(env, session, 'reword', 413, started, ctx);
+    return apiError(
+      413,
+      'The text is too long to reword through Dictate Cloud.',
+      'input_too_long',
+      'invalid_request_error',
+    );
+  }
 
   let payload: ChatRequest;
   try {
@@ -77,7 +97,7 @@ export async function handleChat(
     const refusal = debit.reason === 'insufficient'
       ? apiError(402, 'Out of credit.', 'insufficient_credits', 'insufficient_quota')
       : debitError(debit.reason);
-    logRefusal(env, session, 'reword', refusal.status, started, ctx, debit.state);
+    if (!debit.repeat) logRefusal(env, session, 'reword', refusal.status, started, ctx, debit.state);
     return refusal;
   }
 

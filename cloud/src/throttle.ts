@@ -54,26 +54,38 @@ const GLOBAL_FAILURE_LIMIT = 60;
 /** Keyed by client address. The address is never stored beyond the sliding window. */
 export async function guardCodeAttempts(env: Env, request: Request): Promise<Response | null> {
   const address = request.headers.get('cf-connecting-ip') ?? 'unknown';
+  const guard = guardStub(env);
 
-  let allowed = true;
+  // The two halves are asked separately, so that each fails open on its own (#383). Read inside the
+  // per-address call, as it was, the address-free breaker went down with it — and the per-address map
+  // is the half a flood from many addresses can break, exactly when the breaker has to hold.
+  // Failing open stays the right trade for either half: the local runtime has no jurisdictions, and
+  // a throttle must never be the reason the service stops working.
+  let recent = 0;
+  let perAddressAllowed = true;
   try {
-    const result = await guardStub(env).attemptCode(address, LIMIT, WINDOW_MS);
-    allowed = result.allowed && result.failures < GLOBAL_FAILURE_LIMIT;
-    // Only the refusals. A legitimate person types their code once or twice, so a line here means
-    // somebody is probing — and the count says how hard. No address is logged: the number is the
-    // signal, and the address would be personal data in a log that outlives the sliding window.
-    if (!allowed) {
-      console.log(
-        `code throttle refused an attempt (${result.recent} from this address, ` +
-        `${result.failures} failures overall in the last minute)`,
-      );
-    }
+    const result = await guard.attemptCode(address, LIMIT, WINDOW_MS);
+    recent = result.recent;
+    perAddressAllowed = result.allowed;
   } catch (error) {
-    // The local runtime has no jurisdictions, and a throttle must never be the reason the service
-    // stops working. Failing open is the right trade for a control whose job is to slow a guessing
-    // attack, not to be the only thing between an attacker and the data.
-    console.log(`code throttle unavailable, attempt not counted: ${String(error).slice(0, 120)}`);
-    return null;
+    console.log(`code throttle per address unavailable, attempt not counted: ${String(error).slice(0, 120)}`);
+  }
+  let failures = 0;
+  try {
+    failures = await guard.codeFailureCount(WINDOW_MS);
+  } catch (error) {
+    console.log(`code failure breaker unavailable: ${String(error).slice(0, 120)}`);
+  }
+
+  const allowed = perAddressAllowed && failures < GLOBAL_FAILURE_LIMIT;
+  // Only the refusals. A legitimate person types their code once or twice, so a line here means
+  // somebody is probing — and the count says how hard. No address is logged: the number is the
+  // signal, and the address would be personal data in a log that outlives the sliding window.
+  if (!allowed) {
+    console.log(
+      `code throttle refused an attempt (${recent} from this address, ` +
+      `${failures} failures overall in the last minute)`,
+    );
   }
 
   if (allowed) return null;
