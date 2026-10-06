@@ -59,6 +59,7 @@ import dev.patrickgold.florisboard.dictate.data.history.DictateHistoryEntry
 import dev.patrickgold.florisboard.dictate.data.history.DictateHistorySource
 import dev.patrickgold.florisboard.dictate.data.history.DictateHistoryStore
 import dev.patrickgold.florisboard.dictate.data.stats.DictateStats
+import dev.patrickgold.florisboard.dictate.field.TranscriptHandover
 import dev.patrickgold.florisboard.dictate.provider.ChatRequest
 import dev.patrickgold.florisboard.dictate.provider.DictateApiException
 import dev.patrickgold.florisboard.dictate.provider.LocalModelCatalog
@@ -319,6 +320,16 @@ object DictateController {
     private var realtimeClosed: CompletableDeferred<Unit>? = null
     private var realtimeContext: Context? = null     // app context to edit the field's provisional text
     private val realtimeShown = StringBuilder()       // text currently committed to the field this session
+    /** The transcript [realtimeShown] was last written from: what the user sees, and takes over by editing it. */
+    private var realtimeShownTranscript = ""
+
+    /**
+     * What the user has taken over of this realtime dictation by editing it in the field (issue #421) —
+     * empty until they do. It is theirs from then on: the preview never revises it again and writes only
+     * what the transcript says after it ([TranscriptHandover.continuation]), and the finished text at the
+     * stop replaces only that rest. See [handOverIfEdited].
+     */
+    private var realtimeHandedOver = ""
 
     /**
      * The separator decided for the dictation currently in the field — a space or nothing (issue #443),
@@ -1759,6 +1770,8 @@ object DictateController {
         // engine mid-flight.
         adoptHistoryId: Long? = null,
         latencyTrace: BatchLatencyTrace = BatchLatencyTrace(),
+        // A realtime dictation falling back to batch: what the user took over of its preview (#421).
+        handedOver: String = "",
     ) {
         logLatency(latencyTrace, "transcribeEntered")
         val account = if (forceLocal) localTranscriptionAccount() else transcriptionAccount()
@@ -2089,6 +2102,7 @@ object DictateController {
                     alreadyFormatted = chatAudio,
                     capture = capture,
                     latencyTrace = latencyTrace,
+                    handedOver = handedOver,
                 )
                 logLatency(latencyTrace, "finalizeCompleted", finalizeStartedNanos)
                 outcome = "success"
@@ -2178,6 +2192,9 @@ object DictateController {
      * realtime path (issue #128): runs live-prompt rewording or the auto-formatting/auto-apply/pending
      * prompt chain (unless [alreadyFormatted]), applies the deterministic mappings, commits, and records
      * stats. [rawText] is the transcript to process; [live] routes it as a live-prompt instruction.
+     *
+     * [handedOver] is what the user took over of a live preview by editing it (issue #421). It is in the
+     * field as they left it, so only the rest of [rawText] is finished and written.
      */
     private suspend fun finalizeAndCommit(
         appContext: Context,
@@ -2188,6 +2205,7 @@ object DictateController {
         finalizeViaComposing: Boolean = false,
         capture: HistoryCapture? = null,
         latencyTrace: BatchLatencyTrace? = null,
+        handedOver: String = "",
     ) {
         swallowedRewording = null // this dictation's own slate (issue #284)
         // The spoken command word (#139): a transcript that opens with the user's trigger is an
@@ -2195,9 +2213,12 @@ object DictateController {
         // instead of tapped. Checked here rather than per path so every route into this function is
         // covered by one rule: batch, realtime (which has usually armed it mid-stream already, and
         // re-reads the same transcript here to take the word off), segmented and the on-device model.
+        // Always the whole transcript, as the stream judged it: a preview that was handed over was shown,
+        // so it never opened with the trigger, whatever the rest of it happens to start with.
         val spokenCommand = commandTrigger().takeIf { it.isNotEmpty() }
             ?.let { CommandTrigger.instructionFor(rawText, it) }
         val isLive = live || spokenCommand != null
+        val text = TranscriptHandover.continuation(handedOver, rawText)
         val finalText = if (isLive) {
             // The spoken transcript is an instruction; send it to GPT (optionally operating on the current
             // selection) and insert the answer instead of the transcript.
@@ -2213,12 +2234,12 @@ object DictateController {
             // after the stop is what UiState.Rewording is for, and the Smartbar already says it.
             _state.value = UiState.Rewording(appContext.getString(R.string.dictate__status_rewording))
             val selection = sink(appContext).selectedText().takeIf { it.isNotEmpty() }
-            requestReword(spokenCommand ?: rawText, selection)
+            requestReword(spokenCommand ?: text, selection)
         } else {
             // Normal dictation: auto-formatting + auto-apply prompts, then the prompts the user queued by
             // tapping the prompt row while recording, in tap order; then commit. [alreadyFormatted] skips
             // the rewording pass (single-call multimodal #130 already returns finished text).
-            val processed = if (alreadyFormatted) rawText else postProcessTranscript(appContext, rawText)
+            val processed = if (alreadyFormatted) text else postProcessTranscript(appContext, text)
             applyPendingPrompts(appContext, processed)
         }
         // Paragraph splitting (issue #225): break a long *pure* transcript into paragraphs at sentence
@@ -2226,12 +2247,12 @@ object DictateController {
         // multimodal, or an auto-format/prompt pass that actually changed it) — that output already carries
         // its own paragraphing and must not be second-guessed.
         val splitWords = prefs.dictate.paragraphSplitWords.get()
-        val isPureTranscript = !isLive && !alreadyFormatted && finalText == rawText
+        val isPureTranscript = !isLive && !alreadyFormatted && finalText == text
         // Keep the raw transcript for the history when a prompt actually rewrote it (issue #240), so the
         // original wording stays recoverable without re-running (and paying for) the transcription. Only
         // the prompt chain counts: the deterministic steps below (paragraph splitting, custom mappings)
         // would otherwise store a near-identical copy differing in little more than line breaks.
-        val originalForHistory = if (finalText != rawText) rawText else ""
+        val originalForHistory = if (finalText != text) rawText else ""
         val paragraphed = if (isPureTranscript && splitWords > 0) {
             TranscriptParagraphs.split(finalText, splitWords)
         } else {
@@ -2239,6 +2260,13 @@ object DictateController {
         }
         // Deterministic find-and-replace dictionary (issue #129), applied right before insert.
         val outputText = prefs.dictate.customMappings.get().apply(paragraphed)
+        // The whole dictation, for what keeps a record of it — the history, the stats, the re-insert cache —
+        // while the field gets only the part that was not handed over (#421). [text] is the tail of [rawText].
+        val dictated = if (text.length == rawText.length) {
+            outputText
+        } else {
+            TranscriptJoin.join(rawText.dropLast(text.length).trimEnd(), outputText, appContext.transcriptTighteningSymbols())
+        }
         // The space in front of it, if the field needs one (#443). Kept out of [outputText] on purpose:
         // the history, the re-insert cache and the clipboard copies hold the dictation, not the seam.
         val lead: String
@@ -2246,21 +2274,27 @@ object DictateController {
             // Realtime (#128): replace the live-streamed preview with the finished (reworded) result via the
             // minimal diff, then honor auto-enter — instead of committing on top of the preview.
             val outSink = sink(appContext)
+            // Edited while it was being finished (#421): what the user saw is theirs, finished or not, so
+            // the finished text has nothing left to replace. Only words that never reached the field are
+            // still to be written, as they were heard.
+            val shownOwn = realtimeShown.toString().removePrefix(dictationLead)
+            val edited = handOverIfEdited(outSink)
+            val written = if (edited) TranscriptHandover.continuation(shownOwn, text) else outputText
             // A preview already on screen carries the separator decided at its first word; asking the field
             // now would find our own preview in front of the cursor.
             lead = when {
-                outputText.isEmpty() -> ""
+                written.isEmpty() -> ""
                 realtimeShown.isNotEmpty() -> dictationLead
-                else -> leadFor(appContext, outputText)
+                else -> leadFor(appContext, written)
             }
             // Off the main thread for the overlay, like every other accessibility write: this one ends
             // in the same resolve-focus-write-verify round trip (see [writeToSink]).
             val landed = if (outputTarget == OutputTarget.OVERLAY) {
                 withContext(Dispatchers.IO) {
-                    outSink.commitDictationFinal(lead + outputText, realtimeShown.toString())
+                    outSink.commitDictationFinal(lead + written, realtimeShown.toString())
                 }
             } else {
-                outSink.commitDictationFinal(lead + outputText, realtimeShown.toString())
+                outSink.commitDictationFinal(lead + written, realtimeShown.toString())
             }
             realtimeShown.setLength(0)
             realtimeTranscript.setLength(0)
@@ -2272,7 +2306,9 @@ object DictateController {
                 discardRetainedAudio()
                 return
             }
-            if (prefs.dictate.autoEnter.get() && outputText.isNotEmpty()) outSink.performEnter()
+            // Not after an edit at the last moment: the user is in the middle of the text, and auto-enter
+            // would send it.
+            if (prefs.dictate.autoEnter.get() && outputText.isNotEmpty() && !edited) outSink.performEnter()
         } else {
             // Safety net (#214): for the floating button, optionally copy every dictation to the system
             // clipboard so nothing is lost if the accessibility insert is silently swallowed (the known
@@ -2308,13 +2344,13 @@ object DictateController {
             }
         }
         // Re-insert safety net (issue #111) + lifetime stats (issue #142) + history log (issue #140).
-        rememberLastDictation(outputText)
+        rememberLastDictation(dictated)
         lastDictationLead = lead
         if (capture?.isReplay != true) {
-            DictateStats.recordDictation(prefs, outputText, recordedSeconds)
+            DictateStats.recordDictation(prefs, dictated, recordedSeconds)
             if (recordedSeconds > 0L) creditAudioSeconds(recordedSeconds)
         }
-        recordHistory(appContext, outputText, originalForHistory, recordedSeconds, capture, reworded = isLive)
+        recordHistory(appContext, dictated, originalForHistory, recordedSeconds, capture, reworded = isLive)
         discardRetainedAudio()
         if (reportSwallowedRewording(appContext)) return
         _state.value = UiState.Idle
@@ -2436,6 +2472,8 @@ object DictateController {
         _interimText.value = ""
         realtimeContext = appContext
         realtimeShown.setLength(0)
+        realtimeShownTranscript = ""
+        realtimeHandedOver = ""
         realtimeTranscript.setLength(0)
         // The floating button always holds the words back, whatever the preference says (#357).
         //
@@ -2504,13 +2542,21 @@ object DictateController {
                 }
             }
             if (realtimeHidden) return
+            val outSink = sink(appContext)
+            // Text the user has marked mid-dictation is theirs to act on, and a write now would type over
+            // it (#421). Waiting loses nothing: the next update brings the whole transcript again. A
+            // selection from before the first word is the opposite — dictating over it is the point.
+            if (realtimeShown.isNotEmpty() && outSink.selectedText().isNotEmpty()) return
+            handOverIfEdited(outSink)
+            val own = TranscriptHandover.continuation(realtimeHandedOver, full)
             // The separator is settled before the first word goes in (#443) and then travels with the
             // preview, so the finalize replaces like with like.
-            if (realtimeShown.isEmpty()) dictationLead = leadFor(appContext, full)
-            val shown = if (full.isEmpty()) "" else dictationLead + full
-            runCatching { sink(appContext).setDictationPreview(shown, realtimeShown.toString()) }
+            if (realtimeShown.isEmpty()) dictationLead = leadFor(appContext, own)
+            val shown = if (own.isEmpty()) "" else dictationLead + own
+            runCatching { outSink.setDictationPreview(shown, realtimeShown.toString()) }
             realtimeShown.setLength(0)
             realtimeShown.append(shown)
+            realtimeShownTranscript = full
         }
         // Read once for the whole session rather than per piece, so a subtype switch mid-dictation cannot
         // leave one transcript joined by two different conventions.
@@ -2666,12 +2712,12 @@ object DictateController {
                 if (realtimeFailed || !tailComplete || transcript.isEmpty()) {
                     // Drop the live provisional text; the batch path commits fresh from the WAV. With the
                     // preview hidden there is nothing in the field to take back, and realtimeShown says so.
-                    runCatching { sink(appContext).clearDictationPreview(realtimeShown.toString()) }
-                    realtimeShown.setLength(0)
+                    // What the user has edited stays, and the batch text leaves out what they took (#421).
+                    val handedOver = withdrawPreview(appContext)
                     realtimeTranscript.setLength(0)
                     if (wavFile != null && wavFile.exists() && wavFile.length() > 0L) {
                         livePromptArmed = live
-                        transcribe(context, wavFile, recordedSeconds, gate = false)
+                        transcribe(context, wavFile, recordedSeconds, gate = false, handedOver = handedOver)
                     } else {
                         _state.value = UiState.Error(appContext.getString(R.string.dictate__error_no_audio))
                     }
@@ -2691,18 +2737,20 @@ object DictateController {
                     language = prefs.dictate.activeInputLanguage.get().takeIf { it != DictateLanguages.DETECT } ?: "",
                     source = DictateHistorySource.REALTIME,
                 )
-                finalizeAndCommit(appContext, transcript, recordedSeconds, live, alreadyFormatted = false, finalizeViaComposing = true, capture = rtCapture)
+                finalizeAndCommit(
+                    appContext, transcript, recordedSeconds, live, alreadyFormatted = false,
+                    finalizeViaComposing = true, capture = rtCapture, handedOver = realtimeHandedOver,
+                )
                 wavFile?.delete()
             } catch (c: CancellationException) {
                 throw c
             } catch (t: Throwable) {
                 _interimText.value = ""
-                runCatching { sink(appContext).clearDictationPreview(realtimeShown.toString()) }
-                realtimeShown.setLength(0)
+                val handedOver = withdrawPreview(appContext)
                 realtimeTranscript.setLength(0)
                 if (wavFile != null && wavFile.exists() && wavFile.length() > 0L) {
                     livePromptArmed = live
-                    transcribe(context, wavFile, recordedSeconds, gate = false)
+                    transcribe(context, wavFile, recordedSeconds, gate = false, handedOver = handedOver)
                 } else {
                     _state.value = UiState.Error(appContext.getString(R.string.dictate__error_unknown))
                 }
@@ -2737,6 +2785,8 @@ object DictateController {
         // Keep + merge the segment audio only when the history feature would actually store it.
         segmentKeepAudio = prefs.dictate.historyEnabled.get() && prefs.dictate.historyAudioRetention.get()
         realtimeShown.setLength(0)
+        realtimeShownTranscript = ""
+        realtimeHandedOver = ""
         realtimeTranscript.setLength(0)
         // Segmented dictation shows its assembled text as it goes; the hidden-preview mode belongs to
         // realtime alone, and the two are mutually exclusive (see [isSegmentedMode]).
@@ -2890,8 +2940,8 @@ object DictateController {
 
     private fun launchSegmentTranscription(appContext: Context, idx: Int, wav: File, generation: Int) {
         val job = scope.launch {
-            // Best-effort cross-segment continuity: bias the recognizer with what's committed so far.
-            val continuity = realtimeShown.toString()
+            // Best-effort cross-segment continuity: bias the recognizer with what's been said so far.
+            val continuity = realtimeTranscript.toString()
             // One retry before giving up; a still-failed segment leaves a gap (no placeholder), but its
             // audio is preserved in the merged history WAV so nothing is truly lost.
             val text = transcribeSegmentRaw(appContext, wav, continuity)
@@ -2917,17 +2967,21 @@ object DictateController {
                 val raw = segmentResults.remove(segmentCommitIndex)!!.trim()
                 segmentCommitIndex++
                 if (raw.isNotEmpty()) {
+                    // The whole dictation, whatever happens to it in the field: the finalize records it.
+                    TranscriptJoin.appendPiece(realtimeTranscript, raw, tightening)
+                    val outSink = sink(appContext)
+                    // Segments never revise each other, so edited ones simply stay the user's, and the
+                    // preview starts afresh at the cursor with this one (#421).
+                    handOverIfEdited(outSink)
+                    val own = TranscriptHandover.continuation(realtimeHandedOver, realtimeTranscript.toString())
                     val prev = realtimeShown.toString()
                     // The first segment is the one that meets the field's own text (#443).
-                    val full = if (prev.isEmpty()) {
-                        dictationLead = leadFor(appContext, raw)
-                        dictationLead + raw
-                    } else {
-                        TranscriptJoin.join(prev, raw, tightening)
-                    }
-                    runCatching { sink(appContext).setDictationPreview(full, prev) }
+                    if (prev.isEmpty()) dictationLead = leadFor(appContext, own)
+                    val full = dictationLead + own
+                    runCatching { outSink.setDictationPreview(full, prev) }
                     realtimeShown.setLength(0)
                     realtimeShown.append(full)
+                    realtimeShownTranscript = realtimeTranscript.toString()
                 }
             }
             segmentInFlightCount--
@@ -2945,7 +2999,8 @@ object DictateController {
         val account = transcriptionAccount()
         val preset = presetFor(account)
         val model = transcriptionModelFor(appContext, account, preset)
-        val assembled = realtimeShown.toString().trim()
+        val assembled = realtimeTranscript.toString().trim()
+        val handedOver = realtimeHandedOver
         val recordedSeconds = segmentRecordedSeconds
         // Snapshot the kept segment files (in cut order) before resetting; merge them into one WAV so the
         // whole dictation has a single retained-audio file in the history (issue #170 / #140 reuse).
@@ -2975,7 +3030,7 @@ object DictateController {
         )
         finalizeAndCommit(
             appContext, assembled, recordedSeconds, live = false,
-            alreadyFormatted = false, finalizeViaComposing = true, capture = capture,
+            alreadyFormatted = false, finalizeViaComposing = true, capture = capture, handedOver = handedOver,
         )
         mergedWav?.delete() // history already copied it during finalize
     }
@@ -3123,6 +3178,39 @@ object DictateController {
             sink.performEnter()
         }
         return committed
+    }
+
+    /**
+     * Gives the live preview to the user if they have edited it (issue #421), and says whether it did.
+     *
+     * [realtimeShown] is what the dictation believes sits in front of the cursor, and every write is a
+     * diff against it. Once the user has deleted a word somebody else said, or cleared the field, a write
+     * against that belief deletes their own words and types the removed ones back in. So the field as it
+     * stands becomes the baseline instead: everything the user saw is theirs ([realtimeHandedOver]) and
+     * never revised again, and the dictation goes on at the cursor with what is said after it.
+     *
+     * Cutting off the provider's revisions at that point is the price, and the right one: a revision of
+     * text the user has already corrected by hand could only undo the correction.
+     */
+    private fun handOverIfEdited(sink: DictationSink): Boolean {
+        if (realtimeShown.isEmpty()) return false
+        if (runCatching { sink.holdsPreview(realtimeShown.toString()) }.getOrDefault(true)) return false
+        realtimeHandedOver = realtimeShownTranscript
+        realtimeShown.setLength(0)
+        return true
+    }
+
+    /**
+     * Takes the live preview back out of the field for a batch transcription to replace (the stream failed,
+     * or ran out of time), and returns what the user had taken over of it (#421). That part stays in the
+     * field as they left it, so the batch text has to leave it out. An edit since the last update counts.
+     */
+    private fun withdrawPreview(appContext: Context): String {
+        val outSink = sink(appContext)
+        handOverIfEdited(outSink)
+        runCatching { outSink.clearDictationPreview(realtimeShown.toString()) }
+        realtimeShown.setLength(0)
+        return realtimeHandedOver
     }
 
     /**
@@ -4203,7 +4291,8 @@ object DictateController {
     private suspend fun applyPendingPrompts(context: Context, text: String): String {
         val queued = _pendingPrompts.value
         _pendingPrompts.value = emptyList()
-        if (queued.isEmpty()) return text
+        // Nothing left to rework: the user took the whole live preview over and said nothing after (#421).
+        if (queued.isEmpty() || text.isBlank()) return text
         if (rewordingApiKey().isBlank()) return text
         var result = text
         for (p in queued) {

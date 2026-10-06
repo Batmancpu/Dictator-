@@ -74,15 +74,6 @@ data class FieldText(
         }
     }
 
-    private fun isWordChar(c: Char): Boolean = c.isLetterOrDigit() || c in WORD_JOINERS || when (Character.getType(c)) {
-        Character.NON_SPACING_MARK.toInt(), Character.COMBINING_SPACING_MARK.toInt(), Character.ENCLOSING_MARK.toInt() -> true
-        else -> false
-    }
-
-    private companion object {
-        const val WORD_JOINERS = "'’-_"
-    }
-
     /**
      * The [deleteBefore] characters in front of the cursor replaced by [replacement] — the one operation a
      * live dictation preview needs (the same minimal diff the app path applies through the editor).

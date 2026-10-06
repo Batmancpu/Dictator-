@@ -504,6 +504,20 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
     }
 
     /**
+     * Up to [n] characters in front of the cursor (in front of the selection, when there is one), asked of
+     * the editor itself — or null when it cannot be asked.
+     *
+     * [activeContent] is no answer for a caller that has just written through [replaceTextBeforeCursor]:
+     * that write leaves the content to catch up on the next selection update, and until then it still
+     * reads as before. The editor answers in order, after every edit sent ahead of the question. It is
+     * also not limited to the 256 characters the content keeps.
+     */
+    fun textBeforeCursorFromEditor(n: Int): String? {
+        if (n < 1 || activeInfo.isRawInputEditor) return null
+        return currentInputConnection()?.getTextBeforeCursor(n, 0)?.toString()
+    }
+
+    /**
      * Completes the given [candidate] over the word it answers — see [completionReplacementRange]. Does
      * nothing if the current input editor is not rich or if the input connection is invalid.
      *

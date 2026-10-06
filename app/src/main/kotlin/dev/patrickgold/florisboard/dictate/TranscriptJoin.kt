@@ -11,6 +11,7 @@
 package dev.patrickgold.florisboard.dictate
 
 import android.content.Context
+import dev.patrickgold.florisboard.dictate.field.isWrittenWithoutSpaces
 import dev.patrickgold.florisboard.nlpManager
 
 /**
@@ -100,23 +101,10 @@ object TranscriptJoin {
         val before = textBefore?.lastOrNull() ?: return ""
         val first = piece.firstOrNull() ?: return ""
         if (before.isWhitespace() || first.isWhitespace()) return ""
-        if (writtenWithoutSpaces(before) || writtenWithoutSpaces(first)) return ""
+        if (isWrittenWithoutSpaces(before) || isWrittenWithoutSpaces(first)) return ""
         val closesWord = before.isLetterOrDigit() || precedingSymbols.contains(before)
         val opensWord = first.isLetterOrDigit() || followingSymbols.contains(first)
         return if (closesWord && opensWord) " " else ""
-    }
-
-    private fun writtenWithoutSpaces(ch: Char): Boolean = when (Character.UnicodeScript.of(ch.code)) {
-        Character.UnicodeScript.HAN,
-        Character.UnicodeScript.HIRAGANA,
-        Character.UnicodeScript.KATAKANA,
-        Character.UnicodeScript.THAI,
-        Character.UnicodeScript.LAO,
-        Character.UnicodeScript.KHMER,
-        Character.UnicodeScript.MYANMAR,
-        Character.UnicodeScript.TIBETAN,
-        -> true
-        else -> false
     }
 
     /** [appendPiece] for the callers that hold their head as a plain string. */
