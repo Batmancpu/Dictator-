@@ -1,7 +1,7 @@
 # Privacy Policy for Dictate Keyboard
 
 **Effective date:** 31 August 2026
-**Last updated:** 31 August 2026
+**Last updated:** 6 October 2026
 
 This Privacy Policy explains how **Dictate Keyboard** (the "App", application ID
 `net.devemperor.dictate`) handles your information. The App is developed and
@@ -48,7 +48,9 @@ existed: we have no server in your path and no data about you.
 - **Dictate Cloud is the one exception**, it is entirely optional, it is never
   switched on without a purchase you make yourself, and section 4 says exactly
   what it does.
-- Your API keys, prompts, and settings are stored **only on your device**.
+- Your API keys, prompts, and settings are stored **only on your device** — and,
+  if you use Android's own backup, in that backup, end-to-end encrypted
+  (section 2.6).
 - The App contains **no advertising, no tracking, no telemetry, and no
   crash-reporting SDKs**.
 - As a keyboard, the App **does not log your keystrokes or collect what you type**
@@ -89,7 +91,11 @@ delete individually or all at once in the App's settings.
 - **The source audio is not kept** unless you switch that on separately; it is
   **off by default**. Failed transcriptions are an exception: their audio is kept
   so the attempt can be repeated, and is removed with the entry.
-- **Nothing is recorded in password fields or in incognito mode.**
+- **Nothing is recorded in password fields or in incognito mode**, whether you
+  dictate with the keyboard, the floating button or Dictate's voice input. One
+  case cannot be told apart: when another app asks Android's speech recognition
+  for text, it does not say what the text is for, so such a request is kept like
+  any other dictation.
 - None of this is uploaded anywhere. It exists only on your device and is deleted
   when you clear the history or uninstall the App.
 
@@ -98,7 +104,8 @@ To use a provider, you enter your own API key (or, for a local/self-hosted serve
 such as Ollama, a base URL). These credentials and provider settings are stored
 **locally on your device** in the App's private storage. They are sent **only** to
 the corresponding provider's API to authenticate your own requests, and are
-**never** transmitted to the Developer.
+**never** transmitted to the Developer. The one other place they can be is
+Android's own backup, if you use it (section 2.6).
 
 ### 2.5 Prompts and settings
 Custom rewording prompts, style settings, language preferences, and other
@@ -106,6 +113,41 @@ configuration are stored **locally on your device** (in an app-private settings
 store and a local SQLite database). They are not uploaded anywhere except as part
 of a request to your chosen provider when relevant (e.g. a prompt you send for
 rewording).
+
+### 2.6 Android's own backup
+If the backup built into Android is switched on for your phone — the backup to
+your Google account, or a transfer to a new phone — it includes the App's
+settings, so that a new phone starts where the old one left off. That covers
+your API keys, the Dictate Cloud access key and recovery code, the proxy
+password, your prompts and settings, your personal dictionary and the keyboard's
+own files.
+
+- On Android 12 and later, the App takes part in the backup to your Google
+  account **only when that backup is end-to-end encrypted** with your screen
+  lock, which means Google cannot read it.
+- Your **dictation history, its audio and the clipboard are never part of it.**
+- This backup is Android's, not ours, and we never receive it. You can switch it
+  off in Android's settings. The App's own "Back up & Restore" lets you choose to
+  leave the credentials out of a file you make yourself.
+
+### 2.7 The floating dictation button
+The floating button is **optional and off until you switch it on**. It works
+through an Android accessibility service, the one kind of permission that lets
+an app see what is on the screen, so this section says exactly what Dictate does
+with it:
+
+- It finds the text field you are in, and whether that field is a password
+  field.
+- It inserts your dictation into that field.
+- It reads the text of that field when you apply a prompt to it.
+- It notes which app is in front, so the button appears and stays out of the way
+  as you set it up.
+
+It does not read anything else on the screen and does not record your typing.
+Nothing it reads is stored, and nothing leaves your device except text that you
+ask a prompt to reword, which goes to your chosen provider like any other
+rewording. You can switch the service off at any time in Android's accessibility
+settings.
 
 ---
 
@@ -299,6 +341,10 @@ does not require us to collect more information just to be able to (Art. 12(2)).
 | `MODIFY_AUDIO_SETTINGS` / `BLUETOOTH` | To route recording correctly, including through Bluetooth headsets. |
 | `VIBRATE` | Optional haptic feedback. |
 | `POST_NOTIFICATIONS` | To show status notifications (e.g. transcription progress) on Android 13+. |
+| `FOREGROUND_SERVICE` / `FOREGROUND_SERVICE_MICROPHONE` | To keep recording while the floating button is in use over another app, and to finish a transcription for a connected watch. |
+| `FOREGROUND_SERVICE_DATA_SYNC` | To keep downloading an on-device model when you leave the App. |
+| `com.android.vending.BILLING` | To buy Dictate Cloud credit through Google Play — only if you choose to. |
+| Accessibility service | The optional floating dictation button; see section 2.7. |
 
 The App requests the microphone permission only for dictation and uses it only
 while you are actively recording. **The App does not request access to your
@@ -317,7 +363,8 @@ You can see and delete these names in the App's dictionary settings.
 ## 6. Data storage and retention
 
 - **On your device:** API keys, settings, prompts and your dictation history
-  remain on your device until you delete them in the App or uninstall it.
+  remain on your device until you delete them in the App or uninstall it. If you
+  use Android's own backup, it holds a copy of the settings (section 2.6).
   Temporary audio recordings are deleted automatically after transcription.
 - **With your chosen provider:** any retention of audio or text is governed by
   that provider's policy, not by us.
@@ -335,7 +382,7 @@ Although Dictate Keyboard is an input method (a keyboard), it does **not** recor
 log, store, or transmit your general typing. Only audio you deliberately record
 for dictation is processed, and only for the purpose of returning a transcript.
 Password fields and incognito mode are excluded from the dictation history
-entirely.
+entirely; section 2.3 names the one request whose field the App cannot see.
 
 ---
 
@@ -370,7 +417,10 @@ worth less than none:
 ## 9. Data security
 
 Data sent to AI providers, and to Dictate Cloud, is transmitted over encrypted
-HTTPS connections. Your credentials and settings are kept in the App's private,
+HTTPS connections. The one exception is a plain `http://` address you enter
+yourself for a server of your own; it is allowed for a server on your home
+network, and the App warns under the address field that such a connection is not
+encrypted. Your credentials and settings are kept in the App's private,
 sandboxed storage, which on Android is not accessible to other apps. On the
 Dictate Cloud server, recovery codes and access keys are stored only as SHA-256
 hashes, so possession of the database does not allow anyone to sign in. No method
