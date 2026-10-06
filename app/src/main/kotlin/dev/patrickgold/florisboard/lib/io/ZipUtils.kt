@@ -23,7 +23,9 @@ import org.florisboard.lib.android.write
 import org.florisboard.lib.kotlin.io.FsDir
 import org.florisboard.lib.kotlin.io.FsFile
 import java.io.FileOutputStream
+import java.io.IOException
 import java.util.zip.ZipEntry
+import java.util.zip.ZipException
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
@@ -134,13 +136,17 @@ object ZipUtils {
      * @throws java.util.zip.ZipException If a Zip format error has occurred.
      * @throws java.io.IOException If an I/O error has occurred.
      */
-    fun unzip(srcFile: FsFile, dstDir: FsDir) {
+    fun unzip(srcFile: FsFile, dstDir: FsDir, limits: UnzipLimits = UnzipLimits()) {
         require(srcFile.exists() && srcFile.isFile) { "Given src file `$srcFile` is not valid or a directory." }
         dstDir.mkdirs()
         ZipFile(srcFile).use { flexFile ->
             val flexEntries = flexFile.entries()
+            var entryCount = 0
             while (flexEntries.hasMoreElements()) {
                 val flexEntry = flexEntries.nextElement()
+                if (++entryCount > limits.maxEntries) {
+                    throw ZipException("More than ${limits.maxEntries} entries")
+                }
                 if (flexEntry.name.length > 255) {
                     continue
                 }
@@ -156,20 +162,60 @@ object ZipUtils {
                 if (flexEntry.isDirectory) {
                     flexEntryFile.mkdir()
                 } else {
-                    flexFile.copy(flexEntry, flexEntryFile)
+                    flexFile.copy(flexEntry, flexEntryFile, dstDir, limits)
                 }
             }
         }
     }
 
-    private fun ZipFile.copy(srcEntry: ZipEntry, dstFile: FsFile) {
+    /**
+     * What an archive may unpack to, counted as the bytes come out rather than believed from its
+     * directory, which says whatever the archive's maker wrote there and -1 when it does not know (#383).
+     *
+     * There is deliberately no cap on the total: a backup of the dictation history with its audio is
+     * legitimately as large as the user's own audio budget. The device is protected instead, by stopping
+     * before it is left with less than [minFreeBytes].
+     */
+    data class UnzipLimits(
+        val maxEntryBytes: Long = 100_000_000L,
+        val maxEntries: Int = 100_000,
+        val minFreeBytes: Long = 200_000_000L,
+    )
+
+    private fun ZipFile.copy(srcEntry: ZipEntry, dstFile: FsFile, dstDir: FsDir, limits: UnzipLimits) {
+        var written = 0L
+        var fits = true
         dstFile.outputStream().use { outStream ->
-            if (srcEntry.size > 100000000) {
-                return
-            }
             this.getInputStream(srcEntry).use { inStream ->
-                inStream.copyTo(outStream)
+                val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                var sinceSpaceCheck = 0L
+                while (true) {
+                    val read = inStream.read(buffer)
+                    if (read < 0) break
+                    written += read
+                    if (written > limits.maxEntryBytes) {
+                        fits = false
+                        break
+                    }
+                    sinceSpaceCheck += read
+                    if (sinceSpaceCheck >= SPACE_CHECK_INTERVAL_BYTES) {
+                        sinceSpaceCheck = 0L
+                        if (dstDir.usableSpace < limits.minFreeBytes) {
+                            fits = false
+                            break
+                        }
+                    }
+                    outStream.write(buffer, 0, read)
+                }
             }
         }
+        // An entry over its own limit is left out, as before; one that would fill the device ends the
+        // whole archive, since every entry after it would do the same.
+        if (!fits) {
+            dstFile.delete()
+            if (written <= limits.maxEntryBytes) throw IOException("Not enough free space to unpack")
+        }
     }
+
+    private const val SPACE_CHECK_INTERVAL_BYTES = 8L * 1024 * 1024
 }
