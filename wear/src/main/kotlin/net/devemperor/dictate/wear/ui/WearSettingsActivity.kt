@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -64,6 +65,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.devemperor.dictate.wear.audio.WearAudioRecorder
+import net.devemperor.dictate.wear.ime.WearKeyboardPrefs
 import net.devemperor.dictate.wear.ime.WearRecordingInfo
 import net.devemperor.dictate.wear.ime.rememberElapsedLabel
 import net.devemperor.dictate.wear.sync.WearSettingsStore
@@ -346,6 +348,7 @@ private fun SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             item { ListHeader { Text(stringResource(R.string.wear_app_name), fontWeight = FontWeight.SemiBold) } }
+
             // --- Status card: connection + active provider/model + resolved transcription path ---
             item { StatusCard(phoneConnected = phoneConnected, synced = synced) }
 
@@ -453,6 +456,20 @@ private fun SettingsScreen(
                     label = { Text(stringResource(R.string.wear_reword)) },
                     secondaryLabel = { Text(if (reword) stringResource(R.string.wear_reword_on) else stringResource(R.string.wear_reword_off)) },
                     toggleControl = { Switch(checked = reword) },
+                )
+            }
+
+            // --- Auto-send: send/search as soon as a dictation lands (#294); a watch setting, off by default ---
+            item {
+                val context = LocalContext.current
+                var autoSend by remember { mutableStateOf(WearKeyboardPrefs.autoSend(context)) }
+                ToggleChip(
+                    checked = autoSend,
+                    onCheckedChange = { autoSend = it; WearKeyboardPrefs.setAutoSend(context, it) },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text(stringResource(R.string.wear_auto_send)) },
+                    secondaryLabel = { Text(stringResource(if (autoSend) R.string.wear_auto_send_on else R.string.wear_auto_send_off)) },
+                    toggleControl = { Switch(checked = autoSend) },
                 )
             }
 

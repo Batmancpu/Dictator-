@@ -56,4 +56,13 @@
     <string name="wear_cd_discard">Verwerfen</string>
     <string name="wear_err_phone_silent">Keine Antwort vom Handy</string>
     <string name="wear_try_tap_cancel">Zum Abbrechen tippen</string>
+    <string name="wear_err_not_inserted">Nicht eingefügt · Zum Einfügen tippen</string>
+    <string name="wear_cd_send">Senden</string>
+    <string name="wear_cd_search">Suchen</string>
+    <string name="wear_cd_go">Los</string>
+    <string name="wear_cd_done">Fertig</string>
+    <string name="wear_cd_close">Schließen</string>
+    <string name="wear_auto_send">Automatisch senden</string>
+    <string name="wear_auto_send_on">Sendet direkt nach dem Diktat</string>
+    <string name="wear_auto_send_off">Fragt erst mit ✓</string>
 </resources>

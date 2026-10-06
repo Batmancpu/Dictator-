@@ -11,6 +11,7 @@
 package net.devemperor.dictate.wear.ime
 
 import android.os.SystemClock
+import android.view.inputmethod.EditorInfo
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -43,8 +44,11 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material.icons.automirrored.filled.KeyboardReturn
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
@@ -54,6 +58,7 @@ import androidx.compose.material.icons.filled.Mood
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -122,6 +127,8 @@ fun WearKeyboard(
     recordingInfo: WearRecordingInfo,
     errorMessage: String?,
     canResend: Boolean = false,
+    readyText: String? = null,
+    readyAction: Int = EditorInfo.IME_ACTION_DONE,
     peakProvider: () -> Int = { 0 },
 ) {
     // Hold the display on while the watch listens or waits for the text (#363), as the phone's floating
@@ -172,6 +179,8 @@ fun WearKeyboard(
                                 recordingInfo = recordingInfo,
                                 errorMessage = errorMessage,
                                 canResend = canResend,
+                                readyText = readyText,
+                                readyAction = readyAction,
                                 actions = actions,
                                 peakProvider = peakProvider,
                                 onShowNumbers = {
@@ -267,6 +276,8 @@ private fun VoicePage(
     recordingInfo: WearRecordingInfo,
     errorMessage: String?,
     canResend: Boolean,
+    readyText: String?,
+    readyAction: Int,
     actions: WearImeActions,
     peakProvider: () -> Int,
     onShowNumbers: () -> Unit,
@@ -323,6 +334,8 @@ private fun VoicePage(
 
         // Kept audio of a failed or interrupted dictation: the big button sends it again.
         val resend = state == WearDictationState.ERROR && canResend
+        // The dictation is in a field that sends or searches: the big button does that (#294).
+        val ready = state == WearDictationState.READY
         Button(
             onClick = actions.toggleDictation,
             enabled = !busy,
@@ -332,6 +345,10 @@ private fun VoicePage(
             when {
                 busy -> CircularProgressIndicator(modifier = Modifier.size(26.dp), strokeWidth = 3.dp)
                 recording -> Icon(Icons.Filled.Stop, contentDescription = stringResource(R.string.wear_cd_stop), modifier = Modifier.size(28.dp))
+                ready -> {
+                    val (icon, desc) = actionIcon(readyAction)
+                    Icon(icon, contentDescription = stringResource(desc), modifier = Modifier.size(28.dp))
+                }
                 resend -> Icon(Icons.Filled.Refresh, contentDescription = stringResource(R.string.wear_cd_resend), modifier = Modifier.size(28.dp))
                 else -> Icon(Icons.Filled.Mic, contentDescription = stringResource(R.string.wear_cd_dictate), modifier = Modifier.size(28.dp))
             }
@@ -358,6 +375,24 @@ private fun VoicePage(
             }
         }
 
+        // Above the button once it is in: what went into the field, which the keyboard hides — the user
+        // reads it here before sending it off (#294).
+        if (ready && readyText != null) {
+            Box(
+                modifier = Modifier.align(Alignment.Center).offset(y = (-62).dp).padding(horizontal = 28.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = readyText,
+                    style = MaterialTheme.typography.caption1,
+                    color = MaterialTheme.colors.onBackground,
+                    textAlign = TextAlign.Center,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+
         // Below the button: the controls while recording; the X while waiting or holding kept audio, so
         // neither can trap the user; the status line otherwise.
         Box(
@@ -374,6 +409,7 @@ private fun VoicePage(
                     )
                 }
                 busy -> SmallAction(Icons.Filled.Close, stringResource(R.string.wear_cd_cancel), actions.cancelDictation)
+                ready -> SmallAction(Icons.Filled.Close, stringResource(R.string.wear_cd_close), actions.cancelDictation)
                 resend -> Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -391,6 +427,14 @@ private fun VoicePage(
             }
         }
     }
+}
+
+/** The icon and label of a field's finishing action, as the ✓ shows it. */
+private fun actionIcon(action: Int): Pair<ImageVector, Int> = when (action) {
+    EditorInfo.IME_ACTION_SEND -> Icons.AutoMirrored.Filled.Send to R.string.wear_cd_send
+    EditorInfo.IME_ACTION_SEARCH -> Icons.Filled.Search to R.string.wear_cd_search
+    EditorInfo.IME_ACTION_GO -> Icons.AutoMirrored.Filled.ArrowForward to R.string.wear_cd_go
+    else -> Icons.Filled.Check to R.string.wear_cd_done
 }
 
 @Composable

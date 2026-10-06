@@ -26,6 +26,13 @@
     <string name="wear_cd_enter">Enter</string>
     <string name="wear_cd_resend">Send again</string>
     <string name="wear_cd_discard">Discard</string>
+    <!-- The big button once a dictation is in a field that sends/searches (#294), by the field's action -->
+    <string name="wear_cd_send">Send</string>
+    <string name="wear_cd_search">Search</string>
+    <string name="wear_cd_go">Go</string>
+    <string name="wear_cd_done">Done</string>
+    <!-- The X under it: close the keyboard, the text stays in the field unsent -->
+    <string name="wear_cd_close">Close</string>
 
     <!-- Errors -->
     <string name="wear_err_mic_grant">Grant mic in Dictate app</string>
@@ -41,6 +48,8 @@
     <string name="wear_err_no_transport">No phone; sync key in app</string>
     <!-- The phone took the audio and then stopped reporting back (#363). -->
     <string name="wear_err_phone_silent">No answer from phone</string>
+    <!-- The field did not take the dictation (it went away); the text is kept, the big button inserts it (#294) -->
+    <string name="wear_err_not_inserted">Not inserted · Tap to insert</string>
 
     <!-- Settings sections -->
     <string name="wear_sec_try">Try it</string>
@@ -72,6 +81,9 @@
     <string name="wear_reword">Auto-reword</string>
     <string name="wear_reword_on">Format dictations</string>
     <string name="wear_reword_off">Raw text</string>
+    <string name="wear_auto_send">Auto-send</string>
+    <string name="wear_auto_send_on">Sends right after dictating</string>
+    <string name="wear_auto_send_off">Asks with ✓ first</string>
     <string name="wear_resync">Re-sync from phone</string>
 
     <!-- Status card -->

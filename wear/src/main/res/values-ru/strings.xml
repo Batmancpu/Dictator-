@@ -56,4 +56,13 @@
     <string name="wear_cd_discard">Удалить</string>
     <string name="wear_err_phone_silent">Телефон не отвечает</string>
     <string name="wear_try_tap_cancel">Нажмите, чтобы отменить</string>
+    <string name="wear_err_not_inserted">Не вставлено · Нажмите, чтобы вставить</string>
+    <string name="wear_cd_send">Отправить</string>
+    <string name="wear_cd_search">Поиск</string>
+    <string name="wear_cd_go">Перейти</string>
+    <string name="wear_cd_done">Готово</string>
+    <string name="wear_cd_close">Закрыть</string>
+    <string name="wear_auto_send">Автоотправка</string>
+    <string name="wear_auto_send_on">Отправляет сразу после диктовки</string>
+    <string name="wear_auto_send_off">Сначала спрашивает ✓</string>
 </resources>

@@ -56,4 +56,13 @@
     <string name="wear_cd_discard">Buang</string>
     <string name="wear_err_phone_silent">Ponsel tidak menjawab</string>
     <string name="wear_try_tap_cancel">Ketuk untuk batal</string>
+    <string name="wear_err_not_inserted">Tidak disisipkan · Ketuk untuk menyisipkan</string>
+    <string name="wear_cd_send">Kirim</string>
+    <string name="wear_cd_search">Cari</string>
+    <string name="wear_cd_go">Buka</string>
+    <string name="wear_cd_done">Selesai</string>
+    <string name="wear_cd_close">Tutup</string>
+    <string name="wear_auto_send">Kirim otomatis</string>
+    <string name="wear_auto_send_on">Langsung kirim setelah dikte</string>
+    <string name="wear_auto_send_off">Tanya dulu dengan ✓</string>
 </resources>

@@ -56,4 +56,13 @@
     <string name="wear_cd_discard">舍弃</string>
     <string name="wear_err_phone_silent">手机无响应</string>
     <string name="wear_try_tap_cancel">点按取消</string>
+    <string name="wear_err_not_inserted">未插入 · 点按插入</string>
+    <string name="wear_cd_send">发送</string>
+    <string name="wear_cd_search">搜索</string>
+    <string name="wear_cd_go">前往</string>
+    <string name="wear_cd_done">完成</string>
+    <string name="wear_cd_close">关闭</string>
+    <string name="wear_auto_send">自动发送</string>
+    <string name="wear_auto_send_on">听写后立即发送</string>
+    <string name="wear_auto_send_off">先用 ✓ 确认</string>
 </resources>

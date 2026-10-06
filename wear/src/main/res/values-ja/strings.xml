@@ -56,4 +56,13 @@
     <string name="wear_cd_discard">破棄</string>
     <string name="wear_err_phone_silent">スマホから応答なし</string>
     <string name="wear_try_tap_cancel">タップでキャンセル</string>
+    <string name="wear_err_not_inserted">挿入されませんでした · タップで挿入</string>
+    <string name="wear_cd_send">送信</string>
+    <string name="wear_cd_search">検索</string>
+    <string name="wear_cd_go">移動</string>
+    <string name="wear_cd_done">完了</string>
+    <string name="wear_cd_close">閉じる</string>
+    <string name="wear_auto_send">自動送信</string>
+    <string name="wear_auto_send_on">音声入力後すぐ送信</string>
+    <string name="wear_auto_send_off">まず ✓ で確認</string>
 </resources>

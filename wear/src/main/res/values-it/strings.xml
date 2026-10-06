@@ -56,4 +56,13 @@
     <string name="wear_cd_discard">Scarta</string>
     <string name="wear_err_phone_silent">Nessuna risposta dal telefono</string>
     <string name="wear_try_tap_cancel">Tocca per annullare</string>
+    <string name="wear_err_not_inserted">Non inserito · Tocca per inserire</string>
+    <string name="wear_cd_send">Invia</string>
+    <string name="wear_cd_search">Cerca</string>
+    <string name="wear_cd_go">Vai</string>
+    <string name="wear_cd_done">Fatto</string>
+    <string name="wear_cd_close">Chiudi</string>
+    <string name="wear_auto_send">Invio automatico</string>
+    <string name="wear_auto_send_on">Invia subito dopo la dettatura</string>
+    <string name="wear_auto_send_off">Chiede prima con ✓</string>
 </resources>

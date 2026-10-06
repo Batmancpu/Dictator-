@@ -56,4 +56,13 @@
     <string name="wear_cd_discard">Verwijderen</string>
     <string name="wear_err_phone_silent">Geen antwoord van telefoon</string>
     <string name="wear_try_tap_cancel">Tik om te annuleren</string>
+    <string name="wear_err_not_inserted">Niet ingevoegd · Tik om in te voegen</string>
+    <string name="wear_cd_send">Versturen</string>
+    <string name="wear_cd_search">Zoeken</string>
+    <string name="wear_cd_go">Ga</string>
+    <string name="wear_cd_done">Klaar</string>
+    <string name="wear_cd_close">Sluiten</string>
+    <string name="wear_auto_send">Automatisch versturen</string>
+    <string name="wear_auto_send_on">Verstuurt direct na dicteren</string>
+    <string name="wear_auto_send_off">Vraagt eerst met ✓</string>
 </resources>

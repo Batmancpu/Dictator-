@@ -56,4 +56,13 @@
     <string name="wear_cd_discard">Descartar</string>
     <string name="wear_err_phone_silent">O celular não responde</string>
     <string name="wear_try_tap_cancel">Toque para cancelar</string>
+    <string name="wear_err_not_inserted">Não inserido · Toque para inserir</string>
+    <string name="wear_cd_send">Enviar</string>
+    <string name="wear_cd_search">Pesquisar</string>
+    <string name="wear_cd_go">Ir</string>
+    <string name="wear_cd_done">Concluído</string>
+    <string name="wear_cd_close">Fechar</string>
+    <string name="wear_auto_send">Envio automático</string>
+    <string name="wear_auto_send_on">Envia logo após ditar</string>
+    <string name="wear_auto_send_off">Pergunta antes com ✓</string>
 </resources>

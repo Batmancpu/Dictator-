@@ -35,6 +35,8 @@ enum class WearDictationState {
     RECORDING,
     TRANSCRIBING,
     REWORDING,
+    /** The dictation is in a field that sends or searches; a ✓ triggers that, the X leaves it (#294). */
+    READY,
     ERROR,
 }
 

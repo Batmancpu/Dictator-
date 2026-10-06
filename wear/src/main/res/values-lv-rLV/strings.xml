@@ -56,4 +56,13 @@
     <string name="wear_cd_discard">Atmest</string>
     <string name="wear_err_phone_silent">Tālrunis neatbild</string>
     <string name="wear_try_tap_cancel">Pieskaries, lai atceltu</string>
+    <string name="wear_err_not_inserted">Nav ievietots · Pieskaries, lai ievietotu</string>
+    <string name="wear_cd_send">Sūtīt</string>
+    <string name="wear_cd_search">Meklēt</string>
+    <string name="wear_cd_go">Doties</string>
+    <string name="wear_cd_done">Gatavs</string>
+    <string name="wear_cd_close">Aizvērt</string>
+    <string name="wear_auto_send">Automātiski sūtīt</string>
+    <string name="wear_auto_send_on">Sūta uzreiz pēc diktēšanas</string>
+    <string name="wear_auto_send_off">Vispirms jautā ar ✓</string>
 </resources>
