@@ -1388,7 +1388,12 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         if (DictFold.hasNonTrivialFold(index.lang) && word.length >= 2) {
             val key = index.fold(word)
             val forms = index.formsOf(key)
-            if (forms.isNotEmpty() && forms.none { it == word }) {
+            // Compared in the casing the word was typed in: a sentence-initial `Ek` or `Je` *is* the
+            // dictionary's `ek` and `je`. Compared as stored, it read as a spelling to restore, and the
+            // strip held `Ek` as a correction of `Ek` — harmless until the next word's suggestions were
+            // late (the first words after Afrikaans loaded, on the emulator): the space then took the
+            // stale `Ek` and wrote it over `praat`.
+            if (forms.isNotEmpty() && forms.none { it == word || cased(it) == word }) {
                 // Keep the typed spelling tappable and left-most so the restoration can be bypassed (#150).
                 out[TYPED_WORD_KEY + key] = WordSuggestionCandidate(
                     text = word, confidence = 1.0, isEligibleForAutoCommit = false, sourceProvider = this,
@@ -1530,7 +1535,15 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
                     // somebody's name rather than restored to `j'aime`, which the corpus attests 450 times
                     // and the name not at all. First claim wins, and the apostrophe block's is the one
                     // backed by a measurement.
-                    isEligibleForAutoCommit = autoCorrectOn && out.values.none { it.isEligibleForAutoCommit },
+                    //
+                    // A claim on this very slot for this very spelling is not another claim, though: in a
+                    // folding language the restoration above reaches a capitalised word first (`afrikaans`
+                    // folds onto Afrikaans) and proposes exactly what this block would. Counting that
+                    // proposal against itself replaced it with one that could never be taken, so `france`
+                    // and Afrikaans `engels` stayed lowercase while German `haus` became Haus.
+                    isEligibleForAutoCommit = autoCorrectOn && out.none { (key, candidate) ->
+                        candidate.isEligibleForAutoCommit && !(key == lower && candidate.text.toString() == canonical)
+                    },
                     sourceProvider = this,
                 )
             }
