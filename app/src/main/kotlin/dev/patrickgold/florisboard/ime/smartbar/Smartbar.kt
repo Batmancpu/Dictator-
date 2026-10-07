@@ -73,6 +73,7 @@ import dev.patrickgold.florisboard.ime.smartbar.quickaction.QuickActionButton
 import dev.patrickgold.florisboard.ime.smartbar.quickaction.QuickActionsRow
 import dev.patrickgold.florisboard.ime.smartbar.quickaction.keyData
 import dev.patrickgold.florisboard.ime.smartbar.quickaction.ToggleOverflowPanelAction
+import dev.patrickgold.florisboard.ime.text.key.KeyCode
 import dev.patrickgold.florisboard.ime.theme.FlorisImeUi
 import dev.patrickgold.florisboard.keyboardManager
 import dev.patrickgold.florisboard.nlpManager
@@ -198,6 +199,7 @@ private fun SmartbarMainRow(modifier: Modifier = Modifier) {
 
     // Drives the in-Smartbar dictation indicator (recording timer / transcribing spinner).
     val dictateState by DictateController.state.collectAsState()
+    val isDictating = dictateState !is DictateController.UiState.Idle
 
     // Contextual prompt chip strip: shown in place of the candidates while text is selected and
     // rewording is enabled (roadmap 4.3). The selection flag is derived as a distinct boolean so the
@@ -292,7 +294,6 @@ private fun SmartbarMainRow(modifier: Modifier = Modifier) {
         ) {
             val enterTransition = if (shouldAnimate) HorizontalEnterTransition else NoEnterTransition
             val exitTransition = if (shouldAnimate) HorizontalExitTransition else NoExitTransition
-            val isDictating = dictateState !is DictateController.UiState.Idle
             this@CenterContent.AnimatedVisibility(
                 visible = !expanded && !isDictating && !showDictatePromptStrip,
                 enter = enterTransition,
@@ -410,6 +411,40 @@ private fun SmartbarMainRow(modifier: Modifier = Modifier) {
         }
     }
 
+    /**
+     * A running dictation in the two layouts that have no centre part: its bar (bin, timer, level) with the
+     * mic that stops it on the left, where "Actions only" shows the mic anyway.
+     *
+     * The bar used to live only in [CenterContent], which just the two mixed layouts have. So with "Actions
+     * only" the actions row simply stayed during a dictation, and a failed recording had no bin to drop it
+     * in (reported by e-mail); "Suggestions only" kept its suggestions the same way. The mic is looked up
+     * wherever the user put it, because the bar has no stop of its own; "Suggestions only" shows it here
+     * too, the one time it is needed.
+     */
+    @Composable
+    fun RowScope.DictationRow() {
+        val actionArrangement by prefs.smartbar.actionArrangement.collectAsState()
+        val secondActions by prefs.smartbar.actionSecondActions.collectAsState()
+        val evaluator by keyboardManager.activeSmartbarEvaluator.collectAsState()
+        val mic = (listOfNotNull(actionArrangement.stickyAction) + actionArrangement.dynamicActions)
+            .firstOrNull { it.keyData().code == KeyCode.IME_UI_MODE_DICTATE }
+        if (mic != null) {
+            QuickActionButton(
+                modifier = Modifier.padding(horizontal = 4.dp),
+                action = mic,
+                evaluator = evaluator,
+                secondAction = secondActions.childOf(mic.keyData().code),
+            )
+        }
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+        ) {
+            DictateSmartbarUi(dictateState)
+        }
+    }
+
     SideEffect {
         if (!shouldAnimate) {
             scope.launch {
@@ -425,7 +460,9 @@ private fun SmartbarMainRow(modifier: Modifier = Modifier) {
     ) {
         when (smartbarLayout) {
             SmartbarLayout.SUGGESTIONS_ONLY -> {
-                if (showDictatePromptStrip) {
+                if (isDictating) {
+                    DictationRow()
+                } else if (showDictatePromptStrip) {
                     DictatePromptStrip(dictatePrompts, modifier = Modifier.fillMaxSize())
                 } else if (shouldShowInlineSuggestionsUi) {
                     InlineSuggestionsUi(inlineSuggestions)
@@ -435,7 +472,9 @@ private fun SmartbarMainRow(modifier: Modifier = Modifier) {
             }
 
             SmartbarLayout.ACTIONS_ONLY -> {
-                if (shouldShowInlineSuggestionsUi) {
+                if (isDictating) {
+                    DictationRow()
+                } else if (shouldShowInlineSuggestionsUi) {
                     InlineSuggestionsUi(inlineSuggestions)
                 } else {
                     QuickActionsRow(FlorisImeUi.SmartbarSharedActionsRow.elementName)
