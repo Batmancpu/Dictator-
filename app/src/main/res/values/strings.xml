@@ -1155,6 +1155,54 @@
     <string name="apptour63__outro_eyebrow">That is 6.3</string>
     <string name="apptour63__outro_title">Fewer detours, same keyboard</string>
     <string name="apptour63__outro_body">Nothing about the way you dictate has changed — your own key, your own server, or a model on the device. You can revisit any tour under Settings › About.</string>
+    <string name="apptour64__cta_languages" comment="Button on the what\'s-new translation page that opens the screen where translation languages are downloaded">Choose languages</string>
+    <string name="apptour64__cta_providers" comment="Button on a what\'s-new page that opens the list of transcription and rewording providers">Show providers</string>
+    <string name="apptour64__intro_eyebrow">Dictate 6.4</string>
+    <string name="apptour64__intro_title">Translated on the phone, symbols of your own</string>
+    <string name="apptour64__intro_body">Type in one language and the field fills up in another, translated on this device. Both symbol pages can hold the keys you choose. There are new providers and a much better offline model, a word you say to turn a dictation into an instruction, and a privacy and security review of the whole app.</string>
+    <string name="apptour64__translate_eyebrow">New: translate</string>
+    <string name="apptour64__translate_title">Translation that never leaves the phone</string>
+    <string name="apptour64__translate_body">Tap Translate in the Smartbar and type into the field above it — the app’s field fills with the translation as you go. Mozilla’s models do the work on this device, in 49 languages, and nothing you type is sent anywhere. Enter puts in the finished translation before it sends, so a message never goes out half translated. Each language is a one-time download, and the list shows its size before you get it.</string>
+    <string name="apptour64__symbols_eyebrow">New: your own symbols</string>
+    <string name="apptour64__symbols_title">The symbols you use, where you want them</string>
+    <string name="apptour64__symbols_body">Under Keyboard › Custom symbols, both symbol pages become yours, in every language. Tap a key in the picture of the page, choose what it types and what its long press offers, and drag those into order. A palette has the symbols your keyboard does not have yet. Until you change a key the pages look exactly like the built-in ones, and a finished layout can be exported to share.</string>
+    <string name="apptour64__providers_eyebrow">Providers and offline models</string>
+    <string name="apptour64__providers_title">New providers, and a better offline model</string>
+    <string name="apptour64__providers_body" comment="Parakeet Ultra and Parakeet TDT 0.6B v3 are model names and stay as they are">xAI’s Grok now transcribes as well, as a file and live, with the same key that rewords. Scaleway and OVHcloud keep audio and text inside the EU. Offline, Parakeet Ultra replaces Parakeet TDT 0.6B v3: the same 670 MB and the same 25 languages, with 29 % fewer errors in German. If you use v3, download Ultra in the list of on-device models and delete the old one — v3 keeps working until you do. And the providers list now shows only the ones you use; all the others are under “Add a provider”, with a search.</string>
+    <string name="apptour64__command_eyebrow">New: command word</string>
+    <string name="apptour64__command_title">Say the word, and the dictation becomes an instruction</string>
+    <string name="apptour64__command_body">Choose a word under Rewording — “Jarvis”, say. A dictation that starts with it runs as a live prompt: on the selected text, or as a question when nothing is selected. Only the first word counts, so a sentence that merely mentions it is written as usual. Automatic prompts also work as intended now: they always get the dictation they run on, and one that is only [text in brackets] is added to the end as written instead of going to the model.</string>
+    <string name="apptour64__privacy_eyebrow">Privacy and security</string>
+    <string name="apptour64__privacy_title">The whole app, checked</string>
+    <string name="apptour64__privacy_body">Every part of Dictate was reviewed for privacy and security, and what turned up is fixed. A dictation into a password or PIN field stays out of the history, now also through the floating button. Android’s cloud backup only takes your API keys end-to-end encrypted. And “Trust user certificates” is now set per provider account rather than for all of them at once.</string>
+    <string name="apptour64__more_eyebrow">Also</string>
+    <string name="apptour64__more_title">Everything else in 6.4</string>
+    <string name="apptour64__more_body">The smaller changes, for anyone who wants the details. Skip ahead if you don’t.</string>
+    <string name="apptour64__more_typing" comment="Heading of a group of small changes on the what\'s-new page">Typing</string>
+    <string name="apptour64__more_typing_slips">Suggestions read slips: a letter on the wrong key, two swapped, a slip in a half-typed word. The word you meant shows up far more often, and every key press is quicker.</string>
+    <string name="apptour64__more_typing_autocorrect">With auto-correct off, fixes still appear in the strip. The switch only decides whether Space swaps the word.</string>
+    <string name="apptour64__more_typing_glide">Glide typing finds words that start or end on an accented letter — in Hungarian, Russian, Finnish, Polish, Turkish and more.</string>
+    <string name="apptour64__more_typing_swipe">A sideways swipe over the letters no longer switches the language, which mostly happened by accident. The globe key still does, and Gestures brings the swipe back.</string>
+    <string name="apptour64__more_typing_punctuation">A punctuation mark right after an auto-correction takes its space, and a glide along the space bar stays on its line.</string>
+    <string name="apptour64__more_typing_calculator">The calculator answers before the “=”, and a tap on the answer completes the line.</string>
+    <string name="apptour64__more_typing_size">The keyboard remembers its size for each language.</string>
+    <string name="apptour64__more_typing_languages">Afrikaans is a full keyboard language. A new layout only needs its language picked — the other fields fill themselves in.</string>
+    <string name="apptour64__more_dictation" comment="Heading of a group of small changes on the what\'s-new page">Dictation</string>
+    <string name="apptour64__more_dictation_stop">Stopping a dictation that is still waiting for the server keeps the recording, ready to send again.</string>
+    <string name="apptour64__more_dictation_timeout">A connection that stalls gives up after one timeout instead of four, and a request the provider refused is not sent again.</string>
+    <string name="apptour64__more_dictation_live">A word you delete during a live dictation stays deleted, and two dictations in a row get a space between them.</string>
+    <string name="apptour64__more_dictation_hold">Holding the mic to talk: a slow tap stays a tap, and a hold shorter than a second is discarded.</string>
+    <string name="apptour64__more_dictation_talkback">TalkBack can find and press the mic, and says what the dictation is doing.</string>
+    <string name="apptour64__more_clipboard" comment="Heading of a group of small changes on the what\'s-new page">Clipboard and emoji</string>
+    <string name="apptour64__more_clipboard_pins">Pinned clips now sit at the bottom, with tabs to jump between the groups. “Pinned items on top” brings the old order back.</string>
+    <string name="apptour64__more_clipboard_chips">The link, email and number chips beside a copied text can be switched off.</string>
+    <string name="apptour64__more_clipboard_emoji">The emoji row scrolls and answers a long press, and the emoji search shows two rows.</string>
+    <string name="apptour64__more_elsewhere" comment="Heading of a group of small changes on the what\'s-new page">Floating button and watch</string>
+    <string name="apptour64__more_elsewhere_bubble">The floating button can wait for a keyboard before it appears, and writes into the web field you tapped.</string>
+    <string name="apptour64__more_elsewhere_watch">On the watch, a dictation finishes the way its field asks — send, search or a check mark — with auto-send if you want it, and the wait shows its seconds.</string>
+    <string name="apptour64__outro_eyebrow">That is 6.4</string>
+    <string name="apptour64__outro_title">More on the phone, more your own</string>
+    <string name="apptour64__outro_body">Translation and the new offline model work without a connection, and everything else still runs the way you set it up — your own key, your own server, or a model on the device. You can revisit any tour under Settings › About.</string>
     <string name="about__website__title" comment="Preference title linking to the marketing website">Website</string>
     <string name="about__repository__title" comment="Preference title">Repository (GitHub)</string>
     <string name="about__repository__summary" comment="Preference summary">Source code, discussions, issues and info</string>
