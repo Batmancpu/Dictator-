@@ -478,7 +478,7 @@
     <string name="settings__learned__empty" comment="Shown when nothing has been learned yet">Noch nichts gelernt. Wörter, die du tippst und die kein Wörterbuch kennt, erscheinen hier.</string>
     <string name="settings__learned__empty_stage" comment="Shown when one learning stage holds no words, while others do">Auf dieser Stufe steht nichts.</string>
     <string name="settings__learned__disabled" comment="Shown when the learning feature is switched off">Das Lernen beim Tippen ist ausgeschaltet, es wird also nichts Neues gemerkt.</string>
-    <string name="settings__learned__disabled_dictionary" comment="Shown when learning is on but the internal user dictionary it writes into is off">Das interne Benutzerwörterbuch ist ausgeschaltet, also kann nichts gelernt werden — ein aufgeschnapptes Wort hätte kein Ziel. Unter „Benutzerwörterbücher" einschalten.</string>
+    <string name="settings__learned__disabled_dictionary" comment="Shown when learning is on but the internal user dictionary it writes into is off">Das interne Benutzerwörterbuch ist ausgeschaltet, also kann nichts gelernt werden — ein aufgeschnapptes Wort hätte kein Ziel. Unter „Benutzerwörterbücher“ einschalten.</string>
     <string name="settings__learned__stage_remembered" comment="Ladder stage: seen once, no effect yet">Bemerkt — wird noch nicht vorgeschlagen</string>
     <string name="settings__learned__stage_suggested" comment="Ladder stage: appears in the suggestion strip">Wird beim Tippen vorgeschlagen</string>
     <string name="settings__learned__stage_promoted" comment="Ladder stage: in the personal dictionary">Im Wörterbuch — die Autokorrektur lässt es in Ruhe</string>
@@ -2105,7 +2105,7 @@
     <string name="apptour60__chinese_body">Pinyin mit Kandidatenzeile — bisher gab es nur Zhengma, das kaum jemand benutzt. Dazu ein On-Device-Modell, das wirklich auf Chinesisch trainiert wurde, und ein Anbieter, der auch vom Festland aus erreichbar ist.</string>
     <string name="apptour60__emoji_eyebrow">Emoji</string>
     <string name="apptour60__emoji_title">Emojis in deiner Sprache suchen</string>
-    <string name="apptour60__emoji_body">Die Emoji-Suche kannte sechs Sprachen. Jetzt sind es über vierzig — such nach „heart", „心" oder „قلب" und du landest beim selben Emoji. Die Suche folgt der Sprache deiner Tastatur.</string>
+    <string name="apptour60__emoji_body">Die Emoji-Suche kannte sechs Sprachen. Jetzt sind es über vierzig — such nach „heart“, „心“ oder „قلب“ und du landest beim selben Emoji. Die Suche folgt der Sprache deiner Tastatur.</string>
     <string name="apptour60__languages_eyebrow">Wörterbücher</string>
     <string name="apptour60__languages_title">Sieben Sprachen, die keine Vorschläge hatten</string>
     <string name="apptour60__languages_body">Arabisch, Bengalisch, Finnisch, Hindi, Indonesisch, Tamil und Urdu bekommen jetzt Wortvorschläge und Autokorrektur. Isländisch und Georgisch enthielten schlicht die falschen Sprachen und wurden neu gebaut. Und die Langdruck-Zeichen von 19 Layouts richten sich danach, was in der Sprache wirklich geschrieben wird.</string>

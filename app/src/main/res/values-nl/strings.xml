@@ -2034,7 +2034,7 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="apptour60__chinese_body">Pinyin met kandidatenrij — tot nu was er alleen Zhengma, dat vrijwel niemand gebruikt. Daarbij komen een model op het toestel dat echt op Chinees getraind is, en een aanbieder die vanaf het vasteland bereikbaar is.</string>
     <string name="apptour60__emoji_eyebrow">Emoji</string>
     <string name="apptour60__emoji_title">Emoji zoeken in je eigen taal</string>
-    <string name="apptour60__emoji_body">De emojizoekfunctie kende zes talen. Nu zijn het er ruim veertig — zoek op „heart", „心" of „قلب" en je komt bij dezelfde emoji uit. De zoekfunctie volgt de taal van je toetsenbord.</string>
+    <string name="apptour60__emoji_body">De emojizoekfunctie kende zes talen. Nu zijn het er ruim veertig — zoek op “heart”, “心” of “قلب” en je komt bij dezelfde emoji uit. De zoekfunctie volgt de taal van je toetsenbord.</string>
     <string name="apptour60__languages_eyebrow">Woordenboeken</string>
     <string name="apptour60__languages_title">Zeven talen zonder suggesties</string>
     <string name="apptour60__languages_body">Arabisch, Bengaals, Fins, Hindi, Indonesisch, Tamil en Urdu krijgen woordsuggesties en autocorrectie. IJslands en Georgisch bevatten domweg de verkeerde talen en zijn opnieuw gebouwd. En de tekens onder lang indrukken van 19 indelingen volgen nu wat de taal werkelijk schrijft.</string>
