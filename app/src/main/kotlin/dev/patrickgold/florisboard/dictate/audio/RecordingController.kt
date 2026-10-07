@@ -84,11 +84,15 @@ class RecordingController(private val context: Context) {
      * audio, with the reason as `"readError"` or `"silence"` — see the capture loop for what each one
      * means and why both are needed. The owner's job is then to re-route and [swapSource], or to end the
      * dictation; see #411.
+     *
+     * [startRequestedAt] is the `elapsedRealtime` of the tap, so the first frame can be logged as the time
+     * from the tap to the first captured sample (#447).
      */
     suspend fun start(
         audioSource: Int = MediaRecorder.AudioSource.MIC,
         pcmSink: ((pcm16: ByteArray, len: Int) -> Unit)? = null,
         onCaptureLost: ((reason: String) -> Unit)? = null,
+        startRequestedAt: Long = SystemClock.elapsedRealtime(),
     ) {
         if (recording) return
         val minBuf = AudioRecord.getMinBufferSize(SAMPLE_RATE, CHANNEL, ENCODING)
@@ -126,6 +130,7 @@ class RecordingController(private val context: Context) {
             // Start of the current run of all-zero frames, for [longestSilentMs]. Unlike [silentSince]
             // this is only cleared by real audio, never by the trigger firing.
             var silentRunStart = 0L
+            var firstFrameLogged = false
             while (recording) {
                 val current = record
                 if (current == null) {
@@ -151,6 +156,16 @@ class RecordingController(private val context: Context) {
                     continue
                 }
                 failingSince = 0L
+                if (n > 0 && !firstFrameLogged) {
+                    firstFrameLogged = true
+                    // The frame ends now, so its first sample was captured one frame earlier (#447).
+                    val frameMs = n * 1000L / (SAMPLE_RATE * 2)
+                    Log.i(
+                        "DictateLatency",
+                        "phase=firstFrame phaseMs=${SystemClock.elapsedRealtime() - startRequestedAt - frameMs} " +
+                            "frameMs=$frameMs",
+                    )
+                }
                 // Keep reading while paused (so the mic buffer never overflows) but drop the samples.
                 if (n > 0 && !paused) {
                     // Write under the lock so a concurrent rotate() sees a consistent raf/pcmBytes and the

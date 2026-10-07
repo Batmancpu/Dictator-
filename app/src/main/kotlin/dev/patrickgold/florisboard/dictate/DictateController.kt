@@ -1542,6 +1542,9 @@ object DictateController {
         // a screen reader has to speak (#159), and the observer only hears what happens once it runs.
         ensureHapticObserver(appContext)
         if (refuseIfNoCredential(context)) return
+        // Measured from here to the recorder running and to its first frame (#447): whatever is said
+        // before that frame is not in the recording at all.
+        val startRequestedAt = SystemClock.elapsedRealtime()
         // Starting a fresh recording supersedes any kept audio (a failed retry or an interrupted
         // recording the user chose not to send), so drop it instead of leaving a stale offer behind.
         // A continuation keeps its carry-over (seeded above), so only drop it for a normal start.
@@ -1594,8 +1597,13 @@ object DictateController {
                 recorder = RecordingController(appContext).also {
                     it.start(audioSource, pcmSink, onCaptureLost = { reason ->
                         onCaptureRouteLost(appContext, reason)
-                    })
+                    }, startRequestedAt = startRequestedAt)
                 }
+                Log.i(
+                    LATENCY_LOG_TAG,
+                    "phase=captureStarted phaseMs=${SystemClock.elapsedRealtime() - startRequestedAt} " +
+                        "realtime=${realtimeSession != null} segmented=$segmented",
+                )
                 if (prefs.dictate.skipSilentRecordings.get()) {
                     // Hide the one-time native VAD/session setup behind the user's recording time.
                     scope.launch { SpeechGate.prewarm(appContext) }
@@ -2236,6 +2244,12 @@ object DictateController {
                 throw c
             } catch (e: DictateApiException) {
                 outcome = "apiError"
+                // Diagnostics (#447): which failure it was. Provider error text never carries the transcript.
+                Log.i(
+                    LATENCY_LOG_TAG,
+                    "phase=apiError kind=${e.kind} http=${e.httpStatus} code=${e.code} " +
+                        "cause=${e.cause?.javaClass?.simpleName} msg=${e.message?.take(160)?.replace('\n', ' ')}",
+                )
                 // Read before anything below touches the state: this block catches the provider call as
                 // well as the live prompt's rewording inside finalizeAndCommit (issue #284).
                 val stage = stageOf(_state.value)
@@ -2842,6 +2856,14 @@ object DictateController {
                 // A stream still delivering when the tail cap ran out is missing its end, and half a
                 // dictation is worse than the wait: the recording is complete, so transcribe that instead.
                 if (realtimeFailed || !tailComplete || transcript.isEmpty()) {
+                    Log.i(
+                        LATENCY_LOG_TAG,
+                        "phase=realtimeFallback reason=" + when {
+                            realtimeFailed -> "streamFailed"
+                            !tailComplete -> "tailCap"
+                            else -> "emptyTranscript"
+                        },
+                    )
                     // Drop the live provisional text; the batch path commits fresh from the WAV. With the
                     // preview hidden there is nothing in the field to take back, and realtimeShown says so.
                     // What the user has edited stays, and the batch text leaves out what they took (#421).
