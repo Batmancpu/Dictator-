@@ -16,9 +16,9 @@ import dev.patrickgold.florisboard.ime.nlp.latin.DictFold
  * Word → emoji, derived from the CLDR annotations the app already ships (issue #338).
  *
  * The point of building this rather than shipping a curated word list: `assets/ime/media/emoji/
- * annotations/` holds **50 languages**, ~1900 emoji each, and the file for the active locale is parsed
+ * annotations/` holds **51 languages**, ~1900 emoji each, and the file for the active locale is parsed
  * at preload anyway. Inverting it costs one more pass over data already in memory, and the feature
- * starts in every one of those languages at once instead of in English with 49 translation debts.
+ * starts in every one of those languages at once instead of in English with 50 translation debts.
  *
  * Inverting it *naively* is a trap, though, and the trap is worth writing down: CLDR keywords never
  * repeat the emoji's own name, so a keyword-only index answers `pizza` with 🍄 (the brown mushroom

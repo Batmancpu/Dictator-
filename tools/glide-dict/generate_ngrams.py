@@ -33,6 +33,7 @@ from ngramcount import count_ngrams, runs_path, write_table
 # only ever held nine of the forty-one shipped languages, so the record of what most files were built
 # from existed nowhere. Fill a row in whenever a language is (re)generated.
 KNOWN_PACKAGES = {
+    "af": "afr_mixed_2019_1M",
     "ar": "ara_news_2022_1M",
     "bn": "ben_wikipedia_2021_1M",
     "de": "deu_news_2022_1M",

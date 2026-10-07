@@ -110,6 +110,8 @@ def runs_path(pkg: str, cache: str, slice_: str) -> str:
     out = os.path.join(cache, f"{pkg}-{slice_}.runs")
     if os.path.isfile(out) and os.path.getsize(out) > 0:
         return out
+    # dist/ is gitignored and gets cleared to free space, so the cache directory cannot be assumed.
+    os.makedirs(cache, exist_ok=True)
     sys.stderr.write(f"  tokenising {pkg} [{slice_}]\n")
     tmp = out + ".tmp"
     n = 0

@@ -70,6 +70,7 @@ object TrigramCatalog {
      * its job there — the alternative is 34,000 rows of phrases seen twice.
      */
     val all: List<TrigramDict> = listOf(
+        TrigramDict("af", "$REL/af_trigrams_100k.txt", 1736690, "7d72ea817cb06612d00f2496badccbc9db9066d9cfe5b04caa494434760c8260"),
         TrigramDict("ar", "$REL/ar_trigrams_100k.txt", 3340877, "ff5fd11e7f4584fc4729d90be7e357e87b993925660a9ac910848835808d9ede"),
         TrigramDict("bg", "$REL/bg_trigrams_100k.txt", 3311676, "16bda1e90e5e67cc23b837d64052e14c2d7ce87e2bda2370f6dde5d7e36331b6"),
         TrigramDict("bn", "$REL/bn_trigrams_100k.txt", 5121895, "ee9379260dc883fab1e0ea619e118d067ab69f2518a9b699b33b1e2c4eb0aa84"),

@@ -47,6 +47,7 @@
   ],
   "popupMappings": [
     { "id": "default", "authors": [ "patrickgold" ] },
+    { "id": "af", "authors": [ "DevEmperor" ] },
     { "id": "ar", "authors": [ "HeiWiper" ] },
     { "id": "ast", "authors": [ "Softastur" ] },
     { "id": "bg", "authors": [ "iorvethe" ] },
@@ -847,6 +848,15 @@
       "composer": "org.florisboard.composers:appender",
       "currencySet": "org.florisboard.currencysets:euro",
       "popupMapping": "org.florisboard.localization:kab",
+      "preferred": {
+        "characters": "org.florisboard.layouts:qwerty"
+      }
+    },
+    {
+      "languageTag": "af-ZA",
+      "composer": "org.florisboard.composers:appender",
+      "currencySet": "org.florisboard.currencysets:south_african_rand",
+      "popupMapping": "org.florisboard.localization:af",
       "preferred": {
         "characters": "org.florisboard.layouts:qwerty"
       }

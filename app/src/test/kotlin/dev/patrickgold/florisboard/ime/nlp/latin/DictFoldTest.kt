@@ -37,11 +37,12 @@ class DictFoldTest {
     }
 
     @Test
-    fun `only french and arabic script languages fold non-trivially`() {
+    fun `only french, afrikaans and arabic script languages fold non-trivially`() {
         for (lang in listOf("ar", "fa", "ur", "ckb")) {
             assertTrue(DictFold.hasNonTrivialFold(lang), lang)
         }
         assertTrue(DictFold.hasNonTrivialFold("fr"))
+        assertTrue(DictFold.hasNonTrivialFold("af"))
         for (lang in listOf("en", "de", "he", "fa-IR", "", "hi", "bn", "ta")) {
             assertFalse(DictFold.hasNonTrivialFold(lang), lang)
         }
@@ -88,6 +89,25 @@ class DictFoldTest {
             "oeuvre" to "œuvre",
         )) {
             assertEquals(DictFold.foldKey("fr", stored), DictFold.foldKey("fr", typed), "$typed / $stored")
+        }
+    }
+
+    /**
+     * The same property for Afrikaans, on the spellings typed without their long press. Found on the
+     * emulator: before Afrikaans folded, `wereld` and `reen` were committed as typed and reën was not even
+     * offered.
+     */
+    @Test
+    fun `an unaccented afrikaans spelling reaches its accented entry`() {
+        for ((typed, stored) in listOf(
+            "wereld" to "wêreld",
+            "reen" to "reën",
+            "more" to "môre",
+            "brue" to "brûe",
+            "naief" to "naïef",
+            "se" to "sê",
+        )) {
+            assertEquals(DictFold.foldKey("af", stored), DictFold.foldKey("af", typed), "$typed / $stored")
         }
     }
 

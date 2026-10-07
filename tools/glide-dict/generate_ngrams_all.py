@@ -34,6 +34,9 @@ TRIGRAMS = 100_000
 # a newer year — and the rest were resolved against the download server, preferring news, then a news
 # crawl, then Wikipedia, newest first.
 PACKAGES = {
+    # No news corpus exists for Afrikaans; the mixed one is its only million-sentence package, and the
+    # word list is built from it too.
+    "af": "afr_mixed_2019_1M",
     "ar": "ara_news_2022_1M",
     "bg": "bul_news_2022_1M",
     "bn": "ben_wikipedia_2021_1M",

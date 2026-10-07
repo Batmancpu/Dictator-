@@ -29,6 +29,14 @@ MAPPINGS = os.path.join(
 
 # mapping -> {key: character to put under the finger}
 DECISIONS = {
+    # Afrikaans overrules the measurement four times. `e`: ë leads by types (1.6% to 0.6%), because it
+    # marks plurals and compounds (ideë, geëet), but ê leads by tokens (0.6% to 0.5%), and ê sits in sê,
+    # hê and lê, short words with an unaccented twin (se, he, le) that autocorrect cannot turn into the
+    # right one. `o` and `u`: ô and û are the only accents Afrikaans writes on them in its own words
+    # (môre, brûe); the measurement puts them under MIN_SHARE because they live in few words, not because
+    # they are foreign. `n`: the indefinite article 'n is the language's eighth most frequent word, and
+    # its apostrophe otherwise sits behind the comma key's popup.
+    "af": {"e": "ê", "i": "ï", "n": "'n", "o": "ô", "u": "û"},
     "cs": {"a": "á", "c": "č", "d": "ď", "e": "ě", "i": "í", "n": "ň", "o": "ó",
            "r": "ř", "s": "š", "t": "ť", "u": "ů", "y": "ý", "z": "ž"},
     "da": {"a": "æ", "e": "é", "o": "ø"},

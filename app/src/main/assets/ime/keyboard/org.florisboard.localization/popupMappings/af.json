@@ -1,0 +1,93 @@
+{
+  "all": {
+    "a": {
+      "relevant": [
+        { "$": "auto_text_key", "code":  225, "label": "á" },
+        { "$": "auto_text_key", "code":  228, "label": "ä" },
+        { "$": "auto_text_key", "code":  224, "label": "à" },
+        { "$": "auto_text_key", "code":  226, "label": "â" }
+      ]
+    },
+    "e": {
+      "main": { "$": "auto_text_key", "code":  234, "label": "ê" },
+      "relevant": [
+        { "$": "auto_text_key", "code":  235, "label": "ë" },
+        { "$": "auto_text_key", "code":  233, "label": "é" },
+        { "$": "auto_text_key", "code":  232, "label": "è" }
+      ]
+    },
+    "i": {
+      "main": { "$": "auto_text_key", "code":  239, "label": "ï" },
+      "relevant": [
+        { "$": "auto_text_key", "code":  238, "label": "î" },
+        { "$": "auto_text_key", "code":  237, "label": "í" },
+        { "$": "auto_text_key", "code":  236, "label": "ì" }
+      ]
+    },
+    "n": {
+      "main": { "$": "multi_text_key", "codePoints": [39, 110], "label": "'n" },
+      "relevant": [
+        { "$": "auto_text_key", "code":  329, "label": "ŉ" },
+        { "$": "auto_text_key", "code":  241, "label": "ñ" }
+      ]
+    },
+    "o": {
+      "main": { "$": "auto_text_key", "code":  244, "label": "ô" },
+      "relevant": [
+        { "$": "auto_text_key", "code":  246, "label": "ö" },
+        { "$": "auto_text_key", "code":  243, "label": "ó" },
+        { "$": "auto_text_key", "code":  242, "label": "ò" }
+      ]
+    },
+    "u": {
+      "main": { "$": "auto_text_key", "code":  251, "label": "û" },
+      "relevant": [
+        { "$": "auto_text_key", "code":  252, "label": "ü" },
+        { "$": "auto_text_key", "code":  250, "label": "ú" },
+        { "$": "auto_text_key", "code":  249, "label": "ù" }
+      ]
+    },
+    "y": {
+      "relevant": [
+        { "$": "auto_text_key", "code":  253, "label": "ý" }
+      ]
+    },
+    "~right": {
+      "main": { "code":   44, "label": "," },
+      "relevant": [
+        { "code":   38, "label": "&" },
+        { "code":   37, "label": "%" },
+        { "code":   43, "label": "+" },
+        { "code":   34, "label": "\"" },
+        { "code":   45, "label": "-" },
+        { "code":   58, "label": ":" },
+        { "code":   39, "label": "'" },
+        { "code":   64, "label": "@" },
+        { "code":   59, "label": ";" },
+        { "code":   47, "label": "/" },
+        { "$": "layout_direction_selector",
+          "ltr": { "code":   40, "label": "(" },
+          "rtl": { "code":   41, "label": "(" }
+        },
+        { "$": "layout_direction_selector",
+          "ltr": { "code":   41, "label": ")" },
+          "rtl": { "code":   40, "label": ")" }
+        },
+        { "code":   35, "label": "#" },
+        { "code":   33, "label": "!" },
+        { "code":   63, "label": "?" }
+      ]
+    }
+  },
+  "uri": {
+    "~right": {
+      "main": { "code": -255, "label": ".co.za" },
+      "relevant": [
+        { "code": -255, "label": ".com" },
+        { "code": -255, "label": ".za" },
+        { "code": -255, "label": ".org" },
+        { "code": -255, "label": ".net" }
+      ]
+    }
+  }
+}
