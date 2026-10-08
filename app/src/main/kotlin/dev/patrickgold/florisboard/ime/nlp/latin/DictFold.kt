@@ -66,15 +66,21 @@ import java.text.Normalizer
 object DictFold {
     /** Languages written in the Arabic script, using [foldArabic] instead of a plain lowercase. */
     private val ARABIC_SCRIPT = setOf("ar", "fa", "ur", "ckb")
-    /** French accents sit behind long presses, so completion matches their base-letter spelling too. */
-    private const val FRENCH = "fr"
+    /**
+     * Languages whose accents sit behind long presses and get left off, so lookup folds them away and the
+     * restoration in [LatinLanguageProvider] puts them back: French (`hote` → hôte) and Afrikaans
+     * (`wereld` → wêreld, `reen` → reën, `more` → môre — its diacritics are ê ë ô û î ï on keys that
+     * carry the bare letter). A spelling that is itself a word is never touched, so Afrikaans `se` and
+     * `die` stay as typed beside `sê` and `dié`.
+     */
+    private val ACCENT_FOLDED = setOf("fr", "af")
 
     /**
      * Whether [lang] folds to something other than its lowercase form. Callers use this to skip folded
      * lookup/index work for the languages that don't need it, so English and the rest stay on their
      * original code path.
      */
-    fun hasNonTrivialFold(lang: String): Boolean = lang in ARABIC_SCRIPT || lang == FRENCH
+    fun hasNonTrivialFold(lang: String): Boolean = lang in ARABIC_SCRIPT || lang in ACCENT_FOLDED
 
     /**
      * The dictionary key for [word] in [lang]. Both the stored words and the typed word go through this,
@@ -82,7 +88,7 @@ object DictFold {
      */
     fun foldKey(lang: String, word: String): String = when {
         lang in ARABIC_SCRIPT -> foldArabic(word)
-        lang == FRENCH -> foldFrench(word)
+        lang in ACCENT_FOLDED -> foldFrench(word)
         else -> word.lowercase()
     }
 
@@ -90,6 +96,7 @@ object DictFold {
      * Reduces French accents to their base letters for dictionary lookup. NFD covers acute, grave,
      * circumflex, diaeresis and cedilla whether the input arrived precomposed or as a combining mark;
      * `œ` and `æ` need their conventional two-letter expansions because Unicode does not decompose them.
+     * Afrikaans uses it as it stands: its accents are among those, and it writes neither ligature.
      */
     fun foldFrench(word: String): String = Normalizer.normalize(word, Normalizer.Form.NFD)
         .asSequence()

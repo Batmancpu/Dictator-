@@ -31,14 +31,16 @@ class DictationTargetTest {
         val name: String,
         val editable: Boolean = false,
         val children: List<Node> = emptyList(),
+        val focused: Boolean = false,
     )
 
-    private fun target(focused: Node?, maxDepth: Int = 6): Node? =
+    private fun target(focused: Node?, maxDepth: Int = 6, preferFocused: Boolean = false): Node? =
         DictateAccessibilityService.targetUnderFocus(
             focused = focused,
             editable = { it.editable },
             children = { it.children },
             maxDepth = maxDepth,
+            hasFocus = if (preferFocused) ({ it.focused }) else null,
         )
 
     // Chrome, as reported: the toolbar's URL bar is a real editable node, the notepad in the page is a
@@ -78,6 +80,30 @@ class DictationTargetTest {
         val first = Node("first", editable = true)
         val second = Node("second", editable = true)
         assertEquals(first, target(Node("form", children = listOf(first, second))))
+    }
+
+    // A WebView form, as measured on the emulator: input focus names the WebView, and the password field the
+    // user tapped is the second field beneath it. Taking the first one put the dictation into the text field
+    // above, after focusing it, and asked that field whether it was a password field.
+    private val text = Node("text", editable = true)
+    private val password = Node("password", editable = true, focused = true)
+    private val webView = Node("WebView", children = listOf(Node("form", children = listOf(text, password))))
+
+    @Test
+    fun `the field that reports focus wins over the first one when writing`() {
+        assertEquals(password, target(webView, preferFocused = true))
+    }
+
+    @Test
+    fun `without a focused field the first one is still the target`() {
+        val form = Node("form", children = listOf(text, password.copy(focused = false)))
+        assertEquals(text, target(form, preferFocused = true))
+    }
+
+    @Test
+    fun `deciding whether to show the bubble keeps to the first field`() {
+        // Only whether there is a field at all matters there, and it runs on every focus event.
+        assertEquals(text, target(webView))
     }
 
     @Test

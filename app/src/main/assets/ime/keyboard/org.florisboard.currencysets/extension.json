@@ -250,6 +250,18 @@
       ]
     },
     {
+      "id": "south_african_rand",
+      "label": "South African rand (R)",
+      "slots": [
+        { "code":   82, "label": "R" },
+        { "code":   36, "label": "$" },
+        { "code": 8364, "label": "€" },
+        { "code":  162, "label": "¢" },
+        { "code":  163, "label": "£" },
+        { "code":  165, "label": "¥" }
+      ]
+    },
+    {
       "id": "south_korean_won",
       "label": "South Korean won (₩)",
       "slots": [

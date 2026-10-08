@@ -27,6 +27,7 @@ import android.util.Log
 import androidx.core.os.UserManagerCompat
 import dev.patrickgold.florisboard.app.FlorisPreferenceModel
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
+import dev.patrickgold.florisboard.app.PreferenceRecovery
 import dev.patrickgold.florisboard.dictate.data.prefs.DictateLegacyMigrator
 import dev.patrickgold.florisboard.dictate.wear.DictateWearPublisher
 import dev.patrickgold.florisboard.ime.clipboard.ClipboardManager
@@ -128,11 +129,16 @@ class FlorisApplication : Application() {
     fun init() {
         cacheDir?.deleteContentsRecursively()
         scope.launch {
+            // A settings file that cannot be read is kept rather than written over (#383): the migrators
+            // below write at once, and a write replaces the whole file.
+            PreferenceRecovery.setAsideIfUnreadable(this@FlorisApplication)
             val result = FlorisPreferenceStore.initAndroid(
                 context = this@FlorisApplication,
                 datastoreName = FlorisPreferenceModel.NAME,
             )
             Log.i("PREFS", result.toString())
+            if (result.isFailure) PreferenceRecovery.setAsideAfterFailedLoad(this@FlorisApplication)
+            PreferenceRecovery.refresh(this@FlorisApplication)
             DictateLegacyMigrator.migrateIfNeeded(this@FlorisApplication)
             DictateLegacyMigrator.seedDeviceLanguageIfNeeded()
             DictateLegacyMigrator.migrateProviderKeyringIfNeeded()
@@ -140,6 +146,7 @@ class FlorisApplication : Application() {
             DictateLegacyMigrator.migratePromptsActionIfNeeded(this@FlorisApplication)
             DictateLegacyMigrator.migratePromptsLayoutToRowIfNeeded()
             DictateLegacyMigrator.migratePushToTalkDefaultIfNeeded()
+            DictateLegacyMigrator.migrateTrustUserCertsToAccountsIfNeeded()
             DictateLegacyMigrator.migrateWordLearningDefaultIfNeeded()
             DictateLegacyMigrator.migrateHindiDefaultsIfNeeded()
             DictateLegacyMigrator.migrateFrenchPunctuationRuleIfNeeded()

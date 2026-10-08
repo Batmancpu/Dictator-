@@ -34,6 +34,7 @@ import dev.patrickgold.florisboard.clipboardManager
 import dev.patrickgold.florisboard.dictate.field.FieldAutoCorrection
 import dev.patrickgold.florisboard.dictate.field.FieldText
 import dev.patrickgold.florisboard.dictate.snippet.SnippetTriggers
+import dev.patrickgold.florisboard.dictate.symbols.CustomSymbolsStore
 import dev.patrickgold.florisboard.dictate.translate.TranslateBarController
 import dev.patrickgold.florisboard.editorInstance
 import dev.patrickgold.florisboard.extensionManager
@@ -464,6 +465,16 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
                 updateActiveEvaluators {
                     keyboardCache.clear(KeyboardMode.CHARACTERS)
                 }
+            }
+            // The user's own symbol pages (issue #342) also give the letters their long-press symbols,
+            // so a change to them leaves every cached keyboard stale, not only the two symbol pages.
+            scope.launch {
+                combine(prefs.keyboard.customSymbolsEnabled.asFlow(), CustomSymbolsStore.symbols) { _, _ -> }
+                    .collectLatest {
+                        updateActiveEvaluators {
+                            keyboardCache.clear()
+                        }
+                    }
             }
             // Splitting the keyboard is the one window mode that reaches into the arrangement itself: it
             // needs a second space bar so that each half has one (issue #362), so the keyboard on screen

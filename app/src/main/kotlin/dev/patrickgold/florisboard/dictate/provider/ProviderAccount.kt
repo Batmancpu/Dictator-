@@ -82,6 +82,15 @@ data class ProviderAccount(
      */
     val customWarmUp: Boolean = false,
     /**
+     * Trust CA certificates the user installed, for this endpoint only (issue #137, scoped in #383).
+     *
+     * It was one switch for the whole app. Turned on for a server behind a private CA, it also let anything
+     * holding a certificate from that CA — typically a company's TLS-inspecting proxy — read the traffic to
+     * every cloud provider, keys included. Additive field, defaults off; accounts that existed while the old
+     * switch was on were moved over with it on.
+     */
+    val trustUserCerts: Boolean = false,
+    /**
      * Dictate Cloud only — the credit account this device talks to. The wallet's bearer token is not
      * stored here but in [apiKey]: it is what the server authenticates, so putting it anywhere else
      * would mean teaching every call site about a second kind of credential.

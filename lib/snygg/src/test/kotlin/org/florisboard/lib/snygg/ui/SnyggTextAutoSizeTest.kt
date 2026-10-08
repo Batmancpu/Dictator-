@@ -54,6 +54,24 @@ class SnyggTextAutoSizeTest {
     }
 
     @Test
+    fun `a one-line floor keeps a long label whole before it wraps`() {
+        // Issue #342: on one line down to 11sp, wrapped from there down to 6sp.
+        assertEquals(
+            OneLineFirstAutoSize(maxFontSize = 20.sp, oneLineMinFontSize = 11.sp, minFontSize = 6.sp),
+            autoSizeFor(20.sp, 0.3f, oneLineRatio = 0.55f),
+        )
+        // A floor at or under the minimum, or at the themed size, wraps nothing: plain shrink-to-fit.
+        assertEquals(
+            TextAutoSize.StepBased(minFontSize = 6.sp, maxFontSize = 20.sp, stepSize = 0.5.sp),
+            autoSizeFor(20.sp, 0.3f, oneLineRatio = 0.3f),
+        )
+        assertEquals(
+            TextAutoSize.StepBased(minFontSize = 6.sp, maxFontSize = 20.sp, stepSize = 0.5.sp),
+            autoSizeFor(20.sp, 0.3f, oneLineRatio = 1f),
+        )
+    }
+
+    @Test
     fun `a malformed theme cannot hand a non-finite bound to the measure pass`() {
         assertNull(autoSizeFor(Float.NaN.sp, 0.75f))
         assertNull(autoSizeFor(Float.POSITIVE_INFINITY.sp, 0.75f))

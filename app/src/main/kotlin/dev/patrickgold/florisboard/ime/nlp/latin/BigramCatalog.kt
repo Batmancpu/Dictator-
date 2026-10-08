@@ -57,6 +57,7 @@ object BigramCatalog {
     val BUNDLED = setOf("en")
 
     val all: List<BigramDict> = listOf(
+        BigramDict("af", "$REL/af_bigrams_150k.txt", 2224272, "9a1f2a3459617dfac8c68bcc96c568a4b674ccf2d9490dc1444fd85a094c6931"),
         BigramDict("ar", "$REL/ar_bigrams_150k.txt", 3603741, "8274541df961d87fc35bd1197478d18a27e8caf3fec9ae923b5fc9907d874d01"),
         BigramDict("bg", "$REL/bg_bigrams_150k.txt", 3906960, "a63b6fbd4358b6cb25439f695977e7d0efe4921c671ae57cff9f44ae9620fe7a"),
         BigramDict("bn", "$REL/bn_bigrams_150k.txt", 5559168, "796c2461d295a3d1fb932ea6fdbfbdb39ee2456fb07344a69127705b9391d501"),

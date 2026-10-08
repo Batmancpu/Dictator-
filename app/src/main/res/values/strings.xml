@@ -30,6 +30,11 @@
     <string name="prefs__media__gif_setup__open_klipy" comment="Button opening the KLIPY API-keys page">Open KLIPY Partner Panel</string>
     <string name="prefs__media__gif_setup__key_label" comment="Text field label">KLIPY API key</string>
     <string name="prefs__media__gif_setup__privacy_note" comment="Privacy note in the setup dialog">Your search terms are only sent to KLIPY while the GIF panel is open — never during dictation.</string>
+    <string name="prefs__media__gif_content_filter" comment="Title of the setting choosing how strictly GIF results are filtered for adult or offensive content (safe search)">Safe search</string>
+    <string name="prefs__media__gif_content_filter__high" comment="Safe-search level: the strictest filtering">Strict</string>
+    <string name="prefs__media__gif_content_filter__medium" comment="Safe-search level between strict and light">Moderate</string>
+    <string name="prefs__media__gif_content_filter__low" comment="Safe-search level: only the most explicit results are filtered">Light</string>
+    <string name="prefs__media__gif_content_filter__off" comment="Safe-search level: no filtering at all">Off</string>
     <string name="gif__search_placeholder" comment="Search field placeholder; KLIPY attribution requires the KLIPY name here">Search KLIPY</string>
     <string name="gif__powered_by" comment="Attribution shown in the GIF panel">Powered by KLIPY</string>
     <string name="gif__no_results" comment="Empty state when a search returns nothing">No GIFs found</string>
@@ -293,6 +298,10 @@
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Search settings…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">Recent searches</string>
     <string name="settings__search__clear_recent" comment="Button to clear the recent searches">Clear recent searches</string>
+    <string name="dictate__settings_unreadable_card" comment="Red card on the settings home screen, shown after the app could not read its settings file at start and started with the defaults. Tapping it offers to restore the old file.">Your settings could not be read, so Dictate started with its defaults. Tap here to bring them back.</string>
+    <string name="dictate__settings_unreadable_title" comment="Title of the dialog offering to restore the settings that could not be read. One line of about 18 characters at most; it is cut off beyond that.">Restore settings?</string>
+    <string name="dictate__settings_unreadable_message" comment="Body of that dialog. The buttons are Restore, Delete and Cancel; use the same words as those buttons.">When Dictate started, it could not read its settings file. It kept the file untouched and started with the defaults. Restore brings back your providers, keys, prompts and settings as they were. Delete removes the old file.</string>
+    <string name="dictate__settings_restore_failed" comment="Toast when restoring the settings file failed because it still cannot be read">The old settings still cannot be read.</string>
     <string name="settings__search__popular" comment="Header above a small list of popular settings shortcuts">Popular</string>
     <string name="settings__search__no_results" comment="Shown when a settings search returns nothing">No settings found</string>
     <string name="settings__search__keywords__text_expansion" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the typing-shortcut setting, which lets a short trigger expand into a saved block of text. Translate as the words people in your language would actually type when looking for that feature, separated by spaces. Do not translate word for word; add or drop terms as makes sense.">text expansion expander snippet abbreviation macro autotext boilerplate canned response</string>
@@ -404,7 +413,7 @@
     <string name="settings__theme_editor__property_value_shape_apply_for_all_corners">Apply for all corners</string>
     <string name="settings__theme_editor__property_value_color_dialog_title">Edit color string</string>
     <string name="settings__theme_editor__file_selector_dialog_title">Select file</string>
-    <string name="settings__theme_editor__file_selector_no_files_text">No files have been added to this extension yet. Please use the "{action_title}" action in the previous screen to import files.</string>
+    <string name="settings__theme_editor__file_selector_no_files_text">No files have been added to this extension yet. Please use the “{action_title}” action in the previous screen to import files.</string>
     <string name="settings__theme_editor__component_meta_is_night_theme">Is night theme</string>
     <string name="settings__theme_editor__component_meta_is_borderless">Is borderless</string>
     <string name="settings__theme_editor__component_meta_stylesheet_path">Stylesheet path</string>
@@ -639,6 +648,29 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Show a number row above the character layout</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Hinted number row</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Hinted symbols</string>
+    <string name="settings__custom_symbols__title" comment="Screen and entry title: the user's own two symbol pages of the keyboard (issue #342)">Custom symbols</string>
+    <string name="pref__keyboard__custom_symbols__label" comment="Switch: the keyboard's symbol pages are the user's own instead of the language's">Use custom symbols</string>
+    <string name="custom_symbols__edit_key" comment="Dialog title when one key of the symbol page is tapped">Edit key</string>
+    <string name="custom_symbols__key" comment="Text field label: the symbol a tap on the key types">Symbol</string>
+    <string name="custom_symbols__currency" comment="Shown under the symbol field of a key that types whatever currency the active language uses">Currency of the language</string>
+    <string name="custom_symbols__long_press" comment="Section title: the symbols offered when the key is held down">On long press</string>
+    <string name="custom_symbols__add_placeholder" comment="Placeholder of the field that adds long-press symbols; keep the three example symbols with spaces between them">Add, e.g. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as" comment="Label before the choice where a symbol picked from the list below goes">Insert as</string>
+    <string name="custom_symbols__target_key" comment="Choice: a picked symbol becomes what the key types">Key</string>
+    <string name="custom_symbols__target_long_press" comment="Choice: a picked symbol is added to the long-press symbols">Long press</string>
+    <string name="custom_symbols__palette_math" comment="Symbol category, short">Math</string>
+    <string name="custom_symbols__palette_arrows" comment="Symbol category, short">Arrows</string>
+    <string name="custom_symbols__palette_currencies" comment="Symbol category, short">Currencies</string>
+    <string name="custom_symbols__palette_punctuation" comment="Symbol category, short">Punctuation</string>
+    <string name="custom_symbols__palette_shapes" comment="Symbol category, short: ticks, stars, geometric shapes">Shapes</string>
+    <string name="custom_symbols__palette_greek" comment="Symbol category, short: Greek letters">Greek</string>
+    <string name="custom_symbols__palette_scripts" comment="Symbol category, short: superscript and subscript digits">Super &amp; subscript</string>
+    <string name="custom_symbols__reset_all" comment="Menu entry and dialog title">Reset all keys</string>
+    <string name="custom_symbols__reset_all_confirm">Put every key back to its default?</string>
+    <string name="custom_symbols__import_confirm">Replace your symbols with the ones in this file?</string>
+    <string name="custom_symbols__import_done">Symbols imported</string>
+    <string name="custom_symbols__import_invalid">This is not a symbols file</string>
+    <string name="custom_symbols__export_filename" translatable="false">dictate-symbols.json</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Show utility key</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Shows a configurable utility key next to space bar</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Utility key action</string>
@@ -1123,6 +1155,54 @@
     <string name="apptour63__outro_eyebrow">That is 6.3</string>
     <string name="apptour63__outro_title">Fewer detours, same keyboard</string>
     <string name="apptour63__outro_body">Nothing about the way you dictate has changed — your own key, your own server, or a model on the device. You can revisit any tour under Settings › About.</string>
+    <string name="apptour64__cta_languages" comment="Button on the what\'s-new translation page that opens the screen where translation languages are downloaded">Choose languages</string>
+    <string name="apptour64__cta_providers" comment="Button on a what\'s-new page that opens the list of transcription and rewording providers">Show providers</string>
+    <string name="apptour64__intro_eyebrow">Dictate 6.4</string>
+    <string name="apptour64__intro_title">Translated on the phone, symbols of your own</string>
+    <string name="apptour64__intro_body">Type in one language and the field fills up in another, translated on this device. Both symbol pages can hold the keys you choose. There are new providers and a much better offline model, a word you say to turn a dictation into an instruction, and a privacy and security review of the whole app.</string>
+    <string name="apptour64__translate_eyebrow">New: translate</string>
+    <string name="apptour64__translate_title">Translation that never leaves the phone</string>
+    <string name="apptour64__translate_body">Tap Translate in the Smartbar and type into the field above it — the app’s field fills with the translation as you go. Mozilla’s models do the work on this device, in 49 languages, and nothing you type is sent anywhere. Enter puts in the finished translation before it sends, so a message never goes out half translated. Each language is a one-time download, and the list shows its size before you get it.</string>
+    <string name="apptour64__symbols_eyebrow">New: your own symbols</string>
+    <string name="apptour64__symbols_title">The symbols you use, where you want them</string>
+    <string name="apptour64__symbols_body">Under Keyboard › Custom symbols, both symbol pages become yours, in every language. Tap a key in the picture of the page, choose what it types and what its long press offers, and drag those into order. A palette has the symbols your keyboard does not have yet. Until you change a key the pages look exactly like the built-in ones, and a finished layout can be exported to share.</string>
+    <string name="apptour64__providers_eyebrow">Providers and offline models</string>
+    <string name="apptour64__providers_title">New providers, and a better offline model</string>
+    <string name="apptour64__providers_body" comment="Parakeet Ultra and Parakeet TDT 0.6B v3 are model names and stay as they are">xAI’s Grok now transcribes as well, as a file and live, with the same key that rewords. Scaleway and OVHcloud keep audio and text inside the EU. Offline, Parakeet Ultra replaces Parakeet TDT 0.6B v3: the same 670 MB and the same 25 languages, with 29 % fewer errors in German. If you use v3, download Ultra in the list of on-device models and delete the old one — v3 keeps working until you do. And the providers list now shows only the ones you use; all the others are under “Add a provider”, with a search.</string>
+    <string name="apptour64__command_eyebrow">New: command word</string>
+    <string name="apptour64__command_title">Say the word, and the dictation becomes an instruction</string>
+    <string name="apptour64__command_body">Choose a word under Rewording — “Jarvis”, say. A dictation that starts with it runs as a live prompt: on the selected text, or as a question when nothing is selected. Only the first word counts, so a sentence that merely mentions it is written as usual. Automatic prompts also work as intended now: they always get the dictation they run on, and one that is only [text in brackets] is added to the end as written instead of going to the model.</string>
+    <string name="apptour64__privacy_eyebrow">Privacy and security</string>
+    <string name="apptour64__privacy_title">The whole app, checked</string>
+    <string name="apptour64__privacy_body">Every part of Dictate was reviewed for privacy and security, and what turned up is fixed. A dictation into a password or PIN field stays out of the history, now also through the floating button. Android’s cloud backup only takes your API keys end-to-end encrypted. And “Trust user certificates” is now set per provider account rather than for all of them at once.</string>
+    <string name="apptour64__more_eyebrow">Also</string>
+    <string name="apptour64__more_title">Everything else in 6.4</string>
+    <string name="apptour64__more_body">The smaller changes, for anyone who wants the details. Skip ahead if you don’t.</string>
+    <string name="apptour64__more_typing" comment="Heading of a group of small changes on the what\'s-new page">Typing</string>
+    <string name="apptour64__more_typing_slips">Suggestions read slips: a letter on the wrong key, two swapped, a slip in a half-typed word. The word you meant shows up far more often, and every key press is quicker.</string>
+    <string name="apptour64__more_typing_autocorrect">With auto-correct off, fixes still appear in the strip. The switch only decides whether Space swaps the word.</string>
+    <string name="apptour64__more_typing_glide">Glide typing finds words that start or end on an accented letter — in Hungarian, Russian, Finnish, Polish, Turkish and more.</string>
+    <string name="apptour64__more_typing_swipe">A sideways swipe over the letters no longer switches the language, which mostly happened by accident. The globe key still does, and Gestures brings the swipe back.</string>
+    <string name="apptour64__more_typing_punctuation">A punctuation mark right after an auto-correction takes its space, and a glide along the space bar stays on its line.</string>
+    <string name="apptour64__more_typing_calculator">The calculator answers before the “=”, and a tap on the answer completes the line.</string>
+    <string name="apptour64__more_typing_size">The keyboard remembers its size for each language.</string>
+    <string name="apptour64__more_typing_languages">Afrikaans is a full keyboard language. A new layout only needs its language picked — the other fields fill themselves in.</string>
+    <string name="apptour64__more_dictation" comment="Heading of a group of small changes on the what\'s-new page">Dictation</string>
+    <string name="apptour64__more_dictation_stop">Stopping a dictation that is still waiting for the server keeps the recording, ready to send again.</string>
+    <string name="apptour64__more_dictation_timeout">A connection that stalls gives up after one timeout instead of four, and a request the provider refused is not sent again.</string>
+    <string name="apptour64__more_dictation_live">A word you delete during a live dictation stays deleted, and two dictations in a row get a space between them.</string>
+    <string name="apptour64__more_dictation_hold">Holding the mic to talk: a slow tap stays a tap, and a hold shorter than a second is discarded.</string>
+    <string name="apptour64__more_dictation_talkback">TalkBack can find and press the mic, and says what the dictation is doing.</string>
+    <string name="apptour64__more_clipboard" comment="Heading of a group of small changes on the what\'s-new page">Clipboard and emoji</string>
+    <string name="apptour64__more_clipboard_pins">Pinned clips now sit at the bottom, with tabs to jump between the groups. “Pinned items on top” brings the old order back.</string>
+    <string name="apptour64__more_clipboard_chips">The link, email and number chips beside a copied text can be switched off.</string>
+    <string name="apptour64__more_clipboard_emoji">The emoji row scrolls and answers a long press, and the emoji search shows two rows.</string>
+    <string name="apptour64__more_elsewhere" comment="Heading of a group of small changes on the what\'s-new page">Floating button and watch</string>
+    <string name="apptour64__more_elsewhere_bubble">The floating button can wait for a keyboard before it appears, and writes into the web field you tapped.</string>
+    <string name="apptour64__more_elsewhere_watch">On the watch, a dictation finishes the way its field asks — send, search or a check mark — with auto-send if you want it, and the wait shows its seconds.</string>
+    <string name="apptour64__outro_eyebrow">That is 6.4</string>
+    <string name="apptour64__outro_title">More on the phone, more your own</string>
+    <string name="apptour64__outro_body">Translation and the new offline model work without a connection, and everything else still runs the way you set it up — your own key, your own server, or a model on the device. You can revisit any tour under Settings › About.</string>
     <string name="about__website__title" comment="Preference title linking to the marketing website">Website</string>
     <string name="about__repository__title" comment="Preference title">Repository (GitHub)</string>
     <string name="about__repository__summary" comment="Preference summary">Source code, discussions, issues and info</string>
@@ -1153,7 +1233,7 @@
     <string name="setup__nav_next" comment="Setup wizard: go to the next, already-reached step">Next</string>
 
     <string name="setup__enable_ime__title">Enable {app_name}</string>
-    <string name="setup__enable_ime__description">Android requires that every custom keyboard is separately enabled before you can use it. Open the System <i>Language &amp; Input</i> Settings, there enable "{app_name}".</string>
+    <string name="setup__enable_ime__description">Android requires that every custom keyboard is separately enabled before you can use it. Open the System <i>Language &amp; Input</i> Settings, there enable “{app_name}”.</string>
     <string name="setup__enable_ime__open_settings_btn">Open System Settings</string>
 
     <string name="setup__select_ime__title">Select {app_name}</string>
@@ -1419,7 +1499,7 @@
     <string name="ext__meta__title">Title</string>
     <string name="ext__meta__version">Version</string>
     <string name="ext__error__not_found_title">Extension not found</string>
-    <string name="ext__error__not_found_description">No extension with ID "{id}" could be found.</string>
+    <string name="ext__error__not_found_description">No extension with ID “{id}” could be found.</string>
     <string name="ext__editor__title_create_any">Create extension</string>
     <string name="ext__editor__title_create_keyboard">Create keyboard extension</string>
     <string name="ext__editor__title_create_theme">Create theme extension</string>
@@ -1971,6 +2051,8 @@
     <string name="dictate__audio_save_failed" comment="Toast when saving a failed recording did not work">Couldn\'t save the audio</string>
     <string name="dictate__action_dismiss" comment="Content description for the button that dismisses the resend error">Dismiss</string>
     <string name="dictate__interrupted_recording" comment="Smartbar chip shown when the keyboard was closed mid-recording; {time} is the captured length like 0:42. Kept short for the single-line Smartbar.">Interrupted ({time})</string>
+    <string name="dictate__transcription_stopped" comment="Smartbar chip after the user stopped a transcription that was still waiting for the server (#437). The recording is kept and the chip has buttons to send it again or drop it. Also read out in a toast from the floating button, followed by ' — tap to retry'. Kept short for the single-line Smartbar.">Stopped, recording kept</string>
+    <string name="dictate__transcription_stopped_in_history" comment="Short notice after the user stopped a transcription while the resend button is switched off, when the recording is in the dictation history (#437). 'History' is the name of the history screen. Kept short for the single-line Smartbar.">Stopped, recording in History</string>
     <string name="dictate__action_continue_recording" comment="Content description for the button that resumes recording on top of an interrupted recording">Continue recording</string>
     <string name="dictate__a11y_mic_hold_local" comment="Spoken by a screen reader as the long-press action of the Smartbar mic while a recording or a cloud transcription is running: it transcribes this recording with the on-device model instead">Transcribe on this device</string>
     <string name="smartbar__a11y_show_actions" comment="Spoken by a screen reader for the arrow at the edge of the Smartbar while it shows word suggestions: tapping it shows the action buttons instead">Show actions</string>
@@ -2014,6 +2096,7 @@
 
     <!-- Dictate AI providers manager -->
     <string name="dictate__providers_title" comment="Title of the AI providers manager screen and the row linking to it">AI providers</string>
+    <string name="dictate__base_url_cleartext_warning" comment="Warning under the base URL field when the address starts with http:// (not https). The API key and the audio are sent unencrypted.">Not encrypted: the API key and your recordings travel as plain text. Fine on your own network, but on any other Wi-Fi someone else could read them.</string>
     <string name="dictate__providers_summary" comment="Summary showing the active provider. {provider} is a provider name like OpenAI.">Active: {provider}</string>
     <string name="dictate__providers_summary_both" comment="Summary showing the active transcription and rewording providers when they differ. {transcription} and {rewording} are provider names like OpenAI.">Transcription: {transcription} · Rewording: {rewording}</string>
     <string name="dictate__providers_active_group" comment="Group title for the active-provider selectors">Active providers</string>
@@ -2172,7 +2255,6 @@
     <string name="dictate__proxy_auth_group" comment="Group title for optional proxy authentication (HTTP only)">Authentication (optional)</string>
     <string name="dictate__proxy_username_title" comment="Label for the proxy username field">Username</string>
     <string name="dictate__proxy_password_title" comment="Label for the proxy password field">Password</string>
-    <string name="dictate__security_group" comment="Group title for connection security settings">Security</string>
     <string name="dictate__trust_user_certs_title" comment="Title of the setting to trust user-installed CA certificates">Trust user certificates</string>
     <string name="dictate__trust_user_certs_summary" comment="Summary explaining the user-installed CA trust setting">Trust CA certificates you installed, for self-hosted endpoints behind a private CA.</string>
 

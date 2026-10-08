@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Router
 import androidx.compose.material.icons.filled.Tag
-import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -104,15 +103,7 @@ fun DictateProxyScreen() = FlorisScreen {
                 )
             }
         }
-
-        PreferenceGroup(title = stringRes(R.string.dictate__security_group)) {
-            SwitchPreference(
-                prefs.dictate.trustUserCertificates,
-                icon = Icons.Default.VerifiedUser,
-                modifier = Modifier.settingsSearchAnchor("dictate__trust_user_certs_title"),
-                title = stringRes(R.string.dictate__trust_user_certs_title),
-                summary = stringRes(R.string.dictate__trust_user_certs_summary),
-            )
-        }
+        // "Trust user certificates" used to sit here, for the whole app. It moved into each account's
+        // editor (#383), so that a private CA trusted for one server is not trusted for every provider.
     }
 }

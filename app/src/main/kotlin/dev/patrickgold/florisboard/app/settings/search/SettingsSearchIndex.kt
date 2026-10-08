@@ -174,8 +174,9 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.dictate__proxy_auth_group, R.string.dictate__proxy_title, Routes.Settings.DictateProxy, parentRes = R.string.dictate__title),
         SettingsSearchEntry(R.string.dictate__proxy_username_title, R.string.dictate__proxy_title, Routes.Settings.DictateProxy, parentRes = R.string.dictate__title),
         SettingsSearchEntry(R.string.dictate__proxy_password_title, R.string.dictate__proxy_title, Routes.Settings.DictateProxy, parentRes = R.string.dictate__title),
-        SettingsSearchEntry(R.string.dictate__security_group, R.string.dictate__proxy_title, Routes.Settings.DictateProxy, parentRes = R.string.dictate__title),
-        SettingsSearchEntry(R.string.dictate__trust_user_certs_title, R.string.dictate__proxy_title, Routes.Settings.DictateProxy, parentRes = R.string.dictate__title, anchor = "dictate__trust_user_certs_title"),
+        // Hand-added (issue #383): the switch lives in each account's editor dialog now, which no anchor can
+        // reach, so the result opens the list of providers the dialog is opened from.
+        SettingsSearchEntry(R.string.dictate__trust_user_certs_title, R.string.dictate__providers_title, Routes.Settings.DictateProviders, parentRes = R.string.dictate__title),
         SettingsSearchEntry(R.string.dictate__rewording_enabled_title, R.string.dictate__rewording_title, Routes.Settings.DictateRewording, parentRes = R.string.dictate__title, anchor = "dictate__rewording_enabled_title"),
         SettingsSearchEntry(R.string.dictate__prompts_layout_title, R.string.dictate__rewording_title, Routes.Settings.DictateRewording, parentRes = R.string.dictate__title, anchor = "dictate__prompts_layout_title"),
         SettingsSearchEntry(R.string.dictate__manage_prompts_title, R.string.dictate__rewording_title, Routes.Settings.DictateRewording, parentRes = R.string.dictate__title, anchor = "dictate__manage_prompts_title"),
@@ -293,6 +294,8 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.pref__keyboard__number_row__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__number_row__label"),
         SettingsSearchEntry(R.string.pref__keyboard__hinted_number_row_mode__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__hinted_number_row_mode__label"),
         SettingsSearchEntry(R.string.pref__keyboard__hinted_symbols_mode__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__hinted_symbols_mode__label"),
+        SettingsSearchEntry(R.string.settings__custom_symbols__title, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "settings__custom_symbols__title"),
+        SettingsSearchEntry(R.string.pref__keyboard__custom_symbols__label, R.string.settings__custom_symbols__title, Routes.Settings.CustomSymbols, parentRes = R.string.settings__keyboard__title, anchor = "pref__keyboard__custom_symbols__label"),
         SettingsSearchEntry(R.string.pref__keyboard__utility_key_enabled__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__utility_key_enabled__label"),
         SettingsSearchEntry(R.string.pref__keyboard__utility_key_action__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__utility_key_action__label"),
         SettingsSearchEntry(R.string.pref__keyboard__space_bar_mode__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__space_bar_mode__label"),
@@ -334,6 +337,8 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.prefs__media__emoji_suggestion_query_min_length, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__emoji_suggestion_query_min_length"),
         SettingsSearchEntry(R.string.prefs__media__emoji_suggestion_candidate_max_count, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__emoji_suggestion_candidate_max_count"),
         SettingsSearchEntry(R.string.prefs__media__gif_setup__title, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__gif_setup__title"),
+        // Hand-added (issue #383): a rerun of the generator would drop the entries added by hand since.
+        SettingsSearchEntry(R.string.prefs__media__gif_content_filter, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__gif_content_filter"),
         SettingsSearchEntry(R.string.prefs__media__sticker_folder__title, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__sticker_folder__title"),
         SettingsSearchEntry(R.string.prefs__media__sticker_add, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__sticker_add"),
         SettingsSearchEntry(R.string.prefs__media__sticker_import_source, R.string.settings__media__title, Routes.Settings.Media, anchor = "prefs__media__sticker_import_source"),

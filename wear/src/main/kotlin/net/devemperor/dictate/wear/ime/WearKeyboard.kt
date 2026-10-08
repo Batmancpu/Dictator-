@@ -408,8 +408,16 @@ private fun VoicePage(
                         actions.togglePause,
                     )
                 }
-                busy -> SmallAction(Icons.Filled.Close, stringResource(R.string.wear_cd_cancel), actions.cancelDictation)
-                ready -> SmallAction(Icons.Filled.Close, stringResource(R.string.wear_cd_close), actions.cancelDictation)
+                // A lone X sits straight under the round button, not beside it like the recording pair,
+                // so it gets a little more room.
+                busy -> SmallAction(
+                    Icons.Filled.Close, stringResource(R.string.wear_cd_cancel), actions.cancelDictation,
+                    Modifier.offset(y = LONE_ACTION_DROP),
+                )
+                ready -> SmallAction(
+                    Icons.Filled.Close, stringResource(R.string.wear_cd_close), actions.cancelDictation,
+                    Modifier.offset(y = LONE_ACTION_DROP),
+                )
                 resend -> Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -481,6 +489,9 @@ internal fun rememberElapsedLabel(info: WearRecordingInfo): String {
 /** Number of bars in the live recording waveform. */
 private const val WAVEFORM_BARS = 19
 
+/** How much lower a lone X sits than the row below the record button: about 4 dp of gap became 14. */
+private val LONE_ACTION_DROP = 10.dp
+
 /**
  * A compact live level meter shown under the timer while recording: [WAVEFORM_BARS] thin accent bars,
  * the most recent level on the right, scrolling left as new samples arrive. Stays small so it never
@@ -507,10 +518,10 @@ private fun Waveform(levels: List<Float>) {
 }
 
 @Composable
-private fun SmallAction(icon: ImageVector, desc: String, onClick: () -> Unit) {
+private fun SmallAction(icon: ImageVector, desc: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Button(
         onClick = onClick,
-        modifier = Modifier.size(40.dp),
+        modifier = modifier.size(40.dp),
         colors = ButtonDefaults.secondaryButtonColors(),
     ) {
         Icon(icon, contentDescription = desc, modifier = Modifier.size(20.dp))

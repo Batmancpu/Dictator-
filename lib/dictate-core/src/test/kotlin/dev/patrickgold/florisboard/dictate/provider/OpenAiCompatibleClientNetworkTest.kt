@@ -22,6 +22,8 @@ import io.kotest.matchers.string.shouldStartWith
 import okhttp3.Dns
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.SocketPolicy
+import java.util.concurrent.TimeUnit
 import kotlin.io.path.createTempFile
 
 class OpenAiCompatibleClientNetworkTest : FunSpec({
@@ -588,6 +590,63 @@ class OpenAiCompatibleClientNetworkTest : FunSpec({
         DictateApiException(DictateApiException.Kind.TIMEOUT, "timeout").isRetryable shouldBe true
         // The resend chip still reads the kind: a resend the user taps is theirs to try, not a loop of ours.
         http(400).kind.isRetryable shouldBe true
+    }
+
+    // Issue #438: a connection that stalls was sent four times, each attempt waiting out the whole timeout,
+    // so the error took eight minutes at the default. The queued answer behind the stall is what a retry
+    // would have received, so a regression shows up as a success rather than as a hang.
+    test("a request that stalled for its whole budget is not sent again") {
+        val audio = createTempFile(suffix = ".wav").toFile().apply {
+            writeBytes("RIFF-test-audio".encodeToByteArray())
+        }
+        try {
+            MockWebServer().use { server ->
+                server.enqueue(MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE))
+                server.enqueue(MockResponse().setResponseCode(200).setBody("""{"text":"Hallo Welt"}"""))
+                val client = OpenAiCompatibleClient(
+                    ProviderConfig(baseUrl = server.url("/v1/").toString(), apiKey = "test", timeoutSeconds = 1),
+                )
+
+                val error = shouldThrow<DictateApiException> {
+                    client.transcribe(TranscriptionRequest(audioFile = audio, model = "whisper-1"))
+                }
+
+                error.kind shouldBe DictateApiException.Kind.TIMEOUT
+                server.requestCount shouldBe 1
+            }
+        } finally {
+            audio.delete()
+        }
+    }
+
+    // Judged by the time spent, not by the kind of error: a gateway that gives up after a long wait answers
+    // with a 5xx, not a timeout, and repeating it multiplies the wait just the same. An error inside the
+    // budget is still retried; once the request has been going for the budget, the pause included, it ends.
+    test("an error is retried only while the request is inside its budget") {
+        val audio = createTempFile(suffix = ".wav").toFile().apply {
+            writeBytes("RIFF-test-audio".encodeToByteArray())
+        }
+        try {
+            MockWebServer().use { server ->
+                server.enqueue(
+                    MockResponse().setResponseCode(504).setHeadersDelay(1, TimeUnit.SECONDS),
+                )
+                server.enqueue(MockResponse().setResponseCode(504))
+                server.enqueue(MockResponse().setResponseCode(200).setBody("""{"text":"Hallo Welt"}"""))
+                val client = OpenAiCompatibleClient(
+                    ProviderConfig(baseUrl = server.url("/v1/").toString(), apiKey = "test", timeoutSeconds = 2),
+                )
+
+                val error = shouldThrow<DictateApiException> {
+                    client.transcribe(TranscriptionRequest(audioFile = audio, model = "whisper-1"))
+                }
+
+                error.kind shouldBe DictateApiException.Kind.SERVER_ERROR
+                server.requestCount shouldBe 2
+            }
+        } finally {
+            audio.delete()
+        }
     }
 
     // --- Azure Speech / MAI-Transcribe (issue #349) ---

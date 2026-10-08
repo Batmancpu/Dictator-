@@ -44,7 +44,13 @@ export interface WalletState {
 
 export type DebitResult =
   | { ok: true; state: WalletState }
-  | { ok: false; reason: 'blocked' | 'insufficient' | 'rate_limited'; state: WalletState };
+  | {
+      ok: false;
+      reason: 'blocked' | 'insufficient' | 'rate_limited';
+      state: WalletState;
+      /** A rate-limited refusal that is not the first in its minute, so not worth a row of its own. */
+      repeat?: boolean;
+    };
 
 const EMPTY: StoredState = {
   secondsLeft: 0,
@@ -62,6 +68,13 @@ export class Wallet extends DurableObject<Env> {
    * too expensive for that.
    */
   private hits: number[] = [];
+
+  /**
+   * When the last rate-limited refusal that was reported in full went out, in memory like [hits].
+   * A flood is refused on every request, but only its first refusal a minute is worth a row in the
+   * usage log; one per request was the write volume the limit exists to prevent (#383).
+   */
+  private limitedAt: number | null = null;
 
   /**
    * Reads the balance, converting an account that still carries the old separate rewording
@@ -116,20 +129,27 @@ export class Wallet extends DurableObject<Env> {
    */
   async debit(seconds: number, rateLimitPerMinute: number): Promise<DebitResult> {
     const state = await this.read();
-    if (state.status === 'blocked') return { ok: false, reason: 'blocked', state: this.view(state) };
 
     const now = Date.now();
     this.hits = this.hits.filter((t) => now - t < 60_000);
     if (this.hits.length >= rateLimitPerMinute) {
-      return { ok: false, reason: 'rate_limited', state: this.view(state) };
+      const repeat = this.limitedAt !== null && now - this.limitedAt < 60_000;
+      if (!repeat) this.limitedAt = now;
+      return { ok: false, reason: 'rate_limited', state: this.view(state), repeat };
     }
+    // Every attempt fills the window, a refused one too (#383). Pushed only on success, as it was, a
+    // wallet that was empty or had just been blocked was never limited at all: exactly the two
+    // states in which someone keeps hammering, each attempt still costing an authentication, a read
+    // of the upload and a row in the usage log.
+    this.hits.push(now);
+
+    if (state.status === 'blocked') return { ok: false, reason: 'blocked', state: this.view(state) };
 
     const wantSeconds = Math.ceil(seconds);
     if (state.secondsLeft < wantSeconds) {
       return { ok: false, reason: 'insufficient', state: this.view(state) };
     }
 
-    this.hits.push(now);
     const next: StoredState = {
       ...state,
       secondsLeft: state.secondsLeft - wantSeconds,

@@ -215,7 +215,8 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
     /**
      * Whether the bubble started the in-flight dictation. Used to attribute a terminal Error/success state
      * to the overlay (so it is surfaced here) without reacting to a keyboard-driven dictation that happens
-     * while the bubble is also visible.
+     * while the bubble is also visible. A keyboard-driven one that the user left for another app is the
+     * exception; see [reportTerminalState].
      */
     private var weStartedDictation = false
 
@@ -316,6 +317,9 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
                     screenOn = screenOn,
                     allowedInApp = appAllowed,
                 )
+                // Read before this emission shows or hides the button: a failure ends what pinned it, so
+                // the button may be leaving with this very state (see [reportTerminalState]).
+                val wasShown = added
                 if (show) ensureShown() else hide()
                 // The rewording menu is a window of its own and does not come down with hide(). Tied to the
                 // screen alone on purpose: taking it away whenever the bubble hides would be a different
@@ -339,7 +343,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
                     justDictated = true
                 }
                 manageUndo(state, show)
-                reportTerminalState(state)
+                reportTerminalState(state, wasShown, dictateKeyboardShown)
                 // Auto-dim only while idle and shown; restore (and stop the timer) otherwise.
                 val idleShown = state is DictateController.UiState.Idle && show
                 if (idleShown && !idleShownPrev) scheduleDim()
@@ -1479,7 +1483,8 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         ) {
             service.startMicForeground()
             weStartedDictation = true
-            DictateController.sendRetainedAudio(context)
+            // Into the field this button is over, also when the keyboard started the dictation (#437).
+            DictateController.sendRetainedAudio(context, DictateController.OutputTarget.OVERLAY)
             return
         }
         startingDictation { DictateController.onMicClick(context, DictateController.OutputTarget.OVERLAY) }
@@ -1522,10 +1527,14 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
      * indicator on the button and shows the message as a toast (there is no inline text), then clears the
      * error — unless it offers an action — so the keyboard's own chip does not also fire. A clean finish
      * (a busy state returning to idle) flashes a brief success check; a plain cancel just resets the flag.
+     * A dictation the keyboard started and the user left for another app is reported too (#437); the rule
+     * is [BubbleVisibility.reportsEnd].
      */
-    private fun reportTerminalState(state: DictateController.UiState) {
+    private fun reportTerminalState(state: DictateController.UiState, wasShown: Boolean, keyboardShown: Boolean) {
         when (state) {
-            is DictateController.UiState.Error -> if (weStartedDictation) {
+            is DictateController.UiState.Error -> if (
+                BubbleVisibility.reportsEnd(state, prevState, weStartedDictation, wasShown, keyboardShown)
+            ) {
                 weStartedDictation = false
                 // When the recording was kept (#160), tell the user a tap re-sends it.
                 val msg = if (state.action == DictateController.ErrorAction.RESEND) {
@@ -1534,7 +1543,9 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
                     state.message
                 }
                 Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-                holdVisual(ERROR_HOLD_MS, FlashKind.ERROR)
+                // Not for a notice: a stop the user chose (#437) or no speech found is no failure, and the
+                // keyboard shows both untinted as well.
+                if (!state.neutral) holdVisual(ERROR_HOLD_MS, FlashKind.ERROR)
                 // Nothing to react to → don't leave the state machine parked in Error. The four-second
                 // auto-clear lives in the Smartbar, which is not on screen when the floating button is
                 // used with another keyboard, so the state would sit there until the next dictation — and

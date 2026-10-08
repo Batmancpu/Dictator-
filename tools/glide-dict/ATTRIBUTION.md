@@ -11,8 +11,9 @@ themselves (they are consulted only at build time to decide casing and to filter
 - **Leipzig Corpora Collection** (<https://wortschatz-leipzig.de>), the `*-words.txt` word counts inside the
   downloadable packages, **CC BY** — © Universität Leipzig / Sächsische Akademie der Wissenschaften / InfAI;
   Goldhahn, Eckart & Quasthoff, *Building Large Monolingual Dictionaries at the Leipzig Corpora Collection*
-  (LREC 2012). Merged with OPUS by relative share for `hi`, `ta` and `ur`, where OpenSubtitles alone yields
-  too few words to correct against, and the **sole** source for `ka`, whose OPUS list is not Georgian
+  (LREC 2012). Merged with OPUS by relative share for `af`, `hi`, `ta` and `ur`, where OpenSubtitles alone
+  yields too few words to correct against (Afrikaans: 18,811 entries, punctuation included), and the
+  **sole** source for `ka`, whose OPUS list is not Georgian
   (its most frequent entries are single letters and obsolete characters). (The same collection is also
   the sole source of the context tables below.)
 
@@ -40,7 +41,7 @@ has not reached yet.
   | Licence | Languages |
   |---|---|
   | MIT / BSD-3-Clause / Apache-2.0 | ka, tr, lt, ru, fa, nl |
-  | MPL-2.0 / LGPL-2.1 / LGPL-3.0 | fr, sv, et, lv, id (LO) |
+  | MPL-2.0 / LGPL-2.1 / LGPL-3.0 | fr, sv, et, lv, id (LO), af (LO, LGPL — Nieuwoudt/Viljoen lists, Translate.org.za) |
   | Multi-licensed incl. LGPL/MPL (permissive option taken) | bg, ca, da, el, es, hr, hu, hy, pl, pt, ro, sk, sl, sr, ar (LO, GPL-2.0/LGPL-2.1/MPL-1.1 — ayaspell), ta (LO, MPL) |
   | GPL-2.0 / GPL-3.0 (used under the "word list = factual data" rationale, with attribution) | cs, eo, nb, nn, vi, it, uk, bn (LO), hi (LO) |
 
@@ -48,6 +49,15 @@ has not reached yet.
   carries a licence we cannot use — `he` AGPL-3.0, `is` CC-BY-SA-3.0, `fi` Voikko/GPL — or because none
   exists at all (`ur`). The cost is not only cosmetic: with nothing to filter corpus noise, misspelled
   variants stay in the word list, where the engine can no longer correct them.
+- `af` takes its **casing from the corpus** where Hunspell cannot give it (`--corpus-case`): the Afrikaans
+  dictionary lists `afrikaans`, `engels`, `europa` and `kersfees` in lowercase. A spelling the Leipzig
+  sentences use mid-sentence at least 97 % of the time, on 50 sightings or more, replaces the lowercase
+  one (91 words), and keeps hyphenated names that capitalising the first letter cannot produce
+  (`Suid-Afrika`, 18 words). Common nouns the corpus mostly meets as a name are excluded by hand in
+  `generate_all.py`. The other direction too: a word Hunspell takes only capitalised but the corpus writes
+  in lowercase is stored in lowercase when it is a word of its own (`let`, 3 words) and dropped when it is
+  an accent-less spelling of another one (`more` for môre, `le` for lê, 2 words), so the keyboard can
+  still put the accent back.
 
 ## Bundled languages
 English (`en`, from the upstream FlorisBoard dictionary) and German (`de`) ship inside the app; all other

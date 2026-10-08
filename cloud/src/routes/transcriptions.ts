@@ -6,6 +6,13 @@ import { budgetAllows, logUsage, settleBudget, walletStub } from '../meter';
 import { NO_STORE, apiError } from '../util';
 
 /**
+ * The largest body a transcription may have. The app sends Dictate Cloud at most 25 MiB of audio and
+ * packs a recording that would be larger (`ProviderRegistry.maxUploadBytes`), so one more MiB is the
+ * multipart framing and nothing else.
+ */
+const MAX_UPLOAD_BYTES = 26 * 1024 * 1024;
+
+/**
  * `POST /v1/audio/transcriptions` — the path the money flows down.
  *
  * The order is intent, not taste:
@@ -32,6 +39,19 @@ export async function handleTranscription(
     return apiError(401, 'No valid credit token.', 'invalid_token', 'invalid_request_error');
   }
   touch(env, session, ctx);
+
+  // The size is checked before anything reads the body (#383). `formData()` holds all of it in memory,
+  // so a limit applied afterwards came too late: a 120 MB body exhausted the isolate's 128 MB before
+  // any limit or any billing applied, and the abuse was free. The declared length is binding — the
+  // runtime reads no more than it — and a request that declares none is refused for that reason.
+  const declaredBytes = Number(request.headers.get('content-length'));
+  if (!Number.isFinite(declaredBytes) || declaredBytes <= 0) {
+    return apiError(411, 'A Content-Length is required.', 'length_required', 'invalid_request_error');
+  }
+  if (declaredBytes > MAX_UPLOAD_BYTES) {
+    logRefusal(env, session, 'transcribe', 413, started, ctx);
+    return apiError(413, 'The recording is too large.', 'upload_too_large', 'invalid_request_error');
+  }
 
   // `formData()` holds the file in memory. At ten minutes that is about 19 MB against a
   // 128 MB budget — acceptable, and it saves writing a multipart parser just to reach the
@@ -96,7 +116,9 @@ export async function handleTranscription(
   if (!debit.ok) {
     settleBudget(env, -estimateNano, ctx);
     const refusal = debitError(debit.reason);
-    logRefusal(env, session, 'transcribe', refusal.status, started, ctx, debit.state);
+    // Only the first rate-limited refusal of a minute is logged; a flood would otherwise write a row
+    // per request (#383).
+    if (!debit.repeat) logRefusal(env, session, 'transcribe', refusal.status, started, ctx, debit.state);
     return refusal;
   }
 

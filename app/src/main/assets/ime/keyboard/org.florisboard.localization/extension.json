@@ -47,6 +47,7 @@
   ],
   "popupMappings": [
     { "id": "default", "authors": [ "patrickgold" ] },
+    { "id": "af", "authors": [ "DevEmperor" ] },
     { "id": "ar", "authors": [ "HeiWiper" ] },
     { "id": "ast", "authors": [ "Softastur" ] },
     { "id": "bg", "authors": [ "iorvethe" ] },
@@ -73,6 +74,7 @@
     { "id": "hr", "authors": [ "hedidnothingwrong" ] },
     { "id": "hu", "authors": [ "zoli111, gabik65" ] },
     { "id": "hy", "authors": [ "PJTSearch" ] },
+    { "id": "hy-am", "authors": [ "GasparAM" ] },
     { "id": "id", "authors": [ "Linerly" ] },
     { "id": "is", "authors": [ "patrickgold" ] },
     { "id": "it", "authors": [ "patrickgold" ] },
@@ -81,7 +83,6 @@
     { "id": "ka-std", "authors": [ "nE" ] },
     { "id": "kab", "authors": [ "yanis867" ] },
     { "id": "ko", "authors": [ "patrickgold", "Hayleia" ] },
-    { "id": "ko-KR", "authors": [ "Shunnuo" ] },
     { "id": "ku", "authors": [ "GoRaN" ] },
     { "id": "lt", "authors": [ "patrickgold" ] },
     { "id": "lv", "authors": [ "patrickgold", "eandersons" ] },
@@ -94,6 +95,7 @@
     { "id": "ru", "authors": [ "williamtheaker", "33kk" ] },
     { "id": "rue", "authors": [ "svvvst" ] },
     { "id": "sk", "authors": [ "stefan-misik", "majso" ] },
+    { "id": "sl-SI", "authors": [ "samolego" ] },
     { "id": "sr", "authors": [ "hedidnothingwrong", "GrbavaCigla" ] },
     { "id": "sv", "authors": [ "patrickgold" ] },
     { "id": "tr", "authors": [ "kisekinopureya", "patrickgold", "dvrnynr" ] },
@@ -847,6 +849,15 @@
       "composer": "org.florisboard.composers:appender",
       "currencySet": "org.florisboard.currencysets:euro",
       "popupMapping": "org.florisboard.localization:kab",
+      "preferred": {
+        "characters": "org.florisboard.layouts:qwerty"
+      }
+    },
+    {
+      "languageTag": "af-ZA",
+      "composer": "org.florisboard.composers:appender",
+      "currencySet": "org.florisboard.currencysets:south_african_rand",
+      "popupMapping": "org.florisboard.localization:af",
       "preferred": {
         "characters": "org.florisboard.layouts:qwerty"
       }

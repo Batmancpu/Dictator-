@@ -59,7 +59,7 @@
     <application
         android:name="dev.patrickgold.florisboard.FlorisApplication"
         android:allowBackup="true"
-        android:dataExtractionRules="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/app_icon"
         android:label="@string/floris_app_name"
@@ -404,6 +404,15 @@
                 android:name="androidx.emoji2.text.EmojiCompatInitializer"
                 tools:node="remove"/>
         </provider>
+
+        <!-- ML Kit's text recognition (Scan text, #390) runs on the phone, but it brings Google's
+             datatransport along, and that sends usage metrics to firebaselogging.googleapis.com
+             (developers.google.com/ml-kit/terms; measured on the emulator: a FIREBASE_ML_SDK event per
+             scan and an upload job). The app promises no telemetry. Without this registry the
+             transport finds no backend and drops the events instead of sending them. -->
+        <service
+            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+            tools:node="remove"/>
 
     </application>
 

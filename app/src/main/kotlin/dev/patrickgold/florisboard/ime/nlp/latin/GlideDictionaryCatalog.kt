@@ -49,6 +49,7 @@ object GlideDictionaryCatalog {
      * (English is intentionally absent — it is bundled in the APK.)
      */
     val all: List<GlideDict> = listOf(
+        GlideDict("af", "Afrikaans", "$REL/af.json", 886123, "57f66cf01f21da65bac756c74dc10c9587215084a977a6927d9f1dc82d5dda20"),
         GlideDict("ar", "Arabic · العربية", "$REL/ar.json", 1448124, "35868e344825d1594559e1db05046b6f827e4295a1a02bba89735b1356584cea"),
         GlideDict("bg", "Bulgarian · Български", "$REL/bg.json", 1794600, "fa3b438e428427e2ff6597d3db50593e3e045415099b520d203ef5e934e7f623"),
         GlideDict("bn", "Bengali · বাংলা", "$REL/bn.json", 1397678, "63f543fb3827eaaf612b610851fd62fc4486e09a62f6665d9c8cb84e47a45e57"),

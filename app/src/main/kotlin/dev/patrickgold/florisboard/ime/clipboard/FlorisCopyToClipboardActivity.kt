@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.app.apptheme.FlorisAppTheme
+import dev.patrickgold.florisboard.dictate.acceptsSharedUri
 import dev.patrickgold.jetpref.datastore.model.collectAsState
 import org.florisboard.lib.android.AndroidClipboardManager
 import org.florisboard.lib.android.AndroidVersion
@@ -114,16 +115,33 @@ class FlorisCopyToClipboardActivity : ComponentActivity() {
                 intent.getParcelableExtra(Intent.EXTRA_STREAM)
             }
 
-        if (uri == null) {
+        // Whatever another app shares here is untrusted, and this runs in the keyboard's process (#383): an
+        // image that does not decode, or one too large to, threw out of onCreate and took the keyboard
+        // down with it. A file:// path or one of our own Uris is refused, and the clip is set only once
+        // the image has decoded, where it used to be set before.
+        if (uri == null || !acceptsSharedUri(uri)) {
             error = CopyToClipboardError.TYPE_NOT_SUPPORTED_ERROR
             return
         }
-        bitmap = uriToBitmap(uri)
+        val decoded = try {
+            uriToBitmap(uri)
+        } catch (e: Exception) {
+            null
+        } catch (e: OutOfMemoryError) {
+            null
+        }
+        if (decoded == null || runCatching { setClip(uri) }.isFailure) {
+            error = CopyToClipboardError.UNKNOWN_ERROR
+            return
+        }
+        bitmap = decoded
+    }
+
+    private fun setClip(uri: Uri) {
+        clipboardManager.setPrimaryClip(ClipData.newUri(contentResolver, "image", uri))
     }
 
     private fun uriToBitmap(uri: Uri): Bitmap {
-        val clip = ClipData.newUri(contentResolver, "image", uri)
-        clipboardManager.setPrimaryClip(clip)
         return if (AndroidVersion.ATLEAST_API28_P) {
             val source = ImageDecoder.createSource(contentResolver, uri)
             ImageDecoder.decodeBitmap(source)

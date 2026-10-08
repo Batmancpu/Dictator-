@@ -245,12 +245,22 @@ class DictateAccessibilityService : AccessibilityService() {
     private fun focusedEditableNode(): AccessibilityNodeInfo? =
         editableUnderFocus(findFocus(AccessibilityNodeInfo.FOCUS_INPUT))
 
-    /** [targetUnderFocus] over accessibility nodes, with this service's editability heuristic. */
-    private fun editableUnderFocus(focused: AccessibilityNodeInfo?): AccessibilityNodeInfo? =
+    /**
+     * [targetUnderFocus] over accessibility nodes, with this service's editability heuristic.
+     *
+     * [preferFocused] is for writing: it looks past the first field for the one that reports focus, which
+     * can mean walking more of the tree. Deciding whether to show the bubble only needs to know that there
+     * is a field at all, and runs on every focus event, so it keeps the first one.
+     */
+    private fun editableUnderFocus(
+        focused: AccessibilityNodeInfo?,
+        preferFocused: Boolean = false,
+    ): AccessibilityNodeInfo? =
         targetUnderFocus(
             focused = focused,
             editable = { it.isLikelyEditable() },
             children = { node -> (0 until node.childCount).mapNotNull { node.getChild(it) } },
+            hasFocus = if (preferFocused) ({ it.isFocused }) else null,
         )
 
     /**
@@ -601,10 +611,19 @@ class DictateAccessibilityService : AccessibilityService() {
      * needs no node at all — it writes to whatever the system holds as the input target, which is exactly
      * the field the user tapped — so a browser whose web field this cannot name is still served correctly.
      * Only if that path fails too does the caller fall back to the clipboard.
+     *
+     * Beneath a focused container, the field that reports focus itself is the one the user is in. In a
+     * WebView, input focus names the WebView and every form field sits beneath it. The first field there
+     * is rarely the one tapped, and [commitTextIntoFocused] focused whatever this returned before writing,
+     * so a dictation into a page's password field landed in its first text field instead. The password
+     * check that keeps it out of the history asked the same wrong field.
      */
     private fun dictationTarget(): AccessibilityNodeInfo? =
-        editableUnderFocus(findFocus(AccessibilityNodeInfo.FOCUS_INPUT))
-            ?: editableUnderFocus(rootInActiveWindow?.findFocus(AccessibilityNodeInfo.FOCUS_INPUT))
+        editableUnderFocus(findFocus(AccessibilityNodeInfo.FOCUS_INPUT), preferFocused = true)
+            ?: editableUnderFocus(
+                rootInActiveWindow?.findFocus(AccessibilityNodeInfo.FOCUS_INPUT),
+                preferFocused = true,
+            )
 
     /**
      * Whether [node] lives in a soft-keyboard window, i.e. a text field belonging to the IME itself —
@@ -1113,6 +1132,12 @@ class DictateAccessibilityService : AccessibilityService() {
         lastPreviewMs = 0L
     }
 
+    /**
+     * Whether the field a dictation goes into is a password field (#383), so that it stays out of the
+     * history. The node says so itself; a field this service cannot name answers no.
+     */
+    private fun focusedFieldIsPasswordNow(): Boolean = dictationTarget()?.isPassword == true
+
     /** The selected text in the focused editable field, or empty when nothing is selected. */
     private fun selectedTextOfFocused(): String {
         val node = dictationTarget() ?: return ""
@@ -1413,24 +1438,34 @@ class DictateAccessibilityService : AccessibilityService() {
          * wrapped UIs routinely give focus to a container that merely holds the editable view. Everything
          * it returns is inside the focused subtree, so it can only ever name a field the user is already
          * in. [maxDepth] bounds the walk, since a deep tree is walked over IPC one node at a time.
+         *
+         * With [hasFocus], a field beneath the container that reports focus itself wins over the first
+         * one. A WebView form is the case: the WebView holds input focus, and the field the user tapped is
+         * any of the fields beneath it. Without a focused field the first one is still the answer, as
+         * before.
          */
         internal fun <N : Any> targetUnderFocus(
             focused: N?,
             editable: (N) -> Boolean,
             children: (N) -> List<N>,
             maxDepth: Int = MAX_EDITABLE_SEARCH_DEPTH,
+            hasFocus: ((N) -> Boolean)? = null,
         ): N? {
             val node = focused ?: return null
             if (editable(node)) return node
+            var firstEditable: N? = null
             fun descend(from: N, depth: Int): N? {
                 if (depth >= maxDepth) return null
                 for (child in children(from)) {
-                    if (editable(child)) return child
+                    if (editable(child)) {
+                        if (hasFocus == null || hasFocus(child)) return child
+                        if (firstEditable == null) firstEditable = child
+                    }
                     descend(child, depth + 1)?.let { return it }
                 }
                 return null
             }
-            return descend(node, 0)
+            return descend(node, 0) ?: firstEditable
         }
         // Debounce window for focus re-checks so a typing burst triggers at most one focused-node fetch.
         private const val FOCUS_UPDATE_DEBOUNCE_MS = 150L
@@ -1495,6 +1530,9 @@ class DictateAccessibilityService : AccessibilityService() {
 
         /** The full text of the focused field, or empty when the service is unavailable. */
         fun fullText(): String = instance?.fullTextOfFocused() ?: ""
+
+        /** Whether the focused field is a password field; false when the service is unavailable. */
+        fun focusedFieldIsPassword(): Boolean = instance?.focusedFieldIsPasswordNow() ?: false
 
         /** Selects the whole focused field; false when the service is unavailable. */
         fun selectAll(): Boolean = instance?.selectAllInFocused() ?: false

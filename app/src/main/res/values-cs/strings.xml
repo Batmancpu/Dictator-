@@ -131,6 +131,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">Vítejte ve {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name} není povolena v systému a proto nemůže být použita jako metoda zadávání. Klikněte sem pro vyřešení tohoto problému.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name} není vybrán jako výchozí vstupní metoda. Kliknutím sem tento problém vyřešíte.</string>
+    <string name="dictate__settings_unreadable_card">Vaše nastavení nešlo načíst, proto Dictate začal s výchozími hodnotami. Klepnutím je vrátíte zpět.</string>
+    <string name="dictate__settings_unreadable_title">Obnovit nastavení?</string>
+    <string name="dictate__settings_unreadable_message">Při spuštění nemohl Dictate načíst svůj soubor s nastavením. Ponechal ho nedotčený a začal s výchozími hodnotami. „Obnovit“ vrátí vaše poskytovatele, klíče, prompty a nastavení do původního stavu. „Odstranit“ starý soubor smaže.</string>
+    <string name="dictate__settings_restore_failed">Staré nastavení stále nejde načíst.</string>
     <string name="settings__search__title" comment="Title of the settings search screen">Hledat v nastavení</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Hledat v nastavení…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">Nedávná hledání</string>
@@ -448,6 +452,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Zobrazit číselný řádek nad znakovým rozložením</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Řádek čísel s návrhy</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Navrhované symboly</string>
+    <string name="settings__custom_symbols__title">Vlastní symboly</string>
+    <string name="pref__keyboard__custom_symbols__label">Používat vlastní symboly</string>
+    <string name="custom_symbols__edit_key">Upravit klávesu</string>
+    <string name="custom_symbols__key">Symbol</string>
+    <string name="custom_symbols__currency">Měna jazyka</string>
+    <string name="custom_symbols__long_press">Při podržení</string>
+    <string name="custom_symbols__add_placeholder">Přidat, např. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Vložit jako</string>
+    <string name="custom_symbols__target_key">Klávesa</string>
+    <string name="custom_symbols__target_long_press">Podržení</string>
+    <string name="custom_symbols__palette_math">Matematika</string>
+    <string name="custom_symbols__palette_arrows">Šipky</string>
+    <string name="custom_symbols__palette_currencies">Měny</string>
+    <string name="custom_symbols__palette_punctuation">Interpunkce</string>
+    <string name="custom_symbols__palette_shapes">Tvary</string>
+    <string name="custom_symbols__palette_greek">Řečtina</string>
+    <string name="custom_symbols__palette_scripts">Horní a dolní index</string>
+    <string name="custom_symbols__reset_all">Obnovit všechny klávesy</string>
+    <string name="custom_symbols__reset_all_confirm">Vrátit všechny klávesy na výchozí?</string>
+    <string name="custom_symbols__import_confirm">Nahradit vaše symboly symboly z tohoto souboru?</string>
+    <string name="custom_symbols__import_done">Symboly importovány</string>
+    <string name="custom_symbols__import_invalid">Toto není soubor se symboly</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Zobrazit pomocné tlačítko</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Zobrazí nastavitelné pomocné tlačítko vedle mezerníku</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Funkce pomocného tlačítka</string>
@@ -1297,6 +1323,8 @@
     <string name="dictate__floating_button_snap_summary_on">Tlačítko se po přetažení přichytí k nejbližší straně.</string>
     <string name="dictate__floating_button_snap_title">Přichytit k okraji</string>
     <string name="dictate__interrupted_recording">Přerušeno ({time})</string>
+    <string name="dictate__transcription_stopped">Zastaveno, nahrávka zachována</string>
+    <string name="dictate__transcription_stopped_in_history">Zastaveno, nahrávka je v Historii</string>
     <string name="dictate__providers_summary_both">Přepis: {transcription} · Přeformulování: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Uchová poslední diktát, aby jej plovoucí tlačítko mohlo vrátit zpět a klasické rozvržení znovu vložit.</string>
     <string name="dictate__remember_last_dictation_title">Zapamatovat poslední diktování</string>
@@ -1383,6 +1411,7 @@
     <string name="dictate__model_default_summary">Výchozí poskytovatele</string>
     <string name="dictate__custom_server_title">Vlastní server</string>
     <string name="dictate__base_url_title">Základní URL</string>
+    <string name="dictate__base_url_cleartext_warning">Nešifrováno: klíč API a vaše nahrávky putují jako prostý text. Ve vlastní síti je to v pořádku, ale v jakékoli jiné Wi-Fi je může přečíst někdo jiný.</string>
     <string name="dictate__base_url_placeholder">https://vas-server/v1/</string>
     <string name="dictate__base_url_required">Vyžadováno pro vlastního poskytovatele</string>
     <string name="dictate__value_not_set">Nenastaveno</string>
@@ -1831,7 +1860,6 @@
     <string name="dictate__audio_source_voice_recognition_summary">Vyladěno pro řeč s menším zpracováním — vyzkoušejte, pokud je přepis nepřesný</string>
     <string name="dictate__audio_source_unprocessed">Nezpracováno (surové)</string>
     <string name="dictate__audio_source_unprocessed_summary">Žádné zpracování; když to telefon nepodporuje, použije se Rozpoznávání řeči</string>
-    <string name="dictate__security_group">Zabezpečení</string>
     <string name="dictate__trust_user_certs_title">Důvěřovat uživatelským certifikátům</string>
     <string name="dictate__trust_user_certs_summary">Důvěřovat CA certifikátům, které jste sami nainstalovali – pro vlastní koncové body za soukromou CA.</string>
     <string name="dictate__stats_title">Statistiky</string>
@@ -2124,7 +2152,7 @@
     <string name="apptour60__chinese_body">Pinyin s řádkem kandidátů — dosud byl jen Zhengma, který sotva kdo používá. Přibyl model v zařízení skutečně trénovaný na čínštině a poskytovatel dostupný z pevninské Číny.</string>
     <string name="apptour60__emoji_eyebrow">Emodži</string>
     <string name="apptour60__emoji_title">Hledat emodži ve svém jazyce</string>
-    <string name="apptour60__emoji_body">Vyhledávání emodži znalo šest jazyků. Teď jich zná přes čtyřicet — hledejte „heart", „心" nebo „قلب" a dojdete ke stejné emodži. Vyhledávání jde podle jazyka vaší klávesnice.</string>
+    <string name="apptour60__emoji_body">Vyhledávání emodži znalo šest jazyků. Teď jich zná přes čtyřicet — hledejte „heart“, „心“ nebo „قلب“ a dojdete ke stejné emodži. Vyhledávání jde podle jazyka vaší klávesnice.</string>
     <string name="apptour60__languages_eyebrow">Slovníky</string>
     <string name="apptour60__languages_title">Sedm jazyků bez návrhů</string>
     <string name="apptour60__languages_body">Arabština, bengálština, finština, hindština, indonéština, tamilština a urdština dostávají návrhy slov a automatické opravy. Islandština a gruzínština obsahovaly zkrátka nesprávné jazyky a byly postaveny znovu. A znaky pod dlouhým stiskem u 19 rozložení se řídí tím, co se v daném jazyce opravdu píše.</string>
@@ -2229,6 +2257,54 @@
     <string name="apptour63__outro_eyebrow">To je 6.3</string>
     <string name="apptour63__outro_title">Méně oklik, stejná klávesnice</string>
     <string name="apptour63__outro_body">Na tom, jak diktujete, se nic nemění — vlastní klíč, vlastní server nebo model v zařízení. Všechny prohlídky najdete znovu v Nastavení › O aplikaci.</string>
+    <string name="apptour64__cta_languages">Vybrat jazyky</string>
+    <string name="apptour64__cta_providers">Zobrazit poskytovatele</string>
+    <string name="apptour64__intro_eyebrow">Dictate 6.4</string>
+    <string name="apptour64__intro_title">Překlad v telefonu, symboly podle vás</string>
+    <string name="apptour64__intro_body">Píšete v jednom jazyce a pole se plní v jiném — překlad vzniká přímo v tomto zařízení. Obě stránky symbolů mohou nést klávesy, které si vyberete. K tomu noví poskytovatelé a mnohem lepší offline model, slovo, kterým z diktátu uděláte pokyn, a kontrola celé aplikace z hlediska soukromí a zabezpečení.</string>
+    <string name="apptour64__translate_eyebrow">Novinka: překlad</string>
+    <string name="apptour64__translate_title">Překlad, který nikdy neopustí telefon</string>
+    <string name="apptour64__translate_body">Ve Smartbaru klepněte na „Přeložit“ a pište do pole nad ním — pole aplikace se mezitím plní překladem. Práci odvádějí modely od Mozilly v tomto zařízení, ve 49 jazycích, a nic z toho, co napíšete, se nikam neodesílá. Enter nejdřív vloží hotový překlad a teprve pak odešle, takže žádná zpráva neodejde napůl přeložená. Každý jazyk se stahuje jen jednou a seznam předem ukáže jeho velikost.</string>
+    <string name="apptour64__symbols_eyebrow">Novinka: vlastní symboly</string>
+    <string name="apptour64__symbols_title">Symboly, které používáte, tam, kde je chcete</string>
+    <string name="apptour64__symbols_body">V nastavení Klávesnice › Vlastní symboly se obě stránky symbolů stanou vašimi, v každém jazyce. Klepněte na klávesu v obrázku stránky, zvolte, co píše a co nabízí dlouhý stisk, a přetažením to seřaďte, jak chcete. Paleta obsahuje symboly, které vaše klávesnice ještě nemá. Dokud nezměníte žádnou klávesu, vypadají stránky přesně jako vestavěné a hotové rozložení lze exportovat a sdílet.</string>
+    <string name="apptour64__providers_eyebrow">Poskytovatelé a offline modely</string>
+    <string name="apptour64__providers_title">Noví poskytovatelé a lepší offline model</string>
+    <string name="apptour64__providers_body">Grok od xAI teď umí i přepis, ze souboru i naživo, se stejným klíčem, který už slouží k přeformulování. Scaleway a OVHcloud drží zvuk i text v EU. Offline nahrazuje Parakeet Ultra model Parakeet TDT 0.6B v3: stejných 670 MB a stejných 25 jazyků, a v němčině dělá o 29 % méně chyb. Pokud používáte v3, stáhněte Ultra v seznamu modelů v zařízení a starý smažte — do té doby v3 funguje dál. A seznam poskytovatelů teď ukazuje jen ty, které používáte; všechny ostatní najdete pod „Přidat poskytovatele“, s vyhledáváním.</string>
+    <string name="apptour64__command_eyebrow">Novinka: příkazové slovo</string>
+    <string name="apptour64__command_title">Řekněte slovo a z diktátu se stane pokyn</string>
+    <string name="apptour64__command_body">V nastavení Přeformulování si zvolte slovo — třeba „Jarvis“. Diktát, který jím začíná, se spustí jako pokyn naživo: nad vybraným textem, nebo jako otázka, když není nic vybráno. Počítá se jen první slovo, takže věta, která ho jen zmiňuje, se napíše jako obvykle. Automatické prompty teď také fungují, jak mají: vždy dostanou diktát, ke kterému patří, a prompt, který je jen [text v hranatých závorkách], se připojí na konec beze změny, místo aby šel do modelu.</string>
+    <string name="apptour64__privacy_eyebrow">Soukromí a zabezpečení</string>
+    <string name="apptour64__privacy_title">Celá aplikace, prověřená</string>
+    <string name="apptour64__privacy_body">Každá část Dictate prošla kontrolou soukromí a zabezpečení a vše, co se při ní našlo, je opravené. Diktát do pole pro heslo nebo PIN zůstane mimo historii, teď i přes plovoucí tlačítko. Cloudová záloha Androidu si vaše klíče API bere jen šifrované end-to-end. A „Důvěřovat uživatelským certifikátům“ teď nastavujete pro každý účet poskytovatele zvlášť, ne pro všechny najednou.</string>
+    <string name="apptour64__more_eyebrow">A ještě</string>
+    <string name="apptour64__more_title">Všechno ostatní v 6.4</string>
+    <string name="apptour64__more_body">Drobnější změny pro ty, kdo chtějí znát podrobnosti. Pokud ne, klidně listujte dál.</string>
+    <string name="apptour64__more_typing">Psaní</string>
+    <string name="apptour64__more_typing_slips">Návrhy rozpoznají překlepy: písmeno na špatné klávese, dvě prohozená, chybu v napůl napsaném slově. Slovo, které jste mysleli, se objeví mnohem častěji a každý stisk klávesy je rychlejší.</string>
+    <string name="apptour64__more_typing_autocorrect">S vypnutými automatickými opravami se návrhy oprav dál zobrazují v liště. Přepínač už rozhoduje jen o tom, zda mezerník slovo nahradí.</string>
+    <string name="apptour64__more_typing_glide">Psaní tahem najde slova, která začínají nebo končí písmenem s diakritikou — v maďarštině, ruštině, finštině, polštině, turečtině a dalších jazycích.</string>
+    <string name="apptour64__more_typing_swipe">Přejetí do strany přes písmena už nepřepíná jazyk — většinou se to stávalo omylem. Klávesa se zeměkoulí to dělá dál a v nastavení Gesta a psaní tahem lze přejetí vrátit.</string>
+    <string name="apptour64__more_typing_punctuation">Interpunkční znaménko hned po automatické opravě převezme její mezeru a tah po mezerníku zůstane na svém řádku.</string>
+    <string name="apptour64__more_typing_calculator">Kalkulačka odpovídá už před „=“ a klepnutí na výsledek doplní řádek.</string>
+    <string name="apptour64__more_typing_size">Klávesnice si pamatuje svou velikost pro každý jazyk.</string>
+    <string name="apptour64__more_typing_languages">Afrikánština je teď plnohodnotný jazyk klávesnice. Při přidání nového rozložení stačí vybrat jazyk — ostatní pole se vyplní sama.</string>
+    <string name="apptour64__more_dictation">Diktování</string>
+    <string name="apptour64__more_dictation_stop">Když zastavíte diktát, který ještě čeká na server, nahrávka zůstane zachovaná a připravená k novému odeslání.</string>
+    <string name="apptour64__more_dictation_timeout">Spojení, které se zasekne, to vzdá po jednom časovém limitu místo po čtyřech a požadavek, který poskytovatel odmítl, se znovu neodesílá.</string>
+    <string name="apptour64__more_dictation_live">Slovo, které během živého diktátu smažete, zůstane smazané a dva diktáty po sobě dostanou mezi sebou mezeru.</string>
+    <string name="apptour64__more_dictation_hold">Držení mikrofonu při mluvení: pomalé klepnutí zůstane klepnutím a držení kratší než sekunda se zahodí.</string>
+    <string name="apptour64__more_dictation_talkback">TalkBack najde mikrofon, umí ho stisknout a hlásí, co diktování právě dělá.</string>
+    <string name="apptour64__more_clipboard">Schránka a emoji</string>
+    <string name="apptour64__more_clipboard_pins">Připnuté položky jsou teď dole, s kartami pro přeskakování mezi skupinami. „Připnuté položky nahoře“ vrátí původní pořadí.</string>
+    <string name="apptour64__more_clipboard_chips">Čipy s odkazy, e-maily a čísly vedle zkopírovaného textu lze vypnout.</string>
+    <string name="apptour64__more_clipboard_emoji">Řádek emoji se dá posouvat a reaguje na dlouhý stisk; vyhledávání emoji ukazuje dva řádky.</string>
+    <string name="apptour64__more_elsewhere">Plovoucí tlačítko a hodinky</string>
+    <string name="apptour64__more_elsewhere_bubble">Plovoucí tlačítko se může objevit až s otevřenou klávesnicí a píše do webového pole, na které jste klepli.</string>
+    <string name="apptour64__more_elsewhere_watch">Na hodinkách diktát skončí tak, jak to jeho pole vyžaduje — odesláním, hledáním nebo zaškrtnutím —, na přání i s automatickým odesláním, a během čekání běží sekundy.</string>
+    <string name="apptour64__outro_eyebrow">To je 6.4</string>
+    <string name="apptour64__outro_title">Víc v telefonu, víc po vašem</string>
+    <string name="apptour64__outro_body">Překlad a nový offline model fungují bez připojení a všechno ostatní dál běží tak, jak jste si to nastavili — vlastní klíč, vlastní server nebo model v zařízení. Všechny prohlídky najdete znovu v Nastavení › O aplikaci.</string>
     <string name="changelog__v5_0_0">• NOVÉ: Psaní tahem — přejíždějte po klávesách a pište celá slova, se slovníky pro jednotlivé jazyky staženými na vyžádání. 👆\n• NOVÉ: Návrhy slov a automatické opravy — překlepy se opravují automaticky a napsané slovo zůstává na jedno klepnutí. ✨\n• NOVÉ: Přepis v reálném čase — sledujte, jak se slova objevují, zatímco mluvíte, s OpenAI, Deepgram, Soniox, AssemblyAI a ElevenLabs. ⚡\n• NOVÉ: Tři další poskytovatelé přepisu — ElevenLabs Scribe, Deepgram a AssemblyAI. ☁️\n• NOVÉ: Klasické rozvržení diktování — hlasová obrazovka bez klávesnice z Dictate 3 je zpět, zafixovaná nebo na jedno přejetí. 🎙️\n• NOVÉ: Komunitní knihovna promptů — procházejte a sdílejte prompty pro přeformulování. 📚\n• NOVÉ: Statistiky diktování s milníky. 📊\n• NOVÉ: Offline model NVIDIA Parakeet a filtr ticha, který přeskočí prázdné nahrávky. 📴\n• Více: stabilnější plovoucí tlačítko, ovládání úsilí uvažování, haptická odezva, nový motiv E-Reader a desítky oprav. 🛠️</string>
     <string name="media__tab__gifs">GIFs</string>
     <string name="prefs__media__gif__title">GIFs</string>
@@ -2243,6 +2319,11 @@
     <string name="prefs__media__gif_setup__step3">Zkopírujte svůj klíč a vložte jej do pole níže.</string>
     <string name="prefs__media__gif_setup__open_klipy">Otevřít KLIPY Partner Panel</string>
     <string name="prefs__media__gif_setup__key_label">Klíč KLIPY API</string>
+    <string name="prefs__media__gif_content_filter">Bezpečné vyhledávání</string>
+    <string name="prefs__media__gif_content_filter__high">Přísné</string>
+    <string name="prefs__media__gif_content_filter__medium">Střední</string>
+    <string name="prefs__media__gif_content_filter__low">Mírné</string>
+    <string name="prefs__media__gif_content_filter__off">Vypnuto</string>
     <string name="prefs__media__gif_setup__privacy_note">Hledané výrazy se odesílají do KLIPY jen po dobu, kdy je panel GIF otevřený — nikdy během diktování.</string>
     <string name="gif__search_placeholder">Hledat v KLIPY</string>
     <string name="gif__powered_by">Využívá KLIPY</string>

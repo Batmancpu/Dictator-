@@ -37,10 +37,13 @@ import okhttp3.MediaType.Companion.toMediaType
  * @param apiKeyProvider supplies the current (possibly blank) API key.
  * @param customerIdProvider supplies a stable per-install id used for relevance/localization; may
  *   return a blank string, in which case the parameter is omitted.
+ * @param contentFilterProvider supplies the safe-search level, sent with every trending and search
+ *   request.
  */
 class KlipyGifProvider(
     private val apiKeyProvider: () -> String,
     private val customerIdProvider: () -> String = { "" },
+    private val contentFilterProvider: () -> GifContentFilter = { GifContentFilter.HIGH },
 ) : GifProvider {
 
     override val isConfigured: Boolean
@@ -66,6 +69,10 @@ class KlipyGifProvider(
                 .newBuilder()
                 .addQueryParameter("page", page.toString())
                 .addQueryParameter("per_page", PER_PAGE.toString())
+                // The safe-search level was declared, defaulted to high and never sent (#383), so a
+                // keyboard searched at whatever KLIPY's own default is. Both trending and search take
+                // off/low/medium/high (docs.klipy.com, read 2026-10-06).
+                .addQueryParameter("content_filter", contentFilterProvider().apiValue)
             val customerId = customerIdProvider()
             if (customerId.isNotBlank()) {
                 urlBuilder.addQueryParameter("customer_id", customerId)

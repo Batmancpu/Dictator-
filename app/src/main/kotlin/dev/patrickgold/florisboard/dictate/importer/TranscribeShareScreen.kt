@@ -728,7 +728,7 @@ private suspend fun rewordWith(context: Context, promptBody: String, transcript:
             account.customBaseUrl.takeIf { it.isNotBlank() }
         } else null,
         proxy = prefs.dictate.dictateProxyConfig(),
-        trustUserCerts = prefs.dictate.trustUserCertificates.get(),
+        trustUserCerts = account.trustUserCerts,
         timeoutSeconds = prefs.dictate.requestTimeout.get().toLong(),
     )
     return DictateRewording.apply(
@@ -740,7 +740,7 @@ private suspend fun rewordWith(context: Context, promptBody: String, transcript:
         autoFormatting = false,
         languageName = DictateLanguages.englishNameFor(prefs.dictate.activeInputLanguage.get()),
         systemPrompt = null,
-        autoApplyPrompts = listOf(DictateRewording.Prompt(promptBody, requiresSelection = true)),
+        autoApplyPrompts = listOf(DictateRewording.Prompt(promptBody)),
     )
 }
 

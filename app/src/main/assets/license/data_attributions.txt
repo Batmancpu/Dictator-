@@ -15,11 +15,13 @@ Derived from the OPUS OpenSubtitles frequency lists.
   - OPUS — the open parallel corpus: https://opus.nlpl.eu
   - Please cite: P. Lison & J. Tiedemann (2016), "OpenSubtitles2016: Extracting
     Large Parallel Corpora from Movie and TV Subtitles", LREC 2016.
-For Hindi, Tamil and Urdu, where subtitle data alone is too sparse, word counts from
-the Leipzig Corpora Collection (CC BY, cited in section 2 below) are merged in.
+For Afrikaans, Hindi, Tamil and Urdu, where subtitle data alone is too sparse, word counts
+from the Leipzig Corpora Collection (CC BY, cited in section 2 below) are merged in.
 Casing was restored, and corpus noise filtered out, using Hunspell dictionaries as a
-build-time oracle only (github.com/wooorm/dictionaries and, for Arabic and the Indic
-languages, github.com/LibreOffice/dictionaries); their word lists are not redistributed.
+build-time oracle only (github.com/wooorm/dictionaries and, for Afrikaans, Arabic and the
+Indic languages, github.com/LibreOffice/dictionaries); their word lists are not
+redistributed. Where the Afrikaans one accepts a name in lowercase, the casing the Leipzig
+corpus writes it in mid-sentence was used instead.
 
 
 2. Word-pair and word-triple frequency data for context (autocorrect Tier 2, prediction)
@@ -98,7 +100,7 @@ for a stable, project-controlled source.
 
 6. Emoji names and keywords (emoji search, emoji suggestions)
 -------------------------------------------------------------
-Files: ime/media/emoji/annotations/<lang>.txt  (bundled, ~50 languages)
+Files: ime/media/emoji/annotations/<lang>.txt  (bundled, 51 languages)
 
 The searchable name and keywords of every emoji, in each language, come from the Unicode Common
 Locale Data Repository (CLDR v48), both the curated and the derived annotation sets.

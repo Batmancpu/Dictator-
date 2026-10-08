@@ -113,9 +113,11 @@ private val SelectLayoutMap = SubtypeLayoutMap(
 private val SelectLocale = FlorisLocale.from("00", "00")
 private val SelectListKeys = listOf(SelectComponentName)
 
-private class SubtypeEditorState(init: Subtype?) {
+internal class SubtypeEditorState(init: Subtype?) {
     companion object {
-        val Saver = Saver<SubtypeEditorState, String>(
+        // The editor is saved and rebuilt every time the language picker opens on top of it, so what it
+        // filled in itself ([lastFill]) has to travel too, or every pick would look like the user's.
+        val Saver = Saver<SubtypeEditorState, ArrayList<String>>(
             save = { editor ->
                 val subtype = Subtype(
                     id = editor.id.value,
@@ -129,11 +131,17 @@ private class SubtypeEditorState(init: Subtype?) {
                     layoutMap = editor.layoutMap.value,
                     numberRow = editor.numberRow.value,
                 )
-                SubtypeJsonConfig.encodeToString(subtype)
+                arrayListOf(
+                    SubtypeJsonConfig.encodeToString(subtype),
+                    editor.lastFill?.let { SubtypeJsonConfig.encodeToString(it) }.orEmpty(),
+                )
             },
-            restore = { str ->
-                val subtype = SubtypeJsonConfig.decodeFromString<Subtype>(str)
-                SubtypeEditorState(subtype)
+            restore = { saved ->
+                val subtype = SubtypeJsonConfig.decodeFromString<Subtype>(saved[0])
+                SubtypeEditorState(subtype).also { editor ->
+                    editor.lastFill = saved.getOrNull(1)?.takeIf { it.isNotEmpty() }
+                        ?.let { SubtypeJsonConfig.decodeFromString<Subtype>(it) }
+                }
             },
         )
     }
@@ -160,6 +168,57 @@ private class SubtypeEditorState(init: Subtype?) {
         popupMapping.value = subtype.popupMapping
         layoutMap.value = subtype.layoutMap
         numberRow.value = subtype.numberRow
+        lastFill = subtype
+    }
+
+    /** What the editor itself last put into the fields — a preset or [fillUnsetFrom] — as opposed to the user. */
+    private var lastFill: Subtype? = null
+
+    /**
+     * Fills every field the user has not chosen from [base]: the language's preset, or the defaults every
+     * Latin keyboard starts from when it has none.
+     *
+     * Picking a language used to set its popups and nothing else, so a language without a preset —
+     * Dutch, Estonian, Afrikaans before it had one — left a dozen fields at "Select" (characters, two
+     * symbol pages, composer, currency, three number layouts, two phone pads), and saving was refused
+     * until each had been opened and answered. A user asked by e-mail how to add a language "without
+     * having to select 15 mysterious drop-down boxes". Each of those answers is the same for nearly every
+     * Latin-script language, so picking the language is now enough, and the fields stay there to change.
+     *
+     * A field is the user's once it holds neither where a new subtype starts ("Select" for most, the
+     * default provider and punctuation rule for the two that start filled) nor what the editor put there
+     * last. So a preset's own provider (the Han one for Chinese) still arrives, picking Dutch and then
+     * Afrikaans ends with the rand rather than Dutch's dollar, and nothing the user set is overwritten.
+     */
+    fun fillUnsetFrom(base: Subtype) {
+        val previous = lastFill
+        fun <T> unchosen(current: T, start: T, filled: (Subtype) -> T) =
+            current == start || (previous != null && current == filled(previous))
+        fun pick(current: ExtensionComponentName, fallback: ExtensionComponentName, filled: (Subtype) -> ExtensionComponentName) =
+            if (unchosen(current, SelectComponentName, filled)) fallback else current
+        if (unchosen(nlpProviders.value, Subtype.DEFAULT.nlpProviders) { it.nlpProviders }) {
+            nlpProviders.value = base.nlpProviders
+        }
+        composer.value = pick(composer.value, base.composer) { it.composer }
+        currencySet.value = pick(currencySet.value, base.currencySet) { it.currencySet }
+        if (unchosen(punctuationRule.value, Subtype.DEFAULT.punctuationRule) { it.punctuationRule }) {
+            punctuationRule.value = base.punctuationRule
+        }
+        popupMapping.value = pick(popupMapping.value, base.popupMapping) { it.popupMapping }
+        val current = layoutMap.value
+        val fallback = base.layoutMap
+        layoutMap.value = SubtypeLayoutMap(
+            characters = pick(current.characters, fallback.characters) { it.layoutMap.characters },
+            symbols = pick(current.symbols, fallback.symbols) { it.layoutMap.symbols },
+            symbols2 = pick(current.symbols2, fallback.symbols2) { it.layoutMap.symbols2 },
+            numeric = pick(current.numeric, fallback.numeric) { it.layoutMap.numeric },
+            numericAdvanced = pick(current.numericAdvanced, fallback.numericAdvanced) { it.layoutMap.numericAdvanced },
+            numericRow = pick(current.numericRow, fallback.numericRow) { it.layoutMap.numericRow },
+            phone = pick(current.phone, fallback.phone) { it.layoutMap.phone },
+            phone2 = pick(current.phone2, fallback.phone2) { it.layoutMap.phone2 },
+        )
+        if (unchosen(numberRow.value, null) { it.numberRow }) numberRow.value = base.numberRow
+        lastFill = base
     }
 
     fun toSubtype() = runCatching {
@@ -247,6 +306,7 @@ fun SubtypeEditorScreen(id: Long?) = FlorisScreen {
             primaryLocale = locale
             val preset = subtypeManager.getSubtypePresetForLocale(locale)
             popupMapping = preset?.popupMapping ?: extCorePopupMapping("default")
+            subtypeEditor.fillUnsetFrom(preset?.toSubtype() ?: Subtype.DEFAULT)
         }
         selectLocaleScreenResult?.observe(lifecycleOwner, observer)
         onDispose { selectLocaleScreenResult?.removeObserver(observer) }

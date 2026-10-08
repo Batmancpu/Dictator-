@@ -327,7 +327,7 @@ object ImportTranscriber {
                     account.customBaseUrl.takeIf { it.isNotBlank() }
                 } else null,
                 proxy = prefs.dictate.dictateProxyConfig(),
-                trustUserCerts = prefs.dictate.trustUserCertificates.get(),
+                trustUserCerts = account.trustUserCerts,
                 // The user's own limit applies here too, but only upwards: someone who raised it for a
                 // slow machine of their own means it here as well, while the default two minutes is
                 // shorter than a file this size can honestly need.

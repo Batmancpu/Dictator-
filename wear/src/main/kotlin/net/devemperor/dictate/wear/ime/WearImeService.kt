@@ -15,6 +15,7 @@ import android.content.pm.PackageManager
 import android.inputmethodservice.InputMethodService
 import android.os.SystemClock
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
@@ -213,9 +214,7 @@ class WearImeService :
     private val actions = WearImeActions(
         commitText = { text -> ic()?.commitText(text, 1) },
         deleteBackward = { ic()?.deleteSurroundingText(1, 0) },
-        // The field's action if it has one (send, search, …), a line break otherwise — what Enter does on
-        // any keyboard. Committing "\n" never triggered the action, so WhatsApp could not send (#294).
-        performEnter = { sendKeyChar('\n') },
+        performEnter = { performEnter() },
         toggleDictation = { toggleDictation() },
         togglePause = { togglePause() },
         cancelDictation = { cancelDictation() },
@@ -223,6 +222,20 @@ class WearImeService :
     )
 
     private fun ic(): InputConnection? = currentInputConnection
+
+    /**
+     * ⏎: the field's action if it has one (send, search, …), a line break otherwise — what Enter does on
+     * any keyboard, and what `sendKeyChar('\n')` does. Committing "\n" never triggered the action, so
+     * WhatsApp could not send (#294). Once an action has fired the field is done with, so the keyboard
+     * closes rather than sit opaque over the app's result — as m5991's #351 had it.
+     */
+    private fun performEnter() {
+        if (sendDefaultEditorAction(true)) {
+            requestHideSelf(0)
+        } else {
+            sendDownUpKeyEvents(KeyEvent.KEYCODE_ENTER)
+        }
+    }
 
     /**
      * Voice-page record button. Tap once to start recording, tap again to stop; on stop the audio is
@@ -456,7 +469,7 @@ class WearImeService :
                 dictationState.value = WearDictationState.IDLE
                 requestHideSelf(0)
             }
-            isSendingAction(action) && WearKeyboardPrefs.autoSend(this) -> finishWith(action)
+            WearKeyboardPrefs.autoSend(this) -> finishWith(action)
             else -> {
                 readyText.value = text
                 readyAction.intValue = action

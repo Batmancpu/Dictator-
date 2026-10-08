@@ -68,7 +68,7 @@ VS16 = "️"
 # where CLDR uses a macrolanguage: Norwegian Bokmål is `no` there. Android's own legacy codes
 # (`iw`, `in`) are aliased on the Kotlin side, not here — the assets stay on the modern names.
 LANGS = {
-    "ar": "ar", "ast": "ast", "az": "az", "bg": "bg", "bn": "bn", "ca": "ca", "ckb": "ckb",
+    "af": "af", "ar": "ar", "ast": "ast", "az": "az", "bg": "bg", "bn": "bn", "ca": "ca", "ckb": "ckb",
     "cs": "cs", "da": "da", "de": "de", "el": "el", "en": "en", "es": "es", "fa": "fa",
     "fi": "fi", "fo": "fo", "fr": "fr", "he": "he", "hi": "hi", "hr": "hr", "hu": "hu",
     "hy": "hy", "id": "id", "ig": "ig", "is": "is", "it": "it", "ja": "ja", "ka": "ka",

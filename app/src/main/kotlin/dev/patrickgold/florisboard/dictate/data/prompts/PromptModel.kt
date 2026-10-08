@@ -58,21 +58,5 @@ data class PromptModel(
     }
 }
 
-/**
- * The literal text of a snippet prompt — everything between the square brackets — or `null` if this
- * prompt is an instruction for the AI model instead.
- *
- * A prompt whose text is wrapped in `[…]` is inserted verbatim, with no network call: that is the
- * snippet mechanism the prompt chips, the typed triggers (issue #283) and the strip icon all share.
- */
+/** The literal text of this prompt if it is a snippet, else `null` — see [snippetBodyOf]. */
 fun PromptModel.snippetBody(): String? = snippetBodyOf(prompt)
-
-/** [snippetBody] for a prompt text that is still being typed in the editor. */
-fun snippetBodyOf(raw: String?): String? {
-    val text = raw.orEmpty()
-    return if (text.length >= 2 && text.startsWith("[") && text.endsWith("]")) {
-        text.substring(1, text.length - 1)
-    } else {
-        null
-    }
-}

@@ -27,6 +27,7 @@ SCREEN_ROUTE = {
     "ThemeScreen": "Routes.Settings.Theme",
     "KeyboardScreen": "Routes.Settings.Keyboard",
     "InputFeedbackScreen": "Routes.Settings.InputFeedback",
+    "CustomSymbolsScreen": "Routes.Settings.CustomSymbols",
     "SmartbarScreen": "Routes.Settings.Smartbar",
     "SmartbarSecondActionsScreen": "Routes.Settings.SmartbarSecondActions",
     "TypingScreen": "Routes.Settings.Typing",
@@ -54,6 +55,7 @@ for s in ["PhysicalKeyboardScreen","BackupScreen","RestoreScreen"]:
     PARENT[s] = "R.string.settings__other__title"
 PARENT["DictateAddProviderScreen"] = "R.string.dictate__providers_title"
 PARENT["InputFeedbackScreen"] = "R.string.settings__keyboard__title"
+PARENT["CustomSymbolsScreen"] = "R.string.settings__keyboard__title"
 PARENT["SmartbarSecondActionsScreen"] = "R.string.settings__smartbar__title"
 for s in ["ProjectLicenseScreen","ThirdPartyLicensesScreen","DataAttributionsScreen"]:
     PARENT[s] = "R.string.about__title"

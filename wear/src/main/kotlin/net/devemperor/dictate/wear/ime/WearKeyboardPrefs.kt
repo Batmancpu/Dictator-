@@ -19,8 +19,13 @@ object WearKeyboardPrefs {
     private const val KEY_AUTO_SEND = "auto_send"
 
     /**
-     * Send, search or go as soon as a dictation lands in a field that offers it (#294). Off by default:
-     * a misheard sentence would then be out before anyone read it, so the keyboard asks with a ✓ first.
+     * Take the field's action — send, search, go or done — as soon as a dictation lands in it (#294).
+     * Off by default: a misheard sentence would then be out before anyone read it, so the keyboard asks
+     * with a ✓ first.
+     *
+     * Done counts too. On Galaxy watches WhatsApp and Keep hand their input to Samsung's RemoteInput
+     * screen, whose field finishes with DONE and passes the text on only then (found by m5991 on a Watch8
+     * in #351) — so auto-send that skipped DONE would never have sent a WhatsApp message.
      */
     fun autoSend(context: Context): Boolean = prefs(context).getBoolean(KEY_AUTO_SEND, false)
 
@@ -45,10 +50,6 @@ fun EditorInfo.dictationAction(): Int? {
     if (imeOptions and EditorInfo.IME_FLAG_NO_ENTER_ACTION != 0) return null
     return (imeOptions and EditorInfo.IME_MASK_ACTION).takeIf { it in FINISHING_ACTIONS }
 }
-
-/** Actions that send something off; only these are taken without asking when auto-send is on. */
-fun isSendingAction(action: Int): Boolean =
-    action == EditorInfo.IME_ACTION_SEND || action == EditorInfo.IME_ACTION_SEARCH || action == EditorInfo.IME_ACTION_GO
 
 private val FINISHING_ACTIONS = setOf(
     EditorInfo.IME_ACTION_SEND,

@@ -63,6 +63,8 @@ fun ModelPickerDialog(
     kind: ModelKind,
     preset: ProviderPreset,
     apiKey: String,
+    /** The account's own "Trust user certificates" (#383), as it stands in the editor. */
+    trustUserCerts: Boolean,
     current: String,
     cachedModels: List<String>,
     cachedAudioModels: List<String>,
@@ -94,7 +96,7 @@ fun ModelPickerDialog(
                 .from(
                     preset, apiKey,
                     baseUrlOverride = preset.baseUrl,
-                    trustUserCerts = prefs.dictate.trustUserCertificates.get(),
+                    trustUserCerts = trustUserCerts,
                     timeoutSeconds = prefs.dictate.requestTimeout.get().toLong(),
                 )
                 .listModels()

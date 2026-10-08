@@ -28,6 +28,8 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import dev.patrickgold.florisboard.ime.keyboard.Key
 import dev.patrickgold.florisboard.ime.theme.FlorisImeUi
@@ -42,6 +44,38 @@ import org.florisboard.lib.snygg.ui.SnyggRow
 import org.florisboard.lib.snygg.ui.SnyggText
 
 val GlobalStateNumPopupsShowing = MutableStateFlow(0)
+
+/**
+ * How far a key or popup label may shrink to fit its box, or null to keep the themed size. A user's own
+ * symbol key (issue #342) can say `->`, a word, or an e-mail address on a long press; at the themed size
+ * that runs far past its box. One or two code points — a letter, a symbol, an emoji with its variation
+ * selector — are left alone, which keeps every built-in key exactly as it was.
+ */
+fun labelShrinkRatio(label: String): Float? =
+    if (label.codePointCount(0, label.length) > 2) 0.3f else null
+
+/**
+ * How many lines a label that shrinks (see [labelShrinkRatio]) may wrap over, on a key and in a popup,
+ * so that an e-mail address breaks instead of shrinking to a sliver (Jannis's call). The corner hint
+ * keeps one line: wrapped, it would run into the key's own label.
+ */
+const val LONG_LABEL_MAX_LINES = 3
+
+/**
+ * Down to this fraction of the themed size a long label stays on one line; only what does not fit even
+ * then wraps. Without it auto-size takes the largest size in any number of lines and breaks a word as
+ * short as "mfg".
+ */
+const val LONG_LABEL_ONE_LINE_RATIO = 0.55f
+
+/**
+ * A long label in a long-press popup is drawn at this fraction of the themed size, the same for every
+ * element (issue #342). Its element is sized for one line of it, up to a fixed width; beyond that it wraps
+ * over up to [LONG_LABEL_MAX_LINES] and ends in an ellipsis, shrinking at most to [POPUP_LONG_LABEL_MIN_RATIO]
+ * of this when even three lines would not hold it.
+ */
+const val POPUP_LONG_LABEL_SIZE = 0.55f
+const val POPUP_LONG_LABEL_MIN_RATIO = 0.75f
 
 @Composable
 fun PopupBaseBox(
@@ -69,8 +103,13 @@ fun PopupBaseBox(
                     .height(key.visibleBounds.height.toDp())
                     .align(Alignment.TopCenter),
             ) {
+                val shrink = labelShrinkRatio(label)
                 SnyggText(
                     modifier = Modifier.align(Alignment.Center),
+                    maxLines = shrink?.let { LONG_LABEL_MAX_LINES },
+                    autoSizeMinRatio = shrink,
+                    autoSizeOneLineRatio = shrink?.let { LONG_LABEL_ONE_LINE_RATIO },
+                    textAlign = shrink?.let { TextAlign.Center },
                     text = label,
                 )
             }
@@ -118,8 +157,14 @@ fun PopupExtBox(
                         modifier = Modifier.size(elemWidth, elemHeight),
                     ) {
                         element.label?.let { label ->
+                            val long = labelShrinkRatio(label) != null
                             SnyggText(
                                 modifier = Modifier.align(Alignment.Center),
+                                maxLines = if (long) LONG_LABEL_MAX_LINES else null,
+                                overflow = if (long) TextOverflow.Ellipsis else null,
+                                fontSizeMultiplier = if (long) POPUP_LONG_LABEL_SIZE else 1f,
+                                autoSizeMinRatio = if (long) POPUP_LONG_LABEL_MIN_RATIO else null,
+                                textAlign = if (long) TextAlign.Center else null,
                                 text = label,
                             )
                         }

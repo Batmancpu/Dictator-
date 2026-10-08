@@ -1241,6 +1241,8 @@ class OpenAiCompatibleClient(
         diagnosticLabel: String? = null,
     ): String {
         var attempt = 0
+        // From the first attempt on, so that the pauses between attempts count as the waiting they are.
+        val firstStartedNanos = System.nanoTime()
         while (true) {
             val startedNanos = System.nanoTime()
             diagnosticLabel?.let {
@@ -1271,7 +1273,13 @@ class OpenAiCompatibleClient(
                             "kind=${mapped.kind}",
                     )
                 }
-                if (mapped.isRetryable && attempt < maxRetries) {
+                // Retries are for errors that come back fast: a refused connection, a reset, a 502, each
+                // costing seconds. A request that has already taken as long as one attempt may take has
+                // used up the wait the user agreed to, and another attempt only repeats it. A stalled
+                // connection used to cost four full timeouts that way, eight minutes at the default (#438).
+                // From here the resend chip is the retry, and the user decides whether to wait again.
+                val withinBudget = elapsedMillis(firstStartedNanos) < attemptBudgetMillis
+                if (mapped.isRetryable && attempt < maxRetries && withinBudget) {
                     attempt++
                     onRetry(attempt + 1) // report the upcoming attempt (2nd, 3rd, …)
                     delay(RETRY_DELAY_MS)
@@ -1380,12 +1388,20 @@ class OpenAiCompatibleClient(
 
     private fun extractErrorMessage(body: String): String? = parseError(body)?.message
 
+    /**
+     * The longest one attempt may take: the same whole-call budget [buildClient] gives OkHttp. It is the
+     * user's Request timeout for a dictation and the import's own, longer one for a shared file (#337).
+     * [executeForBody] starts no further attempt once a request has been going for this long (#438).
+     */
+    private val attemptBudgetMillis: Long
+        get() = TimeUnit.SECONDS.toMillis(config.callTimeoutSeconds ?: config.timeoutSeconds)
+
     internal fun buildClient(): OkHttpClient {
         val timeout = Duration.ofSeconds(config.timeoutSeconds)
         val builder = OkHttpClient.Builder()
             // The only budget that covers the whole journey, so the only one a long upload can exhaust
             // while everything is working perfectly (issue #337). Per-operation limits stay below.
-            .callTimeout(Duration.ofSeconds(config.callTimeoutSeconds ?: config.timeoutSeconds))
+            .callTimeout(Duration.ofMillis(attemptBudgetMillis))
             // Connection establishment needs a short budget per route. Uploading a long recording and
             // waiting for the model keep the full configured call/read/write timeout below.
             .connectTimeout(NETWORK_CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)

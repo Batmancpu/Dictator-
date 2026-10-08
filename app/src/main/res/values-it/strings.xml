@@ -125,6 +125,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">Benvenuto in {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name} non è abilitato nel sistema e quindi non sarà disponibile come metodo di immissione. Clicca qui per risolvere il problema.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name} non è la tastiera predefinita. Clicca qui per risolvere il problema.</string>
+    <string name="dictate__settings_unreadable_card">Non è stato possibile leggere le tue impostazioni, quindi Dictate è partito con i valori predefiniti. Tocca qui per recuperarle.</string>
+    <string name="dictate__settings_unreadable_title">Ripristinare?</string>
+    <string name="dictate__settings_unreadable_message">All’avvio Dictate non è riuscito a leggere il suo file delle impostazioni. Lo ha conservato intatto ed è partito con i valori predefiniti. «Ripristina» riporta fornitori, chiavi, prompt e impostazioni com’erano. «Elimina» cancella il vecchio file.</string>
+    <string name="dictate__settings_restore_failed">Le vecchie impostazioni non si possono ancora leggere.</string>
     <string name="settings__search__title" comment="Title of the settings search screen">Cerca nelle impostazioni</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Cerca nelle impostazioni…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">Ricerche recenti</string>
@@ -349,6 +353,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Mostra la riga dei numeri nella parte superiore della tastiera</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Barra numerica con suggerimenti</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Simboli suggeriti</string>
+    <string name="settings__custom_symbols__title">Simboli personalizzati</string>
+    <string name="pref__keyboard__custom_symbols__label">Usa simboli personalizzati</string>
+    <string name="custom_symbols__edit_key">Modifica tasto</string>
+    <string name="custom_symbols__key">Simbolo</string>
+    <string name="custom_symbols__currency">Valuta della lingua</string>
+    <string name="custom_symbols__long_press">Tenendo premuto</string>
+    <string name="custom_symbols__add_placeholder">Aggiungi, ad es. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Inserisci come</string>
+    <string name="custom_symbols__target_key">Tasto</string>
+    <string name="custom_symbols__target_long_press">Pressione lunga</string>
+    <string name="custom_symbols__palette_math">Matematica</string>
+    <string name="custom_symbols__palette_arrows">Frecce</string>
+    <string name="custom_symbols__palette_currencies">Valute</string>
+    <string name="custom_symbols__palette_punctuation">Punteggiatura</string>
+    <string name="custom_symbols__palette_shapes">Forme</string>
+    <string name="custom_symbols__palette_greek">Greco</string>
+    <string name="custom_symbols__palette_scripts">Apice e pedice</string>
+    <string name="custom_symbols__reset_all">Ripristina tutti i tasti</string>
+    <string name="custom_symbols__reset_all_confirm">Riportare tutti i tasti al valore predefinito?</string>
+    <string name="custom_symbols__import_confirm">Sostituire i tuoi simboli con quelli di questo file?</string>
+    <string name="custom_symbols__import_done">Simboli importati</string>
+    <string name="custom_symbols__import_invalid">Questo non è un file di simboli</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Mostra tasto funzionalità</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Mostra un tasto funzionalità configurabile vicino alla barra spaziatrice</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Azione del tasto di strumenti</string>
@@ -1064,6 +1090,8 @@
     <string name="dictate__floating_button_snap_summary_on">Il pulsante si aggancia al lato più vicino dopo averlo trascinato.</string>
     <string name="dictate__floating_button_snap_title">Aggancia al bordo</string>
     <string name="dictate__interrupted_recording">Interrotto ({time})</string>
+    <string name="dictate__transcription_stopped">Fermato, registrazione conservata</string>
+    <string name="dictate__transcription_stopped_in_history">Fermato, registrazione in Cronologia</string>
     <string name="dictate__providers_summary_both">Trascrizione: {transcription} · Riformulazione: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Conserva l’ultima dettatura così il pulsante flottante può annullarla e il layout classico può reinserirla.</string>
     <string name="dictate__remember_last_dictation_title">Ricorda ultima dettatura</string>
@@ -1150,6 +1178,7 @@
     <string name="dictate__model_default_summary">Predefinito del fornitore</string>
     <string name="dictate__custom_server_title">Server personalizzato</string>
     <string name="dictate__base_url_title">URL di base</string>
+    <string name="dictate__base_url_cleartext_warning">Non cifrato: la chiave API e le tue registrazioni viaggiano in chiaro. Sulla tua rete va bene, ma su qualsiasi altra Wi-Fi qualcun altro potrebbe leggerle.</string>
     <string name="dictate__base_url_placeholder">https://il-tuo-server/v1/</string>
     <string name="dictate__base_url_required">Obbligatorio per il fornitore personalizzato</string>
     <string name="dictate__value_not_set">Non impostato</string>
@@ -1596,7 +1625,6 @@
     <string name="dictate__audio_source_voice_recognition_summary">Ottimizzato per il parlato con meno elaborazione — provalo se la trascrizione è imprecisa</string>
     <string name="dictate__audio_source_unprocessed">Non elaborato (grezzo)</string>
     <string name="dictate__audio_source_unprocessed_summary">Nessuna elaborazione; ripiega sul Riconoscimento vocale se il telefono non lo supporta</string>
-    <string name="dictate__security_group">Sicurezza</string>
     <string name="dictate__trust_user_certs_title">Considera attendibili i certificati utente</string>
     <string name="dictate__trust_user_certs_summary">Considera attendibili i certificati CA installati, per endpoint self-hosted dietro una CA privata.</string>
     <string name="dictate__stats_title">Statistiche</string>
@@ -1994,6 +2022,54 @@
     <string name="apptour63__outro_eyebrow">Questo è 6.3</string>
     <string name="apptour63__outro_title">Meno giri, stessa tastiera</string>
     <string name="apptour63__outro_body">Nulla cambia nel modo in cui detti — la tua chiave, il tuo server o un modello sul dispositivo. Ritrovi tutti i tour in Impostazioni › Informazioni.</string>
+    <string name="apptour64__cta_languages">Scegli le lingue</string>
+    <string name="apptour64__cta_providers">Mostra i fornitori</string>
+    <string name="apptour64__intro_eyebrow">Dictate 6.4</string>
+    <string name="apptour64__intro_title">Tradotto sul telefono, simboli tutti tuoi</string>
+    <string name="apptour64__intro_body">Scrivi in una lingua e il campo si riempie in un’altra, tradotto su questo dispositivo. Entrambe le pagine dei simboli possono ospitare i tasti che scegli tu. Ci sono nuovi fornitori e un modello offline molto migliore, una parola da pronunciare per trasformare una dettatura in un’istruzione, e una revisione di privacy e sicurezza dell’intera app.</string>
+    <string name="apptour64__translate_eyebrow">Novità: traduci</string>
+    <string name="apptour64__translate_title">Una traduzione che non lascia mai il telefono</string>
+    <string name="apptour64__translate_body">Tocca Traduci nella Smartbar e scrivi nel campo sopra — il campo dell’app si riempie con la traduzione mentre scrivi. Il lavoro lo fanno i modelli di Mozilla su questo dispositivo, in 49 lingue, e nulla di ciò che scrivi viene inviato da nessuna parte. Invio inserisce la traduzione finita prima di spedire, così un messaggio non parte mai tradotto a metà. Ogni lingua si scarica una volta sola, e l’elenco ne mostra le dimensioni prima che tu la scarichi.</string>
+    <string name="apptour64__symbols_eyebrow">Novità: simboli tuoi</string>
+    <string name="apptour64__symbols_title">I simboli che usi, dove li vuoi</string>
+    <string name="apptour64__symbols_body">In Tastiera › Simboli personalizzati, entrambe le pagine dei simboli diventano tue, in ogni lingua. Tocca un tasto nell’immagine della pagina, scegli cosa scrive e cosa offre la sua pressione lunga, e trascinali nell’ordine che preferisci. Una tavolozza raccoglie i simboli che la tua tastiera non ha ancora. Finché non modifichi un tasto, le pagine sono identiche a quelle predefinite, e un layout finito si può esportare per condividerlo.</string>
+    <string name="apptour64__providers_eyebrow">Fornitori e modelli offline</string>
+    <string name="apptour64__providers_title">Nuovi fornitori e un modello offline migliore</string>
+    <string name="apptour64__providers_body">Grok di xAI ora sa anche trascrivere, come file e dal vivo, con la stessa chiave con cui riformula. Scaleway e OVHcloud tengono audio e testo all’interno dell’UE. Offline, Parakeet Ultra sostituisce Parakeet TDT 0.6B v3: stessi 670 MB e stesse 25 lingue, con il 29% di errori in meno in tedesco. Se usi v3, scarica Ultra nell’elenco dei modelli sul dispositivo ed elimina quello vecchio — fino ad allora v3 continua a funzionare. E l’elenco dei fornitori ora mostra solo quelli che usi; tutti gli altri sono in «Aggiungi fornitore», con una ricerca.</string>
+    <string name="apptour64__command_eyebrow">Novità: parola di comando</string>
+    <string name="apptour64__command_title">Di’ la parola e la dettatura diventa un’istruzione</string>
+    <string name="apptour64__command_body">Scegli una parola in Riformulazione, ad esempio «Jarvis». Una dettatura che inizia con quella parola viene eseguita come istruzione dal vivo: sul testo selezionato, o come domanda se non è selezionato nulla. Conta solo la prima parola, quindi una frase che si limita a nominarla viene scritta come sempre. Anche i prompt automatici ora funzionano come previsto: ricevono sempre la dettatura su cui agiscono, e uno composto solo da [testo tra parentesi quadre] viene aggiunto alla fine così com’è invece di andare al modello.</string>
+    <string name="apptour64__privacy_eyebrow">Privacy e sicurezza</string>
+    <string name="apptour64__privacy_title">Tutta l’app, verificata</string>
+    <string name="apptour64__privacy_body">Ogni parte di Dictate è stata esaminata per privacy e sicurezza, e ciò che è emerso è stato corretto. Una dettatura in un campo password o PIN resta fuori dalla cronologia, ora anche tramite il pulsante flottante. Il backup cloud di Android prende le tue chiavi API solo con crittografia end-to-end. E «Considera attendibili i certificati utente» ora si imposta per ogni account del fornitore anziché per tutti insieme.</string>
+    <string name="apptour64__more_eyebrow">Inoltre</string>
+    <string name="apptour64__more_title">Tutto il resto della 6.4</string>
+    <string name="apptour64__more_body">Le modifiche più piccole, per chi vuole i dettagli. Altrimenti, vai pure avanti.</string>
+    <string name="apptour64__more_typing">Digitazione</string>
+    <string name="apptour64__more_typing_slips">I suggerimenti capiscono gli errori di battitura: una lettera sul tasto sbagliato, due lettere invertite, un errore in una parola scritta a metà. La parola che intendevi compare molto più spesso, e ogni pressione di tasto è più rapida.</string>
+    <string name="apptour64__more_typing_autocorrect">Con la correzione automatica disattivata, le correzioni compaiono comunque nella barra dei suggerimenti. L’interruttore decide solo se la barra spaziatrice sostituisce la parola.</string>
+    <string name="apptour64__more_typing_glide">La scrittura con swype trova le parole che iniziano o finiscono con una lettera accentata — in ungherese, russo, finlandese, polacco, turco e altre lingue.</string>
+    <string name="apptour64__more_typing_swipe">Uno scorrimento laterale sulle lettere non cambia più la lingua, cosa che succedeva per lo più per sbaglio. Il tasto del mappamondo lo fa ancora, e in «Gesti &amp; Digitazione a scorrimento» puoi riattivare lo scorrimento.</string>
+    <string name="apptour64__more_typing_punctuation">Un segno di punteggiatura subito dopo una correzione automatica ne prende lo spazio, e uno scorrimento sulla barra spaziatrice resta sulla sua riga.</string>
+    <string name="apptour64__more_typing_calculator">La calcolatrice risponde già prima di «=», e un tocco sul risultato completa la riga.</string>
+    <string name="apptour64__more_typing_size">La tastiera ricorda le sue dimensioni per ogni lingua.</string>
+    <string name="apptour64__more_typing_languages">L’afrikaans è ora una lingua di tastiera completa. Per un nuovo layout basta scegliere la lingua — gli altri campi si compilano da soli.</string>
+    <string name="apptour64__more_dictation">Dettatura</string>
+    <string name="apptour64__more_dictation_stop">Fermare una dettatura che sta ancora aspettando il server conserva la registrazione, pronta per essere inviata di nuovo.</string>
+    <string name="apptour64__more_dictation_timeout">Una connessione bloccata si arrende dopo un solo timeout invece di quattro, e una richiesta rifiutata dal fornitore non viene inviata di nuovo.</string>
+    <string name="apptour64__more_dictation_live">Una parola che cancelli durante una dettatura dal vivo resta cancellata, e due dettature di fila hanno uno spazio in mezzo.</string>
+    <string name="apptour64__more_dictation_hold">Tenendo premuto il microfono per parlare: un tocco lento resta un tocco, e una pressione più breve di un secondo viene scartata.</string>
+    <string name="apptour64__more_dictation_talkback">TalkBack può trovare e premere il microfono, e annuncia cosa sta facendo la dettatura.</string>
+    <string name="apptour64__more_clipboard">Appunti ed emoji</string>
+    <string name="apptour64__more_clipboard_pins">Gli elementi fissati ora stanno in fondo, con schede per saltare da un gruppo all’altro. «Elementi fissati in alto» ripristina il vecchio ordine.</string>
+    <string name="apptour64__more_clipboard_chips">I chip di link, e-mail e numeri accanto a un testo copiato si possono disattivare.</string>
+    <string name="apptour64__more_clipboard_emoji">La riga delle emoji scorre e risponde alla pressione lunga, e la ricerca delle emoji mostra due righe.</string>
+    <string name="apptour64__more_elsewhere">Pulsante flottante e orologio</string>
+    <string name="apptour64__more_elsewhere_bubble">Il pulsante flottante può aspettare che sia aperta una tastiera prima di comparire, e scrive nel campo web che hai toccato.</string>
+    <string name="apptour64__more_elsewhere_watch">Sull’orologio, una dettatura si conclude come chiede il suo campo — invia, cerca o un segno di spunta —, con invio automatico se lo vuoi, e durante l’attesa scorrono i secondi.</string>
+    <string name="apptour64__outro_eyebrow">Questo è 6.4</string>
+    <string name="apptour64__outro_title">Più sul telefono, più a modo tuo</string>
+    <string name="apptour64__outro_body">La traduzione e il nuovo modello offline funzionano senza connessione, e tutto il resto continua a funzionare come l’hai impostato — la tua chiave, il tuo server o un modello sul dispositivo. Ritrovi tutti i tour in Impostazioni › Informazioni.</string>
     <string name="changelog__v5_0_0">• NUOVO: Scrittura a scorrimento — scorri sui tasti per scrivere parole intere, con dizionari per lingua scaricati su richiesta. 👆\n• NUOVO: Suggerimenti di parole e correzione automatica — gli errori vengono corretti da soli e la parola che hai digitato resta a un tocco. ✨\n• NUOVO: Trascrizione in tempo reale — guarda le tue parole apparire mentre parli, con OpenAI, Deepgram, Soniox, AssemblyAI ed ElevenLabs. ⚡\n• NUOVO: Altri tre provider di trascrizione — ElevenLabs Scribe, Deepgram e AssemblyAI. ☁️\n• NUOVO: Layout di dettatura classico — la schermata vocale senza tastiera di Dictate 3 è tornata, fissata o a un semplice scorrimento. 🎙️\n• NUOVO: Libreria di prompt della community — sfoglia e condividi prompt di riformulazione. 📚\n• NUOVO: Statistiche di dettatura con traguardi. 📊\n• NUOVO: Modello offline NVIDIA Parakeet, più un filtro del silenzio che salta le registrazioni vuote. 📴\n• Altro: un pulsante flottante più stabile, il controllo dello sforzo di ragionamento, il feedback aptico, un nuovo tema E-Reader e decine di correzioni. 🛠️</string>
     <string name="media__tab__gifs">GIF</string>
     <string name="prefs__media__gif__title">GIF</string>
@@ -2008,6 +2084,11 @@
     <string name="prefs__media__gif_setup__step3">Copia la tua chiave e incollala nel campo qui sotto.</string>
     <string name="prefs__media__gif_setup__open_klipy">Apri KLIPY Partner Panel</string>
     <string name="prefs__media__gif_setup__key_label">Chiave API KLIPY</string>
+    <string name="prefs__media__gif_content_filter">Ricerca sicura</string>
+    <string name="prefs__media__gif_content_filter__high">Rigorosa</string>
+    <string name="prefs__media__gif_content_filter__medium">Moderata</string>
+    <string name="prefs__media__gif_content_filter__low">Leggera</string>
+    <string name="prefs__media__gif_content_filter__off">Disattivata</string>
     <string name="prefs__media__gif_setup__privacy_note">I tuoi termini di ricerca vengono inviati a KLIPY solo mentre il pannello GIF è aperto — mai durante la dettatura.</string>
     <string name="gif__search_placeholder">Cerca su KLIPY</string>
     <string name="gif__powered_by">Con tecnologia KLIPY</string>

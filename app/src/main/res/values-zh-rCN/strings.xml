@@ -132,6 +132,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">欢迎使用{app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name}没有在系统中被启用，因此在输入法选择界面中不会出现。点击这里解决这一问题。</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name}没有被设置为默认输入法。点击这里解决这一问题。</string>
+    <string name="dictate__settings_unreadable_card">无法读取你的设置，因此 Dictate 已使用默认值启动。点按此处即可恢复。</string>
+    <string name="dictate__settings_unreadable_title">恢复设置？</string>
+    <string name="dictate__settings_unreadable_message">Dictate 启动时无法读取其设置文件。它已原样保留该文件，并使用默认值启动。“还原”会将你的服务商、密钥、提示词和设置恢复原样。“删除”会移除旧文件。</string>
+    <string name="dictate__settings_restore_failed">仍然无法读取旧设置。</string>
     <string name="settings__search__title" comment="Title of the settings search screen">搜索设置</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">搜索设置…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">最近搜索</string>
@@ -449,6 +453,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">在字母布局上方显示数字行</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">提示数字行</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">提示符号</string>
+    <string name="settings__custom_symbols__title">自定义符号</string>
+    <string name="pref__keyboard__custom_symbols__label">使用自定义符号</string>
+    <string name="custom_symbols__edit_key">编辑按键</string>
+    <string name="custom_symbols__key">符号</string>
+    <string name="custom_symbols__currency">语言的货币</string>
+    <string name="custom_symbols__long_press">长按时</string>
+    <string name="custom_symbols__add_placeholder">添加，例如 ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">插入为</string>
+    <string name="custom_symbols__target_key">按键</string>
+    <string name="custom_symbols__target_long_press">长按</string>
+    <string name="custom_symbols__palette_math">数学</string>
+    <string name="custom_symbols__palette_arrows">箭头</string>
+    <string name="custom_symbols__palette_currencies">货币</string>
+    <string name="custom_symbols__palette_punctuation">标点</string>
+    <string name="custom_symbols__palette_shapes">形状</string>
+    <string name="custom_symbols__palette_greek">希腊字母</string>
+    <string name="custom_symbols__palette_scripts">上标和下标</string>
+    <string name="custom_symbols__reset_all">重置所有按键</string>
+    <string name="custom_symbols__reset_all_confirm">将所有按键恢复为默认值？</string>
+    <string name="custom_symbols__import_confirm">用此文件中的符号替换你的符号？</string>
+    <string name="custom_symbols__import_done">符号已导入</string>
+    <string name="custom_symbols__import_invalid">这不是符号文件</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">显示功能键</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">在空格键旁边显示一个可配置的功能键</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">功能键操作</string>
@@ -1276,6 +1302,8 @@
     <string name="dictate__floating_button_snap_summary_on">拖动后按钮会吸附到最近的一侧。</string>
     <string name="dictate__floating_button_snap_title">吸附到边缘</string>
     <string name="dictate__interrupted_recording">已中断（{time}）</string>
+    <string name="dictate__transcription_stopped">已停止，录音已保留</string>
+    <string name="dictate__transcription_stopped_in_history">已停止，录音在历史中</string>
     <string name="dictate__providers_summary_both">转写：{transcription} · 改写：{rewording}</string>
     <string name="dictate__remember_last_dictation_summary">保留你最近一次的听写，以便悬浮按钮可以撤销它、经典布局可以重新插入它。</string>
     <string name="dictate__remember_last_dictation_title">记住上次听写</string>
@@ -1362,6 +1390,7 @@
     <string name="dictate__model_default_summary">服务商默认</string>
     <string name="dictate__custom_server_title">自定义服务器</string>
     <string name="dictate__base_url_title">基础 URL</string>
+    <string name="dictate__base_url_cleartext_warning">未加密：API 密钥和你的录音以明文传输。在你自己的网络中没有问题，但在其他任何 Wi-Fi 上都可能被他人读取。</string>
     <string name="dictate__base_url_placeholder">https://your-server/v1/</string>
     <string name="dictate__base_url_required">自定义服务商必填</string>
     <string name="dictate__value_not_set">未设置</string>
@@ -1806,7 +1835,6 @@
     <string name="dictate__audio_source_voice_recognition_summary">针对语音优化、处理更少 — 如果转录不准确请试试</string>
     <string name="dictate__audio_source_unprocessed">未处理（原始）</string>
     <string name="dictate__audio_source_unprocessed_summary">完全不处理；若手机不支持则回退到语音识别</string>
-    <string name="dictate__security_group">安全</string>
     <string name="dictate__trust_user_certs_title">信任用户证书</string>
     <string name="dictate__trust_user_certs_summary">信任你自己安装的 CA 证书，用于私有 CA 后的自托管端点。</string>
     <string name="dictate__stats_title">统计</string>
@@ -2204,6 +2232,54 @@
     <string name="apptour63__outro_eyebrow">这就是 6.3</string>
     <string name="apptour63__outro_title">弯路更少，键盘依旧</string>
     <string name="apptour63__outro_body">你的口述方式没有任何变化——自己的密钥、自己的服务器，或是设备上的模型。所有导览都能在 设置 › 关于 中重新查看。</string>
+    <string name="apptour64__cta_languages">选择语言</string>
+    <string name="apptour64__cta_providers">查看服务商</string>
+    <string name="apptour64__intro_eyebrow">Dictate 6.4</string>
+    <string name="apptour64__intro_title">在手机上翻译，符号由你安排</string>
+    <string name="apptour64__intro_body">用一种语言输入，输入框里出现的却是另一种语言——翻译就在这台设备上完成。两页符号都能放上你自己选的按键。此外还有新的服务商、一个好得多的离线模型、一个能把听写变成指令的词，以及对整个应用的一次隐私与安全审查。</string>
+    <string name="apptour64__translate_eyebrow">新功能：翻译</string>
+    <string name="apptour64__translate_title">不离开手机的翻译</string>
+    <string name="apptour64__translate_body">在智能栏中点按「翻译」，然后在它上方的输入框里打字——应用的输入框会随之填入译文。翻译由 Mozilla 的模型在这台设备上完成，支持 49 种语言，你输入的内容不会被发送到任何地方。按 Enter 会先填入完整的译文再发送，所以消息绝不会只译了一半就发出去。每种语言只需下载一次，列表会在下载前标出它的大小。</string>
+    <string name="apptour64__symbols_eyebrow">新功能：自己的符号</string>
+    <string name="apptour64__symbols_title">常用的符号，放在你想要的位置</string>
+    <string name="apptour64__symbols_body">在 键盘 › 自定义符号 中，两页符号都由你安排，每种语言都可以。在页面示意图里点按一个按键，选好它输入什么、长按时提供哪些符号，再拖动排好顺序。符号面板里有你的键盘上还没有的符号。在你改动任何按键之前，这些页面和内置的完全一样；排好的布局可以导出分享。</string>
+    <string name="apptour64__providers_eyebrow">服务商与离线模型</string>
+    <string name="apptour64__providers_title">新的服务商，更好的离线模型</string>
+    <string name="apptour64__providers_body">xAI 的 Grok 现在也能转写了，文件和实时都行，用的就是改写所用的同一把密钥。Scaleway 和 OVHcloud 让音频和文字都留在欧盟境内。离线方面，Parakeet Ultra 取代了 Parakeet TDT 0.6B v3：同样是 670 MB、同样支持 25 种语言，德语错误却少了 29%。如果你在用 v3，请在设备端模型列表中下载 Ultra，再删掉旧的——在此之前 v3 照常可用。另外，服务商列表现在只显示你在用的那些；其余的都在「添加服务商」里，还能搜索。</string>
+    <string name="apptour64__command_eyebrow">新功能：指令唤醒词</string>
+    <string name="apptour64__command_title">说出这个词，听写就成了指令</string>
+    <string name="apptour64__command_body">在「改写」中选一个词，比如「贾维斯」。以它开头的听写会作为实时指令执行：有选中的文本就作用于它，什么都没选就作为提问。只有第一个词算数，所以只是顺带提到它的句子会照常写下来。自动提示词现在也按预期工作了：它们总能拿到自己要处理的那段听写；而只由[方括号]括起来的文本构成的提示词，会原样追加到末尾，不再发给模型。</string>
+    <string name="apptour64__privacy_eyebrow">隐私与安全</string>
+    <string name="apptour64__privacy_title">整个应用，全面检查</string>
+    <string name="apptour64__privacy_body">Dictate 的每个部分都做了隐私与安全审查，发现的问题均已修复。在密码或 PIN 输入框里听写的内容不会进入历史记录，现在通过悬浮按钮也是如此。Android 的云备份只会以端到端加密的形式带走你的 API 密钥。「信任用户证书」现在按服务商账户分别设置，而不是一次对所有账户生效。</string>
+    <string name="apptour64__more_eyebrow">此外</string>
+    <string name="apptour64__more_title">6.4 的其他改动</string>
+    <string name="apptour64__more_body">一些较小的改动，写给想了解细节的人。不感兴趣的话，直接跳过即可。</string>
+    <string name="apptour64__more_typing">打字</string>
+    <string name="apptour64__more_typing_slips">建议现在能读懂手误：按到了旁边的键、两个字母前后颠倒、打到一半的词里有错。你想要的那个词出现得频繁多了，每次按键也更快。</string>
+    <string name="apptour64__more_typing_autocorrect">关闭「自动更正」后，更正仍会显示在建议栏中。这个开关只决定按空格时是否替换单词。</string>
+    <string name="apptour64__more_typing_glide">滑动输入能找到以带重音符号的字母开头或结尾的词——匈牙利语、俄语、芬兰语、波兰语、土耳其语等均适用。</string>
+    <string name="apptour64__more_typing_swipe">在字母上横向滑动不再切换语言——这多半是误触。地球键仍可切换，在「手势 &amp; 滑动输入」中也能把这个滑动找回来。</string>
+    <string name="apptour64__more_typing_punctuation">紧跟在自动更正之后的标点会占据它留下的空格；沿空格键滑动时也会停留在当前这一行。</string>
+    <string name="apptour64__more_typing_calculator">计算器在输入「=」之前就给出结果，点按结果即可补全这一行。</string>
+    <string name="apptour64__more_typing_size">键盘会按语言分别记住自己的大小。</string>
+    <string name="apptour64__more_typing_languages">南非荷兰语现已成为完整的键盘语言。新建布局只需选好语言——其余字段会自动填好。</string>
+    <string name="apptour64__more_dictation">听写</string>
+    <string name="apptour64__more_dictation_stop">停止一段仍在等待服务器的听写时，录音会被保留，随时可以重新发送。</string>
+    <string name="apptour64__more_dictation_timeout">连接卡住时，经过一次超时就会放弃，而不是四次；被服务商拒绝的请求也不会再重发。</string>
+    <string name="apptour64__more_dictation_live">实时听写中删掉的词会保持删除，连续两段听写之间也会加上空格。</string>
+    <string name="apptour64__more_dictation_hold">按住麦克风说话时：慢慢的一次点按仍算点按，按住不到一秒则会被丢弃。</string>
+    <string name="apptour64__more_dictation_talkback">TalkBack 能找到并按下麦克风，还会播报听写正在做什么。</string>
+    <string name="apptour64__more_clipboard">剪贴板与表情</string>
+    <string name="apptour64__more_clipboard_pins">置顶的剪贴内容现在排在底部，并有标签页可在各组之间跳转。「置顶项显示在上方」可以恢复原来的顺序。</string>
+    <string name="apptour64__more_clipboard_chips">复制的文本旁边那些链接、电子邮件和电话号码小标签现在可以关闭。</string>
+    <string name="apptour64__more_clipboard_emoji">表情行可以滚动，也会响应长按；表情搜索会显示两行。</string>
+    <string name="apptour64__more_elsewhere">悬浮按钮与手表</string>
+    <string name="apptour64__more_elsewhere_bubble">悬浮按钮可以等键盘出现后再显示，并会写入你点按的那个网页输入框。</string>
+    <string name="apptour64__more_elsewhere_watch">在手表上，听写会按输入框的要求结束——发送、搜索或打勾——可按需自动发送，等待时还会显示秒数。</string>
+    <string name="apptour64__outro_eyebrow">这就是 6.4</string>
+    <string name="apptour64__outro_title">更多在手机上完成，更多由你决定</string>
+    <string name="apptour64__outro_body">翻译和新的离线模型无需联网即可使用，其他一切仍按你的设置运行——自己的密钥、自己的服务器，或是设备上的模型。所有导览都能在 设置 › 关于 中重新查看。</string>
     <string name="changelog__v5_0_0">• 新增：滑动输入 — 在按键上滑动即可输入整个单词，配有按需下载的分语言词典。 👆\n• 新增：单词建议与自动更正 — 拼写错误会自动更正，你输入的原词只需一按即可取回。 ✨\n• 新增：实时转录 — 说话时即可看到文字出现，支持 OpenAI、Deepgram、Soniox、AssemblyAI 和 ElevenLabs。 ⚡\n• 新增：又添三家转录服务商 — ElevenLabs Scribe、Deepgram 和 AssemblyAI。 ☁️\n• 新增：经典听写布局 — Dictate 3 的无键盘语音界面回归，可锁定或一滑即达。 🎙️\n• 新增：社区提示词库 — 浏览并分享改写提示词。 📚\n• 新增：带里程碑的听写统计。 📊\n• 新增：离线模型 NVIDIA Parakeet，以及跳过空录音的静音过滤器。 📴\n• 更多：更稳定的悬浮按钮、推理强度控制、触觉反馈、全新的 E-Reader 主题以及数十项修复。 🛠️</string>
     <string name="media__tab__gifs">GIFs</string>
     <string name="prefs__media__gif__title">GIFs</string>
@@ -2218,6 +2294,11 @@
     <string name="prefs__media__gif_setup__step3">复制你的密钥并粘贴到下方的字段中。</string>
     <string name="prefs__media__gif_setup__open_klipy">打开 KLIPY 合作伙伴面板</string>
     <string name="prefs__media__gif_setup__key_label">KLIPY API 密钥</string>
+    <string name="prefs__media__gif_content_filter">安全搜索</string>
+    <string name="prefs__media__gif_content_filter__high">严格</string>
+    <string name="prefs__media__gif_content_filter__medium">中等</string>
+    <string name="prefs__media__gif_content_filter__low">宽松</string>
+    <string name="prefs__media__gif_content_filter__off">关闭</string>
     <string name="prefs__media__gif_setup__privacy_note">只有在 GIF 面板打开时，你的搜索词才会发送给 KLIPY — 听写过程中绝不发送。</string>
     <string name="gif__search_placeholder">搜索 KLIPY</string>
     <string name="gif__powered_by">由 KLIPY 提供支持</string>

@@ -17,6 +17,8 @@
 package dev.patrickgold.florisboard.ime.popup
 
 import android.content.Context
+import android.graphics.Paint
+import android.util.TypedValue
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.requiredSize
@@ -45,6 +47,17 @@ import dev.patrickgold.florisboard.ime.text.keyboard.TextKeyData
 import dev.patrickgold.florisboard.ime.theme.FlorisImeUi
 import dev.patrickgold.florisboard.lib.FlorisRect
 import dev.patrickgold.florisboard.lib.toIntOffset
+import kotlin.math.floor
+
+/**
+ * The size a long popup label is measured at to size its element (issue #342): the default theme's 22sp
+ * at [POPUP_LONG_LABEL_SIZE], which is what PopupExtBox draws it at.
+ */
+private const val LABEL_MEASURE_SP = 22f * POPUP_LONG_LABEL_SIZE
+private const val LABEL_PADDING_DP = 12f
+
+/** No element grows wider than this many keys; a longer label wraps instead (Jannis's call). */
+private const val MAX_ELEMENT_KEYS = 2f
 
 @Composable
 fun rememberPopupUiController(
@@ -142,7 +155,6 @@ class PopupUiController(
         if (!isSuitableForExtendedPopup(key)) return
 
         val baseBounds = baseRenderInfo?.bounds ?: boundsProvider(key)
-        val keyPopupDiffX = (key.visibleBounds.width - baseBounds.width) / 2.0f
 
         // Anchor left if keyView is in left half of keyboardView, else anchor right
         val anchorLeft = key.visibleBounds.left < size.width / 2
@@ -172,6 +184,17 @@ class PopupUiController(
             }
         }
 
+        // Every element is as wide as the widest label needs, up to two keys, and never so wide that a row
+        // leaves the keyboard.
+        val elemWidth = if (key is TextKey) {
+            val labels = key.computedPopups.getPopupKeys(keyHintConfiguration).map { evaluator.computeLabel(it) }
+            elementWidthFor(labels, baseBounds.width, minOf(MAX_ELEMENT_KEYS * baseBounds.width, size.width / row0count))
+        } else {
+            baseBounds.width
+        }
+        val isWidened = elemWidth > baseBounds.width
+        val keyPopupDiffX = (key.visibleBounds.width - elemWidth) / 2.0f
+
         // Calculate anchor offset (always positive int, direction depends on anchorLeft and
         // anchorRight state)
         val anchorOffset = when {
@@ -185,11 +208,11 @@ class PopupUiController(
                 val availableSpace = when {
                     anchorLeft -> key.visibleBounds.left + keyPopupDiffX
                     anchorRight -> size.width -
-                        (key.visibleBounds.left + keyPopupDiffX + baseBounds.width)
+                        (key.visibleBounds.left + keyPopupDiffX + elemWidth)
                     else -> 0.0f
                 }
                 while (offset > 0) {
-                    if (availableSpace >= offset * baseBounds.width) {
+                    if (availableSpace >= offset * elemWidth) {
                         break
                     } else {
                         offset -= 1
@@ -277,16 +300,19 @@ class PopupUiController(
         }
 
         // Calculate layout params
-        val extWidth = row0count * baseBounds.width
+        val extWidth = row0count * elemWidth
         val extHeight = when {
             row1count > 0 -> baseBounds.height * 0.4f * 2.0f
             else -> baseBounds.height * 0.4f
         }
-        val x = ((key.visibleBounds.width - baseBounds.width) / 2.0f) + when {
-            anchorLeft -> -anchorOffset * baseBounds.width
-            anchorRight -> -extWidth + baseBounds.width + anchorOffset * baseBounds.width
+        val anchoredX = keyPopupDiffX + when {
+            anchorLeft -> -anchorOffset * elemWidth
+            anchorRight -> -extWidth + elemWidth + anchorOffset * elemWidth
             else -> 0.0f
         } + key.visibleBounds.left
+        // Widened elements can run past the far edge; they are pulled back onto the keyboard, which the
+        // geometric hit test in propagateMotionEvent allows for.
+        val x = if (isWidened) anchoredX.coerceIn(0f, (size.width - extWidth).coerceAtLeast(0f)) else anchoredX
         val y = -baseBounds.height - when {
             row1count > 0 -> (baseBounds.height * 0.4f).toInt()
             else -> 0
@@ -304,8 +330,30 @@ class PopupUiController(
             anchorOffset = anchorOffset,
             row0count = row0count,
             row1count = row1count,
+            elemWidth = elemWidth,
         )
         activeElementIndex = initUiIndex
+    }
+
+    private val labelPaint by lazy {
+        Paint().apply {
+            textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, LABEL_MEASURE_SP, context.resources.displayMetrics)
+        }
+    }
+
+    /**
+     * How wide each element of a popup has to be for [labels] (issue #342): a key's own width for the
+     * usual one or two code points, enough for one line of a word on a user's symbol key, and at most
+     * [maxWidth] — a label longer than that wraps over up to three lines in PopupExtBox and is cut off
+     * after them. Jannis turned down elements that grew to the keyboard's full width before wrapping.
+     */
+    private fun elementWidthFor(labels: List<String?>, keyWidth: Float, maxWidth: Float): Float {
+        val widest = labels.maxOfOrNull { label ->
+            if (label == null || labelShrinkRatio(label) == null) 0f else labelPaint.measureText(label)
+        } ?: 0f
+        if (widest == 0f) return keyWidth
+        val padding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, LABEL_PADDING_DP, context.resources.displayMetrics)
+        return (widest + padding).coerceAtMost(maxWidth).coerceAtLeast(keyWidth)
     }
 
     /**
@@ -325,6 +373,9 @@ class PopupUiController(
 
         val extRenderInfo = extRenderInfo ?: return false
         val baseBounds = extRenderInfo.baseBounds
+        if (extRenderInfo.elemWidth > baseBounds.width) {
+            return propagateWidened(extRenderInfo, key, xEvent, yEvent)
+        }
         val keyPopupDiffX = (key.visibleBounds.width - baseBounds.width) / 2.0f
 
         val x = xEvent - key.visibleBounds.left
@@ -384,6 +435,30 @@ class PopupUiController(
             }
         }
 
+        return true
+    }
+
+    /**
+     * [propagateMotionEvent] for a popup with widened elements (issue #342). The arithmetic above counts
+     * in key widths from the key's own edge, which a widened popup — possibly pulled back from the
+     * keyboard's edge — no longer lines up with, so the element is found where it is drawn: by row from
+     * the finger's height, as above, and by column from the popup's bounds. Past either end of a row the
+     * end element stays selected, like the narrow popup.
+     */
+    private fun propagateWidened(info: ExtRenderInfo, key: Key, xEvent: Float, yEvent: Float): Boolean {
+        val baseBounds = info.baseBounds
+        val y = yEvent - key.visibleBounds.top
+        if (y < -baseBounds.height || y > 0.9f * baseBounds.height) {
+            return false
+        }
+        if (xEvent < info.bounds.left - info.elemWidth || xEvent > info.bounds.right + info.elemWidth) {
+            return false
+        }
+        val row = info.elements[if (y < 0 && info.row1count > 0) 1 else 0]
+        if (row.isEmpty()) return false
+        val rowLeft = if (info.anchorLeft) info.bounds.left else info.bounds.right - row.size * info.elemWidth
+        val column = floor((xEvent - rowLeft) / info.elemWidth).toInt().coerceIn(0, row.size - 1)
+        activeElementIndex = row[column].orderedIndex
         return true
     }
 
@@ -466,7 +541,7 @@ class PopupUiController(
         }
         extRenderInfo?.let { renderInfo ->
             val baseBounds = renderInfo.baseBounds
-            val elemWidth = baseBounds.width
+            val elemWidth = renderInfo.elemWidth
             val elemHeight = baseBounds.height * 0.4f
             PopupExtBox(
                 modifier = Modifier
@@ -501,6 +576,8 @@ class PopupUiController(
         val anchorOffset: Int,
         val row0count: Int,
         val row1count: Int,
+        /** One element's width: the key's, or more for long labels (issue #342). */
+        val elemWidth: Float,
     )
 
     data class Element(

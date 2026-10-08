@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.app.apptheme.FlorisAppTheme
+import dev.patrickgold.florisboard.dictate.acceptsSharedUri
 import org.florisboard.lib.compose.ProvideLocalizedResources
 import java.io.File
 
@@ -61,7 +62,8 @@ class TranscribeShareActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val incoming = incomingUris(intent)
+        // Only what another app can honestly share: not a file:// path and not one of our own Uris (#383).
+        val incoming = incomingUris(intent).filter { acceptsSharedUri(it) }
         // Callers with no activity of their own — the floating button — ask the screen to run the picker
         // itself. Only on a fresh start: after a recreation the launcher redelivers the result instead.
         val pickHere = incoming.isEmpty() && intent?.getBooleanExtra(EXTRA_PICK, false) == true

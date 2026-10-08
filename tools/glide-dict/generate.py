@@ -41,6 +41,7 @@ import sys, os, io, json, math, gzip, tarfile, hashlib, argparse, subprocess, te
 
 from wordfilter import drop_foreign_scripts, is_word, strip_arabic_marks
 
+HERE = os.path.dirname(os.path.abspath(__file__))
 OPUS = "https://object.pouta.csc.fi/OPUS-OpenSubtitles/v2018/freq"
 LEIPZIG = "https://downloads.wortschatz-leipzig.de/corpora"
 WOOORM = "https://raw.githubusercontent.com/wooorm/dictionaries/main/dictionaries"
@@ -206,12 +207,67 @@ def uses_title_case(words: list) -> bool:
     return not any("GEORGIAN" in s for s in scripts)
 
 
-def build_case_oracle(words: list, dict_name: str, lo_dict: str = "") -> dict:
+def load_mid_sentence_forms(pkg: str) -> dict:
+    """lowercase word → {spelling: count}, counted only where no sentence starts, from a Leipzig package.
+
+    A capital at the start of a sentence says nothing about the word, so the first token of every
+    sentence, and the one after a full stop, colon, question or exclamation mark, is not counted.
+    Reuses the n-gram tools' corpus cache, so a language built both ways downloads its package once.
+    """
+    from ngramcount import EDGE_PUNCT, sentences
+    cache = os.path.join(HERE, "dist", "corpora")
+    forms: dict = {}
+    for _, text in sentences(pkg, cache):
+        start = True
+        for raw in text.split():
+            tok = raw.strip(EDGE_PUNCT)
+            if tok and not start and is_word(tok.lower()):
+                counts = forms.setdefault(tok.lower(), {})
+                counts[tok] = counts.get(tok, 0) + 1
+            start = raw.rstrip("\"'”’)»").endswith((".", "!", "?", ":")) or (start and not tok)
+    sys.stderr.write(f"  corpus case from {pkg}: {len(forms)} words seen mid-sentence\n")
+    return forms
+
+
+# How sure the corpus has to be before it overrides a lowercase word, and on how many sightings. Strict
+# on purpose: the keyboard commits a dictionary word in the dictionary's casing, so a common noun wrongly
+# capitalised here would be capitalised in every sentence the user types it in.
+CORPUS_CASE_SHARE = 0.97
+CORPUS_CASE_MIN = 50
+
+
+def corpus_spelling(word: str, forms: dict):
+    """The spelling [word] has in the corpus mid-sentence, if that is a capitalised one used at least
+    CORPUS_CASE_SHARE of the time — capitals at the start of each hyphenated part only (Wes-Kaap), so an
+    abbreviation (OT, vC) or a single letter (R, J) is never taken."""
+    counts = forms.get(word)
+    if not counts or len(word) < 3:
+        return None
+    form = max(counts, key=counts.get)
+    total = sum(counts.values())
+    if total < CORPUS_CASE_MIN or counts[form] < CORPUS_CASE_SHARE * total or form == word:
+        return None
+    parts = [p for p in form.split("-") if p]
+    if not all(p[:1].isupper() and p[1:] == p[1:].lower() for p in parts):
+        return None
+    return form
+
+
+def build_case_oracle(words: list, dict_name: str, lo_dict: str = "", corpus_forms: dict = None,
+                      corpus_exclude: set = frozenset()) -> dict:
     """
     Map each lowercase word to its correct case via hunspell (word→cased). Words that hunspell rejects in
     *both* cases are omitted (they are OPUS subtitle noise: typos, foreign/Swiss spellings like "gross",
     names) — the caller drops any word not in the returned map. Falls back to keeping everything lowercase
     if no Hunspell dictionary is available.
+
+    [corpus_forms] (from load_mid_sentence_forms) is for a Hunspell dictionary that cannot answer the
+    casing question: the Afrikaans one lists `afrikaans`, `engels`, `europa` and `kersfees` in lowercase,
+    so every one of them passed as a lowercase word. Where Hunspell takes the lowercase form, a spelling
+    the corpus uses almost without exception (corpus_spelling) replaces it; where Hunspell rejects both
+    simple forms, that spelling is tried instead, which keeps hyphenated names (Suid-Afrika) that
+    capitalising the first letter alone could never produce. [corpus_exclude] holds the words the corpus
+    gets wrong: common nouns that are also the name of a newspaper, a team or a family (smit, maroela).
     """
     if not uses_title_case(words):
         sys.stderr.write("  (script has no title case: keeping every word lowercase)\n")
@@ -253,6 +309,47 @@ def build_case_oracle(words: list, dict_name: str, lo_dict: str = "") -> dict:
         f"  hunspell '{source}': {len(oracle)} of {len(lowers)} words kept "
         f"({len(lowers) - len(oracle)} rejected as noise/misspellings)\n"
     )
+    if corpus_forms:
+        spelled = {w: f for w in lowers if w not in corpus_exclude
+                   and (f := corpus_spelling(w, corpus_forms)) is not None
+                   and oracle.get(w, w) == w}
+        bad_spelled = rejected(list(spelled.values()))
+        recased = rescued = 0
+        for w, f in spelled.items():
+            if f in bad_spelled:
+                continue
+            if w in oracle:
+                recased += 1
+            else:
+                rescued += 1
+            oracle[w] = f
+        sys.stderr.write(f"  corpus case: {recased} words capitalised, {rescued} kept in the corpus spelling\n")
+
+        # The other direction: Hunspell takes only the capitalised form, but the corpus writes the word in
+        # lowercase mid-sentence. Either it is a lowercase word the dictionary lacks (`let`, as in "let op")
+        # or an accent-less spelling of another word (`more` for môre, `le` for lê), which must not become
+        # a word of its own or the keyboard could never put the accent back. Which one it is shows in the
+        # list itself: whether another kept word folds onto the same letters.
+        def bare(word: str) -> str:
+            return "".join(c for c in unicodedata.normalize("NFD", word.lower()) if unicodedata.category(c) != "Mn")
+        bare_others = {}
+        for w, form in oracle.items():
+            bare_others.setdefault(bare(form), set()).add(w)
+        lowered = dropped = 0
+        for w, cap in zip(lowers, caps):
+            if oracle.get(w) != cap or w in corpus_exclude:
+                continue
+            counts = corpus_forms.get(w) or {}
+            total = sum(counts.values())
+            if total < CORPUS_CASE_MIN or counts.get(w, 0) < 0.6 * total:
+                continue
+            if bare_others.get(w, set()) - {w}:
+                del oracle[w]
+                dropped += 1
+            else:
+                oracle[w] = w
+                lowered += 1
+        sys.stderr.write(f"  corpus case: {lowered} words lowercased, {dropped} accent-less spellings dropped\n")
     return oracle
 
 
@@ -290,6 +387,11 @@ def main():
     ap.add_argument("--name", default="<DisplayName>")
     ap.add_argument("--top", type=int, default=50000)
     ap.add_argument("--out", default=".")
+    ap.add_argument("--corpus-case", default="",
+                    help="Leipzig package whose mid-sentence spellings decide the casing where the Hunspell "
+                         "dictionary cannot (it accepts a name in lowercase); see build_case_oracle")
+    ap.add_argument("--corpus-case-exclude", default="",
+                    help="comma-separated lowercase words --corpus-case must leave alone")
     ap.add_argument("--no-hunspell", action="store_true",
                     help="skip the Hunspell casing/filter (OPUS frequencies only, all lowercase) — use for "
                          "languages whose Hunspell dictionary has an incompatible licence (e.g. AGPL/CC-BY-SA) "
@@ -308,7 +410,9 @@ def main():
         sys.stderr.write("  (Hunspell skipped: OPUS-only, lowercase)\n")
         oracle = {w: w for w, _ in words}
     else:
-        oracle = build_case_oracle(words, args.dict or args.lang, args.lo_dict)
+        forms = load_mid_sentence_forms(args.corpus_case) if args.corpus_case else None
+        exclude = {w.strip() for w in args.corpus_case_exclude.split(",") if w.strip()}
+        oracle = build_case_oracle(words, args.dict or args.lang, args.lo_dict, forms, exclude)
     data = to_json(words, oracle)
 
     os.makedirs(args.out, exist_ok=True)

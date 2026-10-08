@@ -204,13 +204,21 @@ class PromptsDatabaseHelper private constructor(
         // library", which is the safe answer — the content fallback still catches old imports.
         val libraryIdx = getColumnIndex("LIBRARY_ID")
         val libraryId = if (libraryIdx >= 0 && !isNull(libraryIdx)) getString(libraryIdx) else null
+        val prompt = getString(getColumnIndexOrThrow("PROMPT"))
+        val autoApply = getInt(getColumnIndexOrThrow("AUTO_APPLY")) == 1
         return PromptModel(
             id = getInt(getColumnIndexOrThrow("ID")),
             pos = getInt(getColumnIndexOrThrow("POS")),
             name = getString(getColumnIndexOrThrow("NAME")),
-            prompt = getString(getColumnIndexOrThrow("PROMPT")),
-            requiresSelection = getInt(getColumnIndexOrThrow("REQUIRES_SELECTION")) == 1,
-            autoApply = getInt(getColumnIndexOrThrow("AUTO_APPLY")) == 1,
+            prompt = prompt,
+            // Read through the rule rather than as stored: an automatic prompt saved with the switch off
+            // has to reach every reader (keyboard, watch sync, list, export) already switched on.
+            requiresSelection = promptRequiresSelection(
+                prompt,
+                requiresSelection = getInt(getColumnIndexOrThrow("REQUIRES_SELECTION")) == 1,
+                autoApply = autoApply,
+            ),
+            autoApply = autoApply,
             reasoningEffort = reasoning,
             reasoningEffortCustom = reasoningCustom,
             trigger = trigger,

@@ -132,6 +132,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">Üdvözli a {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">A {app_name} nincs engedélyezve a rendszerben, így nem lesz elérhető beviteli módként a bevitelválasztóban. A probléma megoldásához kattintson ide.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">Nem a {app_name} az alapértelmezett beviteli mód. A probléma megoldásához kattintson ide.</string>
+    <string name="dictate__settings_unreadable_card">A beállításaidat nem sikerült beolvasni, ezért a Dictate az alapértékekkel indult. Koppints ide a visszaállításukhoz.</string>
+    <string name="dictate__settings_unreadable_title">Visszaállítás?</string>
+    <string name="dictate__settings_unreadable_message">Induláskor a Dictate nem tudta beolvasni a beállításfájlját. Érintetlenül megőrizte, és az alapértékekkel indult. A „Helyreállítás” visszahozza a szolgáltatóidat, kulcsaidat, utasításaidat és beállításaidat úgy, ahogy voltak. A „Törlés” eltávolítja a régi fájlt.</string>
+    <string name="dictate__settings_restore_failed">A régi beállításokat továbbra sem lehet beolvasni.</string>
     <string name="settings__search__title" comment="Title of the settings search screen">Keresés a beállításokban</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Keresés a beállításokban…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">Legutóbbi keresések</string>
@@ -448,6 +452,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Számsor megjelenítése a karakterelrendezés felett</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Tipp számsor</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Javasolt szimbólumok</string>
+    <string name="settings__custom_symbols__title">Saját szimbólumok</string>
+    <string name="pref__keyboard__custom_symbols__label">Saját szimbólumok használata</string>
+    <string name="custom_symbols__edit_key">Billentyű szerkesztése</string>
+    <string name="custom_symbols__key">Szimbólum</string>
+    <string name="custom_symbols__currency">A nyelv pénzneme</string>
+    <string name="custom_symbols__long_press">Hosszú nyomásra</string>
+    <string name="custom_symbols__add_placeholder">Hozzáadás, pl. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Beszúrás mint</string>
+    <string name="custom_symbols__target_key">Billentyű</string>
+    <string name="custom_symbols__target_long_press">Hosszú nyomás</string>
+    <string name="custom_symbols__palette_math">Matematika</string>
+    <string name="custom_symbols__palette_arrows">Nyilak</string>
+    <string name="custom_symbols__palette_currencies">Pénznemek</string>
+    <string name="custom_symbols__palette_punctuation">Írásjelek</string>
+    <string name="custom_symbols__palette_shapes">Alakzatok</string>
+    <string name="custom_symbols__palette_greek">Görög</string>
+    <string name="custom_symbols__palette_scripts">Felső és alsó index</string>
+    <string name="custom_symbols__reset_all">Minden billentyű visszaállítása</string>
+    <string name="custom_symbols__reset_all_confirm">Visszaállítod az összes billentyűt alapértelmezettre?</string>
+    <string name="custom_symbols__import_confirm">Lecseréled a szimbólumaidat a fájlban lévőkre?</string>
+    <string name="custom_symbols__import_done">Szimbólumok importálva</string>
+    <string name="custom_symbols__import_invalid">Ez nem szimbólumfájl</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Kellékgomb megjelenítése</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Egy beállítható kellékgomb megjelenítése a szóköz mellett</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Kellékgomb művelet</string>
@@ -1280,6 +1306,8 @@
     <string name="dictate__floating_button_snap_summary_on">Húzás után a gomb a legközelebbi oldalhoz illeszkedik.</string>
     <string name="dictate__floating_button_snap_title">Illesztés a szélhez</string>
     <string name="dictate__interrupted_recording">Megszakítva ({time})</string>
+    <string name="dictate__transcription_stopped">Leállítva, felvétel megőrizve</string>
+    <string name="dictate__transcription_stopped_in_history">Leállítva, felvétel az Előzményekben</string>
     <string name="dictate__providers_summary_both">Átírás: {transcription} · Átfogalmazás: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Megőrzi az utolsó diktálást, hogy a lebegő gomb visszavonhassa, a klasszikus elrendezés pedig újra beszúrhassa.</string>
     <string name="dictate__remember_last_dictation_title">Utolsó diktálás megjegyzése</string>
@@ -1366,6 +1394,7 @@
     <string name="dictate__model_default_summary">Szolgáltató alapértelmezett</string>
     <string name="dictate__custom_server_title">Egyéni szerver</string>
     <string name="dictate__base_url_title">Alap-URL</string>
+    <string name="dictate__base_url_cleartext_warning">Titkosítatlan: az API-kulcs és a felvételeid egyszerű szövegként utaznak. A saját hálózatodon ez rendben van, de bármely más Wi-Fi-n valaki más is elolvashatja őket.</string>
     <string name="dictate__base_url_placeholder">https://your-server/v1/</string>
     <string name="dictate__base_url_required">Az egyéni szolgáltatóhoz szükséges</string>
     <string name="dictate__value_not_set">Nincs beállítva</string>
@@ -1812,7 +1841,6 @@
     <string name="dictate__audio_source_voice_recognition_summary">Beszédre hangolva, kevesebb feldolgozással — próbáld ki, ha az átírás pontatlan</string>
     <string name="dictate__audio_source_unprocessed">Feldolgozatlan (nyers)</string>
     <string name="dictate__audio_source_unprocessed_summary">Egyáltalán nincs feldolgozás; ha a telefonod nem támogatja, visszavált Beszédfelismerésre</string>
-    <string name="dictate__security_group">Biztonság</string>
     <string name="dictate__trust_user_certs_title">Felhasználói tanúsítványok megbízása</string>
     <string name="dictate__trust_user_certs_summary">Megbízik a telepített CA-tanúsítványokban, saját üzemeltetésű végpontokhoz privát CA mögött.</string>
     <string name="dictate__stats_title">Statisztika</string>
@@ -2105,7 +2133,7 @@
     <string name="apptour60__chinese_body">Pinjin jelöltsorral — eddig csak a Zhengma volt, amit alig használ valaki. Ezenkívül egy eszközön futó modell, amit valóban kínaira tanítottak, és egy szolgáltató, ami a szárazföldről is elérhető.</string>
     <string name="apptour60__emoji_eyebrow">Emodzsi</string>
     <string name="apptour60__emoji_title">Emodzsikeresés a saját nyelveden</string>
-    <string name="apptour60__emoji_body">Az emodzsikereső hat nyelvet ismert. Most több mint negyvenet — keress rá arra, hogy „heart", „心" vagy „قلب", és ugyanahhoz az emodzsihoz jutsz. A keresés a billentyűzeted nyelvét követi.</string>
+    <string name="apptour60__emoji_body">Az emodzsikereső hat nyelvet ismert. Most több mint negyvenet — keress rá arra, hogy „heart”, „心” vagy „قلب”, és ugyanahhoz az emodzsihoz jutsz. A keresés a billentyűzeted nyelvét követi.</string>
     <string name="apptour60__languages_eyebrow">Szótárak</string>
     <string name="apptour60__languages_title">Hét nyelv, amelynek nem volt javaslata</string>
     <string name="apptour60__languages_body">Az arab, a bengáli, a finn, a hindi, az indonéz, a tamil és az urdu mostantól szójavaslatokat és automatikus javítást kap. Az izlandi és a grúz egyszerűen rossz nyelvet tartalmazott, ezeket újraépítettük. A 19 kiosztás hosszú nyomásra előjövő karakterei pedig ahhoz igazodnak, amit az adott nyelv valóban ír.</string>
@@ -2210,6 +2238,54 @@
     <string name="apptour63__outro_eyebrow">Ez a 6.3</string>
     <string name="apptour63__outro_title">Kevesebb kerülő, ugyanaz a billentyűzet</string>
     <string name="apptour63__outro_body">Semmi nem változik abban, ahogy diktálsz — saját kulcs, saját kiszolgáló vagy egy modell az eszközön. Minden bemutatót újra megtalálsz a Beállítások › Névjegy alatt.</string>
+    <string name="apptour64__cta_languages">Nyelvek kiválasztása</string>
+    <string name="apptour64__cta_providers">Szolgáltatók megtekintése</string>
+    <string name="apptour64__intro_eyebrow">Dictate 6.4</string>
+    <string name="apptour64__intro_title">Fordítás a telefonon, szimbólumok ízlésed szerint</string>
+    <string name="apptour64__intro_body">Egy nyelven gépelsz, és a mező egy másikon telik meg — a fordítás ezen az eszközön készül. Mindkét szimbólumoldalon azok a billentyűk lehetnek, amelyeket te választasz. Emellett új szolgáltatók és egy sokkal jobb offline modell, egy kimondott szó, amely a diktálásból utasítást csinál, és az egész alkalmazás adatvédelmi és biztonsági átvizsgálása.</string>
+    <string name="apptour64__translate_eyebrow">Új: fordítás</string>
+    <string name="apptour64__translate_title">Fordítás, amely sosem hagyja el a telefont</string>
+    <string name="apptour64__translate_body">Koppints a Smartbar „Fordítás” gombjára, és gépelj a fölötte lévő mezőbe — közben az alkalmazás mezője megtelik a fordítással. A munkát a Mozilla modelljei végzik ezen az eszközön, 49 nyelven, és semmi, amit begépelsz, nem kerül sehová. Az Enter előbb beilleszti a kész fordítást, és csak utána küld, így egyetlen üzenet sem megy ki félig lefordítva. Minden nyelvet csak egyszer kell letölteni, és a lista előre megmutatja a méretét.</string>
+    <string name="apptour64__symbols_eyebrow">Új: saját szimbólumok</string>
+    <string name="apptour64__symbols_title">A szimbólumaid, ott, ahol szeretnéd</string>
+    <string name="apptour64__symbols_body">A Billentyűzet › Saját szimbólumok alatt mindkét szimbólumoldal a tiéd lesz, minden nyelven. Koppints egy billentyűre az oldal képén, válaszd ki, mit ír és mit kínál hosszú nyomásra, és húzással rendezd őket tetszőleges sorrendbe. Egy paletta tartalmazza azokat a szimbólumokat, amelyek a billentyűzetedről még hiányoznak. Amíg egyetlen billentyűt sem módosítasz, az oldalak pontosan úgy néznek ki, mint a beépítettek, a kész elrendezés pedig exportálható és megosztható.</string>
+    <string name="apptour64__providers_eyebrow">Szolgáltatók és offline modellek</string>
+    <string name="apptour64__providers_title">Új szolgáltatók és egy jobb offline modell</string>
+    <string name="apptour64__providers_body">Mostantól az xAI Grok is átír, fájlból és élőben is, ugyanazzal a kulccsal, amellyel már átfogalmaz. A Scaleway és az OVHcloud az EU-n belül tartja a hangot és a szöveget. Offline a Parakeet Ultra lép a Parakeet TDT 0.6B v3 helyébe: ugyanaz a 670 MB és ugyanaz a 25 nyelv, németül 29%-kal kevesebb hibával. Ha a v3-at használod, töltsd le az Ultrát az eszközön futó modellek listájában, és töröld a régit — addig a v3 tovább működik. A szolgáltatók listája pedig mostantól csak azokat mutatja, amelyeket használsz; az összes többi a „Szolgáltató hozzáadása” alatt van, kereséssel.</string>
+    <string name="apptour64__command_eyebrow">Új: parancsszó</string>
+    <string name="apptour64__command_title">Mondd ki a szót, és a diktálásból utasítás lesz</string>
+    <string name="apptour64__command_body">Válassz egy szót az Átfogalmazás alatt — mondjuk „Jarvis”. Az ezzel kezdődő diktálás élő utasításként fut: a kijelölt szövegen, vagy kérdésként, ha nincs semmi kijelölve. Csak az első szó számít, így az a mondat, amely csupán említi, a szokásos módon íródik le. Az automatikus promptok is úgy működnek most, ahogy kell: mindig megkapják a diktálást, amelyhez tartoznak, és az a prompt, amely csak [szögletes zárójelbe tett szöveg], változatlanul a végére kerül, ahelyett hogy a modellhez menne.</string>
+    <string name="apptour64__privacy_eyebrow">Adatvédelem és biztonság</string>
+    <string name="apptour64__privacy_title">Az egész alkalmazás, átvizsgálva</string>
+    <string name="apptour64__privacy_body">A Dictate minden részét átnéztük adatvédelmi és biztonsági szempontból, és amit találtunk, azt kijavítottuk. A jelszó- vagy PIN-mezőbe diktált szöveg kimarad az előzményekből, mostantól a lebegő gombon keresztül is. Az Android felhőalapú biztonsági mentése csak végponttól végpontig titkosítva viszi magával az API-kulcsaidat. A „Felhasználói tanúsítványok megbízása” pedig mostantól szolgáltatói fiókonként állítható, nem mindegyikre egyszerre.</string>
+    <string name="apptour64__more_eyebrow">Ezenkívül</string>
+    <string name="apptour64__more_title">Minden más a 6.4-ben</string>
+    <string name="apptour64__more_body">A kisebb változások, mindenkinek, aki kíváncsi a részletekre. Ha nem, nyugodtan lapozz tovább.</string>
+    <string name="apptour64__more_typing">Gépelés</string>
+    <string name="apptour64__more_typing_slips">A javaslatok felismerik az elütéseket: egy rossz billentyűre került betűt, két felcserélt betűt, egy hibát egy félig begépelt szóban. A szó, amire gondoltál, sokkal gyakrabban jelenik meg, és minden billentyűleütés gyorsabb.</string>
+    <string name="apptour64__more_typing_autocorrect">Kikapcsolt automatikus javítás mellett is megjelennek a javítások a sávban. A kapcsoló már csak arról dönt, hogy a szóköz lecseréli-e a szót.</string>
+    <string name="apptour64__more_typing_glide">A csúsztatott gépelés megtalálja az ékezetes betűvel kezdődő vagy végződő szavakat — magyarul, oroszul, finnül, lengyelül, törökül és más nyelveken is.</string>
+    <string name="apptour64__more_typing_swipe">Ha oldalra húzod az ujjad a betűkön, az már nem vált nyelvet — ez többnyire véletlenül történt. A földgömb billentyű továbbra is vált, a húzás pedig a Gesztusok és csúsztatott gépelés alatt kapcsolható vissza.</string>
+    <string name="apptour64__more_typing_punctuation">Az automatikus javítás után közvetlenül beírt írásjel átveszi annak szóközét, a szóköz billentyűn végzett csúsztatás pedig a saját sorában marad.</string>
+    <string name="apptour64__more_typing_calculator">A számológép már az „=” előtt válaszol, és az eredményre koppintva kiegészül a sor.</string>
+    <string name="apptour64__more_typing_size">A billentyűzet minden nyelvhez megjegyzi a méretét.</string>
+    <string name="apptour64__more_typing_languages">Az afrikaans mostantól teljes értékű billentyűzetnyelv. Új elrendezés hozzáadásakor elég kiválasztani a nyelvet — a többi mező magától kitöltődik.</string>
+    <string name="apptour64__more_dictation">Diktálás</string>
+    <string name="apptour64__more_dictation_stop">Ha leállítasz egy diktálást, amely még a kiszolgálóra vár, a felvétel megmarad, és újra elküldhető.</string>
+    <string name="apptour64__more_dictation_timeout">Az elakadó kapcsolat egyetlen időtúllépés után feladja, nem négy után, és a szolgáltató által elutasított kérés nem megy el újra.</string>
+    <string name="apptour64__more_dictation_live">Az a szó, amelyet élő diktálás közben törölsz, törölve is marad, és két egymást követő diktálás közé szóköz kerül.</string>
+    <string name="apptour64__more_dictation_hold">A mikrofon nyomva tartása beszédhez: a lassú koppintás koppintás marad, az egy másodpercnél rövidebb nyomva tartást pedig elveti az alkalmazás.</string>
+    <string name="apptour64__more_dictation_talkback">A TalkBack megtalálja és meg is tudja nyomni a mikrofont, és bemondja, mit csinál éppen a diktálás.</string>
+    <string name="apptour64__more_clipboard">Vágólap és emoji</string>
+    <string name="apptour64__more_clipboard_pins">A kitűzött elemek most alul vannak, fülekkel a csoportok közötti ugráshoz. A „Kitűzött elemek felül” visszahozza a régi sorrendet.</string>
+    <string name="apptour64__more_clipboard_chips">A másolt szöveg melletti hivatkozás-, e-mail- és szám-chipek kikapcsolhatók.</string>
+    <string name="apptour64__more_clipboard_emoji">Az emojisor görgethető, és reagál a hosszú nyomásra, az emojikeresés pedig két sort mutat.</string>
+    <string name="apptour64__more_elsewhere">Lebegő gomb és óra</string>
+    <string name="apptour64__more_elsewhere_bubble">A lebegő gomb megvárhatja, hogy megnyíljon egy billentyűzet, mielőtt megjelenik, és abba a webes mezőbe ír, amelyre koppintottál.</string>
+    <string name="apptour64__more_elsewhere_watch">Az órán a diktálás úgy zárul, ahogy a mezője kéri — küldéssel, kereséssel vagy pipával —, kérésre automatikus küldéssel, várakozás közben pedig peregnek a másodpercek.</string>
+    <string name="apptour64__outro_eyebrow">Ez a 6.4</string>
+    <string name="apptour64__outro_title">Több a telefonon, még inkább a tiéd</string>
+    <string name="apptour64__outro_body">A fordítás és az új offline modell kapcsolat nélkül is működik, minden más pedig továbbra is úgy fut, ahogy beállítottad — saját kulcs, saját kiszolgáló vagy egy modell az eszközön. Minden bemutatót újra megtalálsz a Beállítások › Névjegy alatt.</string>
     <string name="changelog__v5_0_0">• ÚJ: Húzásos gépelés — húzza az ujját a billentyűkön, hogy egész szavakat írjon, igény szerint letöltődő, nyelvenkénti szótárakkal. 👆\n• ÚJ: Szójavaslatok és automatikus javítás — az elgépelések automatikusan javulnak, és a beírt szó egy koppintásra marad. ✨\n• ÚJ: Valós idejű átírás — nézze, ahogy a szavak megjelennek beszéd közben, OpenAI, Deepgram, Soniox, AssemblyAI és ElevenLabs használatával. ⚡\n• ÚJ: Három további átírási szolgáltató — ElevenLabs Scribe, Deepgram és AssemblyAI. ☁️\n• ÚJ: Klasszikus diktálási elrendezés — a Dictate 3 billentyűzet nélküli hangképernyője visszatért, rögzítve vagy egy húzásnyira. 🎙️\n• ÚJ: Közösségi prompt-könyvtár — böngésszen és osszon meg újrafogalmazási prompteket. 📚\n• ÚJ: Diktálási statisztikák mérföldkövekkel. 📊\n• ÚJ: Offline modell NVIDIA Parakeet, valamint egy csendszűrő, amely kihagyja az üres felvételeket. 📴\n• Továbbá: stabilabb lebegő gomb, gondolkodási erőfeszítés vezérlése, haptikus visszajelzés, új E-Reader téma és több tucat javítás. 🛠️</string>
     <string name="media__tab__gifs">GIF-ek</string>
     <string name="prefs__media__gif__title">GIF-ek</string>
@@ -2224,6 +2300,11 @@
     <string name="prefs__media__gif_setup__step3">Másold ki a kulcsot, és illeszd be az alábbi mezőbe.</string>
     <string name="prefs__media__gif_setup__open_klipy">KLIPY Partner Panel megnyitása</string>
     <string name="prefs__media__gif_setup__key_label">KLIPY API-kulcs</string>
+    <string name="prefs__media__gif_content_filter">Biztonságos keresés</string>
+    <string name="prefs__media__gif_content_filter__high">Szigorú</string>
+    <string name="prefs__media__gif_content_filter__medium">Mérsékelt</string>
+    <string name="prefs__media__gif_content_filter__low">Enyhe</string>
+    <string name="prefs__media__gif_content_filter__off">Ki</string>
     <string name="prefs__media__gif_setup__privacy_note">A keresési kifejezéseidet csak akkor küldjük el a KLIPY-nek, amíg a GIF-panel nyitva van — soha nem diktálás közben.</string>
     <string name="gif__search_placeholder">Keresés a KLIPY-ben</string>
     <string name="gif__powered_by">A KLIPY szolgáltatásával</string>

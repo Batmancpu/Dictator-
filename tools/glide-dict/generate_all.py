@@ -36,6 +36,9 @@ NO_HUNSPELL = {"he", "is", "fi", "ur"}
 # (news or Wikipedia, CC BY) is merged in by relative frequency to fill the gap. Measured word counts
 # from OPUS alone: Tamil 7,145 · Hindi 15,706 · Urdu 11,230.
 LEIPZIG = {
+    # Afrikaans has 18,811 OPUS entries in all, punctuation included. Leipzig has no news corpus for it;
+    # the mixed one (news, web and Wikipedia) is its only million-sentence package.
+    "af": "afr_mixed_2019_1M",
     "hi": "hin_news_2022_1M",
     "ta": "tam_wikipedia_2021_1M",
     "ur": "urd_newscrawl_2016_1M",
@@ -56,8 +59,23 @@ FIX_OPUS_ENCODING = {"is": "iso8859_4:latin1"}
 # Languages built from Leipzig alone, because their OPUS list is unusable rather than merely small.
 LEIPZIG_ONLY = {"ka"}
 
+# Languages whose Hunspell dictionary cannot answer the casing question, as out_code -> (Leipzig package,
+# words to leave alone); see build_case_oracle in generate.py. The Afrikaans dictionary lists afrikaans,
+# engels, europa and kersfees in lowercase, so it accepts them that way and the oracle kept them so. The
+# exclusions are common nouns the corpus mostly meets as a name — a newspaper, a team, a family — read
+# through by hand from the 108 words the corpus would capitalise: venter (hawker), maroela (marula),
+# huisgenoot (housemate), jonker (squire), peet (godparent), els (alder), braam (bramble), koen (bold),
+# landman (farmer), volkskool, boekhuis (bookshop), klopper (knocker), kramer (stallholder), helpmekaar
+# (mutual help), plaassilo's (farm silos), warmbad (hot spring), and god, which is lowercase for any god
+# but the Christian one.
+CORPUS_CASE = {
+    "af": ("afr_mixed_2019_1M", "venter,maroela,huisgenoot,jonker,peet,els,braam,koen,landman,volkskool,"
+                                "boekhuis,klopper,kramer,helpmekaar,plaassilo's,warmbad,god"),
+}
+
 # out_code, opus_code, hunspell_dict, display_name
 LANGS = [
+    ("af", "af", "lo:af_ZA/af_ZA", "Afrikaans"),
     ("ar", "ar", "lo:ar/ar", "Arabic · العربية"),
     ("bn", "bn", "lo:bn_BD/bn_BD", "Bengali · বাংলা"),
     ("bg", "bg", "bg", "Bulgarian · Български"),
@@ -119,6 +137,9 @@ def main():
             cmd += ["--fix-opus-encoding", FIX_OPUS_ENCODING[out_code]]
         if out_code in NO_HUNSPELL:
             cmd.append("--no-hunspell")
+        if out_code in CORPUS_CASE:
+            pkg, exclude = CORPUS_CASE[out_code]
+            cmd += ["--corpus-case", pkg, "--corpus-case-exclude", exclude]
         proc = subprocess.run(cmd, capture_output=True, text=True)
         sys.stderr.write(proc.stderr)
         line = proc.stdout.strip()

@@ -124,6 +124,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">Ласкаво просимо до {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name} не ввімкнено в системі, тому він не буде доступним як метод вводу в меню вибору методу вводу. Натисніть сюди, щоб виправити це.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name} не вибрано як стандартний метод вводу. Натисніть сюди, щоб виправити це.</string>
+    <string name="dictate__settings_unreadable_card">Не вдалося прочитати ваші налаштування, тому Dictate запустився зі стандартними значеннями. Торкніться тут, щоб повернути їх.</string>
+    <string name="dictate__settings_unreadable_title">Відновити?</string>
+    <string name="dictate__settings_unreadable_message">Під час запуску Dictate не зміг прочитати свій файл налаштувань. Він зберіг файл недоторканим і запустився зі стандартними значеннями. «Відновити» повертає ваших постачальників, ключі, промпти й налаштування такими, якими вони були. «Видалити» стирає старий файл.</string>
+    <string name="dictate__settings_restore_failed">Старі налаштування досі не вдається прочитати.</string>
     <string name="settings__search__title" comment="Title of the settings search screen">Пошук у налаштуваннях</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Пошук у налаштуваннях…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">Останні пошуки</string>
@@ -330,6 +334,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Зображати рядок цифр над розкладкою</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">Підказка в строці з цифрами</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Підказки симолів</string>
+    <string name="settings__custom_symbols__title">Власні символи</string>
+    <string name="pref__keyboard__custom_symbols__label">Використовувати власні символи</string>
+    <string name="custom_symbols__edit_key">Змінити клавішу</string>
+    <string name="custom_symbols__key">Символ</string>
+    <string name="custom_symbols__currency">Валюта мови</string>
+    <string name="custom_symbols__long_press">Під час утримання</string>
+    <string name="custom_symbols__add_placeholder">Додати, напр. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Вставити як</string>
+    <string name="custom_symbols__target_key">Клавіша</string>
+    <string name="custom_symbols__target_long_press">Утримання</string>
+    <string name="custom_symbols__palette_math">Математика</string>
+    <string name="custom_symbols__palette_arrows">Стрілки</string>
+    <string name="custom_symbols__palette_currencies">Валюти</string>
+    <string name="custom_symbols__palette_punctuation">Пунктуація</string>
+    <string name="custom_symbols__palette_shapes">Фігури</string>
+    <string name="custom_symbols__palette_greek">Грецька</string>
+    <string name="custom_symbols__palette_scripts">Верхній і нижній індекс</string>
+    <string name="custom_symbols__reset_all">Скинути всі клавіші</string>
+    <string name="custom_symbols__reset_all_confirm">Повернути всі клавіші до типових?</string>
+    <string name="custom_symbols__import_confirm">Замінити ваші символи символами з цього файлу?</string>
+    <string name="custom_symbols__import_done">Символи імпортовано</string>
+    <string name="custom_symbols__import_invalid">Це не файл символів</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Показати допоміжну клавішу</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Показує настроювану допоміжну клавішу поряд з пробілом</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Дія допоміжної клавіші</string>
@@ -1126,6 +1152,8 @@
     <string name="dictate__floating_button_snap_summary_on">Після перетягування кнопка прилипає до найближчого краю.</string>
     <string name="dictate__floating_button_snap_title">Прилипати до краю</string>
     <string name="dictate__interrupted_recording">Перервано ({time})</string>
+    <string name="dictate__transcription_stopped">Зупинено, запис збережено</string>
+    <string name="dictate__transcription_stopped_in_history">Зупинено, запис в Історії</string>
     <string name="dictate__providers_summary_both">Транскрипція: {transcription} · Переформулювання: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Зберігає останнє диктування, щоб плаваюча кнопка могла його скасувати, а класична розкладка — вставити знову.</string>
     <string name="dictate__remember_last_dictation_title">Запам’ятовувати останнє диктування</string>
@@ -1212,6 +1240,7 @@
     <string name="dictate__model_default_summary">За замовчуванням постачальника</string>
     <string name="dictate__custom_server_title">Власний сервер</string>
     <string name="dictate__base_url_title">Базовий URL</string>
+    <string name="dictate__base_url_cleartext_warning">Без шифрування: ключ API і ваші записи передаються відкритим текстом. У власній мережі це нормально, але в будь-якій іншій мережі Wi-Fi їх може прочитати хтось інший.</string>
     <string name="dictate__base_url_placeholder">https://ваш-сервер/v1/</string>
     <string name="dictate__base_url_required">Обов\'язково для власного постачальника</string>
     <string name="dictate__value_not_set">Не задано</string>
@@ -1660,7 +1689,6 @@
     <string name="dictate__audio_source_voice_recognition_summary">Налаштовано для мовлення з меншою обробкою — спробуйте, якщо транскрипція неточна</string>
     <string name="dictate__audio_source_unprocessed">Без обробки (сирий)</string>
     <string name="dictate__audio_source_unprocessed_summary">Узагалі без обробки; повертається до Розпізнавання мовлення, якщо телефон не підтримує</string>
-    <string name="dictate__security_group">Безпека</string>
     <string name="dictate__trust_user_certs_title">Довіряти сертифікатам користувача</string>
     <string name="dictate__trust_user_certs_summary">Довіряти встановленим вами сертифікатам ЦС для власних точок за приватним ЦС.</string>
     <string name="dictate__stats_title">Статистика</string>
@@ -2058,6 +2086,54 @@
     <string name="apptour63__outro_eyebrow">Це 6.3</string>
     <string name="apptour63__outro_title">Менше обхідних шляхів, та сама клавіатура</string>
     <string name="apptour63__outro_body">У тому, як ви диктуєте, нічого не змінюється — власний ключ, власний сервер або модель на пристрої. Усі огляди знову доступні в Налаштування › Про застосунок.</string>
+    <string name="apptour64__cta_languages">Вибрати мови</string>
+    <string name="apptour64__cta_providers">Показати постачальників</string>
+    <string name="apptour64__intro_eyebrow">Dictate 6.4</string>
+    <string name="apptour64__intro_title">Переклад на телефоні й символи на ваш смак</string>
+    <string name="apptour64__intro_body">Ви друкуєте однією мовою, а поле заповнюється іншою — перекладає сам пристрій. Обидві сторінки символів тепер вміщують ті клавіші, які оберете ви. А ще — нові постачальники й значно точніша офлайн-модель, слово, що перетворює диктування на інструкцію, і перевірка всього застосунку на приватність і безпеку.</string>
+    <string name="apptour64__translate_eyebrow">Нове: переклад</string>
+    <string name="apptour64__translate_title">Переклад, що ніколи не залишає телефон</string>
+    <string name="apptour64__translate_body">Торкніться «Перекласти» в Smartbar і друкуйте в полі над нею — поле застосунку по ходу заповнюється перекладом. Роботу виконують моделі Mozilla просто на цьому пристрої, для 49 мов, і нічого з набраного нікуди не надсилається. Enter спершу вставляє готовий переклад і лише потім надсилає, тож повідомлення ніколи не піде перекладеним наполовину. Кожна мова завантажується один раз, а список заздалегідь показує її розмір.</string>
+    <string name="apptour64__symbols_eyebrow">Нове: власні символи</string>
+    <string name="apptour64__symbols_title">Ваші символи — там, де вони вам потрібні</string>
+    <string name="apptour64__symbols_body">У розділі Клавіатура › Власні символи обидві сторінки символів стають вашими, для кожної мови. Торкніться клавіші на зображенні сторінки, виберіть, що вона друкує і що пропонує за довгим натисканням, і розставте все перетягуванням у потрібному порядку. На палітрі є символи, яких на вашій клавіатурі ще немає. Поки ви не зміните жодної клавіші, сторінки виглядають точнісінько як вбудовані, а готову розкладку можна експортувати й поділитися нею.</string>
+    <string name="apptour64__providers_eyebrow">Постачальники та офлайн-моделі</string>
+    <string name="apptour64__providers_title">Нові постачальники й покращена офлайн-модель</string>
+    <string name="apptour64__providers_body">Grok від xAI тепер ще й транскрибує — з файлу та наживо, тим самим ключем, яким переформульовує. Scaleway та OVHcloud тримають аудіо й текст у межах ЄС. Серед офлайн-моделей Parakeet Ultra замінює Parakeet TDT 0.6B v3: ті самі 670 МБ і ті самі 25 мов, але на 29 % менше помилок у німецькій. Якщо ви користуєтеся v3, завантажте Ultra у списку моделей на пристрої та видаліть стару — доти v3 і далі працюватиме. А список постачальників тепер показує лише тих, якими ви користуєтеся; усі інші зібрано в розділі «Додати постачальника», де є пошук.</string>
+    <string name="apptour64__command_eyebrow">Нове: командне слово</string>
+    <string name="apptour64__command_title">Скажіть слово — і диктування стане інструкцією</string>
+    <string name="apptour64__command_body">Оберіть слово в розділі «Переформулювання» — скажімо, «Джарвіс». Диктування, що з нього починається, виконується як голосова інструкція: над виділеним текстом або як запитання, якщо нічого не виділено. Зараховується лише перше слово, тож речення, де воно просто згадується, записується як завжди. І автоматичні промпти тепер працюють як задумано: вони завжди отримують диктування, до якого застосовуються, а промпт, у якому є лише [текст у квадратних дужках], додається в кінець як є, замість того щоб іти до моделі.</string>
+    <string name="apptour64__privacy_eyebrow">Приватність і безпека</string>
+    <string name="apptour64__privacy_title">Перевірено весь застосунок</string>
+    <string name="apptour64__privacy_body">Кожну частину Dictate перевірено на приватність і безпеку, і все знайдене виправлено. Диктування в поле пароля чи PIN-коду не потрапляє до історії — тепер і через плаваючу кнопку. Хмарне резервне копіювання Android зберігає ваші API-ключі лише з наскрізним шифруванням. А «Довіряти сертифікатам користувача» тепер налаштовується для кожного облікового запису постачальника окремо, а не для всіх одразу.</string>
+    <string name="apptour64__more_eyebrow">А ще</string>
+    <string name="apptour64__more_title">Усе інше в 6.4</string>
+    <string name="apptour64__more_body">Дрібніші зміни — для тих, кому цікаві подробиці. Якщо ні, просто гортайте далі.</string>
+    <string name="apptour64__more_typing">Набір тексту</string>
+    <string name="apptour64__more_typing_slips">Підказки розуміють одруки: літеру не на тій клавіші, дві переставлені літери, помилку в недописаному слові. Потрібне слово з’являється значно частіше, а кожне натискання обробляється швидше.</string>
+    <string name="apptour64__more_typing_autocorrect">З вимкненим автовиправленням варіанти виправлення все одно з’являються в рядку підказок. Перемикач вирішує лише одне: чи замінює пробіл слово.</string>
+    <string name="apptour64__more_typing_glide">Безперервний ввід знаходить слова, що починаються або закінчуються літерою з діакритикою, — угорською, російською, фінською, польською, турецькою та іншими мовами.</string>
+    <string name="apptour64__more_typing_swipe">Свайп убік по літерах більше не перемикає мову — здебільшого це траплялося випадково. Клавіша з глобусом і далі перемикає, а в розділі «Жести та безперервний ввід» свайп можна повернути.</string>
+    <string name="apptour64__more_typing_punctuation">Розділовий знак одразу після автовиправлення стає на місце його пробілу, а ковзання по пробілу більше не зводить курсор на інший рядок.</string>
+    <string name="apptour64__more_typing_calculator">Калькулятор відповідає ще до «=», а дотик до відповіді доповнює рядок.</string>
+    <string name="apptour64__more_typing_size">Клавіатура запам’ятовує свій розмір для кожної мови.</string>
+    <string name="apptour64__more_typing_languages">Африкаанс став повноцінною мовою клавіатури. Для нової розкладки досить вибрати мову — решта полів заповниться сама.</string>
+    <string name="apptour64__more_dictation">Диктування</string>
+    <string name="apptour64__more_dictation_stop">Якщо зупинити диктування, яке ще чекає на сервер, запис збережеться і його можна буде надіслати знову.</string>
+    <string name="apptour64__more_dictation_timeout">Зависле з’єднання переривається після одного тайм-ауту замість чотирьох, а запит, який постачальник відхилив, більше не надсилається повторно.</string>
+    <string name="apptour64__more_dictation_live">Слово, видалене під час диктування в реальному часі, залишається видаленим, а між двома диктуваннями поспіль з’являється пробіл.</string>
+    <string name="apptour64__more_dictation_hold">Запис утриманням мікрофона: повільний дотик лишається дотиком, а утримання коротше за секунду відкидається.</string>
+    <string name="apptour64__more_dictation_talkback">TalkBack знаходить кнопку мікрофона, може її натиснути й повідомляє, що зараз робить диктування.</string>
+    <string name="apptour64__more_clipboard">Буфер обміну та емодзі</string>
+    <string name="apptour64__more_clipboard_pins">Закріплені записи тепер унизу, а вкладки дають змогу переходити між групами. «Закріплені вгорі» повертає попередній порядок.</string>
+    <string name="apptour64__more_clipboard_chips">Кнопки з посиланнями, адресами пошти й номерами поруч зі скопійованим текстом можна вимкнути.</string>
+    <string name="apptour64__more_clipboard_emoji">Рядок емодзі прокручується й реагує на довге натискання, а пошук емодзі показує два ряди.</string>
+    <string name="apptour64__more_elsewhere">Плаваюча кнопка та годинник</string>
+    <string name="apptour64__more_elsewhere_bubble">Плаваюча кнопка може дочекатися клавіатури, перш ніж з’явитися, і пише в те вебполе, якого ви торкнулися.</string>
+    <string name="apptour64__more_elsewhere_watch">На годиннику диктування завершується так, як того вимагає його поле, — надсиланням, пошуком чи галочкою, за бажанням з автоматичним надсиланням, а під час очікування видно секунди.</string>
+    <string name="apptour64__outro_eyebrow">Це 6.4</string>
+    <string name="apptour64__outro_title">Більше на телефоні, більше під себе</string>
+    <string name="apptour64__outro_body">Переклад і нова офлайн-модель обходяться без з’єднання, а все інше й далі працює так, як ви налаштували, — власний ключ, власний сервер або модель на пристрої. Усі огляди знову доступні в Налаштування › Про застосунок.</string>
     <string name="changelog__v5_0_0">• НОВЕ: Друк свайпом — проводьте по клавішах, щоб писати слова цілком, зі словниками для окремих мов, що завантажуються за запитом. 👆\n• НОВЕ: Підказки слів і автовиправлення — помилки виправляються автоматично, а набране слово лишається за один дотик. ✨\n• НОВЕ: Транскрипція в реальному часі — дивіться, як слова з’являються, поки ви говорите, з OpenAI, Deepgram, Soniox, AssemblyAI та ElevenLabs. ⚡\n• НОВЕ: Ще три провайдери транскрипції — ElevenLabs Scribe, Deepgram та AssemblyAI. ☁️\n• НОВЕ: Класичний макет диктування — голосовий екран без клавіатури з Dictate 3 повернувся, зафіксований або за один свайп. 🎙️\n• НОВЕ: Бібліотека промптів спільноти — переглядайте та діліться промптами для переформулювання. 📚\n• НОВЕ: Статистика диктування з віхами. 📊\n• НОВЕ: Офлайн-модель NVIDIA Parakeet, а також фільтр тиші, що пропускає порожні записи. 📴\n• Більше: стабільніша плаваюча кнопка, керування зусиллям міркування, тактильний відгук, нова тема E-Reader і десятки виправлень. 🛠️</string>
     <string name="media__tab__gifs">GIFs</string>
     <string name="prefs__media__gif__title">GIFs</string>
@@ -2072,6 +2148,11 @@
     <string name="prefs__media__gif_setup__step3">Скопіюйте ключ і вставте його в поле нижче.</string>
     <string name="prefs__media__gif_setup__open_klipy">Відкрити Партнерську панель KLIPY</string>
     <string name="prefs__media__gif_setup__key_label">Ключ API KLIPY</string>
+    <string name="prefs__media__gif_content_filter">Безпечний пошук</string>
+    <string name="prefs__media__gif_content_filter__high">Суворий</string>
+    <string name="prefs__media__gif_content_filter__medium">Помірний</string>
+    <string name="prefs__media__gif_content_filter__low">М’який</string>
+    <string name="prefs__media__gif_content_filter__off">Вимкнено</string>
     <string name="prefs__media__gif_setup__privacy_note">Ваші пошукові запити надсилаються до KLIPY лише коли відкрита панель GIF — ніколи під час диктування.</string>
     <string name="gif__search_placeholder">Пошук у KLIPY</string>
     <string name="gif__powered_by">На основі KLIPY</string>

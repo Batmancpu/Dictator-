@@ -125,6 +125,10 @@
     <string name="settings__home__title" comment="Title of the Home screen">Welkom bij {app_name}</string>
     <string name="settings__home__ime_not_enabled" comment="Error message shown in Home fragment when Dictate Keyboard is not enabled in the system">{app_name} is niet ingeschakeld in het systeem en zal dus niet beschikbaar zijn als een invoermethode in de invoermethode-kiezer. Klik hier om dit probleem op te lossen.</string>
     <string name="settings__home__ime_not_selected" comment="Warning message shown in Home fragment when Dictate Keyboard is not selected as the default keyboard">{app_name} is niet geselecteerd als de standaard invoermethode. Klik hier om dit probleem op te lossen.</string>
+    <string name="dictate__settings_unreadable_card">Je instellingen konden niet worden gelezen, dus Dictate is gestart met de standaardwaarden. Tik hier om ze terug te halen.</string>
+    <string name="dictate__settings_unreadable_title">Herstellen?</string>
+    <string name="dictate__settings_unreadable_message">Bij het starten kon Dictate zijn instellingenbestand niet lezen. Het heeft het onaangeroerd bewaard en is gestart met de standaardwaarden. ‘Herstellen’ haalt je aanbieders, sleutels, prompts en instellingen terug zoals ze waren. ‘Verwijderen’ wist het oude bestand.</string>
+    <string name="dictate__settings_restore_failed">De oude instellingen kunnen nog steeds niet worden gelezen.</string>
     <string name="settings__search__title" comment="Title of the settings search screen">Instellingen doorzoeken</string>
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Instellingen doorzoeken…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">Recente zoekopdrachten</string>
@@ -371,6 +375,28 @@
     <string name="pref__keyboard__number_row__summary" comment="Preference summary">Toon nummerrij boven de alfabettoetsen</string>
     <string name="pref__keyboard__hinted_number_row_mode__label" comment="Preference title">nummer op de achterkant</string>
     <string name="pref__keyboard__hinted_symbols_mode__label" comment="Preference title">Symbolen achter</string>
+    <string name="settings__custom_symbols__title">Eigen symbolen</string>
+    <string name="pref__keyboard__custom_symbols__label">Eigen symbolen gebruiken</string>
+    <string name="custom_symbols__edit_key">Toets bewerken</string>
+    <string name="custom_symbols__key">Symbool</string>
+    <string name="custom_symbols__currency">Valuta van de taal</string>
+    <string name="custom_symbols__long_press">Bij lang indrukken</string>
+    <string name="custom_symbols__add_placeholder">Toevoegen, bijv. ✔ ☑ ✅</string>
+    <string name="custom_symbols__insert_as">Invoegen als</string>
+    <string name="custom_symbols__target_key">Toets</string>
+    <string name="custom_symbols__target_long_press">Lang indrukken</string>
+    <string name="custom_symbols__palette_math">Wiskunde</string>
+    <string name="custom_symbols__palette_arrows">Pijlen</string>
+    <string name="custom_symbols__palette_currencies">Valuta’s</string>
+    <string name="custom_symbols__palette_punctuation">Leestekens</string>
+    <string name="custom_symbols__palette_shapes">Vormen</string>
+    <string name="custom_symbols__palette_greek">Grieks</string>
+    <string name="custom_symbols__palette_scripts">Super- en subscript</string>
+    <string name="custom_symbols__reset_all">Alle toetsen herstellen</string>
+    <string name="custom_symbols__reset_all_confirm">Alle toetsen terugzetten naar de standaard?</string>
+    <string name="custom_symbols__import_confirm">Je symbolen vervangen door die uit dit bestand?</string>
+    <string name="custom_symbols__import_done">Symbolen geïmporteerd</string>
+    <string name="custom_symbols__import_invalid">Dit is geen symbolenbestand</string>
     <string name="pref__keyboard__utility_key_enabled__label" comment="Preference title">Toon functietoets</string>
     <string name="pref__keyboard__utility_key_enabled__summary" comment="Preference summary">Toont een instelbare functietoets naast de spatiebalk</string>
     <string name="pref__keyboard__utility_key_action__label" comment="Preference title">Functietoets actie</string>
@@ -1181,6 +1207,8 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__floating_button_snap_summary_on">De knop klikt na het slepen vast aan de dichtstbijzijnde zijde.</string>
     <string name="dictate__floating_button_snap_title">Aan rand vastklikken</string>
     <string name="dictate__interrupted_recording">Onderbroken ({time})</string>
+    <string name="dictate__transcription_stopped">Gestopt, opname bewaard</string>
+    <string name="dictate__transcription_stopped_in_history">Gestopt, opname staat in Geschiedenis</string>
     <string name="dictate__providers_summary_both">Transcriptie: {transcription} · Herformulering: {rewording}</string>
     <string name="dictate__remember_last_dictation_summary">Bewaart je laatste dictaat zodat de zwevende knop het ongedaan kan maken en de klassieke lay-out het opnieuw kan invoegen.</string>
     <string name="dictate__remember_last_dictation_title">Laatste dictaat onthouden</string>
@@ -1267,6 +1295,7 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__model_default_summary">Standaard van de aanbieder</string>
     <string name="dictate__custom_server_title">Aangepaste server</string>
     <string name="dictate__base_url_title">Basis-URL</string>
+    <string name="dictate__base_url_cleartext_warning">Niet versleuteld: de API-sleutel en je opnames gaan als platte tekst over het netwerk. Prima op je eigen netwerk, maar op elk ander wifi-netwerk kan iemand anders ze lezen.</string>
     <string name="dictate__base_url_placeholder">https://jouw-server/v1/</string>
     <string name="dictate__base_url_required">Vereist voor de aangepaste aanbieder</string>
     <string name="dictate__value_not_set">Niet ingesteld</string>
@@ -1713,7 +1742,6 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__audio_source_voice_recognition_summary">Afgestemd op spraak met minder verwerking — probeer dit als de transcriptie onnauwkeurig is</string>
     <string name="dictate__audio_source_unprocessed">Onverwerkt (ruw)</string>
     <string name="dictate__audio_source_unprocessed_summary">Helemaal geen verwerking; valt terug op Spraakherkenning als je telefoon het niet ondersteunt</string>
-    <string name="dictate__security_group">Beveiliging</string>
     <string name="dictate__trust_user_certs_title">Gebruikerscertificaten vertrouwen</string>
     <string name="dictate__trust_user_certs_summary">Vertrouw CA-certificaten die je hebt geïnstalleerd, voor zelf-gehoste eindpunten achter een privé-CA.</string>
     <string name="dictate__stats_title">Statistieken</string>
@@ -2006,7 +2034,7 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="apptour60__chinese_body">Pinyin met kandidatenrij — tot nu was er alleen Zhengma, dat vrijwel niemand gebruikt. Daarbij komen een model op het toestel dat echt op Chinees getraind is, en een aanbieder die vanaf het vasteland bereikbaar is.</string>
     <string name="apptour60__emoji_eyebrow">Emoji</string>
     <string name="apptour60__emoji_title">Emoji zoeken in je eigen taal</string>
-    <string name="apptour60__emoji_body">De emojizoekfunctie kende zes talen. Nu zijn het er ruim veertig — zoek op „heart", „心" of „قلب" en je komt bij dezelfde emoji uit. De zoekfunctie volgt de taal van je toetsenbord.</string>
+    <string name="apptour60__emoji_body">De emojizoekfunctie kende zes talen. Nu zijn het er ruim veertig — zoek op “heart”, “心” of “قلب” en je komt bij dezelfde emoji uit. De zoekfunctie volgt de taal van je toetsenbord.</string>
     <string name="apptour60__languages_eyebrow">Woordenboeken</string>
     <string name="apptour60__languages_title">Zeven talen zonder suggesties</string>
     <string name="apptour60__languages_body">Arabisch, Bengaals, Fins, Hindi, Indonesisch, Tamil en Urdu krijgen woordsuggesties en autocorrectie. IJslands en Georgisch bevatten domweg de verkeerde talen en zijn opnieuw gebouwd. En de tekens onder lang indrukken van 19 indelingen volgen nu wat de taal werkelijk schrijft.</string>
@@ -2111,6 +2139,54 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="apptour63__outro_eyebrow">Dat is 6.3</string>
     <string name="apptour63__outro_title">Minder omwegen, hetzelfde toetsenbord</string>
     <string name="apptour63__outro_body">Aan de manier waarop je dicteert verandert niets — je eigen sleutel, je eigen server of een model op het toestel. Alle rondleidingen vind je terug onder Instellingen › Over.</string>
+    <string name="apptour64__cta_languages">Talen kiezen</string>
+    <string name="apptour64__cta_providers">Aanbieders tonen</string>
+    <string name="apptour64__intro_eyebrow">Dictate 6.4</string>
+    <string name="apptour64__intro_title">Vertaald op je telefoon, symbolen naar jouw hand</string>
+    <string name="apptour64__intro_body">Typ in de ene taal en het veld vult zich in een andere, vertaald op dit toestel. Beide symboolpagina’s kunnen de toetsen dragen die jij kiest. Daarnaast zijn er nieuwe aanbieders en een veel beter offline model, een woord dat je uitspreekt om van een dictaat een instructie te maken, en een controle van de hele app op privacy en beveiliging.</string>
+    <string name="apptour64__translate_eyebrow">Nieuw: vertalen</string>
+    <string name="apptour64__translate_title">Vertalingen die je telefoon nooit verlaten</string>
+    <string name="apptour64__translate_body">Tik in de Smartbar op Vertalen en typ in het veld erboven — het veld van de app vult zich ondertussen met de vertaling. De modellen van Mozilla doen het werk op dit toestel, in 49 talen, en niets van wat je typt wordt ergens heen gestuurd. Enter zet eerst de afgemaakte vertaling neer en verstuurt dan, zodat een bericht nooit half vertaald de deur uit gaat. Elke taal download je één keer, en de lijst laat vooraf zien hoe groot die is.</string>
+    <string name="apptour64__symbols_eyebrow">Nieuw: je eigen symbolen</string>
+    <string name="apptour64__symbols_title">De symbolen die je gebruikt, waar jij ze wilt</string>
+    <string name="apptour64__symbols_body">Onder Toetsenbord › Eigen symbolen worden beide symboolpagina’s van jou, in elke taal. Tik op een toets in de afbeelding van de pagina, kies wat hij typt en wat lang indrukken aanbiedt, en sleep die in de volgorde die je wilt. Een palet bevat de symbolen die je toetsenbord nog niet heeft. Zolang je geen toets verandert, zien de pagina’s er precies zo uit als de ingebouwde, en een afgewerkte indeling kun je exporteren om te delen.</string>
+    <string name="apptour64__providers_eyebrow">Aanbieders en offline modellen</string>
+    <string name="apptour64__providers_title">Nieuwe aanbieders en een beter offline model</string>
+    <string name="apptour64__providers_body">Grok van xAI transcribeert nu ook, als bestand en live, met dezelfde sleutel die al herformuleert. Scaleway en OVHcloud houden audio en tekst binnen de EU. Offline vervangt Parakeet Ultra het Parakeet TDT 0.6B v3: dezelfde 670 MB en dezelfde 25 talen, met 29% minder fouten in het Duits. Gebruik je v3, download Ultra dan in de lijst met modellen op het toestel en verwijder het oude — tot dan blijft v3 gewoon werken. En de lijst met aanbieders toont nu alleen nog de aanbieders die je gebruikt; alle andere staan onder “Aanbieder toevoegen”, met een zoekfunctie.</string>
+    <string name="apptour64__command_eyebrow">Nieuw: commandowoord</string>
+    <string name="apptour64__command_title">Zeg het woord, en het dictaat wordt een instructie</string>
+    <string name="apptour64__command_body">Kies een woord onder Herformulering — “Jarvis” bijvoorbeeld. Een dictaat dat ermee begint, wordt uitgevoerd als live-instructie: op de geselecteerde tekst, of als vraag als er niets is geselecteerd. Alleen het eerste woord telt, dus een zin die het alleen noemt, wordt gewoon uitgeschreven. Automatische prompts werken nu ook zoals bedoeld: ze krijgen altijd het dictaat waarop ze draaien, en een prompt die alleen uit [tekst tussen haken] bestaat, wordt letterlijk aan het eind toegevoegd in plaats van naar het model te gaan.</string>
+    <string name="apptour64__privacy_eyebrow">Privacy en beveiliging</string>
+    <string name="apptour64__privacy_title">De hele app, nagelopen</string>
+    <string name="apptour64__privacy_body">Elk onderdeel van Dictate is nagelopen op privacy en beveiliging, en wat daarbij boven kwam, is opgelost. Een dictaat in een wachtwoord- of pincodeveld blijft buiten de geschiedenis, nu ook via de zwevende knop. De cloudback-up van Android neemt je API-sleutels alleen nog end-to-end versleuteld mee. En “Gebruikerscertificaten vertrouwen” stel je nu per aanbiederaccount in, in plaats van voor alle tegelijk.</string>
+    <string name="apptour64__more_eyebrow">Verder</string>
+    <string name="apptour64__more_title">Al het andere in 6.4</string>
+    <string name="apptour64__more_body">De kleinere wijzigingen, voor wie het precies wil weten. Zo niet, blader dan gewoon door.</string>
+    <string name="apptour64__more_typing">Typen</string>
+    <string name="apptour64__more_typing_slips">Suggesties lezen tikfouten: een letter op de verkeerde toets, twee omgewisselde letters, een fout in een half getypt woord. Het woord dat je bedoelde verschijnt veel vaker, en elke toetsaanslag gaat sneller.</string>
+    <string name="apptour64__more_typing_autocorrect">Met autocorrectie uit verschijnen verbeteringen nog steeds in de balk. De schakelaar bepaalt alleen nog of de spatiebalk het woord vervangt.</string>
+    <string name="apptour64__more_typing_glide">Vegend typen vindt woorden die met een letter met accent beginnen of eindigen — in het Hongaars, Russisch, Fins, Pools, Turks en meer talen.</string>
+    <string name="apptour64__more_typing_swipe">Zijwaarts vegen over de letters wisselt niet meer van taal — dat gebeurde meestal per ongeluk. De wereldbol-toets doet het nog wel, en onder Gebaren &amp; Typen met gebaren zet je het vegen terug.</string>
+    <string name="apptour64__more_typing_punctuation">Een leesteken direct na een autocorrectie neemt de spatie ervan over, en glijden over de spatiebalk blijft op dezelfde regel.</string>
+    <string name="apptour64__more_typing_calculator">De rekenmachine antwoordt al vóór het “=”, en een tik op de uitkomst maakt de regel af.</string>
+    <string name="apptour64__more_typing_size">Het toetsenbord onthoudt zijn grootte voor elke taal.</string>
+    <string name="apptour64__more_typing_languages">Afrikaans is nu een volwaardige toetsenbordtaal. Voor een nieuwe indeling hoef je alleen de taal te kiezen — de andere velden vullen zichzelf in.</string>
+    <string name="apptour64__more_dictation">Dicteren</string>
+    <string name="apptour64__more_dictation_stop">Stop je een dictaat dat nog op de server wacht, dan blijft de opname bewaard, klaar om opnieuw te versturen.</string>
+    <string name="apptour64__more_dictation_timeout">Een verbinding die vastloopt, geeft het na één time-out op in plaats van na vier, en een verzoek dat de aanbieder heeft geweigerd, wordt niet opnieuw verstuurd.</string>
+    <string name="apptour64__more_dictation_live">Een woord dat je tijdens een live dictaat verwijdert, blijft verwijderd, en twee dictaten na elkaar krijgen een spatie ertussen.</string>
+    <string name="apptour64__more_dictation_hold">De microfoon vasthouden om te praten: een langzame tik blijft een tik, en vasthouden korter dan een seconde wordt weggegooid.</string>
+    <string name="apptour64__more_dictation_talkback">TalkBack kan de microfoon vinden en indrukken, en vertelt wat het dictaat aan het doen is.</string>
+    <string name="apptour64__more_clipboard">Klembord en emoji</string>
+    <string name="apptour64__more_clipboard_pins">Vastgemaakte items staan nu onderaan, met tabbladen om tussen de groepen te springen. “Vastgemaakte items bovenaan” brengt de oude volgorde terug.</string>
+    <string name="apptour64__more_clipboard_chips">De chips voor links, e-mails en nummers naast een gekopieerde tekst kun je uitzetten.</string>
+    <string name="apptour64__more_clipboard_emoji">De emojirij scrolt en reageert op lang indrukken, en het zoeken naar emoji toont twee rijen.</string>
+    <string name="apptour64__more_elsewhere">Zwevende knop en horloge</string>
+    <string name="apptour64__more_elsewhere_bubble">De zwevende knop kan wachten op een toetsenbord voordat hij verschijnt, en schrijft in het webveld waarop je hebt getikt.</string>
+    <string name="apptour64__more_elsewhere_watch">Op het horloge eindigt een dictaat zoals het veld dat vraagt — versturen, zoeken of een vinkje —, met automatisch versturen als je dat wilt, en tijdens het wachten lopen de seconden mee.</string>
+    <string name="apptour64__outro_eyebrow">Dat is 6.4</string>
+    <string name="apptour64__outro_title">Meer op je telefoon, meer naar jouw hand</string>
+    <string name="apptour64__outro_body">Vertalen en het nieuwe offline model werken zonder verbinding, en al het andere werkt nog steeds zoals jij het hebt ingesteld — je eigen sleutel, je eigen server of een model op het toestel. Alle rondleidingen vind je terug onder Instellingen › Over.</string>
     <string name="changelog__v5_0_0">• NIEUW: Veegtypen — veeg over de toetsen om hele woorden te typen, met woordenboeken per taal die op aanvraag worden gedownload. 👆\n• NIEUW: Woordsuggesties &amp; autocorrectie — typfouten worden automatisch hersteld en het woord dat je typte blijft één tik verwijderd. ✨\n• NIEUW: Realtime transcriptie — zie je woorden verschijnen terwijl je praat, met OpenAI, Deepgram, Soniox, AssemblyAI en ElevenLabs. ⚡\n• NIEUW: Drie extra transcriptieaanbieders — ElevenLabs Scribe, Deepgram en AssemblyAI. ☁️\n• NIEUW: Klassieke dicteerindeling — het toetsenbordloze spraakscherm uit Dictate 3 is terug, vastgezet of gewoon één veeg weg. 🎙️\n• NIEUW: Community-promptbibliotheek — blader door en deel herformuleringsprompts. 📚\n• NIEUW: Dicteerstatistieken met mijlpalen. 📊\n• NIEUW: Offline-model NVIDIA Parakeet, plus een stiltefilter dat lege opnames overslaat. 📴\n• Meer: een stabielere zwevende knop, instelbare redeneerinspanning, haptische feedback, een nieuw E-Reader-thema en tientallen oplossingen. 🛠️</string>
     <string name="media__tab__gifs">GIFs</string>
     <string name="prefs__media__gif__title">GIFs</string>
@@ -2125,6 +2201,11 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="prefs__media__gif_setup__step3">Kopieer je sleutel en plak deze in het veld hieronder.</string>
     <string name="prefs__media__gif_setup__open_klipy">Open KLIPY Partner Panel</string>
     <string name="prefs__media__gif_setup__key_label">KLIPY-API-sleutel</string>
+    <string name="prefs__media__gif_content_filter">Veilig zoeken</string>
+    <string name="prefs__media__gif_content_filter__high">Streng</string>
+    <string name="prefs__media__gif_content_filter__medium">Gemiddeld</string>
+    <string name="prefs__media__gif_content_filter__low">Licht</string>
+    <string name="prefs__media__gif_content_filter__off">Uit</string>
     <string name="prefs__media__gif_setup__privacy_note">Je zoektermen worden alleen naar KLIPY gestuurd terwijl het GIF-paneel open is — nooit tijdens het dicteren.</string>
     <string name="gif__search_placeholder">KLIPY doorzoeken</string>
     <string name="gif__powered_by">Mogelijk gemaakt door KLIPY</string>

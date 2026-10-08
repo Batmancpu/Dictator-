@@ -87,4 +87,28 @@ object BubbleVisibility {
         !recognitionActive &&
         screenOn &&
         allowedInApp
+
+    /**
+     * Whether the button has to report a dictation that has just ended in [state], an error or a notice.
+     * It has no text of its own, so it reports with a toast.
+     *
+     * Always when the button started the dictation itself ([startedHere]). It also reports one the keyboard
+     * started that was still transcribing or rewording ([previous]) while the button was on screen
+     * ([wasShown]) and the keyboard was not ([keyboardShown]). That is the user who started a dictation, left
+     * for another app while it was sent, and watched the button's spinner instead (#437). The keyboard's chip
+     * is nowhere on screen for them, so a failure used to pass in silence: the spinner just went away, while
+     * the recording was kept the whole time. Where the keyboard is on screen, its chip says it, and a second
+     * report would only repeat it.
+     */
+    fun reportsEnd(
+        state: DictateController.UiState,
+        previous: DictateController.UiState,
+        startedHere: Boolean,
+        wasShown: Boolean,
+        keyboardShown: Boolean,
+    ): Boolean = state is DictateController.UiState.Error && (
+        startedHere ||
+            (wasShown && !keyboardShown && (previous is DictateController.UiState.Transcribing ||
+                previous is DictateController.UiState.Rewording))
+        )
 }
