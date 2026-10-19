@@ -2360,7 +2360,20 @@ object DictateController {
         // so it never opened with the trigger, whatever the rest of it happens to start with.
         val spokenCommand = commandTrigger().takeIf { it.isNotEmpty() }
             ?.let { CommandTrigger.instructionFor(rawText, it) }
-        val isLive = live || spokenCommand != null
+        // A live prompt that cannot be sent — its provider wants a key and has none — becomes a plain
+        // dictation, and the notice below says why the text was not reworded. It used to fail after the
+        // whole recording, with "Check your API key" right behind "Transcribing…": read by someone on the
+        // on-device engine who had taken the unlabelled chip for the dictation button, that said
+        // transcription needed a key (e-mail, 2026-10-19). Turning the chip away before the recording was
+        // the alternative; it saves the user nothing they wanted, while the transcript is exactly that.
+        val wantsLive = live || spokenCommand != null
+        val isLive = wantsLive && rewordingHasCredential()
+        if (wantsLive && !isLive) {
+            swallowedRewording = DictateApiException(
+                DictateApiException.Kind.INVALID_API_KEY,
+                appContext.getString(R.string.dictate__error_no_api_key),
+            )
+        }
         val text = TranscriptHandover.continuation(handedOver, rawText)
         val finalText = if (isLive) {
             // The spoken transcript is an instruction; send it to GPT (optionally operating on the current
@@ -4765,6 +4778,10 @@ object DictateController {
     /** Effective rewording key: the rewording account's, falling back to the transcription account's. */
     private fun rewordingApiKey(): String =
         rewordingAccount().apiKey.ifBlank { transcriptionAccount().apiKey }
+
+    /** Whether a rewording can be sent at all: the condition [requestRewordRaw] refuses on, asked first. */
+    private fun rewordingHasCredential(): Boolean =
+        rewordingApiKey().isNotBlank() || !requiresKey(rewordingAccount())
 
     private fun promptsDb(context: Context) = PromptsDatabaseHelper.getInstance(context)
 
