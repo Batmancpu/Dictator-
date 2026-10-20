@@ -598,12 +598,19 @@ object ProviderRegistry {
         apiKeyUrl = "https://www.assemblyai.com/dashboard/api-keys",
         defaultTranscriptionModel = "universal-3-pro",
         curatedTranscriptionModels = listOf("universal-3-pro", "universal-2"),
-        // Realtime (#128): Universal-Streaming wss streaming.assemblyai.com/v3/ws (~300ms). Model ids
-        // verified when the session is built (billed by connection-open duration).
+        // Realtime (#128) over wss streaming.assemblyai.com/v3/ws, billed by connection-open duration.
+        // Ids from the endpoint's own list of accepted `speech_model` values (2026-10-20). 3.6 Pro covers
+        // 32 languages and formats its text ($0.45/h); the two Universal-Streaming models are the
+        // cheaper tier ($0.15/h) for English, or English, Spanish, German, French, Portuguese and Italian.
+        // 3.5 Pro is left out: superseded by 3.6, and it refuses some of the language codes 3.6 takes.
         supportsRealtime = true,
         realtimeApi = RealtimeApi.ASSEMBLYAI,
-        defaultRealtimeModel = "universal-streaming",
-        curatedRealtimeModels = listOf("universal-streaming"),
+        defaultRealtimeModel = "universal-3-6-pro",
+        curatedRealtimeModels = listOf(
+            "universal-3-6-pro",
+            "universal-streaming-multilingual",
+            "universal-streaming-english",
+        ),
     )
 
     /**

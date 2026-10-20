@@ -2766,7 +2766,7 @@ object DictateController {
                 RealtimeClient.open(
                     api!!, account.apiKey, model, language, callbacks,
                     baseUrl = realtimeEndpointFor(account),
-                    // Same as the batch path: the three providers with a list-shaped language field hear
+                    // Same as the batch path: the providers with a list-shaped language field hear
                     // which languages to expect instead of nothing at all (#99).
                     expectedLanguages = expectedLanguages(),
                 )
