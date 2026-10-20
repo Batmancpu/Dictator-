@@ -142,6 +142,11 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
     private var pauseShowJob: Job? = null
     private val pauseSize get() = sdp(34)
 
+    /** The live caption above (or below) the bubble while a streaming dictation runs (discussion #453). */
+    private var previewView: TextView? = null
+    private var previewParams: WindowManager.LayoutParams? = null
+    private var previewAdded = false
+
     /**
      * Distance between the bubble's visible shape and the cancel/undo button beside it.
      *
@@ -257,6 +262,12 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
 
     /** Starts observing the feature toggle + focus + design + dictation state to drive the bubble. */
     fun start() {
+        scope.launch {
+            // The live caption (#453) follows the stream's text and the dictation's state; whether the bubble
+            // itself is up is asked inside, since a hidden bubble has nothing to caption.
+            combine(DictateController.interimText, DictateController.state) { text, state -> text to state }
+                .collect { (text, state) -> managePreview(text, state) }
+        }
         scope.launch {
             DictateAccessibilityService.foregroundPackage.collect { pkg -> onForegroundPackageChanged(pkg) }
         }
@@ -421,6 +432,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         pauseShowJob?.cancel()
         hidePause()
         hideUndo()
+        hidePreview()
     }
 
     // --- Cancel button (shown while recording) ---------------------------------------------------
@@ -563,6 +575,93 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         )
     }
 
+    // --- Live caption (shown while a streaming dictation runs, discussion #453) --------------------
+
+    /**
+     * Shows the end of the running transcript in a small card by the bubble, while the field still gets
+     * nothing until stop (#357). It needs a stream: with batch transcription there is no text before the
+     * stop, so the card never appears. Not touchable — it must never catch a tap meant for the app under it
+     * — and hidden from accessibility services, so TalkBack does not speak into the microphone.
+     */
+    private fun managePreview(text: String, state: DictateController.UiState) {
+        val shown = added && !dimmed && state is DictateController.UiState.Recording &&
+            text.isNotBlank() && DictateController.overlayPreviewWanted()
+        if (!shown) {
+            hidePreview()
+            return
+        }
+        val v = previewView ?: createPreviewView().also { previewView = it }
+        v.text = BubbleLivePreview.tail(text)
+        if (!previewAdded) {
+            val lp = previewParams ?: createPreviewParams().also { previewParams = it }
+            runCatching {
+                service.noteOwnWindowChange()
+                windowManager.addView(v, lp)
+                previewAdded = true
+            }
+        }
+        positionPreview()
+    }
+
+    private fun hidePreview() {
+        val v = previewView
+        if (previewAdded && v != null) {
+            service.noteOwnWindowChange()
+            runCatching { windowManager.removeView(v) }
+        }
+        previewAdded = false
+    }
+
+    private fun createPreviewView(): TextView = TextView(context).apply {
+        setTextColor(color(R.color.dictate_overlay_icon))
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f)
+        maxLines = 3
+        val hz = dp(14)
+        val vt = dp(10)
+        setPadding(hz, vt, hz, vt)
+        background = roundedRect(color(R.color.dictate_overlay_menu_surface), dpf(14f))
+        elevation = dpf(6f)
+        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+    }
+
+    private fun createPreviewParams(): WindowManager.LayoutParams = WindowManager.LayoutParams(
+        WindowManager.LayoutParams.WRAP_CONTENT,
+        WindowManager.LayoutParams.WRAP_CONTENT,
+        WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+        PixelFormat.TRANSLUCENT,
+    ).apply { gravity = Gravity.TOP or Gravity.START }
+
+    /**
+     * Above the bubble, against the same wall, so it reads as the bubble's own and leaves the row of side
+     * buttons beside it free; below it when the bubble is parked too close to the top for that.
+     */
+    private fun positionPreview() {
+        val plp = previewParams ?: return
+        val preview = previewView ?: return
+        val blp = params ?: return
+        val bubble = rootView ?: return
+        val maxWidth = (screenWidth() * PREVIEW_MAX_WIDTH).toInt()
+        preview.measure(
+            View.MeasureSpec.makeMeasureSpec(maxWidth, View.MeasureSpec.AT_MOST),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+        )
+        val w = preview.measuredWidth
+        val h = preview.measuredHeight
+        val gap = sdp(8)
+        val inset = skin?.visualInset ?: 0
+        val bubbleHeight = bubble.height.takeIf { it > 0 } ?: skin?.shapeHeight ?: 0
+        val left = leftX()
+        plp.x = if (sideIsRight) left + bubble.width - inset - w else left + inset
+        plp.x = plp.x.coerceIn(0, (screenWidth() - w).coerceAtLeast(0))
+        val above = blp.y - gap - h
+        plp.y = if (above >= 0) above else blp.y + bubbleHeight + gap
+        plp.y = plp.y.coerceIn(0, (screenHeight() - h).coerceAtLeast(0))
+        if (previewAdded) runCatching { windowManager.updateViewLayout(preview, plp) }
+    }
+
     // --- Undo button (shown beside the bubble right after a dictation, issue #133) ----------------
 
     private fun manageUndo(state: DictateController.UiState, shown: Boolean) {
@@ -662,11 +761,12 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         if (pauseAdded) runCatching { windowManager.updateViewLayout(pause, plp) }
     }
 
-    /** Keeps every button that is up beside the bubble after it moved or changed size. */
+    /** Keeps every button that is up beside the bubble, and its caption, with it after it moved or resized. */
     private fun positionSideButtons() {
         if (cancelAdded) positionCancel()
         if (pauseAdded) positionPause()
         if (undoAdded) positionUndo()
+        if (previewAdded) positionPreview()
     }
 
     // --- Long-press rewording menu ---------------------------------------------------------------
@@ -1052,6 +1152,8 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         pauseView = null
         pauseIcon = null
         pauseParams = null
+        previewView = null
+        previewParams = null
         undoView = null
         undoParams = null
         lastAppliedState = null // fresh skin starts blank; force the next applyState to paint it
@@ -2877,6 +2979,9 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
 
         /** How long the cancel button waits before its window is added; see [manageCancel]. */
         private const val CANCEL_SHOW_DELAY_MS = 40L
+
+        /** The live caption's widest, as a share of the screen (#453); three lines of it hold the tail. */
+        private const val PREVIEW_MAX_WIDTH = 0.72f
 
         /** Aurora orb (#253): three blobs, started apart and orbiting at rates that never quite repeat. */
         private const val FULL_TURN = 6.2831855f

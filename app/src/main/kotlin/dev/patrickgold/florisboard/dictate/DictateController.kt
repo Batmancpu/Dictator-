@@ -318,6 +318,15 @@ object DictateController {
      */
     val interimText: StateFlow<String> = _interimText.asStateFlow()
 
+    /**
+     * Whether the floating button may caption the running stream next to itself (discussion #453): only a
+     * dictation the button started, never a live prompt — its words are an instruction, the same reason
+     * they stay out of the field — and not for someone who keeps the stream out of sight until stop
+     * (`prefs.dictate.realtimeHidePreview`, #345). The field never sees the words before stop, whatever this says.
+     */
+    fun overlayPreviewWanted(): Boolean =
+        outputTarget == OutputTarget.OVERLAY && !livePromptArmed && !prefs.dictate.realtimeHidePreview.get()
+
     private var realtimeSession: RealtimeSession? = null
     private val realtimeFinal = StringBuilder()      // accumulated finalized segments
     @Volatile private var realtimeFailed = false     // stream errored → fall back to batch on stop
