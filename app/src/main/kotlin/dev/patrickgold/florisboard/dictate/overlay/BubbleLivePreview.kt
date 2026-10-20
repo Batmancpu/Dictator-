@@ -35,4 +35,16 @@ internal object BubbleLivePreview {
         val fromWord = if (wordStart in 0 until cut.length - 1) cut.substring(wordStart + 1) else cut
         return "…$fromWord"
     }
+
+    /**
+     * [shown] with its first word let go — the next step when it still takes more lines than the card has
+     * (the controller measures; this only cuts). Null once a single word is left: cutting further would show
+     * nothing at all.
+     */
+    fun dropFirstWord(shown: String): String? {
+        val rest = shown.removePrefix("…")
+        val space = rest.indexOf(' ')
+        if (space < 0 || space == rest.length - 1) return null
+        return "…" + rest.substring(space + 1)
+    }
 }

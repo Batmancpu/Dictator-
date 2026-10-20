@@ -32,6 +32,20 @@ class BubbleLivePreviewTest {
         assertTrue(shown.length <= 12)
     }
 
+    /** When the lines still do not fit, the oldest word goes next, and the ellipsis stays a single one. */
+    @Test
+    fun `letting go of the first word keeps one ellipsis`() {
+        assertEquals("…two three", BubbleLivePreview.dropFirstWord("one two three"))
+        assertEquals("…three", BubbleLivePreview.dropFirstWord("…two three"))
+    }
+
+    /** One word left: nothing more to let go, or the card would be empty. */
+    @Test
+    fun `the last word is never dropped`() {
+        assertEquals(null, BubbleLivePreview.dropFirstWord("…three"))
+        assertEquals(null, BubbleLivePreview.dropFirstWord("three"))
+    }
+
     @Test
     fun `a word longer than the budget is cut rather than lost`() {
         val shown = BubbleLivePreview.tail("Donaudampfschifffahrtsgesellschaft", maxChars = 10)
