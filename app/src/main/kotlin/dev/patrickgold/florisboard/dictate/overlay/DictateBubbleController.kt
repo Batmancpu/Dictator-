@@ -56,6 +56,7 @@ import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisAppActivity
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.dictate.DictateController
+import dev.patrickgold.florisboard.dictate.DictateLanguages
 import dev.patrickgold.florisboard.dictate.importer.TranscribeShareActivity
 import dev.patrickgold.florisboard.dictate.recognition.RecognitionBridge
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonDesign
@@ -742,8 +743,44 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
         // separated from them by a rule: they open a screen instead of dictating, and a row reading
         // "Transcribe a file" in among the saved prompts would read as a third prompt. The hold is the
         // only free gesture this button has (#357), so this menu is where anything new has to go.
-        val actions = BubbleMenuAction.entries.filter { it.pref(prefs).get() }
+        val languages = DictateLanguages.parseSelection(prefs.dictate.inputLanguages.get())
+        val actions = BubbleMenuAction.entries.filter {
+            it.pref(prefs).get() && (it != BubbleMenuAction.LANGUAGE || languages.size > 1)
+        }
+        fun divider() = list.addView(menuDivider(), LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            dp(1).coerceAtLeast(1),
+        ).apply {
+            val m = dp(8)
+            topMargin = m
+            bottomMargin = m
+        })
         actions.forEach { action ->
+            if (action == BubbleMenuAction.LANGUAGE) {
+                // The languages the user dictates in, as the keyboard's language chip lists them on a long
+                // press, the active one ticked. A tap makes it active and closes the menu: the language is
+                // chosen for the dictation that follows, which starts with the next tap on the button.
+                val active = prefs.dictate.activeInputLanguage.get()
+                languages.forEach { language ->
+                    val name = if (language.code == DictateLanguages.DETECT) {
+                        context.getString(R.string.dictate__language_detect)
+                    } else {
+                        language.displayName()
+                    }
+                    val isActive = language.code == active
+                    val icon = if (isActive) R.drawable.ic_dictate_overlay_check else R.drawable.ic_dictate_language
+                    list.addView(
+                        menuItem(name, icon, bold = isActive) {
+                            hidePromptMenu()
+                            DictateController.setLanguage(language.code)
+                        },
+                        rowParams(),
+                    )
+                }
+                // Apart from the entries that open a screen, which would otherwise read as more languages.
+                if (actions.size > 1) divider()
+                return@forEach
+            }
             list.addView(
                 menuItem(context.getString(action.labelRes), action.iconRes, bold = false) {
                     hidePromptMenu()
@@ -752,16 +789,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
                 rowParams(),
             )
         }
-        if (actions.isNotEmpty()) {
-            list.addView(menuDivider(), LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                dp(1).coerceAtLeast(1),
-            ).apply {
-                val m = dp(8)
-                topMargin = m
-                bottomMargin = m
-            })
-        }
+        if (actions.isNotEmpty()) divider()
         // Live Prompt heads the prompts (freeform voice command, #230): records a spoken instruction via
         // the floating button, then rewords it — with the selected text as context, or generating from
         // scratch — and injects the result. The icon is the chip's own on the prompt strip,
@@ -880,6 +908,7 @@ class DictateBubbleController(private val service: DictateAccessibilityService) 
 
     /** Runs one of the menu's actions (#408). The menu is already closed by the time this is called. */
     private fun runMenuAction(action: BubbleMenuAction) = when (action) {
+        BubbleMenuAction.LANGUAGE -> Unit // its rows set the language themselves; see addPromptMenu
         BubbleMenuAction.TRANSCRIBE_FILE -> launchFromBubble(TranscribeShareActivity.pickIntent(context))
         BubbleMenuAction.HISTORY -> openSettingsScreen("settings/dictate/history")
         BubbleMenuAction.SETTINGS -> openSettingsScreen("settings/dictate")

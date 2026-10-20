@@ -658,6 +658,13 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         // for a Gboard + bubble user that menu is the only route to their prompts, so nothing joins it
         // unasked. The hold is also the only free gesture the button has — #357 is why these are menu
         // entries and not a second gesture.
+        //
+        // The language rows (discussion #454) list the transcription languages to pick the active one from,
+        // for people who dictate only through the button and had to open a keyboard to switch.
+        val floatingButtonMenuLanguage = boolean(
+            key = "dictate__floating_button_menu_language",
+            default = false,
+        )
         val floatingButtonMenuTranscribeFile = boolean(
             key = "dictate__floating_button_menu_transcribe_file",
             default = false,
