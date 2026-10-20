@@ -941,6 +941,28 @@ class EditorInstance(context: Context) : AbstractEditorInstance(context) {
         }
     }
 
+    /**
+     * Sends Enter as a key press, whatever the field — the variant offered on a long press of Enter.
+     *
+     * [performEnter] types a line break into every field that is not raw input, and a terminal tells the
+     * two apart: the key press reaches it as a carriage return and runs the line, while the typed "\n"
+     * arrives as a line feed (Ctrl+J), which many command-line programs take for "new line, don't send
+     * yet" — "like Shift+Enter on my desktop", as a user put it (e-mail, 2026-10-20). Termux escapes this
+     * by asking for raw input (TYPE_NULL), and where it does not, by turning "\n" into "\r" itself
+     * (termux-app TerminalView, read 2026-10-20); terminals that do neither had no way to submit a line
+     * from this keyboard.
+     *
+     * @return True on success, false if an error occurred or the input connection is invalid.
+     */
+    fun performEnterKeyPress(): Boolean {
+        dropPendingMaterializedSpace()
+        autoSpace.setInactive()
+        phantomSpace.setInactive()
+        // A word still being composed is the app's text before the key arrives, as with a typed Enter.
+        currentInputConnection()?.finishComposingText()
+        return sendDownUpKeyEvent(KeyEvent.KEYCODE_ENTER)
+    }
+
     fun tryPerformEnterCommitRaw(): Boolean {
         return if (subtypeManager.activeSubtype.primaryLocale.language.startsWith("zh") && activeContent.composing.length > 0) {
             finalizeComposingText(activeContent.composingText)

@@ -1254,6 +1254,17 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
     }
 
     /**
+     * Handles a [KeyCode.ENTER_KEY_PRESS] event: Enter as a key press, never as a typed line break or the
+     * field's IME action (see [EditorInstance.performEnterKeyPress]). The word before it is offered for
+     * learning as [handleEnter] does; no snippet expands, since this Enter is meant to run the line.
+     */
+    private fun handleEnterKeyPress() {
+        if (pendingSnippetTrigger() == null) offerFinishedWordForLearning()
+        TouchTrace.reset() // word boundary (issue #242)
+        editorInstance.performEnterKeyPress()
+    }
+
+    /**
      * Handles a [KeyCode.LANGUAGE_SWITCH] event. Also handles if the language switch should cycle
      * FlorisBoard internal or system-wide.
      */
@@ -1658,7 +1669,8 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
         }
         when (data.code) {
             KeyCode.SPACE -> if (!translating || !autoCorrectTranslateWord()) setFieldText(field, current.insert(" "))
-            KeyCode.ENTER -> {
+            // The key-press variant is for the app's field; in one of ours it is simply Enter.
+            KeyCode.ENTER, KeyCode.ENTER_KEY_PRESS -> {
                 when {
                     field == InternalField.TRANSLATE && translateKeepsLineBreaks() -> {
                         setFieldText(field, current.insert("\n"))
@@ -2038,6 +2050,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             KeyCode.DELETE -> handleBackwardDelete(OperationUnit.CHARACTERS)
             KeyCode.DELETE_WORD -> handleBackwardDelete(OperationUnit.WORDS)
             KeyCode.ENTER -> handleEnter()
+            KeyCode.ENTER_KEY_PRESS -> handleEnterKeyPress()
             KeyCode.FORWARD_DELETE -> handleForwardDelete(OperationUnit.CHARACTERS)
             KeyCode.FORWARD_DELETE_WORD -> handleForwardDelete(OperationUnit.WORDS)
             KeyCode.IME_SHOW_UI -> FlorisImeService.showUi()

@@ -49,6 +49,9 @@ object KeyCode {
     const val FORWARD_DELETE_WORD =          -10
     const val SHIFT =                        -11
     const val CAPS_LOCK =                    -13
+    // Enter sent as a key press in every field, offered on a long press of Enter (see
+    // EditorInstance.performEnterKeyPress). -14 was free between the modifiers and the arrows.
+    const val ENTER_KEY_PRESS =              -14
 
     const val ARROW_LEFT =                   -21
     const val ARROW_RIGHT =                  -22

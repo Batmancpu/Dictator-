@@ -3,6 +3,7 @@
     "~enter": {
       "main": { "code": -212, "label": "ime_ui_mode_media", "type": "system_gui" },
       "relevant": [
+        { "code": -14, "label": "enter_key_press", "type": "system_gui" },
         { "code": -112, "label": "compact_layout_to_right", "type": "system_gui" },
         { "code": -213, "label": "ime_ui_mode_clipboard", "type": "system_gui"}
       ]
