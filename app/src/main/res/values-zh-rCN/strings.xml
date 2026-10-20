@@ -149,6 +149,7 @@
     <string name="settings__search__keywords__momentary_layer">长按 滑动 符号 层 临时 瞬时 标点 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">表情 emoji 行 栏 最近 使用 键盘 上方 快捷</string>
     <string name="settings__search__keywords__request_timeout">超时 等待 慢 连接 秒 断开</string>
+    <string name="settings__search__keywords__floating_side_buttons">撤销 取消 暂停 继续 恢复</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">语言 &amp; 键盘布局</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">语言名称的显示语言</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">以键盘子类型的语言显示键盘标签</string>
@@ -1287,9 +1288,6 @@
     <string name="dictate__floating_button_apps_search">搜索应用</string>
     <string name="dictate__floating_button_apps_none">未找到与“{search_term}”匹配的应用</string>
     <string name="dictate__floating_button_design_title">按钮样式</string>
-    <string name="dictate__floating_button_haptic_summary_off">点按时不振动。</string>
-    <string name="dictate__floating_button_haptic_summary_on">点按按钮时短暂振动。</string>
-    <string name="dictate__floating_button_haptic_title">点按时振动</string>
     <string name="dictate__floating_button_no_prompts">暂无改写提示词——请在 Dictate 设置中添加。</string>
     <string name="dictate__floating_button_remember_position_summary_off">所有应用共用一个位置。</string>
     <string name="dictate__floating_button_remember_position_summary_on">每个应用保留各自的按钮位置。</string>
@@ -1770,9 +1768,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">听写仅插入，不复制到剪贴板。</string>
     <string name="dictate__floating_button_menu_group">长按菜单</string>
     <string name="dictate__floating_button_menu_settings_title">Dictate 设置</string>
-    <string name="dictate__floating_button_undo_summary_off">不显示撤销按钮。</string>
-    <string name="dictate__floating_button_undo_summary_on">听写完成后，按钮旁会出现撤销按钮，轻点一下即可删除已插入的文本。</string>
-    <string name="dictate__floating_button_undo_title">撤销按钮</string>
+    <string name="dictate__floating_button_side_buttons_title">额外按钮</string>
     <string name="dictate__mappings_add">添加映射</string>
     <string name="dictate__mappings_editor_title">映射</string>
     <string name="dictate__mappings_empty_summary">添加规则可在每条转录中自动替换字词或短语——精确匹配，不消耗 AI 令牌。</string>

@@ -149,6 +149,7 @@
     <string name="settings__search__keywords__momentary_layer">nyomva tartás húzás szimbólum réteg írásjel ideiglenes 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">emodzsi emoji sor sáv nemrég használt billentyűzet felett gyors</string>
     <string name="settings__search__keywords__request_timeout">időkorlát időtúllépés lassú várakozás kapcsolat másodperc</string>
+    <string name="settings__search__keywords__floating_side_buttons">visszavonás mégse szünet szüneteltetés folytatás elvetés</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Nyelvek és elrendezések</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Nyelvek neveinek megjelenítése ebben</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Billentyűzetcímkék megjelenítése altípusok nyelvén</string>
@@ -1291,9 +1292,6 @@
     <string name="dictate__floating_button_apps_search">Alkalmazások keresése</string>
     <string name="dictate__floating_button_apps_none">Nincs találat erre: „{search_term}”</string>
     <string name="dictate__floating_button_design_title">Gomb stílusa</string>
-    <string name="dictate__floating_button_haptic_summary_off">Nincs rezgés koppintáskor.</string>
-    <string name="dictate__floating_button_haptic_summary_on">Rövid rezgés, amikor megérinti a gombot.</string>
-    <string name="dictate__floating_button_haptic_title">Rezgés koppintáskor</string>
     <string name="dictate__floating_button_no_prompts">Még nincsenek átfogalmazási utasítások — adjon hozzá a Dictate beállításaiban.</string>
     <string name="dictate__floating_button_remember_position_summary_off">Egy közös pozíció minden alkalmazáshoz.</string>
     <string name="dictate__floating_button_remember_position_summary_on">Minden alkalmazás megőrzi a saját gombpozícióját.</string>
@@ -1775,9 +1773,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">A diktálások csak beszúrásra kerülnek, a vágólapra nem másolódnak.</string>
     <string name="dictate__floating_button_menu_group">Nyomva tartás menü</string>
     <string name="dictate__floating_button_menu_settings_title">Dictate beállításai</string>
-    <string name="dictate__floating_button_undo_summary_off">Nem jelenik meg visszavonás gomb.</string>
-    <string name="dictate__floating_button_undo_summary_on">Diktálás után a gomb mellett megjelenik egy visszavonás gomb, amellyel egyetlen koppintással eltávolítható a beillesztett szöveg.</string>
-    <string name="dictate__floating_button_undo_title">Visszavonás gomb</string>
+    <string name="dictate__floating_button_side_buttons_title">További gombok</string>
     <string name="dictate__mappings_add">Hozzárendelés hozzáadása</string>
     <string name="dictate__mappings_editor_title">Hozzárendelés</string>
     <string name="dictate__mappings_empty_summary">Adj hozzá szabályt, amely minden átiratban automatikusan lecseréli a szavakat vagy kifejezéseket — pontosan, MI-tokenek nélkül.</string>

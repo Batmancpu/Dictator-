@@ -142,6 +142,7 @@
     <string name="settings__search__keywords__momentary_layer">長押し スライド 記号 レイヤー 一時 句読点 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">絵文字 行 バー 最近 使った キーボード 上 クイック</string>
     <string name="settings__search__keywords__request_timeout">タイムアウト 時間切れ 遅い 待機 接続 秒</string>
+    <string name="settings__search__keywords__floating_side_buttons">元に戻す キャンセル 一時停止 再開 取り消し</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">言語と入力</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">言語名の表示形式</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">サブタイプの言語でキーボードラベルを表示</string>
@@ -1224,9 +1225,6 @@
     <string name="dictate__floating_button_apps_search">アプリを検索</string>
     <string name="dictate__floating_button_apps_none">「{search_term}」に一致するアプリはありません</string>
     <string name="dictate__floating_button_design_title">ボタンのスタイル</string>
-    <string name="dictate__floating_button_haptic_summary_off">タップ時に振動しません。</string>
-    <string name="dictate__floating_button_haptic_summary_on">ボタンをタップすると短く振動します。</string>
-    <string name="dictate__floating_button_haptic_title">タップ時に振動</string>
     <string name="dictate__floating_button_no_prompts">言い換えプロンプトがまだありません。Dictate の設定で追加してください。</string>
     <string name="dictate__floating_button_remember_position_summary_off">すべてのアプリで共通の位置。</string>
     <string name="dictate__floating_button_remember_position_summary_on">アプリごとにボタンの位置を保持します。</string>
@@ -1707,9 +1705,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">口述は挿入されるだけで、クリップボードにはコピーされません。</string>
     <string name="dictate__floating_button_menu_group">長押しメニュー</string>
     <string name="dictate__floating_button_menu_settings_title">Dictate の設定</string>
-    <string name="dictate__floating_button_undo_summary_off">元に戻すボタンを表示しません。</string>
-    <string name="dictate__floating_button_undo_summary_on">音声入力後、ボタンの横に元に戻すボタンが表示され、ワンタップで挿入したテキストを削除できます。</string>
-    <string name="dictate__floating_button_undo_title">元に戻すボタン</string>
+    <string name="dictate__floating_button_side_buttons_title">追加のボタン</string>
     <string name="dictate__mappings_add">マッピングを追加</string>
     <string name="dictate__mappings_editor_title">マッピング</string>
     <string name="dictate__mappings_empty_summary">ルールを追加すると、すべての文字起こしで単語や語句を自動置換します — 正確で、AI トークン不要。</string>

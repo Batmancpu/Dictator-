@@ -142,6 +142,7 @@
     <string name="settings__search__keywords__momentary_layer">ضغط مطول سحب رمز طبقة ترقيم مؤقت 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">رموز تعبيرية صف شريط مؤخرا مستخدمة فوق لوحة المفاتيح سريع</string>
     <string name="settings__search__keywords__request_timeout">مهلة انتهت المهلة بطيء انتظار اتصال ثواني</string>
+    <string name="settings__search__keywords__floating_side_buttons">تراجع إلغاء إيقاف مؤقت استئناف</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">اللغات و التخطيطات</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">عرض أسم اللغة المفعلة</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">أنواع الإدخال الفرعية</string>
@@ -1150,9 +1151,6 @@
     <string name="dictate__floating_button_apps_search">البحث في التطبيقات</string>
     <string name="dictate__floating_button_apps_none">لم يُعثر على تطبيق لـ «{search_term}»</string>
     <string name="dictate__floating_button_design_title">نمط الزر</string>
-    <string name="dictate__floating_button_haptic_summary_off">بدون اهتزاز عند النقر.</string>
-    <string name="dictate__floating_button_haptic_summary_on">اهتزاز قصير عند النقر على الزر.</string>
-    <string name="dictate__floating_button_haptic_title">اهتزاز عند النقر</string>
     <string name="dictate__floating_button_no_prompts">لا توجد مطالبات إعادة صياغة بعد — أضف بعضها في إعدادات Dictate.</string>
     <string name="dictate__floating_button_remember_position_summary_off">موضع واحد مشترك لكل التطبيقات.</string>
     <string name="dictate__floating_button_remember_position_summary_on">يحتفظ كل تطبيق بموضع الزر الخاص به.</string>
@@ -1638,9 +1636,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">يتم إدراج الإملاءات فقط، دون نسخها إلى الحافظة.</string>
     <string name="dictate__floating_button_menu_group">قائمة الضغط المطوّل</string>
     <string name="dictate__floating_button_menu_settings_title">إعدادات Dictate</string>
-    <string name="dictate__floating_button_undo_summary_off">لا يظهر زر التراجع.</string>
-    <string name="dictate__floating_button_undo_summary_on">بعد الإملاء، يظهر زر تراجع بجانب الزر لإزالة النص المُدرَج بنقرة واحدة.</string>
-    <string name="dictate__floating_button_undo_title">زر التراجع</string>
+    <string name="dictate__floating_button_side_buttons_title">أزرار إضافية</string>
     <string name="dictate__mappings_add">إضافة تعيين</string>
     <string name="dictate__mappings_editor_title">التعيين</string>
     <string name="dictate__mappings_empty_summary">أضف قاعدة لاستبدال الكلمات أو العبارات تلقائيًا في كل نص — بدقة ودون رموز ذكاء اصطناعي.</string>

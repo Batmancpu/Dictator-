@@ -142,6 +142,7 @@
     <string name="settings__search__keywords__momentary_layer">vasthouden schuiven symbool laag leesteken tijdelijk kort 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">emoji rij balk recent gebruikt boven toetsenbord snel</string>
     <string name="settings__search__keywords__request_timeout">time-out verlopen traag wachten verbinding seconden</string>
+    <string name="settings__search__keywords__floating_side_buttons">ongedaan annuleren pauze pauzeren hervatten</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Talen &amp; Indelingen</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Taalnamen weergeven in</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Toetsenbordlabels weergeven in subtypetaal</string>
@@ -1192,9 +1193,6 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__floating_button_apps_search">Apps zoeken</string>
     <string name="dictate__floating_button_apps_none">Geen app gevonden voor ‘{search_term}’</string>
     <string name="dictate__floating_button_design_title">Knopstijl</string>
-    <string name="dictate__floating_button_haptic_summary_off">Geen trilling bij tikken.</string>
-    <string name="dictate__floating_button_haptic_summary_on">Een korte tril wanneer je op de knop tikt.</string>
-    <string name="dictate__floating_button_haptic_title">Trillen bij tikken</string>
     <string name="dictate__floating_button_no_prompts">Nog geen herformuleer-prompts — voeg er enkele toe in de Dictate-instellingen.</string>
     <string name="dictate__floating_button_remember_position_summary_off">Eén gedeelde positie voor alle apps.</string>
     <string name="dictate__floating_button_remember_position_summary_on">Elke app houdt zijn eigen knoppositie.</string>
@@ -1676,9 +1674,7 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Dictaten worden alleen ingevoegd, niet naar het klembord gekopieerd.</string>
     <string name="dictate__floating_button_menu_group">Menu bij ingedrukt houden</string>
     <string name="dictate__floating_button_menu_settings_title">Dictate-instellingen</string>
-    <string name="dictate__floating_button_undo_summary_off">Geen knop voor ongedaan maken weergegeven.</string>
-    <string name="dictate__floating_button_undo_summary_on">Na een dictaat verschijnt er een knop voor ongedaan maken naast de knop om de ingevoegde tekst met één tik te verwijderen.</string>
-    <string name="dictate__floating_button_undo_title">Knop voor ongedaan maken</string>
+    <string name="dictate__floating_button_side_buttons_title">Extra knoppen</string>
     <string name="dictate__mappings_add">Toewijzing toevoegen</string>
     <string name="dictate__mappings_editor_title">Toewijzing</string>
     <string name="dictate__mappings_empty_summary">Voeg een regel toe om woorden of zinnen in elk transcript automatisch te vervangen — exact, zonder AI-tokens.</string>

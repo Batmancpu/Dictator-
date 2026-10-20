@@ -141,6 +141,7 @@
     <string name="settings__search__keywords__momentary_layer">halten ziehen symbol ebene sonderzeichen umschalten kurz vorübergehend 123 satzzeichen iphone</string>
     <string name="settings__search__keywords__emoji_row">emoji reihe zeile leiste zuletzt benutzt über tastatur schnell smiley</string>
     <string name="settings__search__keywords__request_timeout">Zeitlimit Timeout Zeitüberschreitung langsam warten Verbindung Sekunden abgebrochen</string>
+    <string name="settings__search__keywords__floating_side_buttons">rückgängig abbrechen pause pausieren fortsetzen verwerfen</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Sprachen &amp; Layouts</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Sprachnamen anzeigen in</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Untertypen</string>
@@ -1231,9 +1232,6 @@
     <string name="dictate__floating_button_remember_position_title">Position pro App merken</string>
     <string name="dictate__floating_button_remember_position_summary_on">Jede App behält ihre eigene Button-Position.</string>
     <string name="dictate__floating_button_remember_position_summary_off">Eine gemeinsame Position für alle Apps.</string>
-    <string name="dictate__floating_button_haptic_title">Vibrieren beim Tippen</string>
-    <string name="dictate__floating_button_haptic_summary_on">Kurzes Vibrieren beim Antippen des Buttons.</string>
-    <string name="dictate__floating_button_haptic_summary_off">Kein Vibrieren beim Tippen.</string>
     <string name="dictate__floating_button_no_prompts">Noch keine Umformulieren-Prompts — füge welche in den Dictate-Einstellungen hinzu.</string>
     <string name="dictate__floating_button_badge_new">Neu</string>
 
@@ -1745,9 +1743,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Diktate werden nur eingefügt, nicht in die Zwischenablage kopiert.</string>
     <string name="dictate__floating_button_menu_group">Menü beim Halten</string>
     <string name="dictate__floating_button_menu_settings_title">Dictate-Einstellungen</string>
-    <string name="dictate__floating_button_undo_summary_off">Es wird keine Rückgängig-Schaltfläche angezeigt.</string>
-    <string name="dictate__floating_button_undo_summary_on">Nach einer Diktateingabe erscheint neben der Schaltfläche eine Rückgängig-Schaltfläche, mit der du den eingefügten Text mit einem Tippen wieder entfernst.</string>
-    <string name="dictate__floating_button_undo_title">Rückgängig-Schaltfläche</string>
+    <string name="dictate__floating_button_side_buttons_title">Zusätzliche Schaltflächen</string>
     <string name="dictate__mappings_add">Zuordnung hinzufügen</string>
     <string name="dictate__mappings_editor_title">Zuordnung</string>
     <string name="dictate__mappings_empty_summary">Füge eine Regel hinzu, um Wörter oder Wortgruppen in jedem Transkript automatisch zu ersetzen — exakt, ohne KI-Tokens.</string>

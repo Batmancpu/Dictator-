@@ -145,6 +145,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="settings__search__keywords__momentary_layer">tahan geser simbol lapisan tanda baca sementara sesaat 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">emoji baris deret terbaru digunakan di atas papan ketik cepat</string>
     <string name="settings__search__keywords__request_timeout">batas waktu timeout lambat menunggu koneksi detik</string>
+    <string name="settings__search__keywords__floating_side_buttons">urungkan batal jeda lanjutkan buang</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Tata letak Bahasa &amp;</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Tampilkan nama-nama bahasa di</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Tampilkan label keyboard dalam bahasa subtipe</string>
@@ -1247,9 +1248,6 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__floating_button_apps_search">Cari aplikasi</string>
     <string name="dictate__floating_button_apps_none">Tidak ada aplikasi untuk “{search_term}”</string>
     <string name="dictate__floating_button_design_title">Gaya tombol</string>
-    <string name="dictate__floating_button_haptic_summary_off">Tanpa getaran saat diketuk.</string>
-    <string name="dictate__floating_button_haptic_summary_on">Getaran singkat saat Anda mengetuk tombol.</string>
-    <string name="dictate__floating_button_haptic_title">Getar saat diketuk</string>
     <string name="dictate__floating_button_no_prompts">Belum ada prompt penyusunan ulang — tambahkan di pengaturan Dictate.</string>
     <string name="dictate__floating_button_remember_position_summary_off">Satu posisi bersama untuk semua aplikasi.</string>
     <string name="dictate__floating_button_remember_position_summary_on">Setiap aplikasi menyimpan posisi tombolnya sendiri.</string>
@@ -1730,9 +1728,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Dikte hanya disisipkan, tidak disalin ke papan klip.</string>
     <string name="dictate__floating_button_menu_group">Menu saat ditahan</string>
     <string name="dictate__floating_button_menu_settings_title">Pengaturan Dictate</string>
-    <string name="dictate__floating_button_undo_summary_off">Tidak ada tombol urungkan yang ditampilkan.</string>
-    <string name="dictate__floating_button_undo_summary_on">Setelah dikte, tombol urungkan muncul di samping tombol untuk menghapus teks yang disisipkan dengan satu ketukan.</string>
-    <string name="dictate__floating_button_undo_title">Tombol urungkan</string>
+    <string name="dictate__floating_button_side_buttons_title">Tombol tambahan</string>
     <string name="dictate__mappings_add">Tambah pemetaan</string>
     <string name="dictate__mappings_editor_title">Pemetaan</string>
     <string name="dictate__mappings_empty_summary">Tambahkan aturan untuk mengganti otomatis kata atau frasa di tiap transkrip — tepat, tanpa token AI.</string>

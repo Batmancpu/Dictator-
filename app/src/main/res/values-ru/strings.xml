@@ -147,6 +147,7 @@
     <string name="settings__search__keywords__momentary_layer">удержать провести символ слой пунктуация временно на мгновение 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">эмодзи ряд строка панель недавние использованные над клавиатурой быстрый смайлик</string>
     <string name="settings__search__keywords__request_timeout">тайм-аут время ожидания медленно ждать соединение секунды</string>
+    <string name="settings__search__keywords__floating_side_buttons">отменить отмена пауза приостановить продолжить сбросить</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Языки и раскладки</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Подписи к языкам</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Отображать надписи на клавиатуре на языке подтипов</string>
@@ -1298,9 +1299,6 @@
     <string name="dictate__floating_button_apps_search">Поиск приложений</string>
     <string name="dictate__floating_button_apps_none">Приложение по запросу «{search_term}» не найдено</string>
     <string name="dictate__floating_button_design_title">Стиль кнопки</string>
-    <string name="dictate__floating_button_haptic_summary_off">Без вибрации при касании.</string>
-    <string name="dictate__floating_button_haptic_summary_on">Короткая вибрация при касании кнопки.</string>
-    <string name="dictate__floating_button_haptic_title">Вибрация при касании</string>
     <string name="dictate__floating_button_no_prompts">Пока нет подсказок для переформулирования — добавьте их в настройках Dictate.</string>
     <string name="dictate__floating_button_remember_position_summary_off">Одна общая позиция для всех приложений.</string>
     <string name="dictate__floating_button_remember_position_summary_on">Каждое приложение хранит собственную позицию кнопки.</string>
@@ -1784,9 +1782,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Диктовки только вставляются, но не копируются в буфер обмена.</string>
     <string name="dictate__floating_button_menu_group">Меню при удержании</string>
     <string name="dictate__floating_button_menu_settings_title">Настройки Dictate</string>
-    <string name="dictate__floating_button_undo_summary_off">Кнопка отмены не показывается.</string>
-    <string name="dictate__floating_button_undo_summary_on">После диктовки рядом с кнопкой появляется кнопка отмены, позволяющая удалить вставленный текст одним нажатием.</string>
-    <string name="dictate__floating_button_undo_title">Кнопка отмены</string>
+    <string name="dictate__floating_button_side_buttons_title">Дополнительные кнопки</string>
     <string name="dictate__mappings_add">Добавить замену</string>
     <string name="dictate__mappings_editor_title">Замена</string>
     <string name="dictate__mappings_empty_summary">Добавьте правило для автозамены слов или фраз в каждой расшифровке — точно, без токенов ИИ.</string>

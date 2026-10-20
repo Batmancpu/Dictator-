@@ -626,10 +626,17 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             default = BubbleApps.Empty,
             serializer = BubbleApps.Serializer,
         )
-        // Vibrate briefly when the button is tapped.
-        val floatingButtonHaptic = boolean(
-            key = "dictate__floating_button_haptic",
+        // The small buttons beside the bubble, ticked together in one "Extra buttons" dialog
+        // (BubbleSideButton). The cancel × used to be always there, so it stays on unless taken away; the
+        // pause button (e-mail, 2026-10-20) is new and joins nobody's overlay unasked. Whether the bubble
+        // vibrates on a tap is no longer a switch of its own: it follows the keyboard's haptic feedback.
+        val floatingButtonCancelEnabled = boolean(
+            key = "dictate__floating_button_cancel_enabled",
             default = true,
+        )
+        val floatingButtonPauseEnabled = boolean(
+            key = "dictate__floating_button_pause_enabled",
+            default = false,
         )
         // Optional undo control on the floating button (issue #133): when on, an undo button appears
         // next to the bubble after a dictation and removes the last inserted text in one tap. Off by
@@ -2057,6 +2064,11 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
                     rawValue = DictateFloatingButtonShowWhen.fromShowWithDictateKeyboard(entry.rawValue).name,
                 )
             }
+
+            // The floating button's own "Vibrate on tap" switch is gone: a tap on it now buzzes when the
+            // keyboard's key presses do (Sounds & Vibration), the way the keyboard's microphone always has.
+            // Nothing reads the old value any more, so it is dropped rather than carried along.
+            "dictate__floating_button_haptic" -> entry.reset()
 
             // Default: keep entry
             else -> entry.keepAsIs()

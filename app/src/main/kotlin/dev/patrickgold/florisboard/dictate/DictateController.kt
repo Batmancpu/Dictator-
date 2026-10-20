@@ -79,6 +79,7 @@ import dev.patrickgold.florisboard.dictate.provider.TranscriptionApi
 import dev.patrickgold.florisboard.dictate.provider.TranscriptionRequest
 import dev.patrickgold.florisboard.dictate.overlay.AccessibilitySink
 import dev.patrickgold.florisboard.dictate.overlay.DictateAccessibilityService
+import dev.patrickgold.florisboard.dictate.overlay.floatingButtonTapBuzzes
 import dev.patrickgold.florisboard.dictate.provider.chatModelFor
 import dev.patrickgold.florisboard.dictate.provider.chatModelIsPresetDefault
 import dev.patrickgold.florisboard.dictate.provider.singleCallApplies
@@ -512,11 +513,11 @@ object DictateController {
 
     /**
      * Whether the tap that drove this transition has already produced a buzz of its own — the floating
-     * button's own haptic, or the keyboard's ordinary key feedback. Read at the moment of the
-     * transition, so a user who turns either off starts getting the dictation buzz instead.
+     * button's, which follows the keyboard's key feedback, or the keyboard's ordinary key feedback. Read at
+     * the moment of the transition, so a user who turns it off starts getting the dictation buzz instead.
      */
-    private fun pressAlreadyBuzzed(): Boolean = when (outputTarget) {
-        OutputTarget.OVERLAY -> prefs.dictate.floatingButtonHaptic.get()
+    private fun pressAlreadyBuzzed(context: Context): Boolean = when (outputTarget) {
+        OutputTarget.OVERLAY -> floatingButtonTapBuzzes(context, prefs)
         OutputTarget.IME -> prefs.inputFeedback.hapticEnabled.get()
         OutputTarget.RECOGNITION_SERVICE -> false
     }
@@ -549,7 +550,7 @@ object DictateController {
                     // its user this buzz is the only sign the recording really started (#159).
                     (new is UiState.Recording && prev !is UiState.Recording) ||
                         (prev is UiState.Recording && new is UiState.Transcribing) -> {
-                        if (DictateAccessibility.isScreenReaderOn(appContext) || !pressAlreadyBuzzed()) {
+                        if (DictateAccessibility.isScreenReaderOn(appContext) || !pressAlreadyBuzzed(appContext)) {
                             DictateHaptics.short(appContext)
                         }
                     }

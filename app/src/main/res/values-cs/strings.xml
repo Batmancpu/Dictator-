@@ -148,6 +148,7 @@
     <string name="settings__search__keywords__momentary_layer">podržet přeject symbol vrstva interpunkce dočasně okamžitě 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">emodži emoji řádek lišta nedávné použité nad klávesnicí rychlý</string>
     <string name="settings__search__keywords__request_timeout">časový limit timeout pomalé čekání spojení sekundy</string>
+    <string name="settings__search__keywords__floating_side_buttons">zpět zrušit pauza pozastavit pokračovat zahodit</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Jazyky a rozložení</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Zobrazovat názvy jazyků v</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Zobrazit popisky kláves v jazyce podtypu</string>
@@ -1308,9 +1309,6 @@
     <string name="dictate__floating_button_apps_search">Hledat aplikace</string>
     <string name="dictate__floating_button_apps_none">Pro „{search_term}“ nebyla nalezena žádná aplikace</string>
     <string name="dictate__floating_button_design_title">Styl tlačítka</string>
-    <string name="dictate__floating_button_haptic_summary_off">Bez vibrace při klepnutí.</string>
-    <string name="dictate__floating_button_haptic_summary_on">Krátké zavibrování při klepnutí na tlačítko.</string>
-    <string name="dictate__floating_button_haptic_title">Vibrovat při klepnutí</string>
     <string name="dictate__floating_button_no_prompts">Zatím žádné přeformulovací pokyny — přidejte je v nastavení Dictate.</string>
     <string name="dictate__floating_button_remember_position_summary_off">Jedna společná poloha pro všechny aplikace.</string>
     <string name="dictate__floating_button_remember_position_summary_on">Každá aplikace si pamatuje vlastní polohu tlačítka.</string>
@@ -1794,9 +1792,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Diktování se pouze vkládají, nekopírují se do schránky.</string>
     <string name="dictate__floating_button_menu_group">Nabídka při podržení</string>
     <string name="dictate__floating_button_menu_settings_title">Nastavení Dictate</string>
-    <string name="dictate__floating_button_undo_summary_off">Tlačítko zpět se nezobrazuje.</string>
-    <string name="dictate__floating_button_undo_summary_on">Po diktování se vedle tlačítka zobrazí tlačítko zpět, kterým jedním klepnutím odstraníte vložený text.</string>
-    <string name="dictate__floating_button_undo_title">Tlačítko zpět</string>
+    <string name="dictate__floating_button_side_buttons_title">Další tlačítka</string>
     <string name="dictate__mappings_add">Přidat pravidlo</string>
     <string name="dictate__mappings_editor_title">Pravidlo</string>
     <string name="dictate__mappings_empty_summary">Přidejte pravidlo pro automatické nahrazení slov nebo frází v každém přepisu — přesně, bez AI tokenů.</string>
