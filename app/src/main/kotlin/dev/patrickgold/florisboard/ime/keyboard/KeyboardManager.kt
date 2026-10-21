@@ -736,7 +736,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
      * question.
      */
     private fun endOfWord(): SuggestionCandidate? {
-        val candidate = nlpManager.getAutoCommitCandidate()
+        val candidate = nlpManager.getAutoCommitCandidate(editorInstance.activeContent.composingText)
         if (candidate != null) {
             commitAutoCorrection(candidate)
             lastTypedWord = null
@@ -2159,7 +2159,7 @@ class KeyboardManager(context: Context) : InputKeyEventReceiver {
             KeyCode.VIEW_SYMBOLS2 -> activeState.keyboardMode = KeyboardMode.SYMBOLS2
             else -> {
                 if (activeState.imeUiMode == ImeUiMode.MEDIA) {
-                    nlpManager.getAutoCommitCandidate()?.let { commitAutoCorrection(it) }
+                    nlpManager.getAutoCommitCandidate(editorInstance.activeContent.composingText)?.let { commitAutoCorrection(it) }
                     editorInstance.commitText(data.asString(isForDisplay = false))
                     return@batchEdit
                 }

@@ -333,16 +333,26 @@ class NlpManager(context: Context) {
             return
         }
         val reqTime = SystemClock.uptimeMillis()
+        val word = content.composingText.toString()
         suggestJob?.cancel()
         suggestJob = scope.launch {
             val candidates = computeSuggestions(subtype, content)
             internalSuggestionsGuard.withLock {
                 if (internalSuggestions.first < reqTime) {
+                    suggestionsWord = word
                     internalSuggestions = reqTime to candidates
                 }
             }
         }
     }
+
+    /**
+     * The word being composed when the suggestions now in [internalSuggestions] were computed, or null
+     * where they did not come from [suggest] and belong to no typed word (a glide's alternatives, a clear).
+     * See [getAutoCommitCandidate] for why it is kept.
+     */
+    @Volatile
+    private var suggestionsWord: String? = null
 
     /**
      * The candidates for a keyboard-internal field (issue #424) — the translate bar or one of the searches —
@@ -445,6 +455,7 @@ class NlpManager(context: Context) {
         val reqTime = SystemClock.uptimeMillis()
         holdNextSuggest = holdNext
         runBlocking {
+            suggestionsWord = null
             internalSuggestions = reqTime to if (wanted) suggestions else emptyList()
         }
     }
@@ -452,11 +463,24 @@ class NlpManager(context: Context) {
     fun clearSuggestions() {
         val reqTime = SystemClock.uptimeMillis()
         runBlocking {
+            suggestionsWord = null
             internalSuggestions = reqTime to emptyList()
         }
     }
 
-    fun getAutoCommitCandidate(): SuggestionCandidate? {
+    /**
+     * The candidate Space may swap in for [composingWord], if the strip holds one *for that word*.
+     *
+     * The strip is computed off the typing path and can lag behind it — most of all for the first words
+     * after a word list loads. Asked without checking, Space took whatever eligible candidate was still
+     * standing there from the word before and wrote it over the new one: `Ek Ek` when Afrikaans was added
+     * (only that trigger was removed then), and on Polish, where a restored `Cześć` sits eligible in the
+     * strip, `Cześć Cześć` for "czesc wiem" (issue #451). A word whose suggestions have not arrived yet
+     * now stands as typed.
+     */
+    fun getAutoCommitCandidate(composingWord: CharSequence): SuggestionCandidate? {
+        val forWord = suggestionsWord
+        if (forWord != null && forWord != composingWord.toString()) return null
         return activeCandidates.firstOrNull { it.isEligibleForAutoCommit }
     }
 
