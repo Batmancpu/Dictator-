@@ -49,6 +49,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
@@ -131,7 +132,12 @@ fun PreviewKeyboardField(
                 keyboardActions = KeyboardActions(
                     onDone = { focusManager.clearFocus() },
                 ),
-                keyboardOptions = KeyboardOptions(autoCorrectEnabled = true),
+                // The keyboard capitalises a sentence only where the field asks for it. Without this the
+                // one field for trying settings out was the one place that never did.
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    autoCorrectEnabled = true,
+                ),
                 singleLine = true,
                 shape = RectangleShape,
                 colors = TextFieldDefaults.colors(
