@@ -73,6 +73,12 @@ CORPUS_CASE = {
                                 "boekhuis,klopper,kramer,helpmekaar,plaassilo's,warmbad,god"),
 }
 
+# Languages the keyboard folds accents for (DictFold.ACCENT_FOLDED), as out_code -> Leipzig package of text
+# written with its diacritics; see settle_accent_twins in generate.py. Polish needs it because a good share
+# of its OpenSubtitles text is typed without them, which put `cie`, `wiec` and `tez` in the list as words
+# and kept cię, więc and też from ever being restored (issue #451). Same package as its n-gram tables.
+ACCENT_TWINS = {"pl": "pol_news_2024_1M"}
+
 # out_code, opus_code, hunspell_dict, display_name
 LANGS = [
     ("af", "af", "lo:af_ZA/af_ZA", "Afrikaans"),
@@ -140,6 +146,8 @@ def main():
         if out_code in CORPUS_CASE:
             pkg, exclude = CORPUS_CASE[out_code]
             cmd += ["--corpus-case", pkg, "--corpus-case-exclude", exclude]
+        if out_code in ACCENT_TWINS:
+            cmd += ["--accent-twins", ACCENT_TWINS[out_code]]
         proc = subprocess.run(cmd, capture_output=True, text=True)
         sys.stderr.write(proc.stderr)
         line = proc.stdout.strip()

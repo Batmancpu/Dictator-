@@ -35,6 +35,7 @@ import dev.patrickgold.florisboard.ime.nlp.SuggestionProvider
 import dev.patrickgold.florisboard.ime.nlp.WordOrigin
 import dev.patrickgold.florisboard.ime.nlp.WordSuggestionCandidate
 import dev.patrickgold.florisboard.lib.devtools.flogDebug
+import dev.patrickgold.florisboard.lib.devtools.flogInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -110,8 +111,8 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
                 if (word.length <= prefix.length || !lower.startsWith(prefix)) return@mapNotNull null
                 val suffix = word.substring(prefix.length)
                 // Fold one character rather than the whole suffix: this runs on every keystroke, and
-                // Normalizer.normalize is the expensive half of [DictFold.foldFrench].
-                val initial = DictFold.foldFrench(suffix.take(1)).firstOrNull() ?: return@mapNotNull null
+                // Normalizer.normalize is the expensive half of [DictFold.foldAccents].
+                val initial = DictFold.foldAccents(suffix.take(1)).firstOrNull() ?: return@mapNotNull null
                 if (initial in FRENCH_ELISION_INITIALS) prefix to suffix else null
             }
         }
@@ -671,6 +672,17 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         /** Every dictionary spelling that folds to [key], most frequent first. */
         fun formsOf(key: String): List<String> = variants[key] ?: listOfNotNull(canonical[key])
 
+        /**
+         * How to show [key] when a context table says the corpus wrote it [written] there (issue #451):
+         * the dictionary's own form of that spelling, so a noun keeps its capital; the corpus spelling
+         * itself when the dictionary has no such form; and the most frequent spelling without one. Showing
+         * the most frequent spelling regardless is what predicted `à` after French "il".
+         */
+        fun spell(key: String, written: String?): String {
+            if (written == null) return canonical[key] ?: key
+            return formsOf(key).firstOrNull { it.equals(written, ignoreCase = true) } ?: written
+        }
+
         companion object {
             /** For a subtype whose language has no dictionary at all — see [dictLangFor]. */
             val EMPTY = LowerIndex("", emptyMap(), emptyMap(), emptySet())
@@ -788,6 +800,38 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         return false
     }
 
+    /**
+     * True if [word] is spelled exactly so — accents included, case aside — in one of the user's *other*
+     * keyboard languages (multilingual typing, #190). Unlike [isKnownWord] this does not answer on the fold
+     * key: `slow` folds onto Polish słów, and is still an English word only as `slow`.
+     */
+    private suspend fun isWordInAnotherLanguage(word: String, subtype: Subtype): Boolean {
+        val active = dictLangFor(subtype) ?: return false
+        for (lang in acceptedDictLangs(subtype)) {
+            if (lang == active) continue
+            val index = lowerIndexForLang(lang)
+            if (index.formsOf(index.fold(word)).any { it.equals(word, ignoreCase = true) }) return true
+        }
+        return false
+    }
+
+    /**
+     * True if the user has made [word], spelled exactly so, their own: it is in their personal dictionary,
+     * by hand or promoted there — which taking a restoration back twice with Backspace does (each counts
+     * [WordLearningGate.REJECTION_WEIGHT]). The accent restoration answers to this before anything else,
+     * or `game` would become gamę every time it was typed. Merely learned is not enough, the same rung as
+     * for any correction: a word in the strip is "never known" ([WordLearningGate.Stage.SUGGESTED]).
+     */
+    private suspend fun isUsersOwnSpelling(word: String, subtype: Subtype): Boolean = isInUserDictionary(word, subtype)
+
+    /**
+     * True if [word] is a known word as written: [isKnownWord], minus the spellings that are known only
+     * because their accents fold away (`game` for gamę). Those are exactly the ones word learning has to
+     * see, or a restoration taken back could never be remembered.
+     */
+    private suspend fun isKnownAsWritten(word: String, subtype: Subtype): Boolean =
+        isKnownWord(word, subtype) && accentlessSpellingOf(word, subtype) == null
+
     /** True if [word] is a known dictionary word in any accepted language, or in the user dictionary. */
     private suspend fun isKnownWord(word: String, subtype: Subtype): Boolean {
         for (lang in acceptedDictLangs(subtype)) {
@@ -809,6 +853,31 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
             }
         }
         return isInUserDictionary(word, subtype)
+    }
+
+    /**
+     * The accented spellings [word] stands for, when it is known only because its accents were folded
+     * away — `zycie` for życie, `hote` for hôte — or null when it is a word as written (issue #451).
+     *
+     * [isKnownWord] answers on the fold key, which is right for the keyboard's own lookups and wrong for
+     * the spell checker: it called `zycie` correct, so the one Polish text it should have marked passed.
+     * Only for the languages that fold accents ([DictFold.foldsAccents]): Arabic folds too, but a vowelled
+     * مَدْرَسَة is correct Arabic, and underlining it is what its fold exists to stop. A word written this way
+     * in any other accepted language, or in the user's own dictionary, is a word.
+     */
+    private suspend fun accentlessSpellingOf(word: String, subtype: Subtype): List<String>? {
+        val spellings = ArrayList<String>()
+        for (lang in acceptedDictLangs(subtype)) {
+            val index = lowerIndexForLang(lang)
+            val forms = index.formsOf(index.fold(word))
+            if (forms.isEmpty()) continue
+            if (!DictFold.foldsAccents(lang) || forms.any { it.equals(word, ignoreCase = true) }) return null
+            // Only what the restoration would offer: `kompozycją` is a correct word the list lacks, not
+            // a misspelling of `kompozycja`.
+            forms.filterTo(spellings) { AccentRestoration.keepsTypedAccents(word, it) }
+        }
+        if (spellings.isEmpty() || isInUserDictionary(word, subtype)) return null
+        return spellings.distinct()
     }
 
     /** Dictionary words closest to (a misspelling of) [word], ranked by frequency. */
@@ -914,8 +983,14 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
             emptyList()
         }
 
+        // A folded table merges `z moją` and `z moja`; it also kept how the corpus wrote the word there.
+        fun written(candidate: String): String? =
+            deepPrefix?.let { trigrams.spellingOf("$it $candidate")?.first }
+                ?: bigrams.spellingOf("$prevWord $candidate")?.first
+
         return mergePredictions(learnedPairs, deepPairs, corpusPairs + fallback, maxCandidateCount).map { (candidate, isLearned) ->
-            val text = index.canonical[candidate] ?: candidate
+            // A learned pair is stored as the user typed it, so it needs no spelling looked up.
+            val text = if (isLearned) index.canonical[candidate] ?: candidate else index.spell(candidate, written(candidate))
             WordSuggestionCandidate(
                 text = text,
                 confidence = (index.freq[candidate] ?: 0) / 255.0,
@@ -1201,7 +1276,47 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
                 runCatching { LearnedWordsStore.prune(appContext, lang) }
             }
         }
+        runCatching { forgetAccentlessLearnedWords(subtype) }
         Unit
+    }
+
+    /**
+     * Once per language that folds its accents: forgets the words the keyboard learned only because it
+     * could not see them (issue #451).
+     *
+     * Before Polish folded, `czesc` was a word the dictionary did not know, typed again and again by
+     * everyone who writes without diacritics — exactly what word learning exists to pick up, and from the
+     * third time on it sat in the personal dictionary. With the fold it is cześć without its accents, and a
+     * personal-dictionary entry is what tells the restoration a spelling is meant ([isUsersOwnSpelling]).
+     * Left alone, the vocabulary the keyboard built would be what keeps it from restoring exactly that
+     * user's commonest words. Seen on the emulator: two sightings under the previous release were enough.
+     *
+     * A word the user added by hand has no learned row and stays where it is; one the keyboard promoted
+     * leaves the personal dictionary with its row, as forgetting it from the strip does
+     * (`NlpManager.forgetLearnedWord`). Afterwards the same spelling can only come back by taking a
+     * restoration back twice, which is meant.
+     */
+    private suspend fun forgetAccentlessLearnedWords(subtype: Subtype) {
+        val lang = dictLangFor(subtype)?.takeIf { DictFold.foldsAccents(it) } ?: return
+        val index = lowerIndexForLang(lang)
+        // Not before the word list is there: it is what tells an accent-less spelling from a word.
+        if (index.freq.isEmpty()) return
+        val forgotten = LearnedWordsStore.forgetOnce(appContext, lang, "accentless_forgotten") { entry ->
+            val forms = index.formsOf(index.fold(entry.word))
+            forms.isNotEmpty() && forms.none { it.equals(entry.word, ignoreCase = true) } &&
+                forms.any { AccentRestoration.keepsTypedAccents(entry.word, it) }
+        } ?: return
+        val promoted = forgotten.filter { it.promoted }
+        if (promoted.isNotEmpty()) {
+            val dao = runCatching { DictionaryManager.default().florisUserDictionaryDao() }.getOrNull()
+            for (entry in promoted) {
+                runCatching { dao?.queryExactFuzzyLocale(entry.word, subtype.primaryLocale)?.forEach { dao.delete(it) } }
+            }
+            onPersonalVocabularyChanged()
+        }
+        if (forgotten.isNotEmpty()) {
+            flogInfo { "forgot ${forgotten.size} accent-less learned $lang words (${promoted.size} promoted)" }
+        }
     }
 
     override suspend fun spell(
@@ -1221,6 +1336,7 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         if (index.freq.isEmpty()) return SpellingResult.unspecified()
         // Known in the active language OR any other configured keyboard language (multilingual, #190).
         if (isKnownWord(trimmed, subtype)) {
+            accentlessSpellingOf(trimmed, subtype)?.let { return SpellingResult.typo(it.toTypedArray()) }
             return SpellingResult.validWord()
         }
         // Unknown word → typo, offering the closest dictionary words as corrections (may be empty).
@@ -1388,12 +1504,61 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         if (DictFold.hasNonTrivialFold(index.lang) && word.length >= 2) {
             val key = index.fold(word)
             val forms = index.formsOf(key)
+            // What the previous word says about the accents (issue #451), for the languages where that
+            // was measured: Polish `czesc` is `część` after `jedna` and `cześć` on its own, and `ze` is
+            // `że` after `wiem`. See [AccentRestoration].
+            val evidence = if (forms.isNotEmpty() && index.lang in AccentRestoration.LANGS) {
+                previousWordOf(content, index)?.let { prev ->
+                    val bigrams = bigramsFor(subtype)
+                    bigrams.spellingOf("$prev $key")?.let { (spelling, count) ->
+                        AccentRestoration.Evidence(spelling, count, bigrams.countOf("$prev $key"))
+                    }
+                }
+            } else {
+                null
+            }
             // Compared in the casing the word was typed in: a sentence-initial `Ek` or `Je` *is* the
             // dictionary's `ek` and `je`. Compared as stored, it read as a spelling to restore, and the
             // strip held `Ek` as a correction of `Ek` — harmless until the next word's suggestions were
             // late (the first words after Afrikaans loaded, on the emulator): the space then took the
             // stale `Ek` and wrote it over `praat`.
-            if (forms.isNotEmpty() && forms.none { it == word || cased(it) == word }) {
+            val typedIsForm = forms.any { it == word || cased(it) == word }
+            // A spelling the user has made their own — put in the personal dictionary, or promoted there by
+            // taking the restoration back — is never restored again.
+            val ownSpelling = forms.isNotEmpty() && isUsersOwnSpelling(word, subtype)
+            val rival = if (typedIsForm && !ownSpelling) AccentRestoration.rival(word, forms, evidence) else null
+            if (rival != null) {
+                // A correct word the sentence would spell differently: offered beside it, and swapped in
+                // on Space only when the corpus leaves next to no doubt. The typed word stays left-most.
+                val (form, mayReplace) = rival
+                val freq = wordDataFor(subtype)[form] ?: index.freq[key] ?: 0
+                // Under its own key, not [TYPED_WORD_KEY]'s: it is a dictionary word, and the completions
+                // below would otherwise list it a second time.
+                out[word.lowercase()] = WordSuggestionCandidate(
+                    text = word, confidence = 1.0, isEligibleForAutoCommit = false, sourceProvider = this,
+                )
+                out.putIfAbsent(
+                    form.lowercase(),
+                    WordSuggestionCandidate(
+                        text = cased(form),
+                        confidence = freq / 255.0,
+                        isEligibleForAutoCommit = mayReplace && autoCorrectOn && freq >= AUTOCORRECT_MIN_FREQ,
+                        sourceProvider = this,
+                    ),
+                )
+            }
+            // A word the user's other keyboard language writes exactly so is theirs (#190): with English
+            // beside Polish, `slow` and `sad` must not become słów and sąd.
+            val restorations =
+                if (forms.isNotEmpty() && !typedIsForm && !ownSpelling && !isWordInAnotherLanguage(word, subtype)) {
+                    AccentRestoration.restorations(index.lang, word, forms, evidence)
+                } else {
+                    emptyList()
+                }
+            // The usual floor for a silent swap, except where the restoration was measured without one.
+            val restoreFloor =
+                if (index.lang in AccentRestoration.LANGS) AccentRestoration.MIN_FREQ else AUTOCORRECT_MIN_FREQ
+            if (restorations.isNotEmpty()) {
                 // Keep the typed spelling tappable and left-most so the restoration can be bypassed (#150).
                 out[TYPED_WORD_KEY + key] = WordSuggestionCandidate(
                     text = word, confidence = 1.0, isEligibleForAutoCommit = false, sourceProvider = this,
@@ -1401,17 +1566,17 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
                 // Each spelling reports its own frequency, not the key's — they are ordered by it, so
                 // showing them all at the most frequent one's confidence would flatten that order away.
                 val data = wordDataFor(subtype)
-                forms.forEachIndexed { i, form ->
+                restorations.forEachIndexed { i, form ->
                     val freq = data[form] ?: index.freq[key] ?: 0
                     out.putIfAbsent(
                         form.lowercase(),
                         WordSuggestionCandidate(
                             text = cased(form),
                             confidence = freq / 255.0,
-                            // Only the most frequent spelling may be swapped in silently, and only if it
-                            // is common enough to be worth overriding what was actually typed.
-                            isEligibleForAutoCommit =
-                                i == 0 && autoCorrectOn && freq >= AUTOCORRECT_MIN_FREQ,
+                            // Only the first spelling — the sentence's choice, else the most frequent —
+                            // may be swapped in silently, and only if it is common enough to be worth
+                            // overriding what was actually typed.
+                            isEligibleForAutoCommit = i == 0 && autoCorrectOn && freq >= restoreFloor,
                             sourceProvider = this,
                         ),
                     )
@@ -1696,8 +1861,8 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
             val ctxTrigrams = trigramsFor(subtype)
             // Two words of evidence outrank one, but only when the exact triple is common enough to be
             // a fact about the language rather than an accident of the corpus.
-            val deep = if (contextWords.size >= 2 && !ctxTrigrams.isEmpty) {
-                val deepPrefix = contextWords.joinToString(" ")
+            val deepPrefix = if (contextWords.size >= 2 && !ctxTrigrams.isEmpty) contextWords.joinToString(" ") else null
+            val deep = if (deepPrefix != null) {
                 ctxTrigrams.topContinuations(deepPrefix, CONTEXT_COMPLETION_SCAN)
                     .firstOrNull { it.startsWith(foldedTyped) && index.freq.containsKey(it) }
                     ?.takeIf { ctxTrigrams.countOf("$deepPrefix $it") >= IN_WORD_PREDICTION_MIN_COUNT }
@@ -1712,7 +1877,11 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
             }
             for (continuation in orderContextCompletions(deep, blessed, CONTEXT_COMPLETION_MAX)) {
                 if (out.size >= completionCap) break
-                val text = cased(index.canonical[continuation] ?: continuation)
+                // In the spelling the corpus used after these words, not the language's commonest one.
+                val written = (if (continuation == deep) deepPrefix else null)
+                    ?.let { ctxTrigrams.spellingOf("$it $continuation")?.first }
+                    ?: ctxBigrams.spellingOf("$ctxPrevWord $continuation")?.first
+                val text = cased(index.spell(continuation, written))
                 out.putIfAbsent(
                     text.lowercase(),
                     WordSuggestionCandidate(
@@ -1957,7 +2126,7 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
         // order the user's own words by (issue #318, round 3). Those sightings are that record, so they
         // keep accruing. The cheap in-memory test comes first: the personal-dictionary query behind
         // [isInUserDictionary] must not run for every ordinary word.
-        val ourPromotedWord = if (!isKnownWord(trimmed, subtype)) {
+        val ourPromotedWord = if (!isKnownAsWritten(trimmed, subtype)) {
             false
         } else {
             val ours = (learnedSnapshotFor(subtype)?.scoreOfKey(folded) ?: 0.0) > 0.0 &&

@@ -59,7 +59,7 @@ class PrefixOrderTest {
     @Test
     fun comparesFoldKeysAsTheyAreWhenTheLanguageHasThem() {
         val words = listOf("hôte", "hotel", "Hôpital", "hors", "été")
-        val keys = words.map { DictFold.foldFrench(it).lowercase() }
+        val keys = words.map { DictFold.foldAccents(it).lowercase() }
         val order = PrefixOrder(words, keys)
         for (prefix in listOf("ho", "hot", "hop", "ete", "x", "")) {
             assertEquals(oracle(words, keys, prefix), order.ranksStartingWith(prefix, Int.MAX_VALUE)?.toList(), prefix)

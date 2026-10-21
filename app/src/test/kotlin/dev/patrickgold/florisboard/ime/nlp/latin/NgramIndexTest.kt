@@ -159,6 +159,57 @@ class NgramIndexTest {
         return x.size - y.size
     }
 
+    // --- the corpus spelling behind a folded key (issue #451) ----------------------------------------
+
+    private fun polish(text: String) = NgramIndex.parse(text) { DictFold.foldKey("pl", it) }
+
+    /**
+     * The point of keeping the spelling: `z moją` and `z moja` are one folded key, and only the table can
+     * still say which of the two the corpus wrote — and how much of the merged count that one carries.
+     */
+    @Test
+    fun `a folded key keeps the commonest spelling and its share`() {
+        val index = polish(table("wiem że\t900", "wiem ze\t12", "z moja\t40", "z moją\t300"))
+        assertEquals(912L, index.countOf("wiem ze"))
+        assertEquals("że" to 900, index.spellingOf("wiem ze"))
+        assertEquals(340L, index.countOf("z moja"))
+        assertEquals("moją" to 300, index.spellingOf("z moja"))
+        assertEquals(null, index.spellingOf("z twoja"))
+    }
+
+    /** The commonest line wins in whichever order the colliding lines arrive. */
+    @Test
+    fun `the commonest spelling wins whichever line comes first`() {
+        val first = polish(table("to że\t500", "to ze\t20"))
+        val last = polish(table("to ze\t20", "to że\t500"))
+        assertEquals("że" to 500, first.spellingOf("to ze"))
+        assertEquals("że" to 500, last.spellingOf("to ze"))
+        // A plain spelling that wins leaves no spelling of its own behind, and must not keep a stale one.
+        val plain = polish(table("razem że\t3", "razem ze\t400"))
+        assertEquals("ze" to 400, plain.spellingOf("razem ze"))
+    }
+
+    /**
+     * The spelling lives in the blob behind its key, so the lookups that read keys must not see it: a
+     * prefix search would otherwise stop matching, or a continuation come back with the spelling glued on.
+     */
+    @Test
+    fun `kept spellings do not leak into keys or continuations`() {
+        val index = polish(table("nie mają\t800", "nie mam\t500", "nie maja\t3", "nie wiem\t900"))
+        assertEquals(listOf("wiem", "maja", "mam"), index.topContinuations("nie", 3))
+        assertEquals(803L, index.countOf("nie maja"))
+        assertEquals("mają" to 800, index.spellingOf("nie maja"))
+        assertEquals("wiem" to 900, index.spellingOf("nie wiem"))
+    }
+
+    /** An unfolded table has nothing to remember: the spelling is the key's own last word. */
+    @Test
+    fun `an unfolded table spells a key as it is`() {
+        val index = NgramIndex.parse(table("in the\t900", "of the\t1200"))
+        assertEquals("the" to 1200, index.spellingOf("of the"))
+        assertEquals(null, index.spellingOf("at the"))
+    }
+
     /** A table big enough that the binary search actually has to work for its answer. */
     @Test
     fun `finds every key in a large sorted table`() {
