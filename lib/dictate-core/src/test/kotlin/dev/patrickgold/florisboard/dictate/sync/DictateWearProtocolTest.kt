@@ -54,6 +54,14 @@ class DictateWearProtocolTest : FunSpec({
         // The old watch's schema without the two fields: unknown keys are ignored, not an error.
         DictateWearProtocol.json.decodeFromString(OldSettings.serializer(), new.encode()).model shouldBe ""
     }
+
+    test("the rewording effort travels to the watch, and a phone without it leaves the field out") {
+        val new = DictateSyncedSettings(chatModel = "gpt-6-luna", rewordingReasoningEffort = "none")
+        DictateSyncedSettings.decode(new.encode())!!.rewordingReasoningEffort shouldBe "none"
+        val old = """{"transcriptionProviderId":"openai","chatModel":"gpt-6-luna"}"""
+        DictateSyncedSettings.decode(old)!!.rewordingReasoningEffort shouldBe null
+        DictateWearProtocol.json.decodeFromString(OldSettings.serializer(), new.encode()).model shouldBe ""
+    }
 })
 
 @kotlinx.serialization.Serializable

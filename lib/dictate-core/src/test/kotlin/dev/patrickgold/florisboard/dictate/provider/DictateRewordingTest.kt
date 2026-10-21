@@ -23,10 +23,12 @@ class DictateRewordingTest : FunSpec({
 
     class AskingModel : LlmProvider {
         val sent = mutableListOf<String>()
+        val efforts = mutableListOf<String?>()
 
         override suspend fun complete(request: ChatRequest): ChatResult {
             val content = request.messages.single().content
             sent += content
+            efforts += request.reasoningEffort
             val text = content.substringAfterLast("\n\n", missingDelimiterValue = "")
             val reply = if (text.startsWith("Hello")) {
                 "Reworded: $text"
@@ -75,5 +77,24 @@ class DictateRewordingTest : FunSpec({
         run(model, "[\nBest regards,]") shouldBe "Hello, see you tomorrow.\nBest regards,"
         run(model, "[, right?]") shouldBe "Hello, see you tomorrow., right?"
         model.sent shouldHaveSize 0
+    }
+
+    // These paths have no reasoning setting of their own; without the effort, OpenAI's default model would
+    // think at medium on every one of their requests.
+    test("every request of the chain carries the reasoning effort it was given") {
+        val model = AskingModel()
+        DictateRewording.apply(
+            client = model,
+            chatModel = "gpt-6-luna",
+            transcript = "Hello, see you tomorrow.",
+            autoFormatting = true,
+            languageName = "English",
+            systemPrompt = null,
+            autoApplyPrompts = listOf(DictateRewording.Prompt("Rewrite the dictated text.")),
+            reasoningEffort = "none",
+        )
+        model.efforts shouldBe listOf("none", "none")
+        run(model, "Rewrite the dictated text.")
+        model.efforts.last() shouldBe null
     }
 })

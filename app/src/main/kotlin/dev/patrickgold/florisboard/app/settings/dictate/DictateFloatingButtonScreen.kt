@@ -18,8 +18,10 @@ import android.content.pm.PackageManager
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.filled.SmartButton
 import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.filled.Apps
@@ -30,7 +32,6 @@ import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.PinDrop
-import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PhotoSizeSelectSmall
 import androidx.compose.material.icons.filled.PushPin
@@ -69,8 +70,10 @@ import dev.patrickgold.florisboard.app.LocalNavController
 import dev.patrickgold.florisboard.app.Routes
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonAppScope
 import dev.patrickgold.florisboard.dictate.overlay.BubbleMenuAction
+import dev.patrickgold.florisboard.dictate.overlay.BubbleSideButton
 import dev.patrickgold.florisboard.dictate.overlay.DictateAccessibilityService
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
+import dev.patrickgold.jetpref.datastore.model.PreferenceData
 import dev.patrickgold.jetpref.datastore.model.collectAsState
 import dev.patrickgold.jetpref.material.ui.JetPrefAlertDialog
 import org.florisboard.lib.compose.rippleClickable
@@ -133,6 +136,7 @@ fun DictateFloatingButtonScreen() = FlorisScreen {
 
         var showDisclosure by remember { mutableStateOf(false) }
         var showMenuDialog by remember { mutableStateOf(false) }
+        var showSideButtonsDialog by remember { mutableStateOf(false) }
 
         SwitchPreference(
             prefs.dictate.floatingButtonEnabled,
@@ -317,22 +321,20 @@ fun DictateFloatingButtonScreen() = FlorisScreen {
                 summaryOff = stringRes(R.string.dictate__floating_button_remember_position_summary_off),
             )
 
-            SwitchPreference(
-                prefs.dictate.floatingButtonHaptic,
-                icon = Icons.Default.Vibration,
-                modifier = Modifier.settingsSearchAnchor("dictate__floating_button_haptic_title"),
-                title = stringRes(R.string.dictate__floating_button_haptic_title),
-                summaryOn = stringRes(R.string.dictate__floating_button_haptic_summary_on),
-                summaryOff = stringRes(R.string.dictate__floating_button_haptic_summary_off),
-            )
-
-            SwitchPreference(
-                prefs.dictate.floatingButtonUndoEnabled,
-                icon = Icons.AutoMirrored.Filled.Undo,
-                modifier = Modifier.settingsSearchAnchor("dictate__floating_button_undo_title"),
-                title = stringRes(R.string.dictate__floating_button_undo_title),
-                summaryOn = stringRes(R.string.dictate__floating_button_undo_summary_on),
-                summaryOff = stringRes(R.string.dictate__floating_button_undo_summary_off),
+            // The small buttons beside the bubble — cancel and pause while it records, undo after it — as one
+            // list, the way the hold menu below is one. They used to be a switch for undo and nothing at all
+            // for the other two. Vibration on a tap is not here any more: it follows Sounds & Vibration.
+            val sideButtons = BubbleSideButton.entries.filter { it.pref(prefs).collectAsState().value }
+            Preference(
+                icon = Icons.Default.SmartButton,
+                modifier = Modifier.settingsSearchAnchor("dictate__floating_button_side_buttons_title"),
+                title = stringRes(R.string.dictate__floating_button_side_buttons_title),
+                summary = if (sideButtons.isEmpty()) {
+                    stringRes(R.string.quick_action__noop)
+                } else {
+                    sideButtons.map { stringRes(it.labelRes) }.joinToString()
+                },
+                onClick = { showSideButtonsDialog = true },
             )
 
             SwitchPreference(
@@ -364,44 +366,19 @@ fun DictateFloatingButtonScreen() = FlorisScreen {
         }
 
         if (showMenuDialog) {
-            JetPrefAlertDialog(
+            CheckboxListDialog(
                 title = stringRes(R.string.dictate__floating_button_menu_group),
-                confirmLabel = stringRes(R.string.action__ok),
-                onConfirm = { showMenuDialog = false },
+                rows = BubbleMenuAction.entries.map { CheckboxRow(it.iconRes, it.labelRes, it.pref(prefs)) },
                 onDismiss = { showMenuDialog = false },
-            ) {
-                val scope = rememberCoroutineScope()
-                Column {
-                    // Rows of our own rather than JetPrefListItem: that one paints itself in the theme's
-                    // `surface`, which inside a dialog (a lighter container) shows up as a black block
-                    // behind the list. Ticking takes effect at once, as it does in the app-visibility
-                    // list — there is nothing here that a second confirmation could protect.
-                    BubbleMenuAction.entries.forEach { action ->
-                        val pref = action.pref(prefs)
-                        val checked by pref.collectAsState()
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .rippleClickable { scope.launch { pref.set(!checked) } }
-                                .padding(horizontal = 8.dp, vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(
-                                imageVector = ImageVector.vectorResource(action.iconRes),
-                                contentDescription = null,
-                            )
-                            Text(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(start = 16.dp),
-                                text = stringRes(action.labelRes),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                            Checkbox(checked = checked, onCheckedChange = null)
-                        }
-                    }
-                }
-            }
+            )
+        }
+
+        if (showSideButtonsDialog) {
+            CheckboxListDialog(
+                title = stringRes(R.string.dictate__floating_button_side_buttons_title),
+                rows = BubbleSideButton.entries.map { CheckboxRow(it.iconRes, it.labelRes, it.pref(prefs)) },
+                onDismiss = { showSideButtonsDialog = false },
+            )
         }
 
         if (showDisclosure) {
@@ -423,6 +400,57 @@ fun DictateFloatingButtonScreen() = FlorisScreen {
                     }
                 },
             )
+        }
+    }
+}
+
+/** One line of a [CheckboxListDialog]: what it is, and the switch its box ticks. */
+private class CheckboxRow(
+    @DrawableRes val iconRes: Int,
+    @StringRes val labelRes: Int,
+    val pref: PreferenceData<Boolean>,
+)
+
+/**
+ * A list of independent switches in one dialog — the hold menu's entries, the buttons beside the bubble.
+ *
+ * Rows of our own rather than JetPrefListItem: that one paints itself in the theme's `surface`, which inside
+ * a dialog (a lighter container) shows up as a black block behind the list. Ticking takes effect at once,
+ * as it does in the app-visibility list — there is nothing here that a second confirmation could protect.
+ */
+@Composable
+private fun CheckboxListDialog(title: String, rows: List<CheckboxRow>, onDismiss: () -> Unit) {
+    JetPrefAlertDialog(
+        title = title,
+        confirmLabel = stringRes(R.string.action__ok),
+        onConfirm = onDismiss,
+        onDismiss = onDismiss,
+    ) {
+        val scope = rememberCoroutineScope()
+        Column {
+            rows.forEach { row ->
+                val checked by row.pref.collectAsState()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .rippleClickable { scope.launch { row.pref.set(!checked) } }
+                        .padding(horizontal = 8.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(row.iconRes),
+                        contentDescription = null,
+                    )
+                    Text(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 16.dp),
+                        text = stringRes(row.labelRes),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                    Checkbox(checked = checked, onCheckedChange = null)
+                }
+            }
         }
     }
 }

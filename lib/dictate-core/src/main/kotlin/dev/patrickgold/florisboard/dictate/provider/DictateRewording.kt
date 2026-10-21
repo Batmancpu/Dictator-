@@ -35,6 +35,8 @@ object DictateRewording {
      * Runs auto-formatting (when [autoFormatting]) and then [autoApplyPrompts] over [transcript], using
      * [client]'s chat model [chatModel]. [languageName] is the readable language for the auto-formatting
      * hint; [systemPrompt] is the rewording system prompt (be-precise / custom) appended to each prompt.
+     * [reasoningEffort] goes out with every request, null omitting it — these paths have no reasoning
+     * setting of their own, so callers pass [ProviderPreset.reasoningEffortWhenOff].
      * Returns the final text (or [transcript] unchanged when nothing applies / everything fails).
      */
     suspend fun apply(
@@ -45,6 +47,7 @@ object DictateRewording {
         languageName: String?,
         systemPrompt: String?,
         autoApplyPrompts: List<Prompt>,
+        reasoningEffort: String? = null,
     ): String {
         if (transcript.isBlank()) return transcript
         var text = transcript
@@ -52,7 +55,8 @@ object DictateRewording {
         if (autoFormatting) {
             val formatPrompt = DictatePromptDefaults.buildAutoFormattingPrompt(languageName, text)
             text = runCatching {
-                client.complete(ChatRequest.ofUser(chatModel, formatPrompt)).text.trim().ifBlank { text }
+                client.complete(ChatRequest.ofUser(chatModel, formatPrompt, reasoningEffort))
+                    .text.trim().ifBlank { text }
             }.getOrDefault(text)
         }
 
@@ -71,7 +75,7 @@ object DictateRewording {
                 append("\n\n").append(text)
             }
             text = runCatching {
-                client.complete(ChatRequest.ofUser(chatModel, content)).text.trim().ifBlank { text }
+                client.complete(ChatRequest.ofUser(chatModel, content, reasoningEffort)).text.trim().ifBlank { text }
             }.getOrDefault(text)
         }
         return text

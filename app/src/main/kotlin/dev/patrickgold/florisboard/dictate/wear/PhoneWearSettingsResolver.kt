@@ -86,6 +86,7 @@ object PhoneWearSettingsResolver {
             // Rewording key only travels under the same opt-in as the transcription key.
             rewordingApiKey = if (syncKey) rewordingKey else "",
             rewordingApi = rewordingPreset.transcriptionApi,
+            rewordingReasoningEffort = rewordingPreset.reasoningEffortWhenOff(chatModel),
             systemPrompt = systemPrompt(prefs),
             autoApplyPrompts = autoApply,
             hapticFeedback = prefs.dictate.hapticFeedback.get(),

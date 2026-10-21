@@ -141,6 +141,7 @@
     <string name="settings__search__keywords__momentary_layer">утримати провести символ шар пунктуація тимчасово миттєво 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">емодзі ряд рядок панель нещодавні використані над клавіатурою швидкий</string>
     <string name="settings__search__keywords__request_timeout">час очікування таймаут повільно чекання зʼєднання секунди</string>
+    <string name="settings__search__keywords__floating_side_buttons">скасувати пауза призупинити продовжити відкинути</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Мови &amp; Розкладки</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Показувати назви мов у</string>
     <string name="settings__localization__group_subtypes__label" comment="Label of subtypes group">Підтипи</string>
@@ -1137,9 +1138,6 @@
     <string name="dictate__floating_button_apps_search">Пошук застосунків</string>
     <string name="dictate__floating_button_apps_none">Застосунків за запитом «{search_term}» не знайдено</string>
     <string name="dictate__floating_button_design_title">Стиль кнопки</string>
-    <string name="dictate__floating_button_haptic_summary_off">Без вібрації під час дотику.</string>
-    <string name="dictate__floating_button_haptic_summary_on">Коротка вібрація під час дотику до кнопки.</string>
-    <string name="dictate__floating_button_haptic_title">Вібрувати під час дотику</string>
     <string name="dictate__floating_button_no_prompts">Поки немає підказок для переформулювання — додайте їх у налаштуваннях Dictate.</string>
     <string name="dictate__floating_button_remember_position_summary_off">Одна спільна позиція для всіх застосунків.</string>
     <string name="dictate__floating_button_remember_position_summary_on">Кожен застосунок зберігає власну позицію кнопки.</string>
@@ -1623,9 +1621,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Диктовки лише вставляються, а не копіюються в буфер обміну.</string>
     <string name="dictate__floating_button_menu_group">Меню при утриманні</string>
     <string name="dictate__floating_button_menu_settings_title">Налаштування Dictate</string>
-    <string name="dictate__floating_button_undo_summary_off">Кнопку скасування не показано.</string>
-    <string name="dictate__floating_button_undo_summary_on">Після диктування поруч із кнопкою з\'являється кнопка скасування, яка одним дотиком видаляє вставлений текст.</string>
-    <string name="dictate__floating_button_undo_title">Кнопка скасування</string>
+    <string name="dictate__floating_button_side_buttons_title">Додаткові кнопки</string>
     <string name="dictate__mappings_add">Додати правило</string>
     <string name="dictate__mappings_editor_title">Правило заміни</string>
     <string name="dictate__mappings_empty_summary">Додайте правило для автозаміни слів або фраз у кожній розшифровці — точно, без токенів ШІ.</string>

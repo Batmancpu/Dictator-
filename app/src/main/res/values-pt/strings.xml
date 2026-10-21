@@ -144,6 +144,7 @@
     <string name="settings__search__keywords__momentary_layer">manter deslizar simbolo nivel pontuacao temporario momentaneo 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">emoji linha barra recentes usados acima teclado rápido</string>
     <string name="settings__search__keywords__request_timeout">tempo limite timeout lento espera ligação segundos</string>
+    <string name="settings__search__keywords__floating_side_buttons">anular cancelar pausa retomar descartar</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Idiomas e esquemas</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Mostrar nome dos idiomas em</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Mostrar as etiquetas do teclado no mesmo idioma</string>
@@ -1272,9 +1273,6 @@
     <string name="dictate__floating_button_apps_search">Procurar aplicações</string>
     <string name="dictate__floating_button_apps_none">Nenhuma aplicação encontrada para «{search_term}»</string>
     <string name="dictate__floating_button_design_title">Estilo do botão</string>
-    <string name="dictate__floating_button_haptic_summary_off">Sem vibração ao tocar.</string>
-    <string name="dictate__floating_button_haptic_summary_on">Uma breve vibração ao tocar no botão.</string>
-    <string name="dictate__floating_button_haptic_title">Vibrar ao tocar</string>
     <string name="dictate__floating_button_no_prompts">Ainda não há prompts de reformulação — adicione alguns nas definições do Dictate.</string>
     <string name="dictate__floating_button_remember_position_summary_off">Uma posição partilhada para todas as apps.</string>
     <string name="dictate__floating_button_remember_position_summary_on">Cada app mantém a sua própria posição do botão.</string>
@@ -1756,9 +1754,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Os ditados são apenas inseridos, não copiados para a área de transferência.</string>
     <string name="dictate__floating_button_menu_group">Menu ao manter premido</string>
     <string name="dictate__floating_button_menu_settings_title">Definições do Dictate</string>
-    <string name="dictate__floating_button_undo_summary_off">Não é mostrado nenhum botão para anular.</string>
-    <string name="dictate__floating_button_undo_summary_on">Após um ditado, surge um botão para anular junto ao botão, para remover o texto inserido com um só toque.</string>
-    <string name="dictate__floating_button_undo_title">Botão para anular</string>
+    <string name="dictate__floating_button_side_buttons_title">Botões adicionais</string>
     <string name="dictate__mappings_add">Adicionar substituição</string>
     <string name="dictate__mappings_editor_title">Substituição</string>
     <string name="dictate__mappings_empty_summary">Adicione uma regra para substituir palavras ou frases em cada transcrição — exato, sem tokens de IA.</string>

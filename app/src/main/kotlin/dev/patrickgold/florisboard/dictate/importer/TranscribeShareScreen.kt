@@ -731,9 +731,10 @@ private suspend fun rewordWith(context: Context, promptBody: String, transcript:
         trustUserCerts = account.trustUserCerts,
         timeoutSeconds = prefs.dictate.requestTimeout.get().toLong(),
     )
+    val chatModel = chatModelFor(account, preset)
     return DictateRewording.apply(
         client = client,
-        chatModel = chatModelFor(account, preset),
+        chatModel = chatModel,
         transcript = transcript,
         // The chosen prompt is the whole job here — no auto-formatting and no auto-apply chain, which
         // the transcript already went through if the user wanted them.
@@ -741,6 +742,7 @@ private suspend fun rewordWith(context: Context, promptBody: String, transcript:
         languageName = DictateLanguages.englishNameFor(prefs.dictate.activeInputLanguage.get()),
         systemPrompt = null,
         autoApplyPrompts = listOf(DictateRewording.Prompt(promptBody)),
+        reasoningEffort = preset.reasoningEffortWhenOff(chatModel),
     )
 }
 

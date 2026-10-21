@@ -129,6 +129,7 @@ object PhoneTranscriber {
             languageName = languageName,
             systemPrompt = systemPrompt,
             autoApplyPrompts = autoApply,
+            reasoningEffort = rewordingPreset.reasoningEffortWhenOff(chatModel),
         )
     }
 

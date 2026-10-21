@@ -187,6 +187,12 @@ data class DictateSyncedSettings(
     val rewordingBaseUrl: String = "",
     val rewordingApiKey: String = "",
     val rewordingApi: TranscriptionApi = TranscriptionApi.OPENAI_MULTIPART,
+    /**
+     * `reasoning_effort` for the standalone rewording requests ([ProviderPreset.reasoningEffortWhenOff]);
+     * null omits it. The watch has no preset to ask, so the phone asks for it. Optional both ways: an older
+     * watch ignores the key, and an older phone leaves it out.
+     */
+    val rewordingReasoningEffort: String? = null,
     /** Rewording system prompt (be-precise / custom), appended to each auto-apply prompt. */
     val systemPrompt: String? = null,
     /** The user's auto-apply prompts, in order, for the standalone rewording chain. */

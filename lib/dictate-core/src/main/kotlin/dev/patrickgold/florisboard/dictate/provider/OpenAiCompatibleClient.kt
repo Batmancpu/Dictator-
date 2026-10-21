@@ -84,23 +84,22 @@ class OpenAiCompatibleClient(
     }
 
     override suspend fun complete(request: ChatRequest): ChatResult {
-        // Skip reasoning_effort up-front for endpoint+model pairs already known to reject it, so we don't
-        // waste a doubled request on every rewording (#184/#186).
-        val key = "${config.normalizedBaseUrl}|${request.model}"
-        val effective = if (request.reasoningEffort != null && key in reasoningEffortUnsupported) {
-            request.copy(reasoningEffort = null)
-        } else {
-            request
-        }
+        // Send straight away what an earlier refusal from this endpoint and model taught us to send instead,
+        // so we don't waste a doubled request on every rewording (#184/#186).
+        val effective = request.copy(reasoningEffort = acceptedEffort(request.model, request.reasoningEffort))
+        // What the answer below was actually asked with, which the empty-answer retry has to judge by.
+        var sent = effective.reasoningEffort
         val first = try {
             completeOnce(effective)
         } catch (e: DictateApiException) {
             // Many models/endpoints reject `reasoning_effort`: it's an unknown option (#184), an
             // unsupported value such as "minimal" on Ollama (#186), or the model "does not support
-            // thinking" (#186). Rather than hard-fail the rewording, remember it and retry once without it.
-            if (effective.reasoningEffort != null && isReasoningEffortRejected(e)) {
-                reasoningEffortUnsupported.add(key)
-                completeOnce(effective.copy(reasoningEffort = null))
+            // thinking" (#186). Rather than hard-fail the rewording, remember it and retry once with what
+            // the provider said it takes, or without the field when it said nothing.
+            val rejected = effective.reasoningEffort
+            if (rejected != null && isReasoningEffortRejected(e)) {
+                sent = rememberRejection(effective.model, rejected, e)
+                completeOnce(effective.copy(reasoningEffort = sent))
             } else {
                 throw e
             }
@@ -113,13 +112,14 @@ class OpenAiCompatibleClient(
             // left to turn down — an answer that came back empty at "low" will not come back fuller at
             // "low" (issue #304).
             is Completion.Empty -> {
-                if (first.thoughtOnly && canLowerThinking(effective.reasoningEffort)) {
+                val floor = acceptedEffort(effective.model, THINKING_FLOOR)
+                if (first.thoughtOnly && canLowerThinking(sent) && floor != null) {
                     // Deliberately not runCatching: that also catches the CancellationException the stop
                     // button throws (#192), turning a cancelled dictation into a failed one.
                     val second = try {
-                        completeOnce(effective.copy(reasoningEffort = THINKING_FLOOR))
+                        completeOnce(effective.copy(reasoningEffort = floor))
                     } catch (e: DictateApiException) {
-                        if (isReasoningEffortRejected(e)) reasoningEffortUnsupported.add(key)
+                        if (isReasoningEffortRejected(e)) rememberRejection(effective.model, floor, e)
                         null
                     }
                     if (second is Completion.Answer) return second.result
@@ -151,6 +151,26 @@ class OpenAiCompatibleClient(
          * one distinction that decides whether asking again is worth anything.
          */
         data class Empty(val message: String, val thoughtOnly: Boolean) : Completion
+    }
+
+    private fun effortKey(model: String, effort: String) =
+        "${config.normalizedBaseUrl}|$model|${effort.trim().lowercase()}"
+
+    /**
+     * What to send for [effort] with [model]: the value itself, or whatever an earlier refusal of it by
+     * this endpoint put in its place — another value, or null for no field at all.
+     */
+    private fun acceptedEffort(model: String, effort: String?): String? {
+        effort ?: return null
+        val key = effortKey(model, effort)
+        return if (reasoningEffortSubstitutes.containsKey(key)) reasoningEffortSubstitutes[key] else effort
+    }
+
+    /** Records what replaces [rejected] from now on (see [nearestSupportedEffort]) and returns it. */
+    private fun rememberRejection(model: String, rejected: String, e: DictateApiException): String? {
+        val substitute = nearestSupportedEffort(rejected, e.message)
+        reasoningEffortSubstitutes[effortKey(model, rejected)] = substitute
+        return substitute
     }
 
     /** True when [e] looks like the provider rejecting the `reasoning_effort` field or its value. */
@@ -1891,11 +1911,40 @@ class OpenAiCompatibleClient(
             value.replace('\r', '_').replace('\n', '_').take(160)
 
         /**
-         * Endpoint+model pairs known to reject `reasoning_effort` (#184/#186). Remembered for the process
-         * lifetime so we omit the field up-front and don't waste a doubled request on every rewording.
+         * Endpoint+model+effort triples a provider refused (#184/#186), each with what goes out in its
+         * place — a value the provider named, or null for no field. Remembered for the process lifetime so
+         * the substitute goes out up-front and a rewording does not cost a doubled request every time.
          */
-        private val reasoningEffortUnsupported =
-            java.util.Collections.synchronizedSet(HashSet<String>())
+        private val reasoningEffortSubstitutes =
+            java.util.Collections.synchronizedMap(HashMap<String, String?>())
+
+        /** Every effort value this client knows of, least thinking first. */
+        private val EFFORT_SCALE = listOf("none", "minimal", "low", "medium", "high", "xhigh", "max")
+
+        /**
+         * The value to ask again with after [rejected] was refused: the one nearest to it among those the
+         * refusal names as supported, the lower one on a tie. Null when the refusal names none, or when
+         * [rejected] is a value of the user's own that sits nowhere on [EFFORT_SCALE] — then the field is
+         * left out, as it always was.
+         *
+         * The list is the provider's own answer, which is why it is read rather than assumed. Asked on
+         * 2026-10-16, OpenAI refused `minimal` on gpt-6-luna with "Supported values are: 'none', 'low',
+         * 'medium', 'high', and 'xhigh'.", and `none` as well as `minimal` on gpt-6.1-sol, whose list starts
+         * at 'low'. Leaving the field out instead had turned a request for the least thinking into the
+         * model's default, medium — the opposite of what was asked for.
+         */
+        internal fun nearestSupportedEffort(rejected: String, message: String?): String? {
+            val want = EFFORT_SCALE.indexOf(rejected.trim().lowercase())
+            // Only what follows the phrase: the refusal quotes the field and the rejected value first.
+            val at = message?.indexOf("supported values", ignoreCase = true) ?: -1
+            if (want < 0 || at < 0) return null
+            val supported = Regex("""'([A-Za-z]+)'""").findAll(message!!.substring(at))
+                .map { EFFORT_SCALE.indexOf(it.groupValues[1].lowercase()) }
+                .filter { it >= 0 && it != want }
+                .toList()
+            val nearest = supported.minWithOrNull(compareBy({ kotlin.math.abs(it - want) }, { it }))
+            return nearest?.let { EFFORT_SCALE[it] }
+        }
 
         /**
          * The effort a retry asks for after a model answered with nothing but thinking (#304).

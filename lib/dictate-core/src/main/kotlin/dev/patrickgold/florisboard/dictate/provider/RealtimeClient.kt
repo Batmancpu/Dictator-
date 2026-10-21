@@ -75,9 +75,9 @@ object RealtimeClient {
      * WebSocket address outright (Soniox, #403) — it is a sibling of the REST host, not a path under it,
      * so there is nothing to derive. Null, and every session goes where it always went.
      *
-     * [expectedLanguages] is read only by the three providers whose language field is a list (OpenAI's
-     * gpt-transcribe generation, Soniox, Gemini), and only when no language is pinned: it turns
-     * auto-detect into detection among the languages the user dictates in (issue #99).
+     * [expectedLanguages] is read only by the providers whose language field is a list (OpenAI's
+     * gpt-transcribe generation, Soniox, Gemini, AssemblyAI's Pro model), and only when no language is
+     * pinned: it turns auto-detect into detection among the languages the user dictates in (issue #99).
      */
     fun open(
         api: RealtimeApi,
@@ -95,7 +95,9 @@ object RealtimeClient {
         RealtimeApi.SONIOX ->
             SonioxRealtimeSession(wsClient, apiKey, model, language, callbacks, baseUrl, expectedLanguages)
                 .also { it.connect() }
-        RealtimeApi.ASSEMBLYAI -> AssemblyAiRealtimeSession(wsClient, apiKey, model, language, callbacks).also { it.connect() }
+        RealtimeApi.ASSEMBLYAI ->
+            AssemblyAiRealtimeSession(wsClient, apiKey, model, language, callbacks, expectedLanguages)
+                .also { it.connect() }
         RealtimeApi.ELEVENLABS -> ElevenLabsRealtimeSession(wsClient, apiKey, model, language, callbacks).also { it.connect() }
         RealtimeApi.GEMINI ->
             GeminiRealtimeSession(wsClient, apiKey, model, language, callbacks, expectedLanguages)
@@ -409,30 +411,85 @@ private class SonioxRealtimeSession(
 }
 
 /**
- * AssemblyAI Universal Streaming over `wss://streaming.assemblyai.com/v3/ws` (config in query params, raw
- * key in the `Authorization` header — no "Bearer"). Streams 16 kHz mono PCM16 as raw binary frames. `Turn`
- * messages carry the current turn text in `transcript`; `end_of_turn` finalizes it. `format_turns` is off
- * (our rewording stage formats), so each turn produces one clean final. `finish()` sends `Terminate`.
+ * AssemblyAI streaming over `wss://streaming.assemblyai.com/v3/ws` (config in query params, raw key in the
+ * `Authorization` header — no "Bearer"). Streams 16 kHz mono PCM16 as raw binary frames. `Turn` messages
+ * carry the whole turn so far in `transcript`; `end_of_turn` finalizes it. `finish()` sends `Terminate`,
+ * which settles the turn in progress before `Termination` (measured 2026-10-20: the final lands ~0.15 s
+ * after it, so no `ForceEndpoint` is needed).
+ *
+ * The model is always named. Until it was, the server picked — English-only Universal-Streaming when this
+ * was written, Universal-3.6 Pro since AssemblyAI moved its default — and the realtime field in the
+ * provider dialog changed nothing at all.
  */
-private class AssemblyAiRealtimeSession(
+internal class AssemblyAiRealtimeSession(
     private val client: OkHttpClient,
     private val apiKey: String,
-    private val model: String,
-    private val language: String?,
+    model: String,
+    language: String?,
     private val callbacks: RealtimeCallbacks,
+    expectedLanguages: List<String> = emptyList(),
+    /** The socket address without its query — AssemblyAI's own, except in tests. */
+    private val endpoint: String = URL,
 ) : RealtimeSession {
+
+    // Blank, or the id this preset used to show: neither is a value the server accepts (it refuses the
+    // session with error 3006), and both meant "the provider's default".
+    private val speechModel = model.trim().takeUnless { it.isEmpty() || it == LEGACY_MODEL_ID }
+        ?: ProviderRegistry.ASSEMBLYAI.defaultRealtimeModel.orEmpty()
+
+    // One code the model does not know fails the whole session, so the list is cut to the ones it does.
+    private val languageCodes = if (speechModel in MULTILINGUAL_PRO_MODELS) {
+        languageHintsOf(language, expectedLanguages)
+            .map { it.substringBefore('-').lowercase() }
+            .filter { it in PRO_LANGUAGE_CODES }
+            .distinct()
+    } else {
+        emptyList()
+    }
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
     private var ws: WebSocket? = null
     @Volatile private var done = false
 
-    private companion object {
-        const val URL = "wss://streaming.assemblyai.com/v3/ws?sample_rate=16000&encoding=pcm_s16le"
+    internal companion object {
+        const val URL = "wss://streaming.assemblyai.com/v3/ws"
+
+        /** What this preset listed before it named a model; never a valid `speech_model`. */
+        const val LEGACY_MODEL_ID = "universal-streaming"
+
+        /** The models that take `language_codes` with exactly [PRO_LANGUAGE_CODES]. */
+        val MULTILINGUAL_PRO_MODELS = setOf("universal-3-6-pro")
+
+        /**
+         * Universal-3.6 Pro's languages, as the endpoint lists them when it refuses an unknown one
+         * (2026-10-20). Its docs say 32; the list is 32 plus `multi`, which means nothing to us.
+         */
+        val PRO_LANGUAGE_CODES = setOf(
+            "en", "es", "de", "fr", "it", "pt", "tr", "nl", "sv", "no", "da", "fi", "hi", "vi", "ar", "he",
+            "ja", "ur", "zh", "ru", "ko", "ca", "gl", "ro", "et", "fa", "yue", "af", "mr", "zu", "xh", "nn",
+        )
+
+        /**
+         * The older Universal-Streaming models return lower case without punctuation unless asked; the Pro
+         * models always format and refuse the switch. Measured: one formatted final per turn, not two.
+         */
+        val FORMAT_TURNS_MODELS = setOf("universal-streaming-english", "universal-streaming-multilingual")
+    }
+
+    /** The socket URL with the session's configuration in its query. */
+    internal fun url(): String = buildString {
+        append(endpoint).append("?sample_rate=16000&encoding=pcm_s16le")
+        if (speechModel.isNotEmpty()) append("&speech_model=").append(URLEncoder.encode(speechModel, "UTF-8"))
+        // A JSON array: "fr,de" would be read as one code and refused.
+        if (languageCodes.isNotEmpty()) {
+            val list = buildJsonArray { languageCodes.forEach { add(it) } }.toString()
+            append("&language_codes=").append(URLEncoder.encode(list, "UTF-8"))
+        }
+        if (speechModel in FORMAT_TURNS_MODELS) append("&format_turns=true")
     }
 
     fun connect() {
-        // Universal Streaming is selected by the /v3/ws endpoint itself; the raw key goes in Authorization.
-        val request = Request.Builder().url(URL).header("Authorization", apiKey).build()
+        val request = Request.Builder().url(url()).header("Authorization", apiKey).build()
         ws = client.newWebSocket(request, listener)
     }
 
@@ -450,13 +507,30 @@ private class AssemblyAiRealtimeSession(
                     }
                 }
                 "Termination" -> finishClosed(webSocket)
+                // A refused session (unknown model or language, no credit) says why here and then closes
+                // with a 3xxx code. Unheard, the dictation sat on an empty stream until stop.
+                "Error" -> emitError(
+                    RuntimeException("AssemblyAI realtime error: ${obj["error"]?.jsonPrimitive?.contentOrNull ?: obj}"),
+                )
             }
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+            if (done) return   // our own cancel() after an error or a stop
             android.util.Log.w("DictateRT", "assemblyai realtime WS failed (http=${response?.code}): ${t.message}")
             emitError(t)
         }
+
+        // The server ends a session it refuses with its own close frame; OkHttp waits for ours before it
+        // reports onClosed, so without this a close that came without an Error message went unnoticed too.
+        override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+            if (code == 1000) {
+                finishClosed(webSocket)
+            } else {
+                emitError(RuntimeException("AssemblyAI closed the realtime stream ($code): $reason"))
+            }
+        }
+
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) = finishClosed(webSocket)
     }
 

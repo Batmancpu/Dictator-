@@ -247,11 +247,13 @@ fun singleCallApplies(transcriptionViaChat: Boolean, preset: ProviderPreset, mod
  * fold leaves blank forever, so every rewording went to the preset default and no setting could change
  * it. So the merged field wins when it holds something ([sharedSingleCallModel]); otherwise the rewording
  * field's own value, and failing that the preset default — which is what an empty box has always meant.
+ * A preset without one (a server of the user's own) is asked for whatever OpenAI's default is: read from
+ * that preset rather than spelled out here, where a copy of `gpt-4o-mini` outlived its retirement notice.
  */
 fun chatModelFor(
     account: ProviderAccount,
     preset: ProviderPreset,
-    fallback: String = "gpt-4o-mini",
+    fallback: String = ProviderRegistry.OPENAI.defaultChatModel.orEmpty(),
 ): String {
     sharedSingleCallModel(account)?.let { return it }
     return account.chatModel.ifBlank { preset.defaultChatModel ?: fallback }

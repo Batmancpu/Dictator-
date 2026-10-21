@@ -149,6 +149,7 @@
     <string name="settings__search__keywords__momentary_layer">przytrzymaj przesuń symbol warstwa interpunkcja tymczasowo chwilowo 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">emoji rząd pasek ostatnio używane nad klawiaturą szybki</string>
     <string name="settings__search__keywords__request_timeout">limit czasu timeout wolno czekanie połączenie sekundy</string>
+    <string name="settings__search__keywords__floating_side_buttons">cofnij anuluj pauza wstrzymaj wznów odrzuć</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Język i układ</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Wyświetla nazwy języków w</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Wyświetlaj etykiety klawiatury w języku podtypu</string>
@@ -1309,9 +1310,6 @@
     <string name="dictate__floating_button_apps_search">Szukaj aplikacji</string>
     <string name="dictate__floating_button_apps_none">Nie znaleziono aplikacji dla „{search_term}”</string>
     <string name="dictate__floating_button_design_title">Styl przycisku</string>
-    <string name="dictate__floating_button_haptic_summary_off">Bez wibracji po dotknięciu.</string>
-    <string name="dictate__floating_button_haptic_summary_on">Krótka wibracja po dotknięciu przycisku.</string>
-    <string name="dictate__floating_button_haptic_title">Wibracja po dotknięciu</string>
     <string name="dictate__floating_button_no_prompts">Brak jeszcze monitów do przeredagowania — dodaj je w ustawieniach Dictate.</string>
     <string name="dictate__floating_button_remember_position_summary_off">Jedna wspólna pozycja dla wszystkich aplikacji.</string>
     <string name="dictate__floating_button_remember_position_summary_on">Każda aplikacja zachowuje własną pozycję przycisku.</string>
@@ -1795,9 +1793,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Dyktowania są tylko wstawiane, nie kopiowane do schowka.</string>
     <string name="dictate__floating_button_menu_group">Menu po przytrzymaniu</string>
     <string name="dictate__floating_button_menu_settings_title">Ustawienia Dictate</string>
-    <string name="dictate__floating_button_undo_summary_off">Nie wyświetlono przycisku cofania.</string>
-    <string name="dictate__floating_button_undo_summary_on">Po dyktowaniu obok przycisku pojawia się przycisk cofania, który jednym dotknięciem usuwa wstawiony tekst.</string>
-    <string name="dictate__floating_button_undo_title">Przycisk cofania</string>
+    <string name="dictate__floating_button_side_buttons_title">Dodatkowe przyciski</string>
     <string name="dictate__mappings_add">Dodaj mapowanie</string>
     <string name="dictate__mappings_editor_title">Mapowanie</string>
     <string name="dictate__mappings_empty_summary">Dodaj regułę, aby automatycznie zastępować słowa lub frazy w każdej transkrypcji — dokładnie, bez tokenów AI.</string>

@@ -143,6 +143,7 @@ object WearTranscription {
             languageName = settings.languageName,
             systemPrompt = settings.systemPrompt,
             autoApplyPrompts = prompts,
+            reasoningEffort = settings.rewordingReasoningEffort,
         )
     }
 

@@ -323,6 +323,11 @@ fun ComputingEvaluator.computeImageVector(data: KeyData): ImageVector? {
                 }
             }
         }
+        // Always the return arrow, whatever the field's own action: this variant never sends, searches or
+        // moves on — it presses Enter, which is what the arrow means on a keyboard.
+        KeyCode.ENTER_KEY_PRESS -> {
+            Icons.AutoMirrored.Filled.KeyboardReturn
+        }
         KeyCode.FORWARD_DELETE -> {
             Icons.AutoMirrored.Default.ForwardDelete
         }

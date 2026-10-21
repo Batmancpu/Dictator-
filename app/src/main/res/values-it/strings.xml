@@ -142,6 +142,7 @@
     <string name="settings__search__keywords__momentary_layer">tenere premuto scorrere simbolo livello punteggiatura temporaneo momentaneo 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">emoji riga barra recenti usate sopra tastiera rapido</string>
     <string name="settings__search__keywords__request_timeout">timeout tempo scaduto lento attesa connessione secondi</string>
+    <string name="settings__search__keywords__floating_side_buttons">annulla pausa riprendi interrompi scarta</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Lingue &amp; Layout</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Visualizza i nomi delle lingue in</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Visualizza le etichette della tastiera nella lingua secondaria</string>
@@ -1075,9 +1076,6 @@
     <string name="dictate__floating_button_apps_search">Cerca app</string>
     <string name="dictate__floating_button_apps_none">Nessuna app trovata per «{search_term}»</string>
     <string name="dictate__floating_button_design_title">Stile del pulsante</string>
-    <string name="dictate__floating_button_haptic_summary_off">Nessuna vibrazione al tocco.</string>
-    <string name="dictate__floating_button_haptic_summary_on">Una breve vibrazione quando tocchi il pulsante.</string>
-    <string name="dictate__floating_button_haptic_title">Vibra al tocco</string>
     <string name="dictate__floating_button_no_prompts">Ancora nessun prompt di riformulazione: aggiungine nelle impostazioni di Dictate.</string>
     <string name="dictate__floating_button_remember_position_summary_off">Una posizione condivisa per tutte le app.</string>
     <string name="dictate__floating_button_remember_position_summary_on">Ogni app mantiene la propria posizione del pulsante.</string>
@@ -1559,9 +1557,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Le dettature vengono solo inserite, non copiate negli appunti.</string>
     <string name="dictate__floating_button_menu_group">Menu a pressione prolungata</string>
     <string name="dictate__floating_button_menu_settings_title">Impostazioni di Dictate</string>
-    <string name="dictate__floating_button_undo_summary_off">Nessun pulsante di annullamento mostrato.</string>
-    <string name="dictate__floating_button_undo_summary_on">Dopo una dettatura, accanto al pulsante compare un pulsante di annullamento per rimuovere il testo inserito con un solo tocco.</string>
-    <string name="dictate__floating_button_undo_title">Pulsante di annullamento</string>
+    <string name="dictate__floating_button_side_buttons_title">Pulsanti aggiuntivi</string>
     <string name="dictate__mappings_add">Aggiungi regola</string>
     <string name="dictate__mappings_editor_title">Regola</string>
     <string name="dictate__mappings_empty_summary">Aggiungi una regola per sostituire parole o frasi in ogni trascrizione — esatto, senza token IA.</string>

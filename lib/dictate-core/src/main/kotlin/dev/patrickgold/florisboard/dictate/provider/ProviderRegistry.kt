@@ -61,6 +61,17 @@ data class ProviderPreset(
      */
     val apiKeyUrl: String? = null,
     val defaultChatModel: String? = null,
+    /**
+     * The `reasoning_effort` [defaultChatModel] runs at while the user's own setting is Off — a fact
+     * about that one model, measured, never a guess about what models in general can take.
+     *
+     * Off omits the field and leaves the effort to the provider, and for a reasoning model the provider's
+     * default is rarely what a rewording wants: OpenAI's gpt-6-luna thinks at medium unless told
+     * otherwise, which made a one-sentence correction twice as slow and multiplied its output tokens.
+     * Applies only while that exact model is the one in use ([reasoningEffortWhenOff]); a model the user
+     * picked runs at whatever their setting says.
+     */
+    val defaultChatReasoningEffort: String? = null,
     val defaultTranscriptionModel: String? = null,
     val extraHeaders: Map<String, String> = emptyMap(),
     val isCustom: Boolean = false,
@@ -121,6 +132,10 @@ data class ProviderPreset(
     /** Whether the audio and text can stay in the EU with this provider — by default, or by region. */
     val servesFromEu: Boolean
         get() = hostedInEu || regions.any { it.id == "eu" }
+
+    /** The effort to send with [model] when the user's setting is Off; null leaves it to the provider. */
+    fun reasoningEffortWhenOff(model: String): String? =
+        defaultChatReasoningEffort?.takeIf { model == defaultChatModel }
 }
 
 /**
@@ -139,18 +154,35 @@ object ProviderRegistry {
         capabilities = CHAT_AND_STT,
         supportsDynamicModels = true,
         apiKeyUrl = "https://platform.openai.com/api-keys",
-        defaultChatModel = "gpt-4o-mini",
+        // OpenAI announced on 2026-10-14 that gpt-4o, gpt-4o-mini, gpt-4.1 and gpt-4.1-mini leave the API
+        // on 2027-01-14, and gpt-4.1-nano goes sooner, on 2026-10-23; all five were this list, and the first
+        // was the default (deprecations page, read 2026-10-16). gpt-6-luna is the replacement OpenAI names
+        // for every one of them and also the cheapest model it sells ($0.10 in / $0.50 out per 1M tokens,
+        // against gpt-4o-mini's $0.15 / $0.60). Like the transcription default below, it reaches everyone
+        // who never chose a model; an explicit choice is stored verbatim and left alone.
+        defaultChatModel = "gpt-6-luna",
+        // Unlike gpt-4o-mini, Luna is a reasoning model, and with the field omitted it thinks at medium.
+        // Measured 2026-10-16 with the app's own requests, five runs each:
+        //     Fix Grammar, one sentence     omitted ~2.0 s, 85-145 reasoning tokens   none ~0.9 s, 0
+        //     auto-formatting, spoken cues  omitted 2.5-7.2 s, up to 620 tokens       none 1.0-1.5 s, 0
+        // At none it set list and paragraph cues as reliably as gpt-4o-mini, and like gpt-4o-mini (every
+        // run) it left a spelling cue standing ("Meyer with a y"), which medium resolved four times in
+        // five. Today's results at today's speed beat a slightly better guess at five times the wait, so
+        // the default runs at none; the emulator showed the same, 1.1-1.6 s against 3.3-4.8 s at medium.
+        // "minimal" is no option: Luna refuses it with a 400, and gpt-6.1-sol refuses none as well.
+        defaultChatReasoningEffort = "none",
         // gpt-transcribe (2026-07) is both cheaper than gpt-4o-transcribe ($0.0045 vs $0.006 per minute)
         // and markedly more accurate, so it is the default. This applies to everyone who never chose a
         // model — the account stores an empty string in that case and resolves through here on every
         // call, so existing installs move to it too. An explicit choice is stored verbatim and untouched.
         defaultTranscriptionModel = "gpt-transcribe",
-        curatedChatModels = listOf(
-            "gpt-4o-mini", "gpt-4o", "gpt-4.1-mini", "gpt-4.1", "gpt-4.1-nano",
-        ),
-        curatedTranscriptionModels = listOf(
-            "gpt-transcribe", "gpt-4o-mini-transcribe", "gpt-4o-transcribe", "whisper-1",
-        ),
+        // gpt-6-astra, the third of the current line, is left to the live catalog: at a hundred times
+        // Luna's price it buys nothing a correction or a rephrasing needs.
+        curatedChatModels = listOf("gpt-6-luna", "gpt-6.1-sol"),
+        // whisper-1, gpt-4o-transcribe and gpt-4o-mini-transcribe leave the API on 2027-02-26 (announced
+        // 2026-08-26). Until then they still come up in the live catalog for whoever wants them; they are
+        // just no longer offered as a starting point.
+        curatedTranscriptionModels = listOf("gpt-transcribe"),
         // The guide lists mp3, mp4, mpeg, mpga, m4a, wav, webm; the API reference adds flac and ogg.
         // Rather than pick a page, the endpoint was asked directly on 2026-09-04 with the same Ogg/Opus
         // bytes twice, same `audio/ogg` part type, only the file NAME differing:
@@ -171,9 +203,9 @@ object ProviderRegistry {
         supportsRealtime = true,
         realtimeApi = RealtimeApi.OPENAI,
         defaultRealtimeModel = "gpt-live-transcribe",
+        // The two gpt-4o transcribers went with the batch list above, for the same 2027-02-26 date.
         curatedRealtimeModels = listOf(
             "gpt-live-transcribe", "gpt-realtime-whisper", "gpt-transcribe",
-            "gpt-4o-transcribe", "gpt-4o-mini-transcribe",
         ),
     )
 
@@ -269,8 +301,13 @@ object ProviderRegistry {
         supportsDynamicModels = true,
         apiKeyUrl = "https://openrouter.ai/keys",
         // OpenRouter exposes hundreds of models (incl. Claude, Gemini, Llama …); users pick from the
-        // live catalog. This is just a safe default to start with and is fully user-overridable.
-        defaultChatModel = "openai/gpt-4o-mini",
+        // live catalog. This is just a safe default to start with and is fully user-overridable. It follows
+        // the OpenAI preset off gpt-4o-mini, whose only upstream is OpenAI and which leaves its API on
+        // 2027-01-14; openai/gpt-6-luna is in OpenRouter's public catalog at the same $0.10 / $0.50
+        // (read 2026-10-16). No [defaultChatReasoningEffort] here: OpenRouter documents its own nested
+        // `reasoning` object and maps efforts to the nearest supported level, and whether it reads the
+        // top-level field this client sends has not been measured.
+        defaultChatModel = "openai/gpt-6-luna",
         // gpt-transcribe is the same model the OpenAI preset defaults to, which is the point: one model
         // behaving one way across providers, already exercised by this app. It is also the only entry
         // below that OpenRouter does not route — OpenAI is its sole upstream, so nobody's dictation
@@ -561,12 +598,19 @@ object ProviderRegistry {
         apiKeyUrl = "https://www.assemblyai.com/dashboard/api-keys",
         defaultTranscriptionModel = "universal-3-pro",
         curatedTranscriptionModels = listOf("universal-3-pro", "universal-2"),
-        // Realtime (#128): Universal-Streaming wss streaming.assemblyai.com/v3/ws (~300ms). Model ids
-        // verified when the session is built (billed by connection-open duration).
+        // Realtime (#128) over wss streaming.assemblyai.com/v3/ws, billed by connection-open duration.
+        // Ids from the endpoint's own list of accepted `speech_model` values (2026-10-20). 3.6 Pro covers
+        // 32 languages and formats its text ($0.45/h); the two Universal-Streaming models are the
+        // cheaper tier ($0.15/h) for English, or English, Spanish, German, French, Portuguese and Italian.
+        // 3.5 Pro is left out: superseded by 3.6, and it refuses some of the language codes 3.6 takes.
         supportsRealtime = true,
         realtimeApi = RealtimeApi.ASSEMBLYAI,
-        defaultRealtimeModel = "universal-streaming",
-        curatedRealtimeModels = listOf("universal-streaming"),
+        defaultRealtimeModel = "universal-3-6-pro",
+        curatedRealtimeModels = listOf(
+            "universal-3-6-pro",
+            "universal-streaming-multilingual",
+            "universal-streaming-english",
+        ),
     )
 
     /**

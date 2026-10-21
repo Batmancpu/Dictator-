@@ -129,6 +129,8 @@ class ChatModelForTest {
         // the phone never intended to use.
         val soniox = ProviderRegistry.SONIOX
         assertEquals("", chatModelFor(account(), soniox, fallback = ""))
-        assertEquals("gpt-4o-mini", chatModelFor(account(), soniox))
+        // Otherwise OpenAI's own default, read from its preset so a retirement there cannot leave a stale
+        // copy here, as gpt-4o-mini once was.
+        assertEquals("gpt-6-luna", chatModelFor(account(), soniox))
     }
 }

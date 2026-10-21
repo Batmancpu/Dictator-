@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Voice input IME (issue #67): a single voice subtype so AOSP-lineage keyboards' mic key can switch
-     to Dictate as the voice input method. -->
+     to Dictate as the voice input method.
+
+     overridesImplicitlyEnabledSubtype is what makes it findable on a phone that is not set to English.
+     Those keyboards ask InputMethodManager.getShortcutInputMethodsAndSubtypes(), which only looks at
+     an IME's *enabled* subtypes, and with none chosen by hand those are the implicitly applicable ones:
+     for a voice subtype, only the ones whose language is among the system languages (AOSP SubtypeUtils,
+     read 2026-10-20 for Android 14 and 15). With "en_US" alone and German as the only system language
+     Dictate was not a voice input at all — HeliBoard hid its mic key, AOSP's did nothing when tapped
+     (reproduced on the emulator, e-mail 2026-10-20). The flag makes the subtype applicable whatever
+     the system languages are. The locale stays: the subtype's language is not what the engine dictates
+     in, which is set in Dictate. -->
 <input-method xmlns:android="http://schemas.android.com/apk/res/android">
     <subtype
         android:label="@string/dictate__title"
         android:imeSubtypeMode="voice"
-        android:imeSubtypeLocale="en_US" />
+        android:imeSubtypeLocale="en_US"
+        android:overridesImplicitlyEnabledSubtype="true" />
 </input-method>

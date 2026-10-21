@@ -577,6 +577,68 @@ class OpenAiCompatibleClientNetworkTest : FunSpec({
         }
     }
 
+    // The refusals below are OpenAI's own, verbatim, from 2026-10-16. Leaving the field out after them gave
+    // the model its default, medium — the opposite of the least thinking that "minimal" asked for.
+    fun refusal(value: String, supported: String) = MockResponse().setResponseCode(400).setBody(
+        """{"error":{"message":"Unsupported value: 'reasoning_effort' does not support '$value' with this """ +
+            """model. Supported values are: $supported.","type":"invalid_request_error",""" +
+            """"param":"reasoning_effort","code":"unsupported_value"}}""",
+    )
+
+    test("a refused effort is asked again at the nearest one the provider names, and from then on at once") {
+        MockWebServer().use { server ->
+            server.enqueue(refusal("minimal", "'none', 'low', 'medium', 'high', and 'xhigh'"))
+            repeat(2) {
+                server.enqueue(
+                    MockResponse().setResponseCode(200).setBody("""{"choices":[{"message":{"content":"Hi."}}]}"""),
+                )
+            }
+            val client = OpenAiCompatibleClient(
+                ProviderConfig(baseUrl = server.url("/v1/").toString(), apiKey = "test"),
+            )
+            val request = ChatRequest.ofUser("gpt-6-luna", "Fix my typos", reasoningEffort = "minimal")
+
+            client.complete(request).text shouldBe "Hi."
+            client.complete(request).text shouldBe "Hi."
+
+            server.takeRequest().body.readUtf8() shouldContain "\"reasoning_effort\":\"minimal\""
+            server.takeRequest().body.readUtf8() shouldContain "\"reasoning_effort\":\"none\""
+            server.takeRequest().body.readUtf8() shouldContain "\"reasoning_effort\":\"none\""
+            server.requestCount shouldBe 3
+        }
+    }
+
+    test("a refused none goes up to the lowest effort the model takes") {
+        MockWebServer().use { server ->
+            server.enqueue(refusal("none", "'low', 'medium', 'high', and 'xhigh'"))
+            server.enqueue(
+                MockResponse().setResponseCode(200).setBody("""{"choices":[{"message":{"content":"Hi."}}]}"""),
+            )
+            val client = OpenAiCompatibleClient(
+                ProviderConfig(baseUrl = server.url("/v1/").toString(), apiKey = "test"),
+            )
+
+            client.complete(ChatRequest.ofUser("gpt-6.1-sol", "Fix my typos", reasoningEffort = "none"))
+                .text shouldBe "Hi."
+
+            server.takeRequest()
+            server.takeRequest().body.readUtf8() shouldContain "\"reasoning_effort\":\"low\""
+        }
+    }
+
+    test("the nearest supported effort: ties go lower, and nothing is made up") {
+        val luna = "Supported values are: 'none', 'low', 'medium', 'high', and 'xhigh'."
+        OpenAiCompatibleClient.nearestSupportedEffort("minimal", luna) shouldBe "none"
+        OpenAiCompatibleClient.nearestSupportedEffort("max", luna) shouldBe "xhigh"
+        OpenAiCompatibleClient.nearestSupportedEffort("Minimal ", luna) shouldBe "none"
+        // A value of the user's own (Custom) has no place on the scale to be near to.
+        OpenAiCompatibleClient.nearestSupportedEffort("turbo", luna) shouldBe null
+        // A refusal that names no list leaves the field out, as before.
+        OpenAiCompatibleClient.nearestSupportedEffort("minimal", "`reasoning_effort` is not supported") shouldBe
+            null
+        OpenAiCompatibleClient.nearestSupportedEffort("minimal", null) shouldBe null
+    }
+
     test("only a refusal loses its retries; a busy server, a lost connection and a 408 keep them") {
         fun http(status: Int) = DictateApiException.fromHttp(status, "Something went wrong")
 

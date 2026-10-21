@@ -145,6 +145,7 @@
     <string name="settings__search__keywords__momentary_layer">mantener deslizar simbolo capa puntuacion temporal momentaneo 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">emoji fila barra recientes usados encima teclado rápido</string>
     <string name="settings__search__keywords__request_timeout">tiempo de espera timeout lento esperar conexión segundos</string>
+    <string name="settings__search__keywords__floating_side_buttons">deshacer cancelar pausa pausar reanudar descartar</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Idiomas &amp; Distribuciones</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Muestra nombres de idiomas en</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Mostrar las etiquetas del teclado en mismo idioma</string>
@@ -1274,9 +1275,6 @@
     <string name="dictate__floating_button_apps_search">Buscar aplicaciones</string>
     <string name="dictate__floating_button_apps_none">No se encontró ninguna aplicación para «{search_term}»</string>
     <string name="dictate__floating_button_design_title">Estilo del botón</string>
-    <string name="dictate__floating_button_haptic_summary_off">Sin vibración al tocar.</string>
-    <string name="dictate__floating_button_haptic_summary_on">Una breve vibración al tocar el botón.</string>
-    <string name="dictate__floating_button_haptic_title">Vibrar al tocar</string>
     <string name="dictate__floating_button_no_prompts">Aún no hay prompts de reformulación: añade algunos en los ajustes de Dictate.</string>
     <string name="dictate__floating_button_remember_position_summary_off">Una posición compartida para todas las apps.</string>
     <string name="dictate__floating_button_remember_position_summary_on">Cada app conserva su propia posición del botón.</string>
@@ -1758,9 +1756,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Los dictados solo se insertan, no se copian al portapapeles.</string>
     <string name="dictate__floating_button_menu_group">Menú al mantener pulsado</string>
     <string name="dictate__floating_button_menu_settings_title">Ajustes de Dictate</string>
-    <string name="dictate__floating_button_undo_summary_off">No se muestra ningún botón para deshacer.</string>
-    <string name="dictate__floating_button_undo_summary_on">Tras un dictado, aparece un botón para deshacer junto al botón que permite eliminar el texto insertado con un solo toque.</string>
-    <string name="dictate__floating_button_undo_title">Botón para deshacer</string>
+    <string name="dictate__floating_button_side_buttons_title">Botones adicionales</string>
     <string name="dictate__mappings_add">Añadir asignación</string>
     <string name="dictate__mappings_editor_title">Asignación</string>
     <string name="dictate__mappings_empty_summary">Añade una regla para reemplazar palabras o frases en cada transcripción — exacto, sin tokens de IA.</string>

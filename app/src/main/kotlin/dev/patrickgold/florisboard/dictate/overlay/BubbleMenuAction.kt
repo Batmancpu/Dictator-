@@ -31,12 +31,19 @@ enum class BubbleMenuAction(
     @StringRes val labelRes: Int,
     @DrawableRes val iconRes: Int,
 ) {
+    /**
+     * Not one row but one per transcription language (discussion #454), the active one ticked — and none
+     * at all while there is only one language to choose from. First, because it changes what the next
+     * dictation will be, while the entries after it leave the button.
+     */
+    LANGUAGE(R.string.dictate__languages_active_title, R.drawable.ic_dictate_language),
     TRANSCRIBE_FILE(R.string.dictate__import_menu, R.drawable.ic_dictate_audio_file),
     HISTORY(R.string.dictate__history_title, R.drawable.ic_dictate_history),
     SETTINGS(R.string.dictate__floating_button_menu_settings_title, R.drawable.ic_dictate_tune);
 
     /** Whether this entry is in the menu. */
     fun pref(prefs: FlorisPreferenceModel): PreferenceData<Boolean> = when (this) {
+        LANGUAGE -> prefs.dictate.floatingButtonMenuLanguage
         TRANSCRIBE_FILE -> prefs.dictate.floatingButtonMenuTranscribeFile
         HISTORY -> prefs.dictate.floatingButtonMenuHistory
         SETTINGS -> prefs.dictate.floatingButtonMenuSettings

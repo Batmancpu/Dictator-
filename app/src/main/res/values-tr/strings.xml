@@ -146,6 +146,7 @@
     <string name="settings__search__keywords__momentary_layer">basılı tut kaydır sembol katman noktalama geçici anlık 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">emoji satır şerit son kullanılan klavye üstünde hızlı</string>
     <string name="settings__search__keywords__request_timeout">zaman aşımı yavaş bekleme bağlantı saniye</string>
+    <string name="settings__search__keywords__floating_side_buttons">geri al iptal duraklat devam vazgeç</string>
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Diller &amp; Düzenler</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Dil adlarını şu dilde göster</string>
     <string name="settings__localization__display_keyboard_labels_in_subtype_language" comment="Label of Display keyboard labels in subtype language preference">Klavye etiketlerini alt tür dilinde göster</string>
@@ -1271,9 +1272,6 @@
     <string name="dictate__floating_button_apps_search">Uygulama ara</string>
     <string name="dictate__floating_button_apps_none">“{search_term}” için uygulama bulunamadı</string>
     <string name="dictate__floating_button_design_title">Düğme stili</string>
-    <string name="dictate__floating_button_haptic_summary_off">Dokununca titreşim yok.</string>
-    <string name="dictate__floating_button_haptic_summary_on">Düğmeye dokununca kısa bir titreşim.</string>
-    <string name="dictate__floating_button_haptic_title">Dokununca titreşim</string>
     <string name="dictate__floating_button_no_prompts">Henüz yeniden ifade istemi yok — Dictate ayarlarından ekleyin.</string>
     <string name="dictate__floating_button_remember_position_summary_off">Tüm uygulamalar için tek ortak konum.</string>
     <string name="dictate__floating_button_remember_position_summary_on">Her uygulama kendi düğme konumunu korur.</string>
@@ -1755,9 +1753,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Dikteler yalnızca eklenir, panoya kopyalanmaz.</string>
     <string name="dictate__floating_button_menu_group">Basılı tutma menüsü</string>
     <string name="dictate__floating_button_menu_settings_title">Dictate ayarları</string>
-    <string name="dictate__floating_button_undo_summary_off">Geri alma düğmesi gösterilmiyor.</string>
-    <string name="dictate__floating_button_undo_summary_on">Bir dikteden sonra, eklenen metni tek dokunuşla kaldırmak için düğmenin yanında bir geri alma düğmesi belirir.</string>
-    <string name="dictate__floating_button_undo_title">Geri alma düğmesi</string>
+    <string name="dictate__floating_button_side_buttons_title">Ek düğmeler</string>
     <string name="dictate__mappings_add">Eşleme ekle</string>
     <string name="dictate__mappings_editor_title">Eşleme</string>
     <string name="dictate__mappings_empty_summary">Her metinde kelime veya ifadeleri otomatik değiştirmek için kural ekleyin — tam, YZ tokeni yok.</string>

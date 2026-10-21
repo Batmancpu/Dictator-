@@ -311,6 +311,7 @@
     <string name="settings__search__keywords__emoji_row" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which shows a row of recent emojis above the keyboard. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">emoji row recent used strip bar above keyboard smiley quick</string>
     <string name="settings__search__keywords__clear_cache" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which empties the app\'s temporary files. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">cache storage space temporary files free up delete clean</string>
     <string name="settings__search__keywords__request_timeout" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting for how long a request may take. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">timeout timed out slow waiting connection seconds gave up</string>
+    <string name="settings__search__keywords__floating_side_buttons" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting choosing which small buttons appear beside the floating button: cancel, pause and undo. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">undo cancel pause resume discard</string>
 
     <string name="settings__localization__title" comment="Title of languages and Layout screen">Languages &amp; Layouts</string>
     <string name="settings__localization__display_language_names_in__label" comment="Label of Display language names in preference">Display language names in</string>
@@ -1925,12 +1926,7 @@
     <string name="dictate__floating_button_remember_position_title" comment="Toggle: remember the floating button position per app">Remember position per app</string>
     <string name="dictate__floating_button_remember_position_summary_on" comment="Summary when per-app position memory is on">Each app keeps its own button position.</string>
     <string name="dictate__floating_button_remember_position_summary_off" comment="Summary when per-app position memory is off">One shared position for all apps.</string>
-    <string name="dictate__floating_button_haptic_title" comment="Toggle: vibrate when the floating button is tapped">Vibrate on tap</string>
-    <string name="dictate__floating_button_haptic_summary_on" comment="Summary when tap vibration is on">A short buzz when you tap the button.</string>
-    <string name="dictate__floating_button_haptic_summary_off" comment="Summary when tap vibration is off">No vibration on tap.</string>
-    <string name="dictate__floating_button_undo_title" comment="Toggle: show an undo button on the floating button to revert the last dictation">Undo button</string>
-    <string name="dictate__floating_button_undo_summary_on" comment="Summary when the floating undo button is enabled">After a dictation, an undo button appears next to the button to remove the inserted text in one tap.</string>
-    <string name="dictate__floating_button_undo_summary_off" comment="Summary when the floating undo button is disabled">No undo button shown.</string>
+    <string name="dictate__floating_button_side_buttons_title" comment="Setting and dialog title: which small buttons appear beside the floating button (cancel, pause, undo), ticked in a dialog">Extra buttons</string>
     <string name="dictate__floating_button_undo_failed" comment="Toast when the undo button could not remove the last text (field changed)">Couldn\'t undo — the text may have changed.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title" comment="Toggle: copy every floating-button dictation to the clipboard">Copy every dictation to clipboard</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on" comment="Summary when copy-every-dictation is enabled">Each dictation is also copied to the clipboard, so you can paste it manually if inserting ever fails. May show a clipboard notice on some phones.</string>
