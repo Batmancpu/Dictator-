@@ -1699,6 +1699,7 @@
     <string name="dictate__fallback_title">フォールバック</string>
     <string name="dictate__fallback_off">オフ</string>
     <string name="dictate__fallback_hint">文字起こしプロバイダーに接続できないときに、音声入力を引き継ぎます。</string>
+    <string name="dictate__providers_transcription_with_fallback">{provider} · フォールバック：{fallback}</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">保存された言い換えプロンプト</string>
     <string name="dictate__floating_button_undo_failed">元に戻せませんでした。テキストが変更された可能性があります。</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">口述をすべてクリップボードにコピー</string>

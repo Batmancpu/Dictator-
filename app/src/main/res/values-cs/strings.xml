@@ -1786,6 +1786,7 @@
     <string name="dictate__fallback_title">Záloha</string>
     <string name="dictate__fallback_off">Vypnuto</string>
     <string name="dictate__fallback_hint">Převezme diktát, když poskytovatel přepisu není dostupný.</string>
+    <string name="dictate__providers_transcription_with_fallback">{provider} · Záloha: {fallback}</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Uložené prompty pro přeformulování</string>
     <string name="dictate__floating_button_undo_failed">Nelze vrátit zpět — text se možná změnil.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Kopírovat každé diktování do schránky</string>

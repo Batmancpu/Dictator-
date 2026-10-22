@@ -545,20 +545,15 @@ private fun TranscribingContent(state: DictateController.UiState.Transcribing) {
         )
     }
     // The same idea for a fallback provider (#455): the active one could not be reached, and this one took
-    // the dictation. The detour sign and its name, so a dictation that went somewhere else says where.
+    // the dictation. Only the detour sign, like the phone above: a provider's name does not fit beside the
+    // status and the clock on a narrow phone, and which provider it is stands in the settings and in the
+    // history. A screen reader is told the name, since it has no settings row in view to look it up from.
     state.via?.let { name ->
         Spacer(modifier = Modifier.width(8.dp))
         SnyggIcon(
             imageVector = Icons.AutoMirrored.Filled.AltRoute,
             modifier = Modifier.size(16.dp),
-            contentDescription = stringRes(R.string.dictate__fallback_title),
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        SnyggText(
-            text = name,
-            modifier = Modifier.widthIn(max = 120.dp),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+            contentDescription = "${stringRes(R.string.dictate__fallback_title)}, $name",
         )
     }
     // How long this has been going (#355). A spinner looks identical at second two and at minute seven,

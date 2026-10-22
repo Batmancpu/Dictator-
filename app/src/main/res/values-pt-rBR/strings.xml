@@ -1572,6 +1572,7 @@
     <string name="dictate__fallback_title">Alternativa</string>
     <string name="dictate__fallback_off">Desativado</string>
     <string name="dictate__fallback_hint">Assume o ditado quando o provedor de transcrição não está acessível.</string>
+    <string name="dictate__providers_transcription_with_fallback">{provider} · Alternativa: {fallback}</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Prompts de reformulação salvos</string>
     <string name="dictate__floating_button_undo_failed">Não foi possível desfazer — o texto pode ter mudado.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Copiar cada ditado para a área de transferência</string>

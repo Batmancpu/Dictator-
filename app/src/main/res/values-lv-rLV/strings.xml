@@ -1714,6 +1714,7 @@
     <string name="dictate__fallback_title">Rezerve</string>
     <string name="dictate__fallback_off">Izslēgts</string>
     <string name="dictate__fallback_hint">Pārņem diktēšanu, ja transkripcijas pakalpojumu sniedzējs nav sasniedzams.</string>
+    <string name="dictate__providers_transcription_with_fallback">{provider} · Rezerve: {fallback}</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Saglabātie pārformulēšanas norādījumi</string>
     <string name="dictate__floating_button_undo_failed">Neizdevās atsaukt — teksts, iespējams, ir mainījies.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Kopēt katru diktātu starpliktuvē</string>

@@ -1776,6 +1776,7 @@
     <string name="dictate__fallback_title">Резерв</string>
     <string name="dictate__fallback_off">Выключено</string>
     <string name="dictate__fallback_hint">Берёт диктовку на себя, когда поставщик транскрибирования недоступен.</string>
+    <string name="dictate__providers_transcription_with_fallback">{provider} · Резерв: {fallback}</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Сохранённые промпты переформулирования</string>
     <string name="dictate__floating_button_undo_failed">Не удалось отменить — возможно, текст изменился.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Копировать каждую диктовку в буфер обмена</string>

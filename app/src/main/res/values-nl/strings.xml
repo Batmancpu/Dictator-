@@ -1668,6 +1668,7 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__fallback_title">Terugval</string>
     <string name="dictate__fallback_off">Uit</string>
     <string name="dictate__fallback_hint">Neemt een dictaat over als de transcriptie-aanbieder niet bereikbaar is.</string>
+    <string name="dictate__providers_transcription_with_fallback">{provider} · Terugval: {fallback}</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Opgeslagen herformuleerprompts</string>
     <string name="dictate__floating_button_undo_failed">Ongedaan maken mislukt — de tekst is mogelijk gewijzigd.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Elk dictaat naar klembord kopiëren</string>

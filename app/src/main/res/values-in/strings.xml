@@ -1722,6 +1722,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__fallback_title">Cadangan</string>
     <string name="dictate__fallback_off">Nonaktif</string>
     <string name="dictate__fallback_hint">Mengambil alih dikte saat penyedia transkripsi tidak dapat dijangkau.</string>
+    <string name="dictate__providers_transcription_with_fallback">{provider} · Cadangan: {fallback}</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Prompt penataan ulang yang tersimpan</string>
     <string name="dictate__floating_button_undo_failed">Tidak dapat membatalkan — teks mungkin telah berubah.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Salin setiap dikte ke papan klip</string>

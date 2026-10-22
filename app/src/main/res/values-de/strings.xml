@@ -1738,6 +1738,7 @@
     <string name="dictate__fallback_title">Fallback</string>
     <string name="dictate__fallback_off">Aus</string>
     <string name="dictate__fallback_hint">Übernimmt ein Diktat, wenn der Transkriptionsanbieter nicht erreichbar ist.</string>
+    <string name="dictate__providers_transcription_with_fallback">{provider} · Fallback: {fallback}</string>
     <string name="dictate__floating_button_undo_failed">Rückgängig machen fehlgeschlagen — der Text wurde möglicherweise geändert.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Jedes Diktat in die Zwischenablage kopieren</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Jedes Diktat wird zusätzlich in die Zwischenablage kopiert, sodass du es manuell einfügen kannst, falls das Einfügen fehlschlägt. Zeigt auf manchen Geräten einen Zwischenablage-Hinweis.</string>

@@ -1762,6 +1762,7 @@
     <string name="dictate__fallback_title">回退</string>
     <string name="dictate__fallback_off">关闭</string>
     <string name="dictate__fallback_hint">无法连接转录服务商时，由它接管本次听写。</string>
+    <string name="dictate__providers_transcription_with_fallback">{provider} · 回退：{fallback}</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">已保存的改写提示词</string>
     <string name="dictate__floating_button_undo_failed">无法撤销——文本可能已更改。</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">将每次听写复制到剪贴板</string>

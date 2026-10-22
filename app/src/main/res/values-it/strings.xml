@@ -1551,6 +1551,7 @@
     <string name="dictate__fallback_title">Ripiego</string>
     <string name="dictate__fallback_off">Disattivato</string>
     <string name="dictate__fallback_hint">Prende in carico la dettatura quando il fornitore di trascrizione non è raggiungibile.</string>
+    <string name="dictate__providers_transcription_with_fallback">{provider} · Ripiego: {fallback}</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Prompt di riformulazione salvati</string>
     <string name="dictate__floating_button_undo_failed">Impossibile annullare — il testo potrebbe essere cambiato.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Copia ogni dettatura negli appunti</string>

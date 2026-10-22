@@ -1747,6 +1747,7 @@
     <string name="dictate__fallback_title">Yedek</string>
     <string name="dictate__fallback_off">Kapalı</string>
     <string name="dictate__fallback_hint">Yazıya dökme sağlayıcısına ulaşılamadığında dikteyi devralır.</string>
+    <string name="dictate__providers_transcription_with_fallback">{provider} · Yedek: {fallback}</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Kaydedilen yeniden ifade istemleri</string>
     <string name="dictate__floating_button_undo_failed">Geri alınamadı — metin değişmiş olabilir.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Her dikteyi panoya kopyala</string>

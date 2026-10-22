@@ -1630,6 +1630,7 @@
     <string name="dictate__fallback_title">الاحتياطي</string>
     <string name="dictate__fallback_off">إيقاف</string>
     <string name="dictate__fallback_hint">يتولى الإملاء عندما يتعذّر الوصول إلى مزوّد التفريغ النصي.</string>
+    <string name="dictate__providers_transcription_with_fallback">{provider} · الاحتياطي: {fallback}</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">مطالبات إعادة الصياغة المحفوظة</string>
     <string name="dictate__floating_button_undo_failed">تعذّر التراجع — ربما تغيّر النص.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">نسخ كل إملاء إلى الحافظة</string>

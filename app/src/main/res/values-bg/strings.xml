@@ -1768,6 +1768,7 @@
     <string name="dictate__fallback_title">Резервен вариант</string>
     <string name="dictate__fallback_off">Изключено</string>
     <string name="dictate__fallback_hint">Поема диктовката, когато доставчикът на транскрибиране е недостъпен.</string>
+    <string name="dictate__providers_transcription_with_fallback">{provider} · Резервен вариант: {fallback}</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Запазени промптове за преформулиране</string>
     <string name="dictate__floating_button_undo_failed">Отмяната е невъзможна — текстът може да е променен.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Копиране на всяка диктовка в клипборда</string>

@@ -1960,8 +1960,11 @@ object DictateController {
         // Who takes over if this provider cannot do it (#104, #455). Nobody for the on-device engine, for a
         // dictation already handed over, or for one the user sent to the phone on purpose (#228/#270).
         val fallbackId = if (localEngine || fallbackAccount != null) null else fallbackIdFor(appContext, account)
-        // Named on the bar while a fallback provider transcribes, so the hand-over is not invisible.
-        val via = fallbackAccount?.let { historyProviderName }
+        // Named on the bar while a fallback provider transcribes, so the hand-over is not invisible — by the
+        // name the Fallback drop-down showed for it, so the two read the same.
+        val via = fallbackAccount?.let {
+            ProviderListing.displayNameOf(it.providerId, prefs.dictate.providerAccounts.get())
+        }
         setTranscribing(onDevice = localEngine, via = via)
         // What a held button can still rescue (#270): the recording this request is carrying, for as long
         // as it is in flight. Cleared in the finally below, so the offer disappears with the request.
