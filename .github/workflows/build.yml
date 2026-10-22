@@ -1,0 +1,104 @@
+name: Build Dictator APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: dictator-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Restore persistent APK signing key
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s signing.keystore || { echo 'Persistent signing.keystore is missing; refusing to create a different key because that would break APK updates.'; exit 1; }
+          mkdir -p "$HOME/.android"
+          install -m 600 signing.keystore "$HOME/.android/debug.keystore"
+
+      - name: Install Android build dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$SDKMANAGER" || { echo "sdkmanager not found at $SDKMANAGER"; exit 1; }
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platform-tools" "platforms;android-36" "build-tools;36.0.0" "cmake;4.1.2" "ndk;29.0.14206865"
+
+      - name: Prepare native build scripts
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x gradlew tools/fetch-sherpa-onnx.sh tools/bergamot/build-android.sh
+
+      - name: Fetch Sherpa ONNX libraries
+        run: ./tools/fetch-sherpa-onnx.sh
+
+      - name: Build Bergamot translation library
+        run: ./tools/bergamot/build-android.sh arm64-v8a
+
+      - name: Calculate update-safe version code
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE_VERSION_CODE="$(sed -n 's/^projectVersionCode=//p' gradle.properties | head -n 1)"
+          test -n "$BASE_VERSION_CODE"
+          TIME_VERSION_CODE=$(( $(date -u +%s) - 1577836800 ))
+          LEGACY_VERSION_CODE=$(( BASE_VERSION_CODE * 100000 + GITHUB_RUN_NUMBER ))
+          CI_VERSION_CODE="$TIME_VERSION_CODE"
+          if [ "$LEGACY_VERSION_CODE" -gt "$CI_VERSION_CODE" ]; then CI_VERSION_CODE="$LEGACY_VERSION_CODE"; fi
+          if [ "$CI_VERSION_CODE" -gt 2100000000 ]; then echo "Version code exceeds Android's supported maximum: $CI_VERSION_CODE"; exit 1; fi
+          echo "CI_VERSION_CODE=$CI_VERSION_CODE" >> "$GITHUB_ENV"
+          echo "Using monotonic versionCode=$CI_VERSION_CODE"
+
+      - name: Build APK
+        run: ./gradlew --no-daemon assembleDebug -PprojectVersionCode="${CI_VERSION_CODE}"
+
+      - name: Verify package, signature, and APK output
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_APK="app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$SOURCE_APK" || { echo 'Gradle did not produce the expected APK.'; exit 1; }
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose "$SOURCE_APK"
+          PACKAGE_ID="$("$ANDROID_HOME/cmdline-tools/latest/bin/apkanalyzer" manifest application-id "$SOURCE_APK")"
+          if [ "$PACKAGE_ID" != "net.devemperor.dictate.debug" ]; then echo "Unexpected application ID: $PACKAGE_ID; refusing to publish an incompatible update."; exit 1; fi
+          mkdir -p release
+          cp "$SOURCE_APK" release/Dictator.apk
+          sha256sum release/Dictator.apk
+
+      - name: Publish a single APK to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: dictator-${{ github.run_id }}
+          name: Dictator APK #${{ github.run_number }}
+          draft: false
+          prerelease: false
+          make_latest: true
+          files: release/Dictator.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
