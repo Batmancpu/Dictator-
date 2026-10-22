@@ -25,7 +25,8 @@ import dev.patrickgold.jetpref.datastore.model.PreferenceData
  * Cancel and pause stand there while a recording runs, undo right after a dictation, so at most two of
  * them are on screen at a time. Declaration order is the order of the dialog and the order outwards
  * from the bubble: cancel keeps the spot right beside it that it has always had, and pause comes after it,
- * or takes that spot when cancel is not wanted.
+ * or takes that spot when cancel is not wanted. A long-form dictation puts its Next button in pause's
+ * place, ticked or not (#460), so it is not one of these.
  *
  * One preference per button rather than a stored list, for the reason [BubbleMenuAction] gives.
  */
