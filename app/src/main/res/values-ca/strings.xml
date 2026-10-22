@@ -1229,7 +1229,7 @@
     <string name="dictate__error_network">Sense connexió a internet</string>
     <string name="dictate__error_server">Proveïdor no disponible – torna-ho a provar</string>
     <string name="dictate__error_try_on_device">Sense connexió – prova al dispositiu</string>
-    <string name="dictate__error_try_on_device_detail">La transcripció al dispositiu no necessita cap connexió: ajuda tant si un proveïdor està bloquejat com si no hi ha cobertura. Configura-la a Proveïdors d\'IA i activa Alternativa fora de línia perquè se n\'encarregui tota sola.</string>
+    <string name="dictate__error_try_on_device_detail">La transcripció al dispositiu no necessita cap connexió: ajuda tant si un proveïdor està bloquejat com si no hi ha cobertura. Configura-la a Proveïdors d\'IA i tria-la a Alternativa perquè se n\'encarregui tota sola.</string>
     <string name="dictate__action_settings">Obre la configuració</string>
     <string name="dictate__action_error_details">Mostra els detalls de l\'error</string>
     <string name="dictate__error_details_title">Detalls de l\'error</string>
@@ -1635,8 +1635,9 @@
         <item quantity="one">{count} idioma</item>
         <item quantity="other">{count} idiomes</item>
     </plurals>
-    <string name="dictate__local_fallback_title">Alternativa fora de línia</string>
-    <string name="dictate__local_fallback_summary">Quan no tens connexió, transcriu localment amb el model baixat després que falli el proveïdor</string>
+    <string name="dictate__fallback_title">Alternativa</string>
+    <string name="dictate__fallback_off">Desactivat</string>
+    <string name="dictate__fallback_hint">Se n’encarrega del dictat quan no es pot contactar amb el proveïdor de transcripció.</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Indicacions de reformulació desades</string>
     <string name="dictate__floating_button_undo_failed">No s\'ha pogut desfer — pot ser que el text hagi canviat.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Copia cada dictat al porta-retalls</string>

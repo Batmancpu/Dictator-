@@ -1163,7 +1163,7 @@
     <string name="dictate__error_network">Sem conexão com a internet</string>
     <string name="dictate__error_server">Provedor indisponível – tente novamente</string>
     <string name="dictate__error_try_on_device">Sem conexão – tente no dispositivo</string>
-    <string name="dictate__error_try_on_device_detail">A transcrição no dispositivo não precisa de conexão nenhuma — ajuda tanto quando um provedor está bloqueado quanto quando não há rede. Configure em Provedores de IA e ative a Alternativa offline para que assuma sozinha.</string>
+    <string name="dictate__error_try_on_device_detail">A transcrição no dispositivo não precisa de conexão nenhuma — ajuda tanto quando um provedor está bloqueado quanto quando não há rede. Configure em Provedores de IA e escolha-a em Alternativa para que assuma sozinha.</string>
     <string name="dictate__action_settings">Abrir configurações</string>
     <string name="dictate__action_error_details">Mostrar detalhes do erro</string>
     <string name="dictate__error_details_title">Detalhes do erro</string>
@@ -1569,8 +1569,9 @@
         <item quantity="one">{count} idioma</item>
         <item quantity="other">{count} idiomas</item>
     </plurals>
-    <string name="dictate__local_fallback_title">Alternativa offline</string>
-    <string name="dictate__local_fallback_summary">Sem internet, transcreva no dispositivo com o modelo baixado após falha do provedor</string>
+    <string name="dictate__fallback_title">Alternativa</string>
+    <string name="dictate__fallback_off">Desativado</string>
+    <string name="dictate__fallback_hint">Assume o ditado quando o provedor de transcrição não está acessível.</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Prompts de reformulação salvos</string>
     <string name="dictate__floating_button_undo_failed">Não foi possível desfazer — o texto pode ter mudado.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Copiar cada ditado para a área de transferência</string>

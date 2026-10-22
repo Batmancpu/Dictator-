@@ -79,6 +79,7 @@ class OpenAiCompatibleClient(
                 callTimeoutSeconds = config.callTimeoutSeconds,
                 proxy = config.proxy,
                 trustUserCerts = config.trustUserCerts,
+                connectTimeoutSeconds = connectTimeoutSeconds,
             )
         ) { buildClient() }
     }
@@ -1299,7 +1300,10 @@ class OpenAiCompatibleClient(
                 // connection used to cost four full timeouts that way, eight minutes at the default (#438).
                 // From here the resend chip is the retry, and the user decides whether to wait again.
                 val withinBudget = elapsedMillis(firstStartedNanos) < attemptBudgetMillis
-                if (mapped.isRetryable && attempt < maxRetries && withinBudget) {
+                // A server nobody could connect to is handed on at once when another provider is waiting for
+                // it (#455): the next attempt would find it just as unreachable, three seconds later.
+                val handedOn = config.handOverUnreachable && mapped.isConnectFailure
+                if (mapped.isRetryable && !handedOn && attempt < maxRetries && withinBudget) {
                     attempt++
                     onRetry(attempt + 1) // report the upcoming attempt (2nd, 3rd, …)
                     delay(RETRY_DELAY_MS)
@@ -1416,6 +1420,13 @@ class OpenAiCompatibleClient(
     private val attemptBudgetMillis: Long
         get() = TimeUnit.SECONDS.toMillis(config.callTimeoutSeconds ?: config.timeoutSeconds)
 
+    private val connectTimeoutSeconds: Long
+        get() = if (config.handOverUnreachable) {
+            ProviderConfig.UNREACHABLE_CONNECT_TIMEOUT_SECONDS
+        } else {
+            NETWORK_CONNECT_TIMEOUT_SECONDS
+        }
+
     internal fun buildClient(): OkHttpClient {
         val timeout = Duration.ofSeconds(config.timeoutSeconds)
         val builder = OkHttpClient.Builder()
@@ -1424,7 +1435,7 @@ class OpenAiCompatibleClient(
             .callTimeout(Duration.ofMillis(attemptBudgetMillis))
             // Connection establishment needs a short budget per route. Uploading a long recording and
             // waiting for the model keep the full configured call/read/write timeout below.
-            .connectTimeout(NETWORK_CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .connectTimeout(connectTimeoutSeconds, TimeUnit.SECONDS)
             // OkHttp 5 Happy Eyeballs races IPv6/IPv4 routes 250 ms apart and keeps the first winner.
             .fastFallback(true)
             .readTimeout(timeout)
@@ -1896,6 +1907,9 @@ class OpenAiCompatibleClient(
             val callTimeoutSeconds: Long?,
             val proxy: ProxyConfig?,
             val trustUserCerts: Boolean,
+            // Shorter while another provider waits to take over (#455); a shared client would otherwise
+            // keep whichever connect timeout the first request happened to build it with.
+            val connectTimeoutSeconds: Long,
         )
 
         private fun sharedClientFor(key: HttpClientKey, build: () -> OkHttpClient): OkHttpClient {
@@ -2092,6 +2106,8 @@ class OpenAiCompatibleClient(
             timeoutSeconds: Long = ProviderConfig.DEFAULT_TIMEOUT_SECONDS,
             /** Whole-call budget where the default two minutes is too short — see [ProviderConfig.callTimeoutSeconds]. */
             callTimeoutSeconds: Long? = null,
+            /** Another provider takes over if this one cannot be reached — see [ProviderConfig.handOverUnreachable]. */
+            handOverUnreachable: Boolean = false,
         ): OpenAiCompatibleClient = OpenAiCompatibleClient(
             ProviderConfig(
                 baseUrl = baseUrlOverride ?: preset.baseUrl,
@@ -2104,6 +2120,7 @@ class OpenAiCompatibleClient(
                 useChatAudio = useChatAudio,
                 trustUserCerts = trustUserCerts,
                 curatedModels = (preset.curatedTranscriptionModels + preset.curatedChatModels).distinct(),
+                handOverUnreachable = handOverUnreachable,
             )
         )
     }

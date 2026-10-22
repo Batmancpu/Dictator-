@@ -1375,7 +1375,7 @@
     <string name="dictate__error_network">Žádné připojení k internetu</string>
     <string name="dictate__error_server">Poskytovatel není dostupný – zkuste to znovu</string>
     <string name="dictate__error_try_on_device">Bez připojení – zkuste v zařízení</string>
-    <string name="dictate__error_try_on_device_detail">Přepis v zařízení nepotřebuje vůbec žádné připojení — pomůže, když je poskytovatel blokovaný, i když není signál. Nastavte jej v sekci Poskytovatelé AI a zapněte Offline záloha, aby se spustil sám.</string>
+    <string name="dictate__error_try_on_device_detail">Přepis v zařízení nepotřebuje vůbec žádné připojení — pomůže, když je poskytovatel blokovaný, i když není signál. Nastavte jej v sekci Poskytovatelé AI a vyberte jej v položce Záloha, aby se spustil sám.</string>
     <string name="dictate__action_settings">Otevřít nastavení</string>
     <string name="dictate__action_error_details">Zobrazit podrobnosti chyby</string>
     <string name="dictate__error_details_title">Podrobnosti chyby</string>
@@ -1783,8 +1783,9 @@
         <item quantity="many">{count} jazyků</item>
         <item quantity="other">{count} jazyků</item>
     </plurals>
-    <string name="dictate__local_fallback_title">Offline záloha</string>
-    <string name="dictate__local_fallback_summary">Když jste offline, přepište zvuk lokálně staženým modelem poté, co poskytovatel selže</string>
+    <string name="dictate__fallback_title">Záloha</string>
+    <string name="dictate__fallback_off">Vypnuto</string>
+    <string name="dictate__fallback_hint">Převezme diktát, když poskytovatel přepisu není dostupný.</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Uložené prompty pro přeformulování</string>
     <string name="dictate__floating_button_undo_failed">Nelze vrátit zpět — text se možná změnil.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Kopírovat každé diktování do schránky</string>

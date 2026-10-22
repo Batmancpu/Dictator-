@@ -40,6 +40,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Adjust
+import androidx.compose.material.icons.automirrored.filled.AltRoute
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.CloudOff
@@ -541,6 +542,23 @@ private fun TranscribingContent(state: DictateController.UiState.Transcribing) {
             imageVector = Icons.Default.PhoneAndroid,
             modifier = Modifier.size(16.dp),
             contentDescription = stringRes(R.string.dictate__status_transcribing_local),
+        )
+    }
+    // The same idea for a fallback provider (#455): the active one could not be reached, and this one took
+    // the dictation. The detour sign and its name, so a dictation that went somewhere else says where.
+    state.via?.let { name ->
+        Spacer(modifier = Modifier.width(8.dp))
+        SnyggIcon(
+            imageVector = Icons.AutoMirrored.Filled.AltRoute,
+            modifier = Modifier.size(16.dp),
+            contentDescription = stringRes(R.string.dictate__fallback_title),
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        SnyggText(
+            text = name,
+            modifier = Modifier.widthIn(max = 120.dp),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
         )
     }
     // How long this has been going (#355). A spinner looks identical at second two and at minute seven,

@@ -31,6 +31,7 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.automirrored.filled.AltRoute
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Dns
@@ -44,11 +45,9 @@ import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Watch
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
@@ -100,6 +99,7 @@ import dev.patrickgold.florisboard.dictate.provider.ProviderPreset
 import dev.patrickgold.florisboard.dictate.provider.ProviderRegion
 import dev.patrickgold.florisboard.dictate.provider.ProviderRegistry
 import dev.patrickgold.florisboard.dictate.provider.TranscriptionApi
+import dev.patrickgold.florisboard.dictate.provider.TranscriptionFallback
 import dev.patrickgold.florisboard.dictate.provider.chatModelFor
 import dev.patrickgold.florisboard.dictate.provider.singleCallApplies
 import dev.patrickgold.florisboard.lib.compose.FlorisHyperlinkText
@@ -155,8 +155,16 @@ fun DictateProvidersScreen() = FlorisScreen {
         val accounts by prefs.dictate.providerAccounts.collectAsState()
         val activeTranscriptionId by prefs.dictate.transcriptionProviderId.collectAsState()
         val activeRewordingId by prefs.dictate.rewordingProviderId.collectAsState()
+        val storedFallbackId by prefs.dictate.transcriptionFallbackId.collectAsState()
         val scope = rememberCoroutineScope()
         val isInstalled: (String) -> Boolean = { LocalModelManager.isInstalled(context, it) }
+        // The fallback that would actually take over (#455), the same answer the dictation path gets: a
+        // choice that is the active provider, or no longer set up, stands down and reads as off.
+        val effectiveFallbackId = TranscriptionFallback.effectiveId(
+            storedFallbackId,
+            activeTranscriptionId,
+            ProviderListing.transcriptionChoices(accounts, selectedId = "", isInstalled).map { it.first },
+        )
 
         // The provider currently being edited in the dialog (null = closed).
         var editingId by remember { mutableStateOf<String?>(null) }
@@ -198,16 +206,26 @@ fun DictateProvidersScreen() = FlorisScreen {
             .sortedBy { it.displayName.lowercase() }
 
         PreferenceGroup(title = stringRes(R.string.dictate__providers_active_group)) {
-            // Custom picker (issue #104): the transcription provider list, plus an offline-fallback
-            // checkbox as an extra item at the bottom of the same dialog (hidden when the chosen
-            // provider is already the on-device one, where a fallback makes no sense).
-            // Both pickers offer only what can do the job right now, plus the current choice (see
+            // The pickers offer only what can do the job right now, plus the current choice (see
             // [ProviderListing.isPickable]); everything else is set up through "Add a provider" first,
             // which the pickers link to. Offering every preset meant offering the chance to pick one
             // that could only answer "no API key" at the moment of dictating.
             TranscriptionProviderPreference(
                 entries = ProviderListing.transcriptionChoices(accounts, activeTranscriptionId, isInstalled),
             )
+            // Right under the provider it stands in for (#455, replacing #104's checkbox in the dialog
+            // above). Not shown while the on-device engine transcribes: it never fails for want of a
+            // connection, so there is nothing to fall back from.
+            if (ProviderRegistry.byId(activeTranscriptionId)?.transcriptionApi != TranscriptionApi.LOCAL_ONDEVICE) {
+                // Only what could take over right now. The two pickers above also keep their current choice
+                // listed when it is no longer set up, so that confirming does not quietly drop it; here such a
+                // choice already reads as Off, and offering it again would offer something that does nothing.
+                FallbackProviderPreference(
+                    entries = ProviderListing.transcriptionChoices(accounts, selectedId = "", isInstalled)
+                        .filter { it.first != activeTranscriptionId },
+                    effectiveId = effectiveFallbackId,
+                )
+            }
             // When the active transcription provider runs single-call multimodal (#130), rewording happens
             // inside that one call, so the rewording provider here is currently unused — surfaced as a
             // trailing info "i" on this row (same pattern as the Punctuation/Style prompt info).
@@ -226,7 +244,7 @@ fun DictateProvidersScreen() = FlorisScreen {
         PreferenceGroup(title = stringRes(R.string.dictate__providers_manage_group)) {
             val keySet = stringRes(R.string.dictate__providers_status_key_set)
             val noKey = stringRes(R.string.dictate__providers_status_no_key)
-            val activeIds = setOf(activeTranscriptionId, activeRewordingId)
+            val activeIds = setOfNotNull(activeTranscriptionId, activeRewordingId, effectiveFallbackId)
 
             // The user's own providers only, with on-device and Dictate Cloud always among them (see
             // [ProviderListing.isListed]); the other presets wait behind "Add a provider" at the end.
@@ -237,7 +255,7 @@ fun DictateProvidersScreen() = FlorisScreen {
                 .sortedByDescending { it.transcriptionApi == TranscriptionApi.LOCAL_ONDEVICE }
             fun roles(id: String): (@Composable () -> Unit)? =
                 if (id in activeIds) {
-                    { ActiveRoleIcons(id, activeTranscriptionId, activeRewordingId) }
+                    { ActiveRoleIcons(id, activeTranscriptionId, activeRewordingId, effectiveFallbackId) }
                 } else {
                     null
                 }
@@ -467,9 +485,8 @@ private fun RewordingProviderPreference(entries: List<Pair<String, String>>, sho
 
 /**
  * Active-transcription-provider picker (issue #104). Opens a dialog listing the transcription-capable
- * providers as radio options, with the **offline fallback** toggle as an extra checkbox item at the
- * bottom of the same dialog. The checkbox is hidden when the chosen provider is the on-device one (a
- * local fallback is meaningless there). Both the selection and the toggle are committed on confirm.
+ * providers as radio options, committed on confirm. Its offline-fallback checkbox became the fallback row
+ * below it (#455).
  */
 @Composable
 private fun TranscriptionProviderPreference(entries: List<Pair<String, String>>) {
@@ -477,7 +494,6 @@ private fun TranscriptionProviderPreference(entries: List<Pair<String, String>>)
     val navController = LocalNavController.current
     val scope = rememberCoroutineScope()
     val selectedId by prefs.dictate.transcriptionProviderId.collectAsState()
-    val fallbackEnabled by prefs.dictate.localFallbackEnabled.collectAsState()
     var open by remember { mutableStateOf(false) }
 
     Preference(
@@ -490,87 +506,142 @@ private fun TranscriptionProviderPreference(entries: List<Pair<String, String>>)
 
     if (open) {
         var sel by remember { mutableStateOf(selectedId) }
-        var fb by remember { mutableStateOf(fallbackEnabled) }
-        val selectionIsLocal =
-            ProviderRegistry.byId(sel)?.transcriptionApi == TranscriptionApi.LOCAL_ONDEVICE
         JetPrefAlertDialog(
             title = stringRes(R.string.dictate__providers_active_transcription),
             confirmLabel = stringRes(R.string.action__ok),
             dismissLabel = stringRes(R.string.action__cancel),
             onConfirm = {
-                scope.launch {
-                    prefs.dictate.transcriptionProviderId.set(sel)
-                    prefs.dictate.localFallbackEnabled.set(fb)
-                }
+                scope.launch { prefs.dictate.transcriptionProviderId.set(sel) }
                 open = false
             },
             onDismiss = { open = false },
         ) {
-            val scrollState = rememberScrollState()
-            val scrollbarColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+            ProviderRadioList(
+                entries = entries,
+                selected = sel,
+                onSelect = { sel = it },
+                onAddProvider = {
+                    open = false
+                    navController.navigate(Routes.Settings.DictateProvidersAdd)
+                },
+            )
+        }
+    }
+}
+
+/**
+ * The provider that takes over when the transcription provider cannot do it (#455): the on-device engine
+ * when the phone is offline, as #104's checkbox did, or any other set-up provider when the active one cannot
+ * be reached — a server at home, from anywhere else. [entries] are the set-up transcription providers except
+ * the active one; [effectiveId] is the choice that currently applies, null for off.
+ *
+ * Its own row rather than an item in the transcription dialog, because it is now a choice among providers
+ * like the two rows around it, not a switch. The one line above the list says when it takes over, which the
+ * name alone cannot: a provider that is merely slow keeps the dictation.
+ */
+@Composable
+private fun FallbackProviderPreference(entries: List<Pair<String, String>>, effectiveId: String?) {
+    val prefs by FlorisPreferenceStore
+    val navController = LocalNavController.current
+    val scope = rememberCoroutineScope()
+    var open by remember { mutableStateOf(false) }
+
+    Preference(
+        icon = Icons.AutoMirrored.Filled.AltRoute,
+        modifier = Modifier.settingsSearchAnchor("dictate__fallback_title"),
+        title = stringRes(R.string.dictate__fallback_title),
+        summary = entries.firstOrNull { it.first == effectiveId }?.second
+            ?: stringRes(R.string.dictate__fallback_off),
+        onClick = { open = true },
+    )
+
+    if (open) {
+        var sel by remember { mutableStateOf(effectiveId ?: TranscriptionFallback.OFF) }
+        JetPrefAlertDialog(
+            title = stringRes(R.string.dictate__fallback_title),
+            confirmLabel = stringRes(R.string.action__ok),
+            dismissLabel = stringRes(R.string.action__cancel),
+            onConfirm = {
+                scope.launch { prefs.dictate.transcriptionFallbackId.set(sel) }
+                open = false
+            },
+            onDismiss = { open = false },
+        ) {
             Column {
-                Column(
-                    modifier = Modifier
-                        .heightIn(max = 320.dp)
-                        .persistentVerticalScrollbar(scrollState, scrollbarColor)
-                        .verticalScroll(scrollState)
-                        .padding(end = 6.dp),
-                ) {
-                    entries.forEach { (id, label) ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { sel = id },
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            RadioButton(selected = sel == id, onClick = { sel = id })
-                            Text(label, modifier = Modifier.padding(start = 8.dp))
-                        }
-                    }
-                    AddProviderPickerRow(onClick = {
+                Text(
+                    text = stringRes(R.string.dictate__fallback_hint),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 8.dp),
+                )
+                ProviderRadioList(
+                    entries = listOf(TranscriptionFallback.OFF to stringRes(R.string.dictate__fallback_off)) + entries,
+                    selected = sel,
+                    onSelect = { sel = it },
+                    onAddProvider = {
                         open = false
                         navController.navigate(Routes.Settings.DictateProvidersAdd)
-                    })
-                }
-                // Extra item at the bottom: offline fallback (only when the choice isn't already local).
-                if (!selectionIsLocal) {
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { fb = !fb }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Checkbox(checked = fb, onCheckedChange = { fb = it })
-                        Column(modifier = Modifier.padding(start = 8.dp).weight(1f)) {
-                            Text(stringRes(R.string.dictate__local_fallback_title))
-                            Text(
-                                text = stringRes(R.string.dictate__local_fallback_summary),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
+                    },
+                )
             }
         }
+    }
+}
+
+/** The scrolling radio list both transcription pickers show, with "Add a provider" at its foot. */
+@Composable
+private fun ProviderRadioList(
+    entries: List<Pair<String, String>>,
+    selected: String,
+    onSelect: (String) -> Unit,
+    onAddProvider: () -> Unit,
+) {
+    val scrollState = rememberScrollState()
+    val scrollbarColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+    Column(
+        modifier = Modifier
+            .heightIn(max = 320.dp)
+            .persistentVerticalScrollbar(scrollState, scrollbarColor)
+            .verticalScroll(scrollState)
+            .padding(end = 6.dp),
+    ) {
+        entries.forEach { (id, label) ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onSelect(id) },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                RadioButton(selected = selected == id, onClick = { onSelect(id) })
+                Text(label, modifier = Modifier.padding(start = 8.dp))
+            }
+        }
+        AddProviderPickerRow(onClick = onAddProvider)
     }
 }
 
 /**
  * The job icons at the end of a provider row: a microphone where it transcribes, the rewording icon where
  * it rewords — the same two icons the active-provider rows at the top of the screen carry, so the pair
- * reads as a pointer back up there. Nothing at all on a provider that is set up but not in use.
+ * reads as a pointer back up there, and the detour sign on the fallback (#455). Nothing at all on a provider
+ * that is set up but not in use.
  */
 @Composable
-private fun ActiveRoleIcons(id: String, transcriptionId: String, rewordingId: String) {
+private fun ActiveRoleIcons(id: String, transcriptionId: String, rewordingId: String, fallbackId: String?) {
     Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         val tint = MaterialTheme.colorScheme.onSurfaceVariant
         if (id == transcriptionId) {
             Icon(
                 imageVector = Icons.Default.Mic,
                 contentDescription = stringRes(R.string.dictate__providers_active_transcription),
+                modifier = Modifier.size(20.dp),
+                tint = tint,
+            )
+        }
+        if (id == fallbackId) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.AltRoute,
+                contentDescription = stringRes(R.string.dictate__fallback_title),
                 modifier = Modifier.size(20.dp),
                 tint = tint,
             )

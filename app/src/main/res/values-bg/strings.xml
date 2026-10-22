@@ -1359,7 +1359,7 @@
     <string name="dictate__error_network">Няма интернет връзка</string>
     <string name="dictate__error_server">Доставчикът е недостъпен – опитайте отново</string>
     <string name="dictate__error_try_on_device">Няма връзка – опитайте локално</string>
-    <string name="dictate__error_try_on_device_detail">Транскрибирането на устройството не се нуждае от никаква връзка — помага както когато доставчикът е блокиран, така и когато няма сигнал. Настройте го от ИИ доставчици и включете Офлайн резервен режим, за да се задейства само.</string>
+    <string name="dictate__error_try_on_device_detail">Транскрибирането на устройството не се нуждае от никаква връзка — помага както когато доставчикът е блокиран, така и когато няма сигнал. Настройте го от ИИ доставчици и го изберете в Резервен вариант, за да се задейства само.</string>
     <string name="dictate__action_settings">Отвори настройките</string>
     <string name="dictate__action_error_details">Покажи подробности за грешката</string>
     <string name="dictate__error_details_title">Подробности за грешката</string>
@@ -1765,8 +1765,9 @@
         <item quantity="one">{count} език</item>
         <item quantity="other">{count} езика</item>
     </plurals>
-    <string name="dictate__local_fallback_title">Офлайн резервен режим</string>
-    <string name="dictate__local_fallback_summary">Когато сте офлайн, транскрибирайте локално с изтегления модел след неуспех на доставчика</string>
+    <string name="dictate__fallback_title">Резервен вариант</string>
+    <string name="dictate__fallback_off">Изключено</string>
+    <string name="dictate__fallback_hint">Поема диктовката, когато доставчикът на транскрибиране е недостъпен.</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Запазени промптове за преформулиране</string>
     <string name="dictate__floating_button_undo_failed">Отмяната е невъзможна — текстът може да е променен.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Копиране на всяка диктовка в клипборда</string>

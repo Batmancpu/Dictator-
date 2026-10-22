@@ -11,6 +11,11 @@
 package dev.patrickgold.florisboard.dictate.provider
 
 import java.io.InterruptedIOException
+import java.net.ConnectException
+import java.net.NoRouteToHostException
+import java.net.PortUnreachableException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 /**
  * Normalised error for all provider calls. The [kind] lets the UI show the right message/action
@@ -72,7 +77,34 @@ class DictateApiException(
     val isRetryable: Boolean
         get() = kind.isRetryable && (httpStatus == null || httpStatus !in 400..499 || httpStatus in RETRYABLE_4XX)
 
+    /**
+     * Whether no connection to the provider could be made at all: the name did not resolve, nothing
+     * listened on the port, there was no route, or the connection attempt timed out (#455).
+     *
+     * Narrower than [Kind.NETWORK] and [Kind.TIMEOUT] on purpose. Those also cover a connection that broke
+     * halfway through the upload and a server that took too long to answer, and in both of those the
+     * provider has already got the audio. Handing it to another provider then would be the "switch after
+     * N seconds" that #391 declined: the same dictation paid for twice, and a slow answer thrown away. A
+     * server that was never reached has seen nothing, so passing the recording on costs nothing.
+     *
+     * A connection timeout and a read timeout are the same exception type; only the message tells them
+     * apart. Android words a connect timeout "failed to connect to … after N ms", the JVM "Connect timed
+     * out", while a read timeout says "timeout" or "Read timed out".
+     */
+    val isConnectFailure: Boolean
+        get() = httpStatus == null && generateSequence(cause) { it.cause }.take(MAX_CAUSE_DEPTH).any(::isUnreachable)
+
     companion object {
+        private const val MAX_CAUSE_DEPTH = 8
+
+        private fun isUnreachable(t: Throwable): Boolean = when (t) {
+            is UnknownHostException, is ConnectException, is NoRouteToHostException, is PortUnreachableException -> true
+            is SocketTimeoutException -> t.message.orEmpty().lowercase().let {
+                it.startsWith("failed to connect") || it.contains("connect timed out")
+            }
+            else -> false
+        }
+
         /** Request Timeout and Too Early: the only client errors whose remedy is to send the request again. */
         private val RETRYABLE_4XX = setOf(408, 425)
 

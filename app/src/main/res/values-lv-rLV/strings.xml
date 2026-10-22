@@ -1304,7 +1304,7 @@
     <string name="dictate__error_network">Nav interneta savienojuma</string>
     <string name="dictate__error_server">Pakalpojuma sniedzējs nav pieejams – mēģiniet vēlreiz</string>
     <string name="dictate__error_try_on_device">Nav savienojuma – mēģiniet ierīcē</string>
-    <string name="dictate__error_try_on_device_detail">Transkripcijai ierīcē savienojums nav vajadzīgs nemaz — tas palīdz gan tad, ja pakalpojums ir bloķēts, gan tad, ja nav signāla. Iestatiet to sadaļā MI pakalpojumu sniedzēji un ieslēdziet Bezsaistes rezerve, lai tā pārņemtu darbu pati.</string>
+    <string name="dictate__error_try_on_device_detail">Transkripcijai ierīcē savienojums nav vajadzīgs nemaz — tas palīdz gan tad, ja pakalpojums ir bloķēts, gan tad, ja nav signāla. Iestatiet to sadaļā MI pakalpojumu sniedzēji un izvēlieties to sadaļā Rezerve, lai tā pārņemtu darbu pati.</string>
     <string name="dictate__action_settings">Atvērt iestatījumus</string>
     <string name="dictate__action_error_details">Rādīt kļūdas detaļas</string>
     <string name="dictate__error_details_title">Kļūdas detaļas</string>
@@ -1711,8 +1711,9 @@
         <item quantity="one">{count} valoda</item>
         <item quantity="other">{count} valodas</item>
     </plurals>
-    <string name="dictate__local_fallback_title">Bezsaistes rezerve</string>
-    <string name="dictate__local_fallback_summary">Bezsaistē transkribē ierīcē ar lejupielādēto modeli pēc nodrošinātāja kļūmes</string>
+    <string name="dictate__fallback_title">Rezerve</string>
+    <string name="dictate__fallback_off">Izslēgts</string>
+    <string name="dictate__fallback_hint">Pārņem diktēšanu, ja transkripcijas pakalpojumu sniedzējs nav sasniedzams.</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Saglabātie pārformulēšanas norādījumi</string>
     <string name="dictate__floating_button_undo_failed">Neizdevās atsaukt — teksts, iespējams, ir mainījies.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Kopēt katru diktātu starpliktuvē</string>

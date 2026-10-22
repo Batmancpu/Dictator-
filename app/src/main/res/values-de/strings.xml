@@ -1275,7 +1275,7 @@
     <string name="dictate__error_network">Keine Internetverbindung</string>
     <string name="dictate__error_server">Anbieter nicht erreichbar – versuche es erneut</string>
     <string name="dictate__error_try_on_device">Keine Verbindung – On-Device nutzen</string>
-    <string name="dictate__error_try_on_device_detail">Die Transkription auf dem Gerät braucht überhaupt keine Verbindung — das hilft, wenn ein Anbieter gesperrt ist, genauso wie ohne Empfang. Unter „KI-Anbieter“ einrichten und danach „Offline-Fallback“ einschalten, damit sie von selbst übernimmt.</string>
+    <string name="dictate__error_try_on_device_detail">Die Transkription auf dem Gerät braucht überhaupt keine Verbindung — das hilft, wenn ein Anbieter gesperrt ist, genauso wie ohne Empfang. Unter „KI-Anbieter“ einrichten und danach unter „Fallback“ auswählen, damit sie von selbst übernimmt.</string>
     <string name="dictate__action_settings">Einstellungen öffnen</string>
     <string name="dictate__action_error_details">Fehlerdetails anzeigen</string>
     <string name="dictate__error_details_title">Fehlerdetails</string>
@@ -1735,8 +1735,9 @@
         <item quantity="one">{count} Sprache</item>
         <item quantity="other">{count} Sprachen</item>
     </plurals>
-    <string name="dictate__local_fallback_title">Offline-Fallback</string>
-    <string name="dictate__local_fallback_summary">Wenn offline, nach dem Fehlschlag des Anbieters lokal mit dem heruntergeladenen Modell transkribieren</string>
+    <string name="dictate__fallback_title">Fallback</string>
+    <string name="dictate__fallback_off">Aus</string>
+    <string name="dictate__fallback_hint">Übernimmt ein Diktat, wenn der Transkriptionsanbieter nicht erreichbar ist.</string>
     <string name="dictate__floating_button_undo_failed">Rückgängig machen fehlgeschlagen — der Text wurde möglicherweise geändert.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Jedes Diktat in die Zwischenablage kopieren</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Jedes Diktat wird zusätzlich in die Zwischenablage kopiert, sodass du es manuell einfügen kannst, falls das Einfügen fehlschlägt. Zeigt auf manchen Geräten einen Zwischenablage-Hinweis.</string>

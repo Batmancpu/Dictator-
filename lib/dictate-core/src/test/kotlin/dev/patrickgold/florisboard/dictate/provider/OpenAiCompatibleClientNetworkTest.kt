@@ -23,7 +23,15 @@ import okhttp3.Dns
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.SocketPolicy
+import java.io.IOException
+import java.net.ConnectException
+import java.net.NoRouteToHostException
+import java.net.ServerSocket
+import java.net.SocketException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLHandshakeException
 import kotlin.io.path.createTempFile
 
 class OpenAiCompatibleClientNetworkTest : FunSpec({
@@ -1266,5 +1274,89 @@ class OpenAiCompatibleClientNetworkTest : FunSpec({
         listOf("DevEmperor", "Dr.", "z.B.", "Anna-Lena Müller", "FlorisBoard").forAll {
             OpenAiCompatibleClient.vocabularyTermOf(" $it ") shouldBe it
         }
+    }
+
+    // #455: only a server that was never reached may be handed to another provider. Once a connection was
+    // made, the provider has (some of) the audio, and a timeout or a reset there is #391's slow answer.
+    test("a connection that could not be made is told apart from one that broke or went quiet") {
+        fun io(cause: Throwable) = DictateApiException.fromIo(cause)
+
+        io(UnknownHostException("Unable to resolve host \"home.lan\"")).isConnectFailure shouldBe true
+        io(ConnectException("Failed to connect to /192.168.1.20:8000")).isConnectFailure shouldBe true
+        io(NoRouteToHostException("No route to host")).isConnectFailure shouldBe true
+        // Android's and the JVM's words for a connect timeout.
+        io(SocketTimeoutException("failed to connect to /192.168.1.20 (port 8000) from /10.0.0.5 (port 41234) after 4000ms"))
+            .isConnectFailure shouldBe true
+        io(SocketTimeoutException("Connect timed out")).isConnectFailure shouldBe true
+        // Wrapped, as OkHttp sometimes hands it on.
+        io(IOException("canceled", ConnectException("Connection refused"))).isConnectFailure shouldBe true
+
+        io(SocketTimeoutException("timeout")).isConnectFailure shouldBe false
+        io(SocketTimeoutException("Read timed out")).isConnectFailure shouldBe false
+        io(SocketException("Connection reset")).isConnectFailure shouldBe false
+        io(IOException("unexpected end of stream on http://192.168.1.20:8000/...")).isConnectFailure shouldBe false
+        io(SSLHandshakeException("Trust anchor for certification path not found.")).isConnectFailure shouldBe false
+        DictateApiException.fromHttp(502, "Bad gateway").isConnectFailure shouldBe false
+    }
+
+    test("a client with another provider waiting gives up on an unreachable server at once") {
+        val audio = createTempFile(suffix = ".wav").toFile().apply {
+            writeBytes("RIFF-test-audio".encodeToByteArray())
+        }
+        // A port that was free a moment ago: nothing listens there, so the connection is refused.
+        val closedPort = ServerSocket(0).use { it.localPort }
+        try {
+            val retries = mutableListOf<Int>()
+            val client = OpenAiCompatibleClient(
+                ProviderConfig(
+                    baseUrl = "http://127.0.0.1:$closedPort/v1/",
+                    apiKey = "test",
+                    handOverUnreachable = true,
+                ),
+            )
+            val started = System.nanoTime()
+
+            val error = shouldThrow<DictateApiException> {
+                client.transcribe(TranscriptionRequest(audioFile = audio, model = "whisper-1")) { retries += it }
+            }
+
+            error.isConnectFailure shouldBe true
+            retries shouldBe emptyList()
+            // Without the hand-over this is three retries three seconds apart.
+            TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - started).toInt() shouldBeLessThan 2_000
+        } finally {
+            audio.delete()
+        }
+    }
+
+    test("a server that answered keeps its retries while another provider waits") {
+        val audio = createTempFile(suffix = ".wav").toFile().apply {
+            writeBytes("RIFF-test-audio".encodeToByteArray())
+        }
+        try {
+            MockWebServer().use { server ->
+                server.enqueue(MockResponse().setResponseCode(503))
+                server.enqueue(MockResponse().setResponseCode(200).setBody("""{"text":"Hallo Welt"}"""))
+                val client = OpenAiCompatibleClient(
+                    ProviderConfig(baseUrl = server.url("/v1/").toString(), apiKey = "test", handOverUnreachable = true),
+                )
+
+                val result = client.transcribe(TranscriptionRequest(audioFile = audio, model = "whisper-1"))
+
+                result.text shouldBe "Hallo Welt"
+                server.requestCount shouldBe 2
+            }
+        } finally {
+            audio.delete()
+        }
+    }
+
+    test("a client with another provider waiting connects with the short timeout") {
+        fun connectMillis(handOver: Boolean) = OpenAiCompatibleClient(
+            ProviderConfig(baseUrl = "https://example.test/v1/", apiKey = "test", handOverUnreachable = handOver),
+        ).buildClient().connectTimeoutMillis
+
+        connectMillis(handOver = true) shouldBe 4_000
+        connectMillis(handOver = false) shouldBe 8_000
     }
 })

@@ -1314,7 +1314,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__error_network">Tidak ada koneksi internet</string>
     <string name="dictate__error_server">Penyedia tidak tersedia – coba lagi</string>
     <string name="dictate__error_try_on_device">Tidak ada koneksi – coba di perangkat</string>
-    <string name="dictate__error_try_on_device_detail">Transkripsi di perangkat sama sekali tidak memerlukan koneksi — berguna saat penyedia diblokir maupun saat tidak ada sinyal. Siapkan di Penyedia AI, lalu aktifkan Cadangan luring agar mengambil alih dengan sendirinya.</string>
+    <string name="dictate__error_try_on_device_detail">Transkripsi di perangkat sama sekali tidak memerlukan koneksi — berguna saat penyedia diblokir maupun saat tidak ada sinyal. Siapkan di Penyedia AI, lalu pilih di Cadangan agar mengambil alih dengan sendirinya.</string>
     <string name="dictate__action_settings">Buka pengaturan</string>
     <string name="dictate__action_error_details">Tampilkan detail kesalahan</string>
     <string name="dictate__error_details_title">Detail kesalahan</string>
@@ -1719,8 +1719,9 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <plurals name="dictate__local_model_languages">
         <item quantity="other">{count} bahasa</item>
     </plurals>
-    <string name="dictate__local_fallback_title">Cadangan luring</string>
-    <string name="dictate__local_fallback_summary">Saat luring, transkripsi di perangkat dengan model yang diunduh setelah penyedia gagal</string>
+    <string name="dictate__fallback_title">Cadangan</string>
+    <string name="dictate__fallback_off">Nonaktif</string>
+    <string name="dictate__fallback_hint">Mengambil alih dikte saat penyedia transkripsi tidak dapat dijangkau.</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Prompt penataan ulang yang tersimpan</string>
     <string name="dictate__floating_button_undo_failed">Tidak dapat membatalkan — teks mungkin telah berubah.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Salin setiap dikte ke papan klip</string>

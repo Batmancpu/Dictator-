@@ -1365,7 +1365,7 @@
     <string name="dictate__error_network">Нет подключения к интернету</string>
     <string name="dictate__error_server">Поставщик недоступен — повторите попытку</string>
     <string name="dictate__error_try_on_device">Нет связи — попробуйте на устройстве</string>
-    <string name="dictate__error_try_on_device_detail">Расшифровке на устройстве связь не нужна вообще — это помогает и когда поставщик заблокирован, и когда нет сети. Настройте её в разделе Поставщики ИИ и включите Офлайн-резерв, чтобы она подключалась сама.</string>
+    <string name="dictate__error_try_on_device_detail">Расшифровке на устройстве связь не нужна вообще — это помогает и когда поставщик заблокирован, и когда нет сети. Настройте её в разделе Поставщики ИИ и выберите её в пункте Резерв, чтобы она подключалась сама.</string>
     <string name="dictate__action_settings">Открыть настройки</string>
     <string name="dictate__action_error_details">Показать сведения об ошибке</string>
     <string name="dictate__error_details_title">Сведения об ошибке</string>
@@ -1773,8 +1773,9 @@
         <item quantity="many">{count} языков</item>
         <item quantity="other">{count} языков</item>
     </plurals>
-    <string name="dictate__local_fallback_title">Офлайн-резерв</string>
-    <string name="dictate__local_fallback_summary">Без сети транскрибируйте на устройстве скачанной моделью после сбоя провайдера</string>
+    <string name="dictate__fallback_title">Резерв</string>
+    <string name="dictate__fallback_off">Выключено</string>
+    <string name="dictate__fallback_hint">Берёт диктовку на себя, когда поставщик транскрибирования недоступен.</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Сохранённые промпты переформулирования</string>
     <string name="dictate__floating_button_undo_failed">Не удалось отменить — возможно, текст изменился.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Копировать каждую диктовку в буфер обмена</string>

@@ -112,7 +112,9 @@ dictate straight into apps while another keyboard is open.
 There are four ways to power it, and you pick one during setup: **your own API key** with the
 provider of your choice, **a server of your own**, **a model on the device** with no network at
 all, or **prepaid credit** if you would rather not deal with any of that. The first three cost
-Dictate nothing and are not going anywhere.
+Dictate nothing and are not going anywhere. They also combine: name a second one as the fallback,
+and it takes over whenever the first cannot be reached — a server at home, say, with a cloud
+provider or the phone itself for when you are out.
 
 <br>
 

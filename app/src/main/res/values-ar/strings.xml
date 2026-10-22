@@ -1217,7 +1217,7 @@
     <string name="dictate__error_network">لا يوجد اتصال بالإنترنت</string>
     <string name="dictate__error_server">المزوّد غير متاح – أعد المحاولة</string>
     <string name="dictate__error_try_on_device">لا يوجد اتصال – جرّب على الجهاز</string>
-    <string name="dictate__error_try_on_device_detail">لا يحتاج التفريغ على الجهاز إلى أي اتصال — وهذا مفيد عندما يكون المزوّد محجوبًا، ومفيد كذلك عند انقطاع الشبكة. أعدّه من مزوّدو الذكاء الاصطناعي، ثم فعّل احتياطي دون اتصال ليتولى المهمة من تلقاء نفسه.</string>
+    <string name="dictate__error_try_on_device_detail">لا يحتاج التفريغ على الجهاز إلى أي اتصال — وهذا مفيد عندما يكون المزوّد محجوبًا، ومفيد كذلك عند انقطاع الشبكة. أعدّه من مزوّدو الذكاء الاصطناعي، ثم اختره في الاحتياطي ليتولى المهمة من تلقاء نفسه.</string>
     <string name="dictate__action_settings">فتح الإعدادات</string>
     <string name="dictate__action_error_details">إظهار تفاصيل الخطأ</string>
     <string name="dictate__error_details_title">تفاصيل الخطأ</string>
@@ -1627,8 +1627,9 @@
         <item quantity="many">{count} لغة</item>
         <item quantity="other">{count} لغة</item>
     </plurals>
-    <string name="dictate__local_fallback_title">احتياطي دون اتصال</string>
-    <string name="dictate__local_fallback_summary">عند عدم الاتصال، فرّغ الصوت محليًا بالنموذج المُنزَّل بعد فشل المزوّد</string>
+    <string name="dictate__fallback_title">الاحتياطي</string>
+    <string name="dictate__fallback_off">إيقاف</string>
+    <string name="dictate__fallback_hint">يتولى الإملاء عندما يتعذّر الوصول إلى مزوّد التفريغ النصي.</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">مطالبات إعادة الصياغة المحفوظة</string>
     <string name="dictate__floating_button_undo_failed">تعذّر التراجع — ربما تغيّر النص.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">نسخ كل إملاء إلى الحافظة</string>

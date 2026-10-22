@@ -2024,7 +2024,7 @@
     <string name="dictate__error_network" comment="Short error: no network connection reached the provider">No internet connection</string>
     <string name="dictate__error_server" comment="Short error: the provider returned a 5xx server error">Provider unavailable – try again</string>
     <string name="dictate__error_try_on_device" comment="Short error replacing the timeout/no-connection headline when the recording never reached the provider and on-device transcription is not set up yet. Keep it short – it has one line on the keyboard.">No connection – try on-device</string>
-    <string name="dictate__error_try_on_device_detail" comment="Longer explanation in the error details popup, shown under the raw provider error. Match the wording of the settings screens: 'AI providers' and 'Offline fallback'.">On-device transcription needs no connection at all — useful where a provider is blocked as well as where there is no signal. Set it up under AI providers, then turn on Offline fallback so it takes over by itself.</string>
+    <string name="dictate__error_try_on_device_detail" comment="Longer explanation in the error details popup, shown under the raw provider error. Match the wording of the settings screens: 'AI providers' and 'Fallback'.">On-device transcription needs no connection at all — useful where a provider is blocked as well as where there is no signal. Set it up under AI providers, then pick it as Fallback so it takes over by itself.</string>
     <string name="dictate__action_settings" comment="Button on a fixable error that opens the Dictate provider settings">Open settings</string>
     <string name="dictate__action_error_details" comment="Accessibility label: tapping the error shows the full provider error text">Show error details</string>
     <string name="dictate__error_details_title" comment="Title of the popup that shows the full provider error text">Error details</string>
@@ -2290,8 +2290,9 @@
     </plurals>
     <string name="dictate__local_model_family_installed" comment="Shown under a model family (Whisper, Kroko) in the on-device picker when some of its variants are downloaded. Both {count} and {total} are numbers.">{count} of {total} installed</string>
     <string name="dictate__local_model_family_open" comment="Spoken action label for the row that opens a model family (Whisper, Kroko) and shows the variants inside it">Show variants</string>
-    <string name="dictate__local_fallback_title" comment="Title of the toggle that enables on-device transcription as an offline fallback">Offline fallback</string>
-    <string name="dictate__local_fallback_summary" comment="Explains the offline fallback toggle">When offline, transcribe on-device with the downloaded model after the provider fails</string>
+    <string name="dictate__fallback_title" comment="Settings row under AI providers, beside 'Transcription' and 'Rewording': the provider that takes over a dictation when the transcription provider cannot do it — the on-device engine or another set-up provider. Also the screen-reader name of the detour icon shown next to a fallback provider's name while it transcribes. Keep it short.">Fallback</string>
+    <string name="dictate__fallback_off" comment="The Fallback setting's value when no provider takes over">Off</string>
+    <string name="dictate__fallback_hint" comment="One line at the top of the Fallback picker, saying when the chosen provider takes over. 'Reached' as in: no connection could be made at all; a provider that is merely slow keeps the dictation.">Takes over a dictation when the transcription provider can’t be reached.</string>
 
     <!-- Dictate recording settings -->
     <string name="dictate__recording_group" comment="Group title for recording-related settings">Recording</string>

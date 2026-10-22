@@ -1142,7 +1142,7 @@
     <string name="dictate__error_network">Nessuna connessione a internet</string>
     <string name="dictate__error_server">Fornitore non disponibile – riprova</string>
     <string name="dictate__error_try_on_device">Nessuna connessione – prova in locale</string>
-    <string name="dictate__error_try_on_device_detail">La trascrizione sul dispositivo non richiede alcuna connessione: è utile sia quando un fornitore è bloccato sia quando manca il segnale. Impostala in Fornitori IA e attiva Ripiego offline perché intervenga da sola.</string>
+    <string name="dictate__error_try_on_device_detail">La trascrizione sul dispositivo non richiede alcuna connessione: è utile sia quando un fornitore è bloccato sia quando manca il segnale. Impostala in Fornitori IA e sceglila in Ripiego perché intervenga da sola.</string>
     <string name="dictate__action_settings">Apri impostazioni</string>
     <string name="dictate__action_error_details">Mostra dettagli dell\'errore</string>
     <string name="dictate__error_details_title">Dettagli dell\'errore</string>
@@ -1548,8 +1548,9 @@
         <item quantity="one">{count} lingua</item>
         <item quantity="other">{count} lingue</item>
     </plurals>
-    <string name="dictate__local_fallback_title">Ripiego offline</string>
-    <string name="dictate__local_fallback_summary">Offline, trascrivi sul dispositivo con il modello scaricato dopo che il provider fallisce</string>
+    <string name="dictate__fallback_title">Ripiego</string>
+    <string name="dictate__fallback_off">Disattivato</string>
+    <string name="dictate__fallback_hint">Prende in carico la dettatura quando il fornitore di trascrizione non è raggiungibile.</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Prompt di riformulazione salvati</string>
     <string name="dictate__floating_button_undo_failed">Impossibile annullare — il testo potrebbe essere cambiato.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Copia ogni dettatura negli appunti</string>

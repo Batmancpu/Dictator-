@@ -75,6 +75,18 @@ data class ProviderConfig(
      * request per provider, because a list compiled into the app can never fail (#384).
      */
     val curatedModels: List<String> = emptyList(),
+    /**
+     * Another provider is waiting to take over if this one cannot be reached (#455): give up on a server
+     * that does not answer the connection after a short [UNREACHABLE_CONNECT_TIMEOUT_SECONDS], and do not
+     * retry a connection that could not be made at all ([DictateApiException.isConnectFailure]).
+     *
+     * Without this the hand-over came too late to be of use. A home server seen from mobile data is a
+     * private address nothing routes to, so each attempt runs the full connect timeout, and three retries
+     * three seconds apart made every dictation away from home wait up to forty seconds before the other
+     * provider was even asked. Everything after a connection was made keeps its retries: there the
+     * provider has the audio, and the answer is still worth waiting for.
+     */
+    val handOverUnreachable: Boolean = false,
 ) {
     /** Base URL guaranteed to end with a single trailing slash. */
     val normalizedBaseUrl: String
@@ -83,6 +95,14 @@ data class ProviderConfig(
     companion object {
         /** Two minutes per read or write, which is the app's answer to "is this connection alive?". */
         const val DEFAULT_TIMEOUT_SECONDS = 120L
+
+        /**
+         * The connect timeout while another provider is waiting ([handOverUnreachable]). A server on the
+         * same network answers in milliseconds and a cloud provider on a usable mobile link in well under a
+         * second; four seconds still allows two lost connection attempts (TCP resends after one second,
+         * then after two more) before the dictation moves on.
+         */
+        const val UNREACHABLE_CONNECT_TIMEOUT_SECONDS = 4L
     }
 }
 

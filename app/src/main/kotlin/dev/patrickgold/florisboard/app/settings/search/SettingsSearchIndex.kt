@@ -162,6 +162,7 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.dictate__proxy_title, R.string.dictate__providers_title, Routes.Settings.DictateProviders, parentRes = R.string.dictate__title, anchor = "dictate__proxy_title"),
         SettingsSearchEntry(R.string.dictate__providers_active_rewording, R.string.dictate__providers_title, Routes.Settings.DictateProviders, parentRes = R.string.dictate__title, anchor = "dictate__providers_active_rewording"),
         SettingsSearchEntry(R.string.dictate__providers_active_transcription, R.string.dictate__providers_title, Routes.Settings.DictateProviders, parentRes = R.string.dictate__title, anchor = "dictate__providers_active_transcription"),
+        SettingsSearchEntry(R.string.dictate__fallback_title, R.string.dictate__providers_title, Routes.Settings.DictateProviders, parentRes = R.string.dictate__title, anchor = "dictate__fallback_title"),
         // The long-press-send-local checkbox lives inside the on-device provider dialog (issue #228); no
         // scroll anchor exists for a dialog, so search just lands on the Providers screen (on-device is at
         // the top of the list).

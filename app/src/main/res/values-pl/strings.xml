@@ -1376,7 +1376,7 @@
     <string name="dictate__error_network">Brak połączenia z internetem</string>
     <string name="dictate__error_server">Dostawca niedostępny – spróbuj ponownie</string>
     <string name="dictate__error_try_on_device">Brak połączenia – spróbuj lokalnie</string>
-    <string name="dictate__error_try_on_device_detail">Transkrypcja na urządzeniu nie potrzebuje żadnego połączenia — pomaga zarówno wtedy, gdy dostawca jest zablokowany, jak i wtedy, gdy nie ma zasięgu. Skonfiguruj ją w sekcji Dostawcy AI i włącz Tryb offline awaryjny, aby przejmowała pracę sama.</string>
+    <string name="dictate__error_try_on_device_detail">Transkrypcja na urządzeniu nie potrzebuje żadnego połączenia — pomaga zarówno wtedy, gdy dostawca jest zablokowany, jak i wtedy, gdy nie ma zasięgu. Skonfiguruj ją w sekcji Dostawcy AI i wybierz ją w opcji Zapasowy dostawca, aby przejmowała pracę sama.</string>
     <string name="dictate__action_settings">Otwórz ustawienia</string>
     <string name="dictate__action_error_details">Pokaż szczegóły błędu</string>
     <string name="dictate__error_details_title">Szczegóły błędu</string>
@@ -1784,8 +1784,9 @@
         <item quantity="many">{count} języków</item>
         <item quantity="other">{count} języków</item>
     </plurals>
-    <string name="dictate__local_fallback_title">Tryb offline awaryjny</string>
-    <string name="dictate__local_fallback_summary">Offline transkrybuj na urządzeniu pobranym modelem, gdy dostawca zawiedzie</string>
+    <string name="dictate__fallback_title">Zapasowy dostawca</string>
+    <string name="dictate__fallback_off">Wyłączone</string>
+    <string name="dictate__fallback_hint">Przejmuje dyktowanie, gdy dostawca transkrypcji jest nieosiągalny.</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Zapisane polecenia przeformułowania</string>
     <string name="dictate__floating_button_undo_failed">Nie można cofnąć — tekst mógł się zmienić.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Kopiuj każde dyktowanie do schowka</string>

@@ -1291,7 +1291,7 @@
     <string name="dictate__error_network">インターネット接続がありません</string>
     <string name="dictate__error_server">プロバイダーが利用できません – もう一度お試しください</string>
     <string name="dictate__error_try_on_device">接続なし – 端末内で試す</string>
-    <string name="dictate__error_try_on_device_detail">端末内の文字起こしは接続をまったく必要としません。プロバイダーがブロックされている場合にも、電波がない場合にも役立ちます。「AIプロバイダー」で設定し、「オフライン時のフォールバック」をオンにすると、自動的に引き継ぎます。</string>
+    <string name="dictate__error_try_on_device_detail">端末内の文字起こしは接続をまったく必要としません。プロバイダーがブロックされている場合にも、電波がない場合にも役立ちます。「AIプロバイダー」で設定し、「フォールバック」で選ぶと、自動的に引き継ぎます。</string>
     <string name="dictate__action_settings">設定を開く</string>
     <string name="dictate__action_error_details">エラーの詳細を表示</string>
     <string name="dictate__error_details_title">エラーの詳細</string>
@@ -1696,8 +1696,9 @@
     <plurals name="dictate__local_model_languages">
         <item quantity="other">{count}言語</item>
     </plurals>
-    <string name="dictate__local_fallback_title">オフライン時のフォールバック</string>
-    <string name="dictate__local_fallback_summary">オフライン時、プロバイダーが失敗したらダウンロード済みモデルで端末上で文字起こしします</string>
+    <string name="dictate__fallback_title">フォールバック</string>
+    <string name="dictate__fallback_off">オフ</string>
+    <string name="dictate__fallback_hint">文字起こしプロバイダーに接続できないときに、音声入力を引き継ぎます。</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">保存された言い換えプロンプト</string>
     <string name="dictate__floating_button_undo_failed">元に戻せませんでした。テキストが変更された可能性があります。</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">口述をすべてクリップボードにコピー</string>

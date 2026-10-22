@@ -1358,7 +1358,7 @@
     <string name="dictate__error_network">Nincs internetkapcsolat</string>
     <string name="dictate__error_server">A szolgáltató nem érhető el – próbálja újra</string>
     <string name="dictate__error_try_on_device">Nincs kapcsolat – próbálja eszközön</string>
-    <string name="dictate__error_try_on_device_detail">Az eszközön futó átíráshoz egyáltalán nem kell kapcsolat — akkor is segít, ha a szolgáltató blokkolva van, és akkor is, ha nincs térerő. Állítsa be az MI-szolgáltatók alatt, majd kapcsolja be az Offline tartalék funkciót, hogy magától átvegye a munkát.</string>
+    <string name="dictate__error_try_on_device_detail">Az eszközön futó átíráshoz egyáltalán nem kell kapcsolat — akkor is segít, ha a szolgáltató blokkolva van, és akkor is, ha nincs térerő. Állítsa be az MI-szolgáltatók alatt, majd válassza ki a Tartalék beállításnál, hogy magától átvegye a munkát.</string>
     <string name="dictate__action_settings">Beállítások megnyitása</string>
     <string name="dictate__action_error_details">Hiba részleteinek megjelenítése</string>
     <string name="dictate__error_details_title">Hiba részletei</string>
@@ -1764,8 +1764,9 @@
         <item quantity="one">{count} nyelv</item>
         <item quantity="other">{count} nyelv</item>
     </plurals>
-    <string name="dictate__local_fallback_title">Offline tartalék</string>
-    <string name="dictate__local_fallback_summary">Offline állapotban a letöltött modellel írd át helyben, miután a szolgáltató hibázott</string>
+    <string name="dictate__fallback_title">Tartalék</string>
+    <string name="dictate__fallback_off">Ki</string>
+    <string name="dictate__fallback_hint">Átveszi a diktálást, ha az átírási szolgáltató nem érhető el.</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Mentett átfogalmazási utasítások</string>
     <string name="dictate__floating_button_undo_failed">A visszavonás nem sikerült — a szöveg időközben megváltozhatott.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Minden diktálás másolása a vágólapra</string>

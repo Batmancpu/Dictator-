@@ -32,4 +32,14 @@ class HistoryEngineTest {
         // Still grouped under the provider the dictation was sent to.
         assertEquals("openai", mixed.providerId)
     }
+
+    @Test
+    fun aModelBothProvidersRunIsNamedOnce() {
+        // A home server and a cloud fallback can serve the same model under the same name (#455).
+        val home = HistoryEngine("custom:home", "Home server", "whisper-1")
+        val cloud = HistoryEngine("custom:cloud", "Cloud", "whisper-1")
+        val mixed = home.fellBackTo(cloud, partly = true)
+        assertEquals("Home server + Cloud", mixed.providerName)
+        assertEquals("whisper-1", mixed.model)
+    }
 }

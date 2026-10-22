@@ -1338,7 +1338,7 @@
     <string name="dictate__error_network">İnternet bağlantısı yok</string>
     <string name="dictate__error_server">Sağlayıcı kullanılamıyor – tekrar deneyin</string>
     <string name="dictate__error_try_on_device">Bağlantı yok – cihazda deneyin</string>
-    <string name="dictate__error_try_on_device_detail">Cihaz üzerinde yazıya dökme hiçbir bağlantı gerektirmez — bir sağlayıcı engellendiğinde de, şebeke olmadığında da işe yarar. Yapay zekâ sağlayıcıları bölümünden kurun ve kendiliğinden devreye girmesi için Çevrimdışı yedek seçeneğini açın.</string>
+    <string name="dictate__error_try_on_device_detail">Cihaz üzerinde yazıya dökme hiçbir bağlantı gerektirmez — bir sağlayıcı engellendiğinde de, şebeke olmadığında da işe yarar. Yapay zekâ sağlayıcıları bölümünden kurun ve kendiliğinden devreye girmesi için Yedek seçeneğinde seçin.</string>
     <string name="dictate__action_settings">Ayarları aç</string>
     <string name="dictate__action_error_details">Hata ayrıntılarını göster</string>
     <string name="dictate__error_details_title">Hata ayrıntıları</string>
@@ -1744,8 +1744,9 @@
         <item quantity="one">{count} dil</item>
         <item quantity="other">{count} dil</item>
     </plurals>
-    <string name="dictate__local_fallback_title">Çevrimdışı yedek</string>
-    <string name="dictate__local_fallback_summary">Çevrimdışıyken, sağlayıcı başarısız olduktan sonra indirilen modelle cihazda yazıya dök</string>
+    <string name="dictate__fallback_title">Yedek</string>
+    <string name="dictate__fallback_off">Kapalı</string>
+    <string name="dictate__fallback_hint">Yazıya dökme sağlayıcısına ulaşılamadığında dikteyi devralır.</string>
     <string name="backup_and_restore__back_up__files_dictate_prompts">Kaydedilen yeniden ifade istemleri</string>
     <string name="dictate__floating_button_undo_failed">Geri alınamadı — metin değişmiş olabilir.</string>
     <string name="dictate__floating_button_copy_to_clipboard_title">Her dikteyi panoya kopyala</string>

@@ -29,6 +29,7 @@ import dev.patrickgold.florisboard.dictate.DictateFloatingButtonShowWhen
 import dev.patrickgold.florisboard.dictate.DictateLongformMode
 import dev.patrickgold.florisboard.dictate.audio.AudioSpeedUp
 import dev.patrickgold.florisboard.dictate.audio.DictateAudioSource
+import dev.patrickgold.florisboard.dictate.provider.ProviderRegistry
 import dev.patrickgold.florisboard.dictate.DictateFloatingButtonSize
 import dev.patrickgold.florisboard.dictate.DictateLegacyLayout
 import dev.patrickgold.florisboard.dictate.DictatePromptsLayout
@@ -316,13 +317,14 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             default = "openai",
         )
 
-        // On-device offline fallback (issue #104): when the active provider is a cloud one and its call
-        // fails because the device is offline (after the normal retries), retry once on-device using the
-        // local provider's downloaded model. No effect if the local model isn't installed, or if the
-        // active provider is already the local one.
-        val localFallbackEnabled = boolean(
-            key = "dictate__local_fallback_enabled",
-            default = false,
+        // The provider that takes over a dictation the active transcription provider cannot handle, as a
+        // provider account id; empty is off. The on-device engine (issue #104, id "local") takes over when
+        // the device is offline or the request times out; any other set-up provider (issue #455) only when
+        // the active one cannot be reached at all. See TranscriptionFallback. Replaces the boolean
+        // `dictate__local_fallback_enabled`, which migrate() carries over as "local".
+        val transcriptionFallbackId = string(
+            key = "dictate__transcription_fallback",
+            default = "",
         )
 
         // Wear OS standalone (#106): when on, the paired watch is allowed to transcribe by itself and
@@ -2076,6 +2078,21 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             // keyboard's key presses do (Sounds & Vibration), the way the keyboard's microphone always has.
             // Nothing reads the old value any more, so it is dropped rather than carried along.
             "dictate__floating_button_haptic" -> entry.reset()
+
+            // The offline-fallback switch became one choice of the transcription fallback (issue #455):
+            // switched on, it meant the on-device engine; switched off, nothing at all. Runs on load and on
+            // a backup import alike.
+            "dictate__local_fallback_enabled" -> {
+                if (entry.rawValue == "true") {
+                    entry.transform(
+                        type = PreferenceType.string(),
+                        key = "dictate__transcription_fallback",
+                        rawValue = ProviderRegistry.LOCAL.id,
+                    )
+                } else {
+                    entry.reset()
+                }
+            }
 
             // Default: keep entry
             else -> entry.keepAsIs()

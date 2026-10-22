@@ -26,18 +26,19 @@ data class HistoryEngine(
     val model: String,
 ) {
     /**
-     * This engine after the offline fallback handed work to [onDevice], the phone's own model. When it
-     * took the whole dictation the entry is simply [onDevice]'s. When it took only [partly] — a long
-     * dictation whose connection dropped halfway, some segments answered by the provider and the rest on
-     * the phone — the entry names both, provider first, and keeps the provider's id.
+     * This engine after a fallback took over from it: the phone's own model (#104) or another provider
+     * (#455). When the fallback took the whole dictation the entry is simply [fallback]'s. When it took only
+     * [partly] — a long dictation whose connection dropped halfway, some segments answered by the provider
+     * and the rest by the fallback — the entry names both, provider first, and keeps the provider's id. A
+     * model both of them run is named once.
      */
-    fun fellBackTo(onDevice: HistoryEngine, partly: Boolean = false): HistoryEngine =
+    fun fellBackTo(fallback: HistoryEngine, partly: Boolean = false): HistoryEngine =
         if (partly) {
             copy(
-                providerName = "$providerName + ${onDevice.providerName}",
-                model = "$model + ${onDevice.model}",
+                providerName = listOf(providerName, fallback.providerName).distinct().joinToString(" + "),
+                model = listOf(model, fallback.model).distinct().joinToString(" + "),
             )
         } else {
-            onDevice
+            fallback
         }
 }
