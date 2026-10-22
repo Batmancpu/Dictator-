@@ -1833,6 +1833,20 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
             }
         }
 
+        // A finished address, offered as typed (discussion #445). The typed word only ever reached the strip
+        // beside a correction (issues #150, #241), and an address is never corrected (see
+        // [isDictionaryJudgeable]) — so it never appeared at all, and there was nothing to long-press to
+        // put it in the personal dictionary. Left-most, never auto-committed: it is what is already there.
+        // Not when the user's own copy of it is coming anyway, from the dictionary or the learned words.
+        if (WordRun.isAddressLike(word) && !isKnown && learned.none { (stored, _) -> stored.equals(word, ignoreCase = true) }) {
+            out.putIfAbsent(
+                word.lowercase(),
+                WordSuggestionCandidate(
+                    text = word, confidence = 1.0, isEligibleForAutoCommit = false, sourceProvider = this,
+                ),
+            )
+        }
+
         // The completions the sentence expects, ahead of the ones the language merely makes common
         // (issue #334, his §3.5 and §3.9). "brand ne" offers `new` before `near`, because `new` is what
         // follows `brand`; without a previous word this block is skipped and the strip is what it was.
@@ -2061,6 +2075,18 @@ class LatinLanguageProvider(context: Context) : SpellingProvider, SuggestionProv
                     ),
                 )
             }
+        }
+
+        // A name with a dot inside it, `my.company` or `internal.domain` (discussion #445). The break
+        // iterator already keeps it in one piece — a dot between letters joins a word in UAX#29 — but no
+        // dictionary word starts with it and none is one edit away, so the strip stayed empty and there was
+        // nothing to long-press. Offered as typed, and only when the strip would otherwise be empty: every
+        // word that has anything better keeps exactly the strip it had, and a sentence that lost its space
+        // after a full stop (`end.next`) merely gets a harmless offer of itself.
+        if (out.isEmpty() && WordRun.isDottedName(word)) {
+            out[word.lowercase()] = WordSuggestionCandidate(
+                text = word, confidence = 1.0, isEligibleForAutoCommit = false, sourceProvider = this,
+            )
         }
 
         return out.values.take(maxCandidateCount)
