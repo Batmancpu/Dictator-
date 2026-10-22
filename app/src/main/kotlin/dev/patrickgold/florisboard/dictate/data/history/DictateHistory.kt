@@ -109,12 +109,21 @@ interface DictateHistoryDao {
 
     // A successful re-transcribe also clears the failed flag (the recovery succeeded). [originalText] is
     // rewritten in the same statement on purpose: the new run produced its own raw transcript, and leaving
-    // the previous one behind would pair a result with an "original" it never came from (issue #240).
+    // the previous one behind would pair a result with an "original" it never came from (issue #240). The
+    // engine is rewritten with it for the same reason: the text now comes from this run's (issue #457).
     @Query(
-        "UPDATE $DICTATE_HISTORY_TABLE SET text = :text, originalText = :originalText, failed = 0 " +
+        "UPDATE $DICTATE_HISTORY_TABLE SET text = :text, originalText = :originalText, " +
+            "providerId = :providerId, providerName = :providerName, model = :model, failed = 0 " +
             "WHERE ${BaseColumns._ID} = :id"
     )
-    suspend fun updateText(id: Long, text: String, originalText: String)
+    suspend fun updateText(
+        id: Long,
+        text: String,
+        originalText: String,
+        providerId: String,
+        providerName: String,
+        model: String,
+    )
 
     @Query("UPDATE $DICTATE_HISTORY_TABLE SET pinned = :pinned WHERE ${BaseColumns._ID} = :id")
     suspend fun setPinned(id: Long, pinned: Boolean)
@@ -270,17 +279,40 @@ object DictateHistoryStore {
         return id
     }
 
-    /** Overwrites an existing entry's transcript in place (used when re-transcribing its audio). */
-    suspend fun updateText(context: Context, id: Long, text: String, originalText: String = "") {
+    /**
+     * Overwrites an existing entry's transcript in place (used when re-transcribing its audio), naming the
+     * [engine] that produced it: a re-transcribe runs on whichever provider is active now (issue #457).
+     */
+    suspend fun updateText(
+        context: Context,
+        id: Long,
+        text: String,
+        originalText: String = "",
+        engine: HistoryEngine,
+    ) {
         if (text.isBlank()) return
-        db(context).dao().updateText(id, text, originalText)
+        db(context).dao().updateText(id, text, originalText, engine)
         // The file already in the export folder now says something this entry no longer does.
         DictateHistoryExporter.enqueue(context, id)
     }
 
+    private suspend fun DictateHistoryDao.updateText(
+        id: Long,
+        text: String,
+        originalText: String,
+        engine: HistoryEngine,
+    ) = updateText(
+        id, text, originalText,
+        providerId = engine.providerId,
+        providerName = engine.providerName.ifBlank { engine.providerId },
+        model = engine.model,
+    )
+
     /**
      * Turns the placeholder row written when the audio was sent (issue #358) into the finished dictation:
      * the transcript replaces the placeholder and [DictateHistoryDao.updateText] clears the failed flag.
+     * The placeholder named the provider the audio was sent to; [engine] is the one whose text came back,
+     * which after the offline fallback or a held stop button is the phone's own model (issue #457).
      *
      * [keepAudio] is the audio-retention preference. The placeholder had to force the WAV in — a
      * dictation that never comes back has nothing else to recover from — but retention governs
@@ -293,10 +325,11 @@ object DictateHistoryStore {
         text: String,
         originalText: String = "",
         keepAudio: Boolean,
+        engine: HistoryEngine,
     ) {
         if (text.isBlank()) return
         val dao = db(context).dao()
-        dao.updateText(id, text, originalText)
+        dao.updateText(id, text, originalText, engine)
         if (!keepAudio) {
             dao.getById(id)?.audioPath?.let { runCatching { File(it).delete() } }
             dao.clearAudio(id)

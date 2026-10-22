@@ -23,6 +23,7 @@ import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.Transaction
+import androidx.room.Update
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import dev.patrickgold.florisboard.ime.nlp.latin.WordLearningGate
@@ -240,6 +241,80 @@ abstract class LearnedWordsDao {
             return
         }
         insertBigram(LearnedBigramEntry(prev = prev, word = word, lang = lang, count = 1, lastUsed = now))
+    }
+
+    // ── Re-keying ────────────────────────────────────────────────────────────────────────────────
+
+    @Update
+    abstract suspend fun updateWords(entries: List<LearnedWordEntry>)
+
+    @Update
+    abstract suspend fun updateBigrams(entries: List<LearnedBigramEntry>)
+
+    @Query("DELETE FROM $LEARNED_WORDS_TABLE WHERE id IN (:ids)")
+    abstract suspend fun deleteWordsById(ids: List<Long>)
+
+    @Query("DELETE FROM $LEARNED_BIGRAMS_TABLE WHERE id IN (:ids)")
+    abstract suspend fun deleteBigramsById(ids: List<Long>)
+
+    /**
+     * Rebuilds every stored key with [fold] — see [LearnedRefold]. Deletes go first: a merged row takes
+     * over a key the rows it absorbs may still hold, and the unique indices would refuse it otherwise.
+     */
+    @Transaction
+    open suspend fun refold(fold: (lang: String, word: String) -> String) {
+        val words = LearnedRefold.words(allWords(), fold)
+        if (words.deletes.isNotEmpty()) deleteWordsById(words.deletes)
+        if (words.updates.isNotEmpty()) updateWords(words.updates)
+        val bigrams = LearnedRefold.bigrams(allBigrams(), fold)
+        if (bigrams.deletes.isNotEmpty()) deleteBigramsById(bigrams.deletes)
+        if (bigrams.updates.isNotEmpty()) updateBigrams(bigrams.updates)
+    }
+}
+
+/**
+ * Brings stored keys up to a changed fold (issue #451).
+ *
+ * A key is stored rather than computed (see [LearnedWordEntry.key]), so when a language starts folding
+ * — Polish did, to restore its accents — its rows are filed under keys nothing looks up any more: `krzyś`
+ * where the keyboard now asks for `krzys`. Each row's key is recomputed from the spelling, and rows that
+ * now share one are merged the way [LearnedWordsDatabase.MIGRATION_1_2] merges them: counts added, the
+ * newest spelling and recency kept, promoted if any of them was.
+ *
+ * Pure, so the merge can be tested without a database.
+ */
+internal object LearnedRefold {
+
+    data class Plan<T>(val updates: List<T>, val deletes: List<Long>)
+
+    fun words(rows: List<LearnedWordEntry>, fold: (lang: String, word: String) -> String): Plan<LearnedWordEntry> {
+        val updates = ArrayList<LearnedWordEntry>()
+        val deletes = ArrayList<Long>()
+        for ((target, group) in rows.groupBy { it.lang to fold(it.lang, it.word) }) {
+            if (group.size == 1 && group[0].key == target.second) continue
+            val newest = group.maxBy { it.lastUsed }
+            updates += newest.copy(
+                key = target.second,
+                count = group.sumOf { it.count },
+                promoted = group.any { it.promoted },
+            )
+            group.filter { it.id != newest.id }.mapTo(deletes) { it.id }
+        }
+        return Plan(updates, deletes)
+    }
+
+    fun bigrams(rows: List<LearnedBigramEntry>, fold: (lang: String, word: String) -> String): Plan<LearnedBigramEntry> {
+        val updates = ArrayList<LearnedBigramEntry>()
+        val deletes = ArrayList<Long>()
+        // The previous word is stored folded already, and only that. Folding it again gives what the new
+        // fold of its original spelling would have been, because every fold ignores case anyway.
+        for ((target, group) in rows.groupBy { Triple(it.lang, fold(it.lang, it.prev), it.word) }) {
+            if (group.size == 1 && group[0].prev == target.second) continue
+            val newest = group.maxBy { it.lastUsed }
+            updates += newest.copy(prev = target.second, count = group.sumOf { it.count })
+            group.filter { it.id != newest.id }.mapTo(deletes) { it.id }
+        }
+        return Plan(updates, deletes)
     }
 }
 

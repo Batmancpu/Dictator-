@@ -58,6 +58,13 @@ has not reached yet.
   in lowercase is stored in lowercase when it is a word of its own (`let`, 3 words) and dropped when it is
   an accent-less spelling of another one (`more` for môre, `le` for lê, 2 words), so the keyboard can
   still put the accent back.
+- `pl` settles its **spellings without diacritics** against the Leipzig word counts of
+  `pol_news_2024_1M` (`--accent-twins`, issue #451), because part of the Polish OpenSubtitles text is
+  typed without them. A bare spelling whose accented twin that news text writes 16 times as often, and
+  which the subtitles write at least 13 times less often than the twin, is dropped (`cie`, `wiec`, `tez`,
+  `Zycie`: 87 words); a bare spelling Hunspell accepts and the news text uses is added where only its
+  accented twin was listed (`kompozycje` beside `kompozycję`: 247 words). The keyboard restores an accent
+  only where the bare spelling is not a word of its own, so this list is what decides it.
 
 ## Bundled languages
 English (`en`, from the upstream FlorisBoard dictionary) and German (`de`) ship inside the app; all other

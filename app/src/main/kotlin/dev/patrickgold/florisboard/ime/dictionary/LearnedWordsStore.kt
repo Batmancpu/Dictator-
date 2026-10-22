@@ -11,6 +11,7 @@
 package dev.patrickgold.florisboard.ime.dictionary
 
 import android.content.Context
+import dev.patrickgold.florisboard.ime.nlp.latin.DictFold
 import dev.patrickgold.florisboard.ime.nlp.latin.WordLearningGate
 import kotlinx.coroutines.flow.Flow
 import org.florisboard.lib.kotlin.guardedByLock
@@ -83,6 +84,53 @@ object LearnedWordsStore {
 
     private fun nowSeconds(): Long = System.currentTimeMillis() / 1000L
 
+    private const val META_PREFS = "dictate_learned_words_meta"
+    private const val FOLD_REVISION_KEY = "fold_revision"
+
+    @Volatile
+    private var foldChecked = false
+
+    /**
+     * Runs a one-time sweep named [sweep] over [lang]'s learned words: forgets every one [pick] selects
+     * and returns them, or returns null when that sweep already ran. Remembered in the same preference
+     * file as the fold revision, so it runs once per installation, not once per start.
+     */
+    suspend fun forgetOnce(
+        context: Context,
+        lang: String,
+        sweep: String,
+        pick: (LearnedWordEntry) -> Boolean,
+    ): List<LearnedWordEntry>? {
+        val meta = context.applicationContext.getSharedPreferences(META_PREFS, Context.MODE_PRIVATE)
+        val marker = "${sweep}_$lang"
+        if (meta.getBoolean(marker, false)) return null
+        ensureFolded(context)
+        val dao = db(context).dao()
+        val picked = dao.wordsFor(lang).filter(pick)
+        if (picked.isNotEmpty()) {
+            dao.deleteWordsById(picked.map { it.id })
+            invalidate(lang)
+        }
+        meta.edit().putBoolean(marker, true).apply()
+        return picked
+    }
+
+    /**
+     * Rebuilds the stored keys once after [DictFold.REVISION] moved (issue #451) — see [LearnedRefold].
+     * Remembered in a preference rather than redone per launch: it is a pass over every row, and it would
+     * otherwise sit in front of the first suggestion after each start.
+     */
+    private suspend fun ensureFolded(context: Context) {
+        if (foldChecked) return
+        val meta = context.applicationContext.getSharedPreferences(META_PREFS, Context.MODE_PRIVATE)
+        if (meta.getInt(FOLD_REVISION_KEY, 0) < DictFold.REVISION) {
+            db(context).dao().refold { lang, word -> DictFold.foldKey(lang, word) }
+            meta.edit().putInt(FOLD_REVISION_KEY, DictFold.REVISION).apply()
+            invalidate()
+        }
+        foldChecked = true
+    }
+
     private suspend fun invalidate(lang: String? = null) {
         snapshots.withLock { cache -> if (lang == null) cache.clear() else cache.remove(lang) }
         bigramCache.withLock { cache -> if (lang == null) cache.clear() else cache.remove(lang) }
@@ -91,23 +139,27 @@ object LearnedWordsStore {
     // ── Reading (the typing path) ────────────────────────────────────────────────────────────────
 
     /** The decayed, sorted view of [lang]'s learned words. Cached; cheap to call per keystroke. */
-    suspend fun snapshot(context: Context, lang: String): LearnedSnapshot =
-        snapshots.withLock { cache ->
+    suspend fun snapshot(context: Context, lang: String): LearnedSnapshot {
+        ensureFolded(context)
+        return snapshots.withLock { cache ->
             cache.getOrPut(lang) {
                 LearnedSnapshot.of(lang, db(context).dao().wordsFor(lang), nowSeconds())
             }
         }
+    }
 
     /**
      * `"prev word" → count` for [lang], in the same shape as the downloaded bigram tables so the
      * prediction code can read one alongside the other.
      */
-    suspend fun bigrams(context: Context, lang: String): Map<String, Int> =
-        bigramCache.withLock { cache ->
+    suspend fun bigrams(context: Context, lang: String): Map<String, Int> {
+        ensureFolded(context)
+        return bigramCache.withLock { cache ->
             cache.getOrPut(lang) {
                 db(context).dao().bigramsFor(lang).associate { "${it.prev} ${it.word}" to it.count }
             }
         }
+    }
 
     // ── Writing ──────────────────────────────────────────────────────────────────────────────────
 

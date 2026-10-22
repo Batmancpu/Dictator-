@@ -80,7 +80,7 @@ object ElisionEvidence {
     /**
      * The lookup key for an already-folded word.
      *
-     * [DictFold.foldFrench] leaves the apostrophe alone — it is punctuation, not a diacritic — so a corpus
+     * [DictFold.foldAccents] leaves the apostrophe alone — it is punctuation, not a diacritic — so a corpus
      * that writes `qu’à` and a reconstruction that writes `qu'a` would never meet. Unifying the two here
      * rather than inside the fold keeps the dictionary's own keys untouched.
      */

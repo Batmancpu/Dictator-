@@ -21,7 +21,8 @@ Casing was restored, and corpus noise filtered out, using Hunspell dictionaries 
 build-time oracle only (github.com/wooorm/dictionaries and, for Afrikaans, Arabic and the
 Indic languages, github.com/LibreOffice/dictionaries); their word lists are not
 redistributed. Where the Afrikaans one accepts a name in lowercase, the casing the Leipzig
-corpus writes it in mid-sentence was used instead.
+corpus writes it in mid-sentence was used instead. For Polish, the Leipzig word counts also
+decide which spellings without diacritics are words of their own.
 
 
 2. Word-pair and word-triple frequency data for context (autocorrect Tier 2, prediction)

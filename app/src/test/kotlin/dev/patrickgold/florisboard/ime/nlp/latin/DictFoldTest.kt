@@ -37,14 +37,55 @@ class DictFoldTest {
     }
 
     @Test
-    fun `only french, afrikaans and arabic script languages fold non-trivially`() {
+    fun `only french, afrikaans, polish and arabic script languages fold non-trivially`() {
         for (lang in listOf("ar", "fa", "ur", "ckb")) {
             assertTrue(DictFold.hasNonTrivialFold(lang), lang)
+            assertFalse(DictFold.foldsAccents(lang), lang)
         }
-        assertTrue(DictFold.hasNonTrivialFold("fr"))
-        assertTrue(DictFold.hasNonTrivialFold("af"))
-        for (lang in listOf("en", "de", "he", "fa-IR", "", "hi", "bn", "ta")) {
+        for (lang in listOf("fr", "af", "pl")) {
+            assertTrue(DictFold.hasNonTrivialFold(lang), lang)
+            assertTrue(DictFold.foldsAccents(lang), lang)
+        }
+        for (lang in listOf("en", "de", "he", "fa-IR", "", "hi", "bn", "ta", "cs", "sk")) {
             assertFalse(DictFold.hasNonTrivialFold(lang), lang)
+        }
+    }
+
+    // --- polish: the letters behind the long presses (issue #451) --------------------------------
+
+    /**
+     * Every Polish letter reaches its base, `ł` included — the one Unicode does not decompose, and the one
+     * a test of the others alone would never notice missing: `wlasnie` would simply stop finding właśnie.
+     */
+    @Test
+    fun `an unaccented polish spelling reaches its accented entry`() {
+        for ((typed, stored) in listOf(
+            "bedzie" to "będzie",
+            "wlasnie" to "właśnie",
+            "czesc" to "cześć",
+            "dziekuje" to "dziękuję",
+            "rowniez" to "również",
+            "zle" to "źle",
+            "zolw" to "żółw",
+            "lodz" to "Łódź",
+            "ZOLW" to "ŻÓŁW",
+        )) {
+            assertEquals(DictFold.foldKey("pl", stored), DictFold.foldKey("pl", typed), "$typed / $stored")
+        }
+        assertEquals("zazolc gesla jazn", DictFold.foldKey("pl", "zażółć gęślą jaźń"))
+    }
+
+    /** The `ł` rule must not re-key French or Afrikaans: neither writes the letter, so nothing moves. */
+    @Test
+    fun `adding polish leaves french and afrikaans keys alone`() {
+        for (word in listOf("hôte", "œuvre", "wêreld", "naïef", "garçon")) {
+            assertEquals(
+                java.text.Normalizer.normalize(word, java.text.Normalizer.Form.NFD)
+                    .filter { it.category != CharCategory.NON_SPACING_MARK }
+                    .lowercase().replace("œ", "oe").replace("æ", "ae"),
+                DictFold.foldAccents(word),
+                word,
+            )
         }
     }
 
@@ -52,10 +93,10 @@ class DictFoldTest {
 
     @Test
     fun `french accents fold to their base letters`() {
-        assertEquals("hote", DictFold.foldFrench("hôte"))
-        assertEquals("garcon", DictFold.foldFrench("garçon"))
-        assertEquals("eleve", DictFold.foldFrench("élève"))
-        assertEquals("deja", DictFold.foldFrench("de\u0301ja"))
+        assertEquals("hote", DictFold.foldAccents("hôte"))
+        assertEquals("garcon", DictFold.foldAccents("garçon"))
+        assertEquals("eleve", DictFold.foldAccents("élève"))
+        assertEquals("deja", DictFold.foldAccents("de\u0301ja"))
     }
 
     @Test
@@ -67,8 +108,8 @@ class DictFoldTest {
 
     @Test
     fun `french ligatures fold to their keyboard spelling`() {
-        assertEquals("oeuvre", DictFold.foldFrench("œuvre"))
-        assertEquals("aether", DictFold.foldFrench("æther"))
+        assertEquals("oeuvre", DictFold.foldAccents("œuvre"))
+        assertEquals("aether", DictFold.foldAccents("æther"))
     }
 
     /**

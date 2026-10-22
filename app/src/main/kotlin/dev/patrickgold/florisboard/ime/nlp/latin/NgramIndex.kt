@@ -46,6 +46,16 @@ package dev.patrickgold.florisboard.ime.nlp.latin
  * file that is *not* sorted — one of the old count-ordered bigram files still on a device, or any
  * file whose keys were folded on the way in ([DictFold.foldKey] can reorder and even collide them) —
  * is detected during that scan and sorted then, so correctness never depends on the file being right.
+ *
+ * ### The spelling a folded key came from (issue #451)
+ *
+ * Folding merges `z moją` and `z moja` into one key, and a key cannot say which of the two the corpus
+ * wrote. Shown through the dictionary's most frequent spelling instead, French predicted `à` after
+ * "il" and Polish would have predicted `moja` after "z" — 2.8 % and 1.7 % of all prediction mass in
+ * a spelling the corpus never used there. So a folded table also keeps, per entry, the last word as
+ * the corpus spelled it in its commonest line, and how often that line was seen. The spelling sits in
+ * the blob right after its key and only where it differs from the folded word, so an unfolded table,
+ * and every entry whose word has nothing to fold, costs nothing extra.
  */
 class NgramIndex private constructor(
     private val blob: ByteArray,
@@ -53,6 +63,8 @@ class NgramIndex private constructor(
     private val keyEnd: IntArray,
     private val counts: IntArray,
     val size: Int,
+    /** Per entry, the count of the line whose spelling is kept; null when the keys were not folded. */
+    private val spellingCounts: IntArray? = null,
 ) {
     val isEmpty: Boolean get() = size == 0
 
@@ -62,6 +74,31 @@ class NgramIndex private constructor(
         val needle = key.toByteArray(Charsets.UTF_8)
         val at = search(needle, needle.size)
         return if (at >= 0) counts[at].toLong() else 0L
+    }
+
+    /**
+     * The last word of the folded [key] as the corpus wrote it most often, and how often it wrote it
+     * so — or null when the table has no such key. For a table that was not folded this is simply the
+     * key's last word and its whole count.
+     *
+     * [countOf] minus the second value is how often the corpus spelled that word any other way, which
+     * is the evidence for choosing between `że` and `ze` after a given word.
+     */
+    fun spellingOf(key: String): Pair<String, Int>? {
+        if (size == 0) return null
+        val needle = key.toByteArray(Charsets.UTF_8)
+        val at = search(needle, needle.size)
+        if (at < 0) return null
+        return lastWordSpelling(at) to (spellingCounts?.get(at) ?: counts[at])
+    }
+
+    /** The corpus spelling of entry [i]'s last word: the bytes kept after its key, or the key's own. */
+    private fun lastWordSpelling(i: Int): String {
+        val kept = lineStart[i + 1] - keyEnd[i]
+        if (kept > 0) return String(blob, keyEnd[i], kept, Charsets.UTF_8)
+        var from = keyEnd[i]
+        while (from > lineStart[i] && blob[from - 1] != SPACE) from--
+        return String(blob, from, keyEnd[i] - from, Charsets.UTF_8)
     }
 
     /**
@@ -164,7 +201,8 @@ class NgramIndex private constructor(
         /**
          * Parse a `key\tcount\n` table. [fold] is applied to every key when the language needs it
          * ([DictFold.hasNonTrivialFold]); folding can reorder keys and make two of them equal, so the
-         * result is re-sorted and merged whenever the scan finds it out of order.
+         * result is re-sorted and merged whenever the scan finds it out of order. A folded table also
+         * keeps the corpus spelling of each entry's last word — see [spellingOf].
          */
         fun parse(text: String, fold: ((String) -> String)? = null): NgramIndex {
             if (text.isEmpty()) return EMPTY
@@ -173,17 +211,25 @@ class NgramIndex private constructor(
             // per comparison, which a sort of a quarter of a million keys does millions of times.
             val keys = ArrayList<ByteArray>(text.length / 24)
             val values = ArrayList<Int>(text.length / 24)
+            // The line's last word as written, where folding changed it; null where it did not.
+            val spellings = if (fold != null) ArrayList<ByteArray?>(text.length / 24) else null
             var sorted = true
             text.lineSequence().forEach { line ->
                 val tab = line.indexOf('\t')
                 if (tab <= 0) return@forEach
                 val count = line.substring(tab + 1).toIntOrNull() ?: return@forEach
-                val key = line.substring(0, tab).let { if (fold != null) fold(it) else it }
+                val raw = line.substring(0, tab)
+                val key = if (fold != null) fold(raw) else raw
                 if (key.isEmpty()) return@forEach
                 val encoded = key.toByteArray(Charsets.UTF_8)
                 if (keys.isNotEmpty() && compareBytes(keys[keys.size - 1], encoded) > 0) sorted = false
                 keys.add(encoded)
                 values.add(count)
+                spellings?.add(
+                    raw.substring(raw.lastIndexOf(' ') + 1)
+                        .takeIf { it != key.substring(key.lastIndexOf(' ') + 1) }
+                        ?.toByteArray(Charsets.UTF_8),
+                )
             }
             if (keys.isEmpty()) return EMPTY
             val order = if (sorted) keys.indices.toList()
@@ -193,11 +239,15 @@ class NgramIndex private constructor(
             val lineStart = IntArray(n + 1)
             val keyEnd = IntArray(n)
             val counts = IntArray(n)
+            val spellingCounts = if (spellings != null) IntArray(n) else null
             var blob = ByteArray(text.length.coerceAtLeast(16))
             var out = 0
             var written = 0
             for (idx in order) {
                 val encoded = keys[idx]
+                val spelling = spellings?.get(idx)
+                val needed = encoded.size + (spelling?.size ?: 0)
+                if (out + needed > blob.size) blob = blob.copyOf(maxOf(blob.size * 2, out + needed))
                 // Folding can collide two spellings onto one key, and a collision has to add the
                 // counts rather than let whichever came last silently replace the other. They are
                 // adjacent because the sequence is sorted by the time it gets here.
@@ -206,19 +256,38 @@ class NgramIndex private constructor(
                     regionEquals(blob, lineStart[written - 1], encoded)
                 ) {
                     counts[written - 1] += values[idx]
+                    // The commonest line decides how the merged entry is spelled. Its spelling is the
+                    // last thing written, so replacing it is rewinding to the end of the key.
+                    if (spellingCounts != null && values[idx] > spellingCounts[written - 1]) {
+                        spellingCounts[written - 1] = values[idx]
+                        out = keyEnd[written - 1]
+                        if (spelling != null) {
+                            spelling.copyInto(blob, out)
+                            out += spelling.size
+                        }
+                    }
                     continue
                 }
-                if (out + encoded.size > blob.size) blob = blob.copyOf(maxOf(blob.size * 2, out + encoded.size))
                 encoded.copyInto(blob, out)
                 lineStart[written] = out
                 out += encoded.size
                 keyEnd[written] = out
+                if (spelling != null) {
+                    spelling.copyInto(blob, out)
+                    out += spelling.size
+                }
                 counts[written] = values[idx]
+                spellingCounts?.set(written, values[idx])
                 written++
             }
             lineStart[written] = out
-            return NgramIndex(blob.copyOf(out), lineStart, keyEnd, counts, written)
+            return NgramIndex(
+                blob.copyOf(out), lineStart, keyEnd, counts, written,
+                spellingCounts?.copyOf(written),
+            )
         }
+
+        private const val SPACE = ' '.code.toByte()
 
         private fun compareBytes(x: ByteArray, y: ByteArray): Int {
             var i = 0
