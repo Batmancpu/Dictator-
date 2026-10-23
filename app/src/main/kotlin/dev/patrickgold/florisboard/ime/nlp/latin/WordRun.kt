@@ -32,7 +32,9 @@ package dev.patrickgold.florisboard.ime.nlp.latin
  * `z.B.` all still end the word exactly where they did before:
  *
  *  - `@` continues a run that has content and does not already carry one. This is the trigger.
- *  - `.` and `-` continue a run that contains `@`, or one that starts with `http`/`www`.
+ *  - `.` and `-` continue a run that contains `@`, or one that starts with `http`/`www`. Before the `@`
+ *    they end the word when typed, and the backward walk takes them back into the address once the
+ *    `@` follows (`vorname.nachname@`, discussion #445; see [isOneRun]).
  *  - `:` and `/` continue a run that starts with `http`.
  *  - `_` and `+` never end a run. They are connectors like `'` and `-` are in Unicode's own rules, and
  *    they have to be unconditional: `user123+tag@gmail.com` types its `+` *before* the `@` that would
@@ -50,6 +52,11 @@ package dev.patrickgold.florisboard.ime.nlp.latin
  * keyboard whose two halves disagree about where a word ends hands one half's work to the other, which
  * is exactly how `top10` became `top0` (issue #311). [runStart] therefore replays [continuesRun] over
  * the candidate rather than reasoning about the shape a second time.
+ *
+ * One exception, on purpose: the dots and hyphens of an address's local part (discussion #445). The
+ * backward walk takes them in only once an `@` stands behind them — after the forward half has finished
+ * with the word in front of the dot — so the two never answer differently about a keystroke while it is
+ * being typed.
  *
  * Pure, no Android dependency, so all of it is unit-testable — same reason [DictFold], [EditDistance]
  * and `DevanagariBase` are shaped this way.
@@ -77,8 +84,9 @@ object WordRun {
         char == '@' -> !run.contains('@') && run.any { it.isLetterOrDigit() }
         // Connectors, unconditionally: they arrive before the `@` that would justify them.
         char == '_' || char == '+' -> run.any { it.isLetterOrDigit() }
-        // The domain's dots and hyphens. `-` before the `@` still ends the word, which costs the rare
-        // hyphenated local part and keeps every hyphenated German compound exactly as it was.
+        // The domain's dots and hyphens. Before the `@` they still end the word — nothing can know yet
+        // that an address is coming, and every sentence end and hyphenated German compound stays exactly
+        // as it was. The local part is glued afterwards, looking back (see [isOneRun]).
         char == '.' || char == '-' -> run.contains('@') || isWebPrefixed(run)
         char == ':' || char == '/' -> isHttpPrefixed(run)
         else -> false
@@ -115,11 +123,29 @@ object WordRun {
      */
     fun isOneRun(text: String): Boolean {
         if (text.isEmpty() || !text[0].isLetterOrDigit()) return false
+        val at = text.indexOf('@')
         for (i in 1 until text.length) {
-            if (!continuesRun(text.substring(0, i), text[i])) return false
+            if (continuesRun(text.substring(0, i), text[i])) continue
+            if (i < at && joinsLocalPart(text, i)) continue
+            return false
         }
         return true
     }
+
+    /**
+     * Whether the dot or hyphen at [i] is part of an address's local part: `vorname.nachname@firma.de`,
+     * `my-company@example.com` (discussion #445).
+     *
+     * The one place where the backward walk knows more than the forward question. When the dot is typed
+     * nothing says an `@` is coming, so it ends the word there, exactly as it ends `Satz.`. Once the `@`
+     * stands behind it the walk can see what the dot was, and glues the address back together — the
+     * composing region is derived from the text on every update, which is what makes a retroactive glue
+     * possible at all. Before the `@` arrives the two halves still agree on everything.
+     *
+     * Only between two letters or digits, so `Satz.@` and a doubled dot stay apart.
+     */
+    private fun joinsLocalPart(text: String, i: Int): Boolean =
+        (text[i] == '.' || text[i] == '-') && text[i - 1].isLetterOrDigit() && text[i + 1].isLetterOrDigit()
 
     /**
      * Whether [word] is an address or a web address — the shape that may be learned verbatim, and the
@@ -136,6 +162,21 @@ object WordRun {
         val domain = word.substring(at + 1)
         val dot = domain.lastIndexOf('.')
         return dot > 0 && domain.length - dot - 1 >= MIN_TLD_LENGTH
+    }
+
+    /**
+     * Whether [word] is a name with a dot inside it — `my.company`, `internal.domain`, `v2.release` — the
+     * kind of word the break iterator keeps whole but no dictionary knows (discussion #445).
+     *
+     * Every dot has a letter or digit on both sides, and there is at least one letter, so `3.14` and a
+     * doubled dot are not names. An abbreviation such as `z.B` passes, which costs nothing: the caller only
+     * ever uses this to fill a strip that would otherwise be empty.
+     */
+    fun isDottedName(word: String): Boolean {
+        if (word.length < 3 || '.' !in word || word.none { it.isLetter() }) return false
+        return word.indices.all { i ->
+            word[i] != '.' || (i in 1 until word.length - 1 && word[i - 1].isLetterOrDigit() && word[i + 1].isLetterOrDigit())
+        }
     }
 
     /** `http…` or `www…`: the two prefixes that let dots and hyphens stay inside a run. */

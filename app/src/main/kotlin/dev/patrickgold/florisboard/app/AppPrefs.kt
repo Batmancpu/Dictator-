@@ -721,8 +721,8 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         // --- Long-form segmented dictation (issue #170) ------------------------------------------
         // Transcribe long dictations segment-by-segment in the background while you keep talking, so you
         // don't wait for one big upload at the end. OFF by default; MANUAL shows the "Next" button, AUTO
-        // additionally uses Silero VAD + Smart Turn v3 at speech pauses. Keyboard-only, not for realtime /
-        // live-prompt / multimodal.
+        // additionally uses Silero VAD + Smart Turn v3 at speech pauses. Keyboard and floating button (#460),
+        // not for realtime / live-prompt / multimodal / system voice input.
         val longformMode = enum(
             key = "dictate__longform_mode",
             default = DictateLongformMode.OFF,

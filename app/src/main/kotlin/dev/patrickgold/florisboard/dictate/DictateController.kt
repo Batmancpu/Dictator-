@@ -322,13 +322,15 @@ object DictateController {
     /**
      * Live transcript while a real-time recording runs: finalized segments plus the current partial. The
      * Smartbar shows this as a live caption; the field only receives the finished (reworded) text on stop.
-     * Empty outside a realtime recording.
+     * A long-form dictation from the floating button fills it too, with the segments transcribed so far
+     * (#460). Empty outside those two.
      */
     val interimText: StateFlow<String> = _interimText.asStateFlow()
 
     /**
-     * Whether the floating button may caption the running stream next to itself (discussion #453): only a
-     * dictation the button started, never a live prompt — its words are an instruction, the same reason
+     * Whether the floating button may caption the running stream next to itself (discussion #453), or the
+     * long-form segments transcribed so far (#460): only a dictation the button started, never a live
+     * prompt — its words are an instruction, the same reason
      * they stay out of the field — and not for someone who keeps the stream out of sight until stop
      * (`prefs.dictate.realtimeHidePreview`, #345). The field never sees the words before stop, whatever this says.
      */
@@ -1590,7 +1592,7 @@ object DictateController {
                 requestAudioFocusIfEnabled(appContext)
                 val audioSource = setupBluetoothIfEnabled(appContext)
                 // Long-form segmented dictation (#170): transcribe cut segments in the background while
-                // recording continues. Off for realtime / live-prompt / overlay / multimodal (see the gate).
+                // recording continues. Off for realtime / live-prompt / system voice input / multimodal (see the gate).
                 val segmented = isSegmentedMode(appContext)
                 // Auto-split: Silero VAD finds candidate pauses, then Smart Turn v3 decides whether the
                 // thought is complete; the configured pause remains the Pipecat-style safety fallback.
@@ -2521,6 +2523,14 @@ object DictateController {
                 realtimeShown.isNotEmpty() -> dictationLead
                 else -> leadFor(appContext, written)
             }
+            // The always-copy safety net (#214) before the commit, for the reason the batch branch gives:
+            // realtime and long-form dictations from the floating button are inserted here, and this
+            // branch used to skip the setting that promises "every dictation".
+            if (outputTarget == OutputTarget.OVERLAY && outputText.isNotEmpty() &&
+                prefs.dictate.floatingButtonCopyToClipboard.get()
+            ) {
+                copyToSystemClipboard(appContext, outputText)
+            }
             // Off the main thread for the overlay, like every other accessibility write: this one ends
             // in the same resolve-focus-write-verify round trip (see [writeToSink]).
             val landed = if (outputTarget == OutputTarget.OVERLAY) {
@@ -3003,13 +3013,17 @@ object DictateController {
     // --- Long-form segmented dictation (issue #170) ---------------------------------------------
 
     /**
-     * Whether the next recording should run in segmented mode: the feature is on, output goes to the
-     * keyboard (not the accessibility overlay), it's not a live-prompt recording, realtime streaming is
-     * not active, and the provider isn't in single-call multimodal mode (which would format per segment).
+     * Whether the next recording should run in segmented mode: the feature is on, it's not a live-prompt
+     * recording, realtime streaming is not active, and the provider isn't in single-call multimodal mode
+     * (which would format per segment).
+     *
+     * The keyboard and the floating button both qualify (#460); system voice input does not, since it hands
+     * back one result and has no field to show progress in. Over the floating button the segments are held
+     * back until stop, see [segmentsHeldBack].
      */
     private fun isSegmentedMode(context: Context): Boolean =
         prefs.dictate.longformMode.get().isEnabled &&
-            outputTarget == OutputTarget.IME &&
+            outputTarget != OutputTarget.RECOGNITION_SERVICE &&
             !livePromptArmed &&
             !isRealtimeActive(context) &&
             !transcriptionAccount().transcriptionViaChat
@@ -3030,8 +3044,9 @@ object DictateController {
         realtimeShownTranscript = ""
         realtimeHandedOver = ""
         realtimeTranscript.setLength(0)
-        // Segmented dictation shows its assembled text as it goes; the hidden-preview mode belongs to
-        // realtime alone, and the two are mutually exclusive (see [isSegmentedMode]).
+        // Segmented dictation has its own rule for holding the text back ([segmentsHeldBack]); the
+        // hidden-preview mode belongs to realtime alone, and the two are mutually exclusive (see
+        // [isSegmentedMode]).
         realtimeHidden = false
         // Reuse the realtime shown-text context so the existing cancel/interrupt cleanup clears the preview.
         realtimeContext = appContext
@@ -3053,9 +3068,18 @@ object DictateController {
         segmentAnsweredAsConfigured = false
         segmentVad?.release()
         segmentVad = null
+        _interimText.value = "" // the floating button's caption of the held-back segments
         _segmentsInFlight.value = 0
         _segmentedRecording.value = false
     }
+
+    /**
+     * Whether a segmented dictation keeps its segments out of the field until stop: over the floating button
+     * (#460), for the reason realtime holds its words back there (#357) — a field written piece by piece
+     * through accessibility drifts out of step with what we believe is in it. The segments go to the
+     * button's live caption instead, and the field gets one verified insert at the end.
+     */
+    private fun segmentsHeldBack(): Boolean = outputTarget == OutputTarget.OVERLAY
 
     /**
      * Cuts the current segment and keeps recording (the "Next segment" button, issue #170). The cut audio
@@ -3099,8 +3123,8 @@ object DictateController {
      * Cancel-button behaviour: in long-form mode, tapping the trash button ends the recording but keeps
      * everything transcribed so far — the already-committed segments are finalized and saved to history as
      * usual; only the current, not-yet-cut chunk is thrown away instead of being transcribed (#183).
-     * Outside long-form it aborts the whole recording ([cancelRecording]). Used by both the Smartbar and
-     * the legacy layout so the trash button behaves consistently.
+     * Outside long-form it aborts the whole recording ([cancelRecording]). Used by the Smartbar, the legacy
+     * layout and the floating button's × (#460), so every cancel button behaves the same.
      */
     fun cancelOrDiscardSegment(context: Context) {
         if (segmentedActive && _state.value is UiState.Recording) {
@@ -3222,6 +3246,11 @@ object DictateController {
                 if (raw.isNotEmpty()) {
                     // The whole dictation, whatever happens to it in the field: the finalize records it.
                     TranscriptJoin.appendPiece(realtimeTranscript, raw, tightening)
+                    if (segmentsHeldBack()) {
+                        // Nothing reaches the field before stop; the caption by the button shows it instead.
+                        _interimText.value = realtimeTranscript.toString()
+                        continue
+                    }
                     val outSink = sink(appContext)
                     // Segments never revise each other, so edited ones simply stay the user's, and the
                     // preview starts afresh at the cursor with this one (#421).
@@ -3246,7 +3275,8 @@ object DictateController {
 
     /**
      * All segments are in and committed as a raw preview; run the whole dictation through the normal
-     * post-processing once and replace the preview with the finished (formatted/reworded) text.
+     * post-processing once and replace the preview with the finished (formatted/reworded) text. Over the
+     * floating button there is no preview ([segmentsHeldBack]), so the replace is the one insert.
      */
     private suspend fun finalizeSegmentedEnd(appContext: Context) {
         val account = transcriptionAccount()
@@ -3280,7 +3310,7 @@ object DictateController {
             audioFile = mergedWav, // the merged segment audio, or null when retention is off
             engine = fallbackEngine?.let { configured.fellBackTo(it, partly = partlyAsConfigured) } ?: configured,
             language = prefs.dictate.activeInputLanguage.get().takeIf { it != DictateLanguages.DETECT } ?: "",
-            source = DictateHistorySource.KEYBOARD,
+            source = if (outputTarget == OutputTarget.OVERLAY) DictateHistorySource.OVERLAY else DictateHistorySource.KEYBOARD,
         )
         finalizeAndCommit(
             appContext, assembled, recordedSeconds, live = false,
@@ -3795,6 +3825,13 @@ object DictateController {
      * [interruptedAudioFile], with its metadata mirrored to prefs. The next keyboard open then offers to
      * send it (see [maybeOfferInterruptedRecording]). Outside the recording state this falls back to the
      * normal teardown ([cancelRecording]).
+     *
+     * A long-form dictation is finished instead, as if stop had been tapped. Its earlier segments are no
+     * longer in the recording — each cut handed them on — so stashing kept only the part since the last cut,
+     * while the segments still transcribing ran on into a dictation that was over and never finished it
+     * (#460: the floating button's screen-off made this reachable). Finishing keeps all of it: text that can
+     * no longer be inserted is kept for re-insert and in the history like any other dictation's, and over
+     * the floating button a refused insert puts it on the clipboard.
      */
     private fun stashRecording(context: Context) {
         val current = _state.value
@@ -3802,6 +3839,10 @@ object DictateController {
         if (current !is UiState.Recording || activeRecorder == null) {
             // Not actively recording (e.g. a start that never got going): use the normal teardown.
             cancelRecording()
+            return
+        }
+        if (segmentedActive) {
+            stopSegmentedAndFinalize(context)
             return
         }
         recorder = null

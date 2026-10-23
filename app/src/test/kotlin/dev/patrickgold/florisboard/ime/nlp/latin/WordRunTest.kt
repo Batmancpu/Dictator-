@@ -162,6 +162,74 @@ class WordRunTest {
         }
     }
 
+    @Test
+    fun `the local part's dots and hyphens join the address once the at sign follows`() {
+        // Discussion #445: the commonest company address there is, and it used to fall apart at its dot.
+        val text = "schreib an vorname.nachname@firma.de"
+        assertEquals(text.indexOf("vorname"), WordRun.runStart(text, text.length - 2))
+        assertEquals(0, WordRun.runStart("my-company@example.com", "my-company@example.com".length - 3))
+        val afterAt = "vorname.nachname@"
+        assertEquals(0, WordRun.runStart(afterAt, afterAt.length))
+        assertTrue(WordRun.isOneRun("first.middle.last@example.co.uk"))
+        assertTrue(WordRun.isAddressLike("vorname.nachname@firma.de"))
+    }
+
+    @Test
+    fun `before the at sign the local part's dot still ends the word`() {
+        // Nothing can know an address is coming, so the forward question answers as it always did…
+        assertFalse(WordRun.continuesRun("vorname", '.'))
+        assertFalse(WordRun.continuesRun("my", '-'))
+        // …and without an `@` behind it the backward walk does not glue either: that is a sentence end.
+        val noAt = "vorname.nachname"
+        assertEquals(noAt.indexOf("nachname"), WordRun.runStart(noAt, noAt.indexOf("nachname")))
+    }
+
+    @Test
+    fun `only a dot between two letters or digits belongs to the local part`() {
+        // A full stop right before a mention, a doubled dot, a dot before the at sign: all stay apart.
+        assertFalse(WordRun.isOneRun("Satz.@anna"))
+        assertFalse(WordRun.isOneRun("a..b@example.com"))
+        assertFalse(WordRun.isOneRun("name.@example.com"))
+        assertFalse(WordRun.isOneRun("name-@example.com"))
+        // Other punctuation never joins, whatever follows.
+        assertFalse(WordRun.isOneRun("hallo,welt@example.com"))
+    }
+
+    @Test
+    fun `typing a dotted address, the backward walk catches up at the at sign`() {
+        val address = "vorname.nachname@firma.de"
+        val dot = address.indexOf('.')
+        val at = address.indexOf('@')
+        for (end in dot + 1..address.length) {
+            val typed = address.substring(0, end)
+            if (end <= at) {
+                // Still before the at sign: the word in front of the dot is over, and the walk leaves the
+                // break iterator's answer — the letters after the dot, or nothing right behind it — alone.
+                val iteratorStart = if (end == dot + 1) end else dot + 1
+                assertEquals(iteratorStart, WordRun.runStart(typed, iteratorStart), "before the at sign on \"$typed\"")
+            } else {
+                // From the at sign on, the whole address, even where the iterator sees no word at all.
+                assertEquals(0, WordRun.runStart(typed, end), "from the at sign on \"$typed\"")
+            }
+        }
+    }
+
+    @Test
+    fun `a name with a dot inside it`() {
+        // Discussion #445: kept whole by the break iterator, known to no dictionary.
+        assertTrue(WordRun.isDottedName("my.company"))
+        assertTrue(WordRun.isDottedName("internal.domain"))
+        assertTrue(WordRun.isDottedName("v2.release"))
+        assertTrue(WordRun.isDottedName("a.b.c"))
+        // Numbers, loose dots and plain words are not.
+        assertFalse(WordRun.isDottedName("3.14"))
+        assertFalse(WordRun.isDottedName("my..company"))
+        assertFalse(WordRun.isDottedName(".company"))
+        assertFalse(WordRun.isDottedName("company."))
+        assertFalse(WordRun.isDottedName("company"))
+        assertFalse(WordRun.isDottedName("a."))
+    }
+
     // ── The shape that may be learned verbatim ───────────────────────────────────────────────────
 
     @Test
