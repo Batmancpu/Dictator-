@@ -46,11 +46,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import dev.patrickgold.florisboard.R
 import dev.patrickgold.florisboard.app.FlorisPreferenceModel
-import dev.patrickgold.florisboard.dictate.DictateReasoningEffort
 import dev.patrickgold.jetpref.datastore.model.PreferenceData
 import dev.patrickgold.jetpref.datastore.model.PreferenceDataEvaluator
 import dev.patrickgold.jetpref.datastore.model.collectAsState
 import dev.patrickgold.florisboard.dictate.data.prompts.DictatePromptDefaults
+import dev.patrickgold.florisboard.dictate.provider.PromptReasoning
 import dev.patrickgold.jetpref.datastore.ui.ListPreferenceEntry
 import dev.patrickgold.jetpref.datastore.ui.Preference
 import dev.patrickgold.jetpref.datastore.ui.PreferenceUiScope
@@ -211,10 +211,13 @@ internal fun PreferenceUiScope<FlorisPreferenceModel>.PromptSelectionPreference(
     }
 }
 
+/** What a set secret shows in its row: always the same, whatever the secret's length. */
+private const val SECRET_MASK = "••••••••"
+
 /**
  * A [Preference] row that edits a string preference through a text dialog. Shared across the Dictate
- * settings screens (API key, model, base URL, custom prompts). Secret fields are masked while typing;
- * pass [multiline] for longer free-text values such as custom prompts.
+ * settings screens (API key, model, base URL, custom prompts). Secret fields are masked while typing and
+ * in the row's summary; pass [multiline] for longer free-text values such as custom prompts.
  *
  * [keyboardType] overrides the default the flags pick — the default suits the addresses and model ids
  * this row was written for, and a value that is ordinary prose (a spoken trigger word) needs a normal
@@ -238,7 +241,10 @@ internal fun PreferenceUiScope<FlorisPreferenceModel>.TextInputPreference(
     infoTitle: String? = null,
     infoText: String? = null,
     notSetSummary: String = stringRes(R.string.dictate__value_not_set),
-    summaryProvider: (String) -> String = { it.ifBlank { notSetSummary } },
+    // A secret is masked in the row as well as in the dialog: the proxy password stood under its title in
+    // plain text, on a screen anyone looking over a shoulder or at a screenshot could read. A fixed mask,
+    // so the row does not give away the length either.
+    summaryProvider: (String) -> String = { if (it.isBlank()) notSetSummary else if (isSecret) SECRET_MASK else it },
 ) {
     val value by pref.collectAsState()
     val scope = rememberCoroutineScope()
@@ -315,35 +321,24 @@ internal fun PreferenceUiScope<FlorisPreferenceModel>.TextInputPreference(
 }
 
 /**
- * A radio-button picker dialog for [DictateReasoningEffort] with an inline text field for the CUSTOM
- * value (issue #186). Shared by the global rewording setting and the per-prompt override. When
- * [includeUseGlobal] is set, a leading "use the global setting" option (value null) is offered.
+ * A radio-button dialog titled "Reasoning effort" that picks one of [options], each shown by [label]. Shared by
+ * an account's reasoning setting (the model's own words) and a prompt's level.
  */
 @Composable
-internal fun ReasoningEffortDialog(
-    initialEffort: DictateReasoningEffort?,
-    initialCustom: String,
-    includeUseGlobal: Boolean,
-    onConfirm: (effort: DictateReasoningEffort?, custom: String) -> Unit,
+internal fun <T> ReasoningChoiceDialog(
+    options: List<T>,
+    initial: T,
+    label: @Composable (T) -> String,
+    onConfirm: (T) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    var selected by remember { mutableStateOf(initialEffort) }
-    var custom by remember { mutableStateOf(initialCustom) }
-    val options = buildList {
-        if (includeUseGlobal) add(null)
-        add(DictateReasoningEffort.OFF)
-        add(DictateReasoningEffort.MINIMAL)
-        add(DictateReasoningEffort.LOW)
-        add(DictateReasoningEffort.MEDIUM)
-        add(DictateReasoningEffort.HIGH)
-        add(DictateReasoningEffort.CUSTOM)
-    }
+    var selected by remember { mutableStateOf(initial) }
     JetPrefAlertDialog(
         scrollModifier = florisDialogScroll(),
         title = stringRes(R.string.dictate__reasoning_effort_title),
         confirmLabel = stringRes(R.string.action__apply),
         dismissLabel = stringRes(R.string.action__cancel),
-        onConfirm = { onConfirm(selected, custom.trim()) },
+        onConfirm = { onConfirm(selected) },
         onDismiss = onDismiss,
     ) {
         Column {
@@ -356,36 +351,39 @@ internal fun ReasoningEffortDialog(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     RadioButton(selected = selected == option, onClick = { selected = option })
-                    Column(modifier = Modifier.weight(1f).padding(start = 4.dp)) {
-                        Text(reasoningEffortDialogLabel(option))
-                        if (option == DictateReasoningEffort.CUSTOM && selected == DictateReasoningEffort.CUSTOM) {
-                            OutlinedTextField(
-                                value = custom,
-                                onValueChange = { custom = it },
-                                singleLine = true,
-                                placeholder = { Text("minimal") },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 4.dp, bottom = 4.dp),
-                            )
-                        }
-                    }
+                    Text(label(option), modifier = Modifier.weight(1f).padding(start = 4.dp))
                 }
             }
         }
     }
 }
 
+/**
+ * A provider's reasoning word as the settings show it: the common ones translated, any other as the provider
+ * writes it. Blank is the account's default, [appDefault] when the app sends one of its own for the model.
+ */
 @Composable
-private fun reasoningEffortDialogLabel(effort: DictateReasoningEffort?): String = stringRes(
-    when (effort) {
-        null -> R.string.dictate__prompt_reasoning_default
-        DictateReasoningEffort.OFF -> R.string.dictate__reasoning_effort_off
-        DictateReasoningEffort.MINIMAL -> R.string.dictate__reasoning_effort_minimal
-        DictateReasoningEffort.LOW -> R.string.dictate__reasoning_effort_low
-        DictateReasoningEffort.MEDIUM -> R.string.dictate__reasoning_effort_medium
-        DictateReasoningEffort.HIGH -> R.string.dictate__reasoning_effort_high
-        DictateReasoningEffort.CUSTOM -> R.string.dictate__reasoning_effort_custom
+internal fun reasoningWordLabel(word: String, appDefault: String? = null): String = when (word.trim()) {
+    "" -> appDefault?.let { stringRes(R.string.dictate__reasoning_effort_app_default, "name" to reasoningWordLabel(it)) }
+        ?: stringRes(R.string.dictate__reasoning_effort_off)
+    "none" -> stringRes(R.string.dictate__reasoning_effort_none)
+    "minimal" -> stringRes(R.string.dictate__reasoning_effort_minimal)
+    "low" -> stringRes(R.string.dictate__reasoning_effort_low)
+    "medium" -> stringRes(R.string.dictate__reasoning_effort_medium)
+    "high" -> stringRes(R.string.dictate__reasoning_effort_high)
+    "xhigh" -> stringRes(R.string.dictate__reasoning_effort_xhigh)
+    "max" -> stringRes(R.string.dictate__reasoning_effort_max)
+    else -> word.trim()
+}
+
+/** A prompt's reasoning level as the prompt editor shows it. */
+@Composable
+internal fun promptReasoningLabel(level: PromptReasoning): String = stringRes(
+    when (level) {
+        PromptReasoning.ACCOUNT -> R.string.dictate__prompt_reasoning_default
+        PromptReasoning.NONE -> R.string.dictate__reasoning_effort_none
+        PromptReasoning.LITTLE -> R.string.dictate__prompt_reasoning_little
+        PromptReasoning.MUCH -> R.string.dictate__prompt_reasoning_much
     },
 )
 

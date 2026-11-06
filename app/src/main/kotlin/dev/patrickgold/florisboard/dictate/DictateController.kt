@@ -72,11 +72,14 @@ import dev.patrickgold.florisboard.dictate.provider.RealtimeApi
 import dev.patrickgold.florisboard.dictate.provider.RealtimeCallbacks
 import dev.patrickgold.florisboard.dictate.provider.RealtimeClient
 import dev.patrickgold.florisboard.dictate.provider.RealtimeSession
+import dev.patrickgold.florisboard.dictate.provider.RealtimeTailWatch
 import dev.patrickgold.florisboard.dictate.provider.AudioContainer
+import dev.patrickgold.florisboard.dictate.provider.PromptReasoning
 import dev.patrickgold.florisboard.dictate.provider.ProviderAccount
 import dev.patrickgold.florisboard.dictate.provider.ProviderListing
 import dev.patrickgold.florisboard.dictate.provider.ProviderPreset
 import dev.patrickgold.florisboard.dictate.provider.ProviderRegistry
+import dev.patrickgold.florisboard.dictate.provider.RewordingBlocker
 import dev.patrickgold.florisboard.dictate.provider.TranscriptionApi
 import dev.patrickgold.florisboard.dictate.provider.TranscriptionFallback
 import dev.patrickgold.florisboard.dictate.provider.TranscriptionRequest
@@ -85,13 +88,14 @@ import dev.patrickgold.florisboard.dictate.overlay.DictateAccessibilityService
 import dev.patrickgold.florisboard.dictate.overlay.floatingButtonTapBuzzes
 import dev.patrickgold.florisboard.dictate.provider.chatModelFor
 import dev.patrickgold.florisboard.dictate.provider.chatModelIsPresetDefault
+import dev.patrickgold.florisboard.dictate.provider.rewordingBlocker
+import dev.patrickgold.florisboard.dictate.provider.rewordingKeyFor
 import dev.patrickgold.florisboard.dictate.provider.singleCallApplies
 import dev.patrickgold.florisboard.dictate.recognition.RecognitionSink
 import dev.patrickgold.florisboard.dictate.snippet.SnippetTriggers
 import dev.patrickgold.florisboard.ime.text.key.KeyVariation
 import dev.patrickgold.florisboard.keyboardManager
 import dev.patrickgold.florisboard.lib.util.AppVersionUtils
-import dev.patrickgold.florisboard.lib.util.VersionName
 import org.florisboard.lib.kotlin.curlyFormat
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -175,10 +179,11 @@ object DictateController {
         ) : UiState
         /**
          * [attempt] is 1 for the first try, 2/3/… while retrying after a transient failure.
-         * [onDevice] means the on-device engine is doing the work — because it is the chosen provider,
-         * because the offline fallback took over (#104), or because the user held the button to send this
-         * one dictation locally (#228/#270). The bar says so: which engine is running is the difference
-         * between waiting on a network and waiting on this phone.
+         * [localModel] is the on-device model doing the work, null while a provider does it — on-device
+         * because it is the chosen provider, because the offline fallback took over (#104), or because the
+         * user held the button to send this one dictation locally (#228/#270). The bar says so: which
+         * engine is running is the difference between waiting on a network and waiting on this phone. The
+         * model itself is named so the bar can also say whether it is still being loaded into memory.
          *
          * [startedAtMs] is an [SystemClock.elapsedRealtime] stamp driving the elapsed-seconds readout
          * (#355) — the moment the *wait* began, not the moment this particular state object was made, so
@@ -188,14 +193,16 @@ object DictateController {
          */
         data class Transcribing(
             val attempt: Int = 1,
-            val onDevice: Boolean = false,
+            val localModel: String? = null,
             val startedAtMs: Long,
             /**
              * The fallback provider this dictation was handed to because the active one could not be
              * reached (#455), by name; null while the active provider is the one transcribing.
              */
             val via: String? = null,
-        ) : UiState
+        ) : UiState {
+            val onDevice: Boolean get() = localModel != null
+        }
         /** A rewording/GPT request is in flight (manual prompt, auto-apply, auto-format or live). */
         data class Rewording(val label: String) : UiState
         /**
@@ -263,9 +270,10 @@ object DictateController {
     /**
      * Which one-time nudge is being shown. RATE/DONATE are usage-gated (see [maybePromptForReview]);
      * CHANGELOG is shown right after an app update (see [maybePromptChangelog]) and opens the in-app
-     * "What's new" dialog instead of a web page.
+     * "What's new" dialog instead of a web page. SAYOVA points at the developer's watch app (see
+     * [maybePromptSayova]).
      */
-    enum class PromoKind { RATE, DONATE, CHANGELOG, FLOATING_BUTTON, MILESTONE, LOW_CREDIT }
+    enum class PromoKind { RATE, DONATE, CHANGELOG, MILESTONE, LOW_CREDIT, SAYOVA }
 
     /**
      * Where the active dictation's output goes: the keyboard editor ([OutputTarget.IME]) or the
@@ -280,12 +288,6 @@ object DictateController {
      * version name carries an unparseable suffix). MUST be false for any committed/shipped build.
      */
     private const val DEBUG_FORCE_CHANGELOG_NUDGE = false
-
-    /** Forces the floating-button spotlight regardless of gates (testing only). MUST be false for shipped builds. */
-    private const val DEBUG_FORCE_FB_SPOTLIGHT = false
-
-    /** This build's release, patch level dropped — the bucket the once-per-release nudges are keyed on. */
-    private val FEATURE_VERSION_NAME = VersionName.featureVersionOf(BuildConfig.VERSION_NAME)
 
     private val prefs by FlorisPreferenceStore
 
@@ -364,6 +366,15 @@ object DictateController {
 
     /** The separator in front of the last committed dictation, so the bubble's undo takes it back too. */
     private var lastDictationLead = ""
+
+    /**
+     * The last dictation as it went into the field, separator included, when its full stop was left off
+     * (issue #468) — and that stop. A dictation right behind it puts the stop back ([leadFor]): the setting
+     * is for a sentence on its own, and two in a row are two sentences, which keep their marks.
+     */
+    private var heldFullStop: HeldFullStop? = null
+
+    private class HeldFullStop(val written: String, val mark: Char)
 
     /**
      * Everything the stream has produced so far, whether or not any of it was put into the field (#345).
@@ -739,25 +750,22 @@ object DictateController {
      * unknown). Above [PACK_ABOVE_BYTES] always; below it only when the provider's own limit is close
      * enough that the WAV would otherwise be refused — three quarters of it, so the decision is made
      * before the edge rather than at it.
+     *
+     * Never into a container the provider is known to refuse: packing makes M4A, and where [accepted]
+     * lacks it the upload was refused, or converted straight back to WAV (Azure's MAI models, measured
+     * 2026-11-03). An empty [accepted] is unknown and packs as before.
      */
-    internal fun shouldPack(wavBytes: Long, limitBytes: Long): Boolean =
-        wavBytes > PACK_ABOVE_BYTES || (limitBytes > 0L && wavBytes > limitBytes / 4 * 3)
+    internal fun shouldPack(wavBytes: Long, limitBytes: Long, accepted: Set<AudioContainer> = emptySet()): Boolean =
+        (accepted.isEmpty() || AudioContainer.M4A in accepted) &&
+            (wavBytes > PACK_ABOVE_BYTES || (limitBytes > 0L && wavBytes > limitBytes / 4 * 3))
     /** Cache file for a recording taken back from a hanging cloud request to finish on-device (#270). */
     private const val RESCUED_AUDIO_NAME = "dictate_rescued.wav"
     /** The recording handed to the fallback provider (#455), with the original's extension appended. */
     private const val FALLBACK_AUDIO_BASENAME = "dictate_fallback"
-    // Realtime (#128, #372): after finish(), how long to wait for the provider to flush the last words
-    // before we commit the already-streamed text. Neither bound is normally reached — the session closes
-    // itself as soon as its end-of-stream marker arrives, measured at 0.27–0.37 s after `audioStreamEnd`
-    // for Gemini (2026-09-14). They bound the unhealthy case, and it takes two of them because one number
-    // cannot: a single fixed budget is either too short for a tail that is seconds behind the microphone
-    // (a mobile uplink that could not carry the audio in real time) or a delay everyone pays on every stop.
-    //
-    // [REALTIME_TAIL_IDLE_MS] is how long the provider may stay *silent* before we stop expecting anything
-    // more; every piece of text that arrives grants it anew, so a stream still catching up is never cut
-    // mid-sentence. [REALTIME_TAIL_MAX_MS] caps the whole wait even while text keeps coming.
-    private const val REALTIME_TAIL_IDLE_MS = 1_200L
-    private const val REALTIME_TAIL_MAX_MS = 8_000L
+    // Realtime (#128, #372, #447): how often the wait after finish() reads the session's backlog and the
+    // time of the last text. The rules themselves are RealtimeTailWatch's; the session's own close wakes
+    // the wait at once, so this only sets how promptly silence and a drained queue are noticed.
+    private const val REALTIME_TAIL_POLL_MS = 50L
 
     // How long a lost microphone (#411) is left to settle before the route is decided again. A single
     // disconnect arrives as a burst of removals and the audio service needs a moment to agree on what is
@@ -778,6 +786,13 @@ object DictateController {
     /** Shortest gap between two wake-up pokes at the same sleeping server (#189). */
     private const val WARM_UP_THROTTLE_MS = 60_000L
 
+    /**
+     * How much of the last dictation the field must still end in for its full stop to be put back (#468).
+     * Enough that typing, a moved cursor or another field never matches by chance; the keyboard's own
+     * view of the text before the cursor is a window, not the whole field.
+     */
+    private const val HELD_STOP_MATCH_CHARS = 64
+
     /** Cumulative recorded audio (seconds) after which the rate / donate nudges appear (roadmap 9.7/9.8). */
 
     /** How long the discarded mic takes to reach the bin; the bar outlives the recording by this much. */
@@ -786,8 +801,10 @@ object DictateController {
     /** How long the key shows a lock after latching, before dissolving into its ordinary icon. */
     const val PUSH_TO_TALK_LOCK_FLASH_MS = 600L
 
-    private const val RATE_THRESHOLD_SECONDS = 180L   // 3 min
-    private const val DONATE_THRESHOLD_SECONDS = 300L // 5 min (user choice; legacy used 10 min)
+    // Jannis, 2026-11-05: 3 and 5 minutes put the two asks a couple of dictations apart in somebody's
+    // first days, so they now leave a real stretch of use between them.
+    private const val RATE_THRESHOLD_SECONDS = 300L    // 5 min
+    private const val DONATE_THRESHOLD_SECONDS = 600L  // 10 min
 
     /**
      * Single entry point for the mic button: starts recording, or stops and transcribes. [target]
@@ -1139,10 +1156,10 @@ object DictateController {
      * only a transition from another state (Recording, Idle) starts a new one. A hand-over to a fallback
      * provider (#455) is the same wait continued, and keeps the stamp the same way.
      */
-    private fun setTranscribing(attempt: Int = 1, onDevice: Boolean = false, via: String? = null) {
+    private fun setTranscribing(attempt: Int = 1, localModel: String? = null, via: String? = null) {
         val startedAtMs = (_state.value as? UiState.Transcribing)?.startedAtMs
             ?: SystemClock.elapsedRealtime()
-        _state.value = UiState.Transcribing(attempt, onDevice, startedAtMs, via)
+        _state.value = UiState.Transcribing(attempt, localModel, startedAtMs, via)
     }
 
     /** Localized one-line headline for an API error [kind] (roadmap 1.12 specific error messages). */
@@ -1152,6 +1169,7 @@ object DictateController {
         DictateApiException.Kind.CONTENT_SIZE_LIMIT -> R.string.dictate__error_content_size_limit
         DictateApiException.Kind.TEXT_SIZE_LIMIT -> R.string.dictate__error_text_size_limit
         DictateApiException.Kind.FORMAT_NOT_SUPPORTED -> R.string.dictate__error_format_not_supported
+        DictateApiException.Kind.MODEL_UNAVAILABLE -> R.string.dictate__error_model_unavailable
         DictateApiException.Kind.TIMEOUT -> R.string.dictate__error_timeout
         DictateApiException.Kind.NETWORK -> R.string.dictate__error_network
         DictateApiException.Kind.SERVER_ERROR -> R.string.dictate__error_server
@@ -1245,7 +1263,9 @@ object DictateController {
             outOfCredit -> ErrorAction.TOP_UP
             canResend && e.kind in EXPORTABLE_ERROR_KINDS -> ErrorAction.SAVE_AUDIO
             canResend && e.kind.isRetryable -> ErrorAction.RESEND
-            e.kind == DictateApiException.Kind.INVALID_API_KEY -> ErrorAction.OPEN_SETTINGS
+            // A model the key may not use is changed where the key is: the provider's settings.
+            e.kind == DictateApiException.Kind.INVALID_API_KEY ||
+                e.kind == DictateApiException.Kind.MODEL_UNAVAILABLE -> ErrorAction.OPEN_SETTINGS
             else -> ErrorAction.NONE
         }
         // The chip fits one short line, so the hint replaces the headline rather than being appended to
@@ -1584,6 +1604,8 @@ object DictateController {
         // will follow.
         warmUp(transcriptionAccount())
         if (rewordingWillFollow()) warmUpRewordingServer()
+        // The same head start for the on-device engine (#449): its model loads while the user speaks.
+        preloadLocalModel(appContext)
         startJob = scope.launch {
             try {
                 // Correct any stale active language (e.g. leftover "detect" after auto-detect was
@@ -1603,7 +1625,8 @@ object DictateController {
                         prefs.dictate.longformAutoSplitSeconds.get() * 1000,
                         useSmartTurn = prefs.dictate.smartTurnEnabled.get() &&
                             SmartTurnModel.isModelAvailable(appContext),
-                    ) { flushSegment(appContext, splitterAlreadyReset = true) }.also { it.start() }
+                    ) { cutAt -> flushSegment(appContext, splitterAlreadyReset = true, cutAtSample = cutAt) }
+                        .also { it.start() }
                 } else null
                 // The mic PCM tap: the realtime session (batch mode), the VAD splitter (auto-split), or none.
                 val pcmSink: ((ByteArray, Int) -> Unit)? = when {
@@ -1967,7 +1990,7 @@ object DictateController {
         val via = fallbackAccount?.let {
             ProviderListing.displayNameOf(it.providerId, prefs.dictate.providerAccounts.get())
         }
-        setTranscribing(onDevice = localEngine, via = via)
+        setTranscribing(localModel = model.takeIf { localEngine }, via = via)
         // What a held button can still rescue (#270): the recording this request is carrying, for as long
         // as it is in flight. Cleared in the finally below, so the offer disappears with the request.
         inFlightAudio = if (localEngine) null else audioFile
@@ -2130,7 +2153,9 @@ object DictateController {
                 if (!chatAudio &&
                     preset.transcriptionApi != TranscriptionApi.LOCAL_ONDEVICE &&
                     source != DictateHistorySource.IMPORT &&
-                    shouldPack(uploadFile.length(), ProviderRegistry.maxUploadBytes(preset.id))
+                    shouldPack(
+                        uploadFile.length(), ProviderRegistry.maxUploadBytes(preset.id), preset.acceptedAudioContainers,
+                    )
                 ) {
                     val packed = AudioEncode.toM4a(uploadFile, File(appContext.cacheDir, PACKED_AUDIO_NAME))
                     if (packed != null) {
@@ -2169,7 +2194,10 @@ object DictateController {
                     expectedLanguages = if (chatAudio) emptyList() else expectedLanguages(),
                     // Non-chat: style/punctuation prompt biases recognition (roadmap 2.4 / 4.11).
                     // Chat-audio: the full instruction (language + style + all auto-formatting) in one go.
-                    prompt = if (chatAudio) buildChatAudioInstruction(appContext) else transcriptionStylePrompt(),
+                    prompt = if (chatAudio) buildChatAudioInstruction(appContext) else transcriptionStylePrompt(prefs),
+                    // The same words one by one, for the providers that take a list (#466). Single-call has
+                    // them in its instruction already.
+                    vocabulary = if (chatAudio) emptyList() else customWordList(prefs),
                 )
                 val providerStartedNanos = SystemClock.elapsedRealtimeNanos()
                 val result = if (preset.transcriptionApi == TranscriptionApi.LOCAL_ONDEVICE) {
@@ -2236,7 +2264,7 @@ object DictateController {
                         )
                         // Sped-up audio (#272) is for the provider that charges by the second, not for the
                         // engine on this phone: the fallback gets the recording as it was.
-                        setTranscribing(onDevice = true)
+                        setTranscribing(localModel = fallback.model)
                         // From here on any failure is the local engine's, not the provider's — which
                         // decides both the wording of a timeout and whether offering "try on-device"
                         // would be advice to do the thing that just ran out of time (#354).
@@ -2254,7 +2282,7 @@ object DictateController {
                 // "This sentence has capitalization and punctuation."). If the result is just that prompt
                 // echoed, treat it as no speech and drop it instead of dumping the prompt into the field.
                 // Skipped for the chat-audio path, whose prompt is an instruction, not a Whisper style hint.
-                if (!chatAudio && DictatePromptDefaults.looksLikeStylePromptEcho(result.text, transcriptionStyleBasePrompt())) {
+                if (!chatAudio && DictatePromptDefaults.looksLikeStylePromptEcho(result.text, transcriptionStyleBasePrompt(prefs))) {
                     outcome = "promptEcho"
                     // Nothing was said, so nothing failed: take the placeholder (#358) back out rather
                     // than leaving a red row offering to re-transcribe silence.
@@ -2442,11 +2470,16 @@ object DictateController {
         // transcription needed a key (e-mail, 2026-10-19). Turning the chip away before the recording was
         // the alternative; it saves the user nothing they wanted, while the transcript is exactly that.
         val wantsLive = live || spokenCommand != null
-        val isLive = wantsLive && rewordingHasCredential()
-        if (wantsLive && !isLive) {
+        val blocker = if (wantsLive) currentRewordingBlocker() else null
+        val isLive = wantsLive && blocker == null
+        if (blocker != null) {
             swallowedRewording = DictateApiException(
-                DictateApiException.Kind.INVALID_API_KEY,
-                appContext.getString(R.string.dictate__error_no_api_key),
+                if (blocker == RewordingBlocker.NO_KEY) {
+                    DictateApiException.Kind.INVALID_API_KEY
+                } else {
+                    DictateApiException.Kind.UNKNOWN
+                },
+                rewordingBlockedMessage(appContext, blocker),
             )
         }
         val text = TranscriptHandover.continuation(handedOver, rawText)
@@ -2494,8 +2527,15 @@ object DictateController {
         } else {
             finalText
         }
+        // A dictation of one sentence without its full stop, when the user asked for that (#468). Before the
+        // mappings, so a replacement written with a dot at its end keeps it; not for a live prompt, whose
+        // answer is not a dictation. What the user took over of the preview counts toward the sentence.
+        val stopLeftOff = !isLive && prefs.dictate.dropFinalFullStop.get() &&
+            FinalFullStop.droppable(paragraphed, head = rawText.dropLast(text.length))
         // Deterministic find-and-replace dictionary (issue #129), applied right before insert.
-        val outputText = prefs.dictate.customMappings.get().apply(paragraphed)
+        val outputText = prefs.dictate.customMappings.get().apply(
+            if (stopLeftOff) paragraphed.dropLast(1) else paragraphed,
+        )
         // The whole dictation, for what keeps a record of it — the history, the stats, the re-insert cache —
         // while the field gets only the part that was not handed over (#421). [text] is the tail of [rawText].
         val dictated = if (text.length == rawText.length) {
@@ -2506,6 +2546,8 @@ object DictateController {
         // The space in front of it, if the field needs one (#443). Kept out of [outputText] on purpose:
         // the history, the re-insert cache and the clipboard copies hold the dictation, not the seam.
         val lead: String
+        // What the field now ends in, separator included, when it is this dictation as written (#468).
+        var inField = ""
         if (finalizeViaComposing) {
             // Realtime (#128): replace the live-streamed preview with the finished (reworded) result via the
             // minimal diff, then honor auto-enter — instead of committing on top of the preview.
@@ -2550,6 +2592,7 @@ object DictateController {
                 discardRetainedAudio()
                 return
             }
+            if (!edited) inField = lead + written
             // Not after an edit at the last moment: the user is in the middle of the text, and auto-enter
             // would send it.
             if (prefs.dictate.autoEnter.get() && outputText.isNotEmpty() && !edited) outSink.performEnter()
@@ -2567,6 +2610,7 @@ object DictateController {
             lead = leadFor(appContext, outputText)
             val committed = commitOutput(appContext, lead + outputText)
             if (committed) latencyTrace?.let { logLatency(it, "outputCommitted") }
+            if (committed) inField = lead + outputText
             // Floating button (#156): the accessibility insert can be silently swallowed by some app fields
             // (Gemini's Compose box, WebViews). Don't flash a false green check — surface an error, and
             // put the text somewhere the user can actually reach.
@@ -2590,6 +2634,13 @@ object DictateController {
         // Re-insert safety net (issue #111) + lifetime stats (issue #142) + history log (issue #140).
         rememberLastDictation(appContext, dictated)
         lastDictationLead = lead
+        // For the next dictation to put the stop back (#468), and only where it can: the field ends in this
+        // one, and not in a mark of its own, which a mapping may have written.
+        heldFullStop = if (stopLeftOff && inField.isNotEmpty() && !FinalFullStop.isEnd(inField.last())) {
+            HeldFullStop(inField, paragraphed.last())
+        } else {
+            null
+        }
         if (capture?.isReplay != true) {
             DictateStats.recordDictation(prefs, dictated, recordedSeconds)
             if (recordedSeconds > 0L) creditAudioSeconds(recordedSeconds)
@@ -2842,6 +2893,10 @@ object DictateController {
                     // Same as the batch path: the providers with a list-shaped language field hear
                     // which languages to expect instead of nothing at all (#99).
                     expectedLanguages = expectedLanguages(),
+                    // Real-time sends no style prompt, only the custom words, as a list (#466).
+                    vocabulary = customWordList(prefs),
+                    proxy = prefs.dictate.dictateProxyConfig(),
+                    trustUserCerts = account.trustUserCerts,
                 )
             }
         }.getOrElse { realtimeFailed = true; null } ?: return null
@@ -2860,44 +2915,56 @@ object DictateController {
     }
 
     /**
-     * Waits out the tail of a finished stream (#372): returns as soon as [closed] completes, or once the
-     * provider has been silent for [REALTIME_TAIL_IDLE_MS], and in no case later than
-     * [REALTIME_TAIL_MAX_MS] after the stop.
+     * Waits out the tail of a finished stream (#372, #447) and says how it ended. The rules are
+     * [RealtimeTailWatch]'s: on a link that kept up, the session's own end answer, or silence after the
+     * last text, or a cap; on one that fell behind, for as long as the backlog still leaves the phone.
      *
-     * The silence is measured from the last text the stream produced, not from the stop, and the recording
-     * having just ended does not mean the provider is done: it is still transcribing whatever audio it has
-     * not caught up with. So an idle window that keeps being renewed is what tells the two apart — a
-     * provider with nothing left to say goes quiet and we commit, one that is still working keeps sending
-     * and we keep listening.
-     *
-     * Returns false in the one case where the stream was cut rather than finished: still producing text
-     * when the hard cap ran out. The transcript is then known to be missing its end, and the caller has a
-     * complete recording to transcribe instead.
+     * The answer is [RealtimeTailWatch.Outcome.complete] false where the stream was cut rather than
+     * finished. The transcript is then known to be missing its end, and the caller has a complete
+     * recording to transcribe instead.
      */
-    private suspend fun awaitRealtimeTail(closed: CompletableDeferred<Unit>?): Boolean {
+    private suspend fun awaitRealtimeTail(
+        session: RealtimeSession?,
+        closed: CompletableDeferred<Unit>?,
+    ): RealtimeTailWatch.Outcome {
         val startedAt = SystemClock.elapsedRealtime()
         // Whatever the provider said while the microphone was open says nothing about how long its closing
         // words will take, so the idle window starts fresh at the stop.
         realtimeLastTextAt = startedAt
-        var endedBy = "cap"
-        while (true) {
-            val now = SystemClock.elapsedRealtime()
-            val idleUntil = realtimeLastTextAt + REALTIME_TAIL_IDLE_MS
-            val until = minOf(idleUntil, startedAt + REALTIME_TAIL_MAX_MS)
-            if (until <= now) {
-                if (idleUntil <= now) endedBy = "silence"
-                break
-            }
-            if (withTimeoutOrNull(until - now) { closed?.await(); true } != null) {
-                endedBy = "provider"
-                break
-            }
-        }
+        val pending = { runCatching { session?.pendingUploadBytes() }.getOrNull() ?: 0L }
+        val watch = RealtimeTailWatch(
+            startedAt,
+            pending(),
+            endsWithAnswer = session?.endsWithAnswer == true,
+            answersAfterPause = session?.answersAfterPause == true,
+        )
+        val outcome = pollRealtimeTail(watch, pending, closed)
         Log.i(
             LATENCY_LOG_TAG,
-            "phase=realtimeTail endedBy=$endedBy phaseMs=${SystemClock.elapsedRealtime() - startedAt}",
+            "phase=realtimeTail endedBy=${outcome.name.lowercase()} " +
+                "phaseMs=${SystemClock.elapsedRealtime() - startedAt} behind=${watch.behind} " +
+                "pendingAtStop=${watch.pendingAtStop} " +
+                "drainMs=${if (watch.drainedAt >= 0L) watch.drainedAt - startedAt else -1} " +
+                "inFlightMs=${watch.inFlightMs}",
         )
-        return endedBy != "cap"
+        return outcome
+    }
+
+    /** Feeds [watch] until it answers. The close wakes the loop at once; the rest is read every few dozen ms. */
+    private suspend fun pollRealtimeTail(
+        watch: RealtimeTailWatch,
+        pending: () -> Long,
+        closed: CompletableDeferred<Unit>?,
+    ): RealtimeTailWatch.Outcome {
+        while (true) {
+            watch.check(SystemClock.elapsedRealtime(), pending(), realtimeLastTextAt, closed?.isCompleted == true)
+                ?.let { return it }
+            if (closed == null) {
+                delay(REALTIME_TAIL_POLL_MS)
+            } else {
+                withTimeoutOrNull(REALTIME_TAIL_POLL_MS) { closed.await() }
+            }
+        }
     }
 
     /**
@@ -2933,8 +3000,10 @@ object DictateController {
                 // fraction of a second. What it must not do is end while the tail is still arriving: the
                 // last word or two of a dictation only reach us in the closing segment, so a fixed budget
                 // committed a sentence one word short whenever the stream was running behind (#372). So
-                // the clock is restarted by every piece of text and only silence ends it early.
-                val tailComplete = awaitRealtimeTail(closed)
+                // the clock is restarted by every piece of text and only silence ends it early — and on an
+                // uplink that fell behind, not even silence until the backlog has left the phone (#447).
+                val tail = awaitRealtimeTail(session, closed)
+                val tailComplete = tail.complete
                 runCatching { session?.cancel() }
                 // From here the transcript is read, and nothing that arrives later may touch the field.
                 // `close(1000)` keeps frames coming until the server's own close, and a final that lands
@@ -2951,13 +3020,15 @@ object DictateController {
                 // buffer only if the stream produced nothing at all.
                 val transcript = realtimeTranscript.toString().trim().ifEmpty { realtimeFinal.toString().trim() }
                 _interimText.value = ""
-                // A stream still delivering when the tail cap ran out is missing its end, and half a
-                // dictation is worse than the wait: the recording is complete, so transcribe that instead.
+                // A stream cut before its end — still delivering at the cap, or its backlog stuck on the
+                // phone — is missing words, and half a dictation is worse than the wait: the recording is
+                // complete, so transcribe that instead.
                 if (realtimeFailed || !tailComplete || transcript.isEmpty()) {
                     Log.i(
                         LATENCY_LOG_TAG,
                         "phase=realtimeFallback reason=" + when {
                             realtimeFailed -> "streamFailed"
+                            tail == RealtimeTailWatch.Outcome.STALLED -> "stalled"
                             !tailComplete -> "tailCap"
                             else -> "emptyTranscript"
                         },
@@ -3090,7 +3161,12 @@ object DictateController {
         flushSegment(context, splitterAlreadyReset = false)
     }
 
-    private fun flushSegment(context: Context, splitterAlreadyReset: Boolean) {
+    /**
+     * [cutAtSample] is where an automatic cut belongs, in the recorder's sample count: in the pause the
+     * splitter found, which may lie before now when the speaker has already gone on. A manual cut has none
+     * and cuts at the moment of the tap.
+     */
+    private fun flushSegment(context: Context, splitterAlreadyReset: Boolean, cutAtSample: Long? = null) {
         if (!segmentedActive || _state.value !is UiState.Recording) return
         val appContext = context.applicationContext
         val generation = segmentGeneration
@@ -3101,7 +3177,7 @@ object DictateController {
             val assigned = segmentMutex.withLock {
                 if (!segmentedActive || _state.value !is UiState.Recording) return@withLock null
                 val i = segmentNextIndex++
-                val w = withContext(Dispatchers.IO) { recorder?.rotate() }
+                val w = withContext(Dispatchers.IO) { recorder?.rotate(cutAtSample) }
                 if (segmentKeepAudio && w != null && w.exists() && w.length() > 0L) segmentAudioFiles[i] = w
                 segmentInFlightCount++
                 _segmentsInFlight.value = segmentInFlightCount
@@ -3244,6 +3320,9 @@ object DictateController {
                 val raw = segmentResults.remove(segmentCommitIndex)!!.trim()
                 segmentCommitIndex++
                 if (raw.isNotEmpty()) {
+                    // A cut the sentence went on through leaves Whisper's "..." at the seam. Only while
+                    // nothing is the user's yet: handed-over text is matched against the transcript's head.
+                    if (realtimeHandedOver.isEmpty()) TranscriptJoin.dropCutEllipsis(realtimeTranscript, raw)
                     // The whole dictation, whatever happens to it in the field: the finalize records it.
                     TranscriptJoin.appendPiece(realtimeTranscript, raw, tightening)
                     if (segmentsHeldBack()) {
@@ -3352,7 +3431,7 @@ object DictateController {
             fallbackIdFor(appContext, account)
         }
         val language = prefs.dictate.activeInputLanguage.get().takeIf { it != DictateLanguages.DETECT }
-        val style = transcriptionStylePrompt()
+        val style = transcriptionStylePrompt(prefs)
         val prompt = continuity.takeLast(200).trim().let { if (it.isEmpty()) style else "$it $style".trim() }
         // Time compression (issue #272): every segment is billed on its own, so the speed-up belongs here
         // too — this is where a long dictation's duration actually adds up. Segments are transcribed
@@ -3370,7 +3449,7 @@ object DictateController {
         // exactly where the segments add up. The WAV stays on disk: it is merged into the history audio.
         val toUpload = spedUp ?: wav
         val packed = if (preset.transcriptionApi != TranscriptionApi.LOCAL_ONDEVICE &&
-            shouldPack(toUpload.length(), ProviderRegistry.maxUploadBytes(preset.id))
+            shouldPack(toUpload.length(), ProviderRegistry.maxUploadBytes(preset.id), preset.acceptedAudioContainers)
         ) {
             AudioEncode.toM4a(toUpload, File(appContext.cacheDir, "pak_${wav.nameWithoutExtension}.m4a"))
         } else {
@@ -3378,7 +3457,7 @@ object DictateController {
         }
         val request = TranscriptionRequest(
             audioFile = packed ?: toUpload, model = model, language = language, prompt = prompt,
-            expectedLanguages = expectedLanguages(),
+            expectedLanguages = expectedLanguages(), vocabulary = customWordList(prefs),
         )
         var fallbackEngine: HistoryEngine? = null
         return try {
@@ -3538,15 +3617,25 @@ object DictateController {
      * field, off the main thread for the overlay like every other accessibility call.
      *
      * Nothing for the system voice input: the calling app joins our result into its own field.
+     *
+     * It also puts back the full stop the last dictation went without (#468), when this one carries on right
+     * behind it: one sentence on its own goes without, two in a row are two sentences and keep their marks.
+     * Not in front of a mark that binds to the word before it — `Buy tofu` + `, milk` wants no stop.
      */
     private suspend fun leadFor(appContext: Context, text: String): String {
         if (text.isEmpty() || outputTarget == OutputTarget.RECOGNITION_SERVICE) return ""
         val sink = sink(appContext)
-        // One character is all the rule looks at.
+        // One character is all the separator rule looks at; a held stop needs to see its dictation.
+        val held = heldFullStop?.takeIf { !TranscriptJoin.DEFAULT_TIGHTENING_SYMBOLS.contains(text.first()) }
+        val length = held?.written?.length?.coerceAtMost(HELD_STOP_MATCH_CHARS) ?: 1
         val before = if (outputTarget == OutputTarget.OVERLAY) {
-            withContext(Dispatchers.IO) { sink.textBeforeCursor(1) }
+            withContext(Dispatchers.IO) { sink.textBeforeCursor(length) }
         } else {
-            sink.textBeforeCursor(1)
+            sink.textBeforeCursor(length)
+        }
+        if (held != null && before != null && before == held.written.takeLast(length)) {
+            val mark = held.mark.toString()
+            return mark + appContext.transcriptSeparatorBefore(mark, text)
         }
         return appContext.transcriptSeparatorBefore(before, text)
     }
@@ -4234,6 +4323,9 @@ object DictateController {
         // Credit running out comes first: it is the only nudge that is about to stop the app working,
         // and asking someone to rate Dictate minutes before it refuses to transcribe is poor timing.
         if (maybeWarnLowCredit()) return
+        // Before rate/donate: those stay until answered, so somebody who never answers them would never
+        // get to see this one.
+        if (maybePromptSayova()) return
         val total = prefs.dictate.totalAudioSeconds.get()
         val kind = when {
             total > DONATE_THRESHOLD_SECONDS && !prefs.dictate.hasDonated.get() -> PromoKind.DONATE
@@ -4241,6 +4333,30 @@ object DictateController {
             else -> return
         }
         _state.value = UiState.Promo(kind)
+    }
+
+    /** How long the SayOVA nudge waits after the keyboard open that scheduled it. */
+    private const val SAYOVA_NUDGE_DELAY_MS = 3 * 24 * 60 * 60 * 1000L
+
+    /**
+     * Points everybody once at SayOVA, the developer's voice assistant for Wear OS watches, and returns true
+     * if it did. Not on the day of the update: the first keyboard open that reaches this point — the update
+     * notice comes first and holds the Smartbar until answered — only schedules it [SAYOVA_NUDGE_DELAY_MS]
+     * later, so the days are counted from that answer, not from the install.
+     * Tapping it opens the "More apps" page under About rather than the store, so nobody lands in Play
+     * without having read what the app is and that it needs a watch.
+     */
+    private fun maybePromptSayova(): Boolean {
+        if (prefs.dictate.sayovaNudgeDone.get()) return false
+        val now = System.currentTimeMillis()
+        val dueAt = prefs.dictate.sayovaNudgeDueAt.get()
+        if (dueAt == 0L) {
+            scope.launch { prefs.dictate.sayovaNudgeDueAt.set(now + SAYOVA_NUDGE_DELAY_MS) }
+            return false
+        }
+        if (now < dueAt) return false
+        _state.value = UiState.Promo(PromoKind.SAYOVA)
+        return true
     }
 
     /** Below this much Dictate Cloud credit the Smartbar says so, once per depletion. */
@@ -4319,27 +4435,9 @@ object DictateController {
     }
 
     /**
-     * Shows a one-time Smartbar spotlight for the floating dictation button to users who have not enabled
-     * it yet, so existing users discover the feature. Tapping it deep-links straight to the floating-button
-     * settings screen (where the accessibility opt-in + disclosure live — it is never auto-enabled).
-     * Gated by a per-release flag; skipped once the user has enabled it or opened its screen. No-op unless idle.
-     *
-     * "Per release" means per *feature* release: a patch is meant to install unnoticed, and a spotlight
-     * reappearing the day after one would announce it just as loudly as an update notice would.
-     */
-    fun maybePromptFloatingButton(context: Context) {
-        if (_state.value !is UiState.Idle) return
-        if (!DEBUG_FORCE_FB_SPOTLIGHT) {
-            if (prefs.dictate.floatingButtonEnabled.get() || prefs.dictate.floatingButtonHintSeen.get()) return
-            if (prefs.dictate.floatingButtonSpotlightVersion.get() == FEATURE_VERSION_NAME) return
-        }
-        _state.value = UiState.Promo(PromoKind.FLOATING_BUTTON)
-    }
-
-    /**
      * Acts on the active promo and marks it done: RATE/DONATE open the Play Store / PayPal page,
-     * CHANGELOG opens the app (which then shows the "What's new" dialog), FLOATING_BUTTON deep-links to its
-     * settings screen. No-op otherwise.
+     * CHANGELOG opens the app (which then shows the "What's new" dialog), SAYOVA the "More apps" page
+     * under About. No-op otherwise.
      */
     fun acceptPromo(context: Context) {
         val kind = (_state.value as? UiState.Promo)?.kind ?: return
@@ -4349,12 +4447,6 @@ object DictateController {
                     Uri.parse("https://play.google.com/store/apps/details?id=net.devemperor.dictate"))
                 PromoKind.DONATE -> Intent(Intent.ACTION_VIEW, Uri.parse("https://paypal.me/DevEmperor"))
                 PromoKind.CHANGELOG -> Intent(context, FlorisAppActivity::class.java)
-                PromoKind.FLOATING_BUTTON -> Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse("ui://florisboard/settings/dictate/floating-button"),
-                    context,
-                    FlorisAppActivity::class.java,
-                ).addCategory(Intent.CATEGORY_BROWSABLE)
                 PromoKind.MILESTONE -> Intent(
                     Intent.ACTION_VIEW,
                     Uri.parse("ui://florisboard/settings/dictate/stats"),
@@ -4364,6 +4456,12 @@ object DictateController {
                 PromoKind.LOW_CREDIT -> Intent(
                     Intent.ACTION_VIEW,
                     Uri.parse("ui://florisboard/settings/dictate/cloud"),
+                    context,
+                    FlorisAppActivity::class.java,
+                ).addCategory(Intent.CATEGORY_BROWSABLE)
+                PromoKind.SAYOVA -> Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("ui://florisboard/settings/about/more-apps"),
                     context,
                     FlorisAppActivity::class.java,
                 ).addCategory(Intent.CATEGORY_BROWSABLE)
@@ -4393,13 +4491,12 @@ object DictateController {
                 // Remember this version so the keyboard nudge shows only once per update. The in-app
                 // dialog stays governed by versionLastChangelog, so tapping/dismissing here never hides it.
                 PromoKind.CHANGELOG -> prefs.dictate.changelogNudgeVersion.set(BuildConfig.VERSION_NAME)
-                // Show the floating-button spotlight only once per feature release (see the gate).
-                PromoKind.FLOATING_BUTTON -> prefs.dictate.floatingButtonSpotlightVersion.set(FEATURE_VERSION_NAME)
                 // The milestone was already consumed when shown; nothing further to persist.
                 PromoKind.MILESTONE -> Unit
                 // The flag was already set when shown, so the nudge cannot come back on the next
                 // keyboard open whether it was acted on or waved away. A purchase clears it again.
                 PromoKind.LOW_CREDIT -> Unit
+                PromoKind.SAYOVA -> prefs.dictate.sayovaNudgeDone.set(true)
             }
         }
     }
@@ -4479,10 +4576,16 @@ object DictateController {
             }
         }
 
-        if (rewordingApiKey().isBlank()) {
+        // Asked of what the provider needs, not of whether a key is stored: a keyless Ollama server or a
+        // server of the user's own used to be refused here with "No API key set".
+        currentRewordingBlocker()?.let { blocker ->
             _state.value = UiState.Error(
-                message = appContext.getString(R.string.dictate__error_no_api_key),
-                kind = DictateApiException.Kind.INVALID_API_KEY,
+                message = rewordingBlockedMessage(appContext, blocker),
+                kind = if (blocker == RewordingBlocker.NO_KEY) {
+                    DictateApiException.Kind.INVALID_API_KEY
+                } else {
+                    DictateApiException.Kind.UNKNOWN
+                },
                 action = ErrorAction.OPEN_SETTINGS,
             )
             return
@@ -4492,7 +4595,7 @@ object DictateController {
         // Store the job so the stop button can abort this reword mid-generation (issue #192).
         rewordJob = scope.launch {
             try {
-                val text = requestReword(raw, input, prompt.reasoningEffort, prompt.reasoningEffortCustom)
+                val text = requestReword(raw, input, prompt.reasoning)
                 // commitText replaces the active selection if any, else inserts at the cursor.
                 val committed = writeToSink(sink, text)
                 // Don't declare success over a write the field refused (issue #277) — the reworded text
@@ -4594,13 +4697,15 @@ object DictateController {
         // Punctuation-only transcripts ("...") are not blank but hold nothing to reword, and a model
         // asked to format them answers the *request* instead of the text. See [hasNoWords].
         if (DictatePromptDefaults.hasNoWords(transcript)) return transcript
-        // No rewording key (not even a shared transcription one) → nothing here can run; return the raw
-        // transcript instead of flashing "Formatting…" and looping through doomed throw/catch calls.
-        if (rewordingApiKey().isBlank()) return transcript
+        // A provider that wants a key and has none, or no model to ask → no request here can run; skip them
+        // instead of flashing "Formatting…" and looping through doomed throw/catch calls. Snippets need no
+        // request and are still appended.
+        val canReword = rewordingCanRun()
         var text = transcript
 
         // 1) Auto-formatting (spoken cues → Markdown). Low-level prompt, no be-precise suffix.
-        if (prefs.dictate.autoFormattingEnabled.get()) {
+        if (prefs.dictate.autoFormattingEnabled.get() && !canReword) noteSkippedRewording(context)
+        if (canReword && prefs.dictate.autoFormattingEnabled.get()) {
             _state.value = UiState.Rewording(context.getString(R.string.dictate__status_formatting))
             // Hint the model with the readable language name ("German"), or "unknown" for auto-detect.
             val languageName = DictateLanguages.englishNameFor(prefs.dictate.activeInputLanguage.get())
@@ -4631,9 +4736,10 @@ object DictateController {
                 text += context.transcriptSeparatorBefore(text, snippet) + snippet
                 continue
             }
+            if (!canReword) { noteSkippedRewording(context); continue }
             _state.value = UiState.Rewording(p.name ?: context.getString(R.string.dictate__status_rewording))
             text = rewordOrKeep(text) {
-                requestReword(instruction, text, p.reasoningEffort, p.reasoningEffortCustom)
+                requestReword(instruction, text, p.reasoning)
             }
         }
         return text
@@ -4665,7 +4771,7 @@ object DictateController {
         _pendingPrompts.value = emptyList()
         // Nothing left to rework: the user took the whole live preview over and said nothing after (#421).
         if (queued.isEmpty() || text.isBlank()) return text
-        if (rewordingApiKey().isBlank()) return text
+        val canReword = rewordingCanRun()
         var result = text
         for (p in queued) {
             val raw = p.prompt.orEmpty()
@@ -4677,19 +4783,15 @@ object DictateController {
                 result += context.transcriptSeparatorBefore(result, snippet) + snippet
                 continue
             }
+            if (!canReword) { noteSkippedRewording(context); continue }
             _state.value = UiState.Rewording(p.name ?: context.getString(R.string.dictate__status_rewording))
             result = rewordOrKeep(result) {
-                requestReword(raw, if (p.requiresSelection) result else null, p.reasoningEffort, p.reasoningEffortCustom)
+                requestReword(raw, if (p.requiresSelection) result else null, p.reasoning)
             }
         }
         return result
     }
 
-    /**
-     * High-level rewording call: builds the user message as `instruction [+ system prompt] [+ input]`
-     * (exactly as the legacy app did – the be-precise prompt is tuned for this position) and returns
-     * the trimmed model output.
-     */
     /**
      * Wake-on-demand for a self-hosted backend (issue #189).
      *
@@ -4711,6 +4813,31 @@ object DictateController {
      * the same head start. One account doing both jobs is woken once.
      */
     private fun warmUpRewordingServer() = warmUp(rewordingAccount(), apiKey = rewordingApiKey())
+
+    /**
+     * Loads the on-device model while a recording runs (#449), so the stop finds it in memory instead of
+     * starting the load. The model is freed after the idle window ("Unload idle model after", 5 min by
+     * default), and reloading Parakeet's 670 MB after the stop is what made the first dictation after a
+     * pause slow. Same model and language as [transcribe] will use, so it fills the very cache entry the
+     * transcription reads. Only for the batch path: a live on-device session loads its streaming model
+     * when it opens, and a cloud account has nothing to load. Fire-and-forget like [warmUp] — a model that
+     * fails to load here is loaded, and reported, by the transcription itself.
+     */
+    private fun preloadLocalModel(appContext: Context) {
+        val account = transcriptionAccount()
+        val preset = presetFor(account)
+        if (preset.transcriptionApi != TranscriptionApi.LOCAL_ONDEVICE) return
+        if (localStreamingModelDir(appContext) != null) return
+        val model = transcriptionModelFor(appContext, account, preset)
+        if (!LocalModelManager.isInstalled(appContext, model)) return
+        val language = prefs.dictate.activeInputLanguage.get().takeIf { it != DictateLanguages.DETECT }
+        LocalTranscriptionProvider.setIdleUnloadMillis(prefs.dictate.localModelUnloadMinutes.get() * 60_000L)
+        scope.launch {
+            val startedAt = SystemClock.elapsedRealtime()
+            LocalTranscriptionProvider(LocalTranscriptionProvider.modelDir(appContext, model)).preload(language)
+            Log.i(LATENCY_LOG_TAG, "phase=localPreload model=$model ms=${SystemClock.elapsedRealtime() - startedAt}")
+        }
+    }
 
     private fun warmUp(account: ProviderAccount, apiKey: String = account.apiKey) {
         if (!account.customWarmUp) return
@@ -4747,37 +4874,41 @@ object DictateController {
         prefs.dictate.rewordingEnabled.get() &&
             (prefs.dictate.autoFormattingEnabled.get() || _prompts.value.any { it.autoApply && it.snippetBody() == null })
 
+    /**
+     * High-level rewording call: the user message is `instruction [+ system prompt] [+ input]`, in the
+     * legacy app's order, with the input framed as the user's text
+     * ([DictatePromptDefaults.buildRewordingRequest]) — unframed, a dictated question got answered and a
+     * dictated request carried out (#469). Returns the trimmed model output.
+     */
     private suspend fun requestReword(
         instruction: String,
         input: String?,
-        reasoning: DictateReasoningEffort? = null,
-        reasoningCustom: String? = null,
+        reasoning: PromptReasoning = PromptReasoning.ACCOUNT,
     ): String {
-        val sys = systemPrompt()
-        val content = buildString {
-            append(instruction)
-            if (sys.isNotBlank()) append("\n\n").append(sys)
-            if (!input.isNullOrBlank()) append("\n\n").append(input)
-        }
-        return requestRewordRaw(content, reasoning, reasoningCustom)
+        val content = DictatePromptDefaults.buildRewordingRequest(instruction, systemPrompt(), input)
+        return DictatePromptDefaults.stripTextTags(requestRewordRaw(content, reasoning))
     }
 
     /**
-     * Low-level rewording call: sends [userContent] verbatim as a single user message. [reasoning] is
-     * the per-prompt reasoning-effort override (issue #155); null falls back to the global setting.
+     * Low-level rewording call: sends [userContent] verbatim as a single user message. [reasoning] is the
+     * prompt's level (#155); ACCOUNT is the rewording account's own setting.
      */
     private suspend fun requestRewordRaw(
         userContent: String,
-        reasoning: DictateReasoningEffort? = null,
-        reasoningCustom: String? = null,
+        reasoning: PromptReasoning = PromptReasoning.ACCOUNT,
     ): String {
         val account = rewordingAccount()
-        // Blank rewording key falls back to the transcription account's key (legacy "reuse" behavior).
-        val apiKey = account.apiKey.ifBlank { transcriptionAccount().apiKey }
-        if (apiKey.isBlank() && requiresKey(account)) {
-            throw DictateApiException(DictateApiException.Kind.INVALID_API_KEY, "No API key set")
-        }
+        val apiKey = rewordingApiKey()
         val preset = presetFor(account)
+        when (rewordingBlocker(account, preset, apiKey)) {
+            RewordingBlocker.NO_KEY ->
+                throw DictateApiException(DictateApiException.Kind.INVALID_API_KEY, "No API key set")
+            // Every caller asks [currentRewordingBlocker] first and says it in the user's language; this
+            // is the backstop, worded like the key one above.
+            RewordingBlocker.NO_MODEL ->
+                throw DictateApiException(DictateApiException.Kind.UNKNOWN, "No rewording model set")
+            null -> Unit
+        }
         val model = chatModelFor(account, preset)
         val client = OpenAiCompatibleClient.from(
             preset, apiKey,
@@ -4786,23 +4917,8 @@ object DictateController {
             trustUserCerts = account.trustUserCerts,
             timeoutSeconds = prefs.dictate.requestTimeout.get().toLong(),
         )
-        // Reasoning effort for reasoning models (issue #141); a per-prompt override wins over the global
-        // setting (#155). OFF → field omitted, unless the model is the preset's own default and the preset
-        // knows what it should run at (gpt-6-luna). CUSTOM (#186) uses a user-entered wire value — the
-        // per-prompt one when the override itself is CUSTOM, else the global custom value.
-        val effort = reasoning ?: prefs.dictate.rewordingReasoningEffort.get()
-        val reasoningWire = when (effort) {
-            DictateReasoningEffort.CUSTOM -> {
-                val custom = if (reasoning == DictateReasoningEffort.CUSTOM) {
-                    reasoningCustom
-                } else {
-                    prefs.dictate.rewordingReasoningEffortCustom.get()
-                }
-                custom?.trim()?.ifBlank { null }
-            }
-            DictateReasoningEffort.OFF -> preset.reasoningEffortWhenOff(model)
-            else -> effort.wire
-        }
+        // Reasoning (#141): the account's own setting, unless the prompt asks for a level of its own (#155).
+        val reasoningWire = rewordingReasoningWire(account, preset, model, reasoning)
         val result = client.complete(
             ChatRequest.ofUser(model, userContent, reasoningEffort = reasoningWire),
         ).text.trim()
@@ -4824,27 +4940,6 @@ object DictateController {
         else -> ""
     }
 
-    /**
-     * Style/punctuation prompt sent with the transcription request (independent of rewording). The
-     * user's custom words (roadmap 11.12) are appended on top of whichever style prompt is active, so
-     * names/jargon are spelled correctly even with the predefined punctuation prompt or with none.
-     */
-    private fun transcriptionStylePrompt(): String? =
-        DictatePromptDefaults.appendCustomWords(transcriptionStyleBasePrompt(), prefs.dictate.customWords.get())
-
-    /**
-     * The style prompt WITHOUT the appended custom-words glossary — the predefined per-language sentence or
-     * the user's custom style prompt. This is the part a Whisper-style model echoes on silence, so the
-     * prompt-echo guard (#77) compares against it rather than the full prompt (whose trailing glossary
-     * would otherwise throw off the overlap check).
-     */
-    private fun transcriptionStyleBasePrompt(): String? = when (prefs.dictate.stylePromptSelection.get()) {
-        DictatePromptDefaults.SELECTION_PREDEFINED ->
-            DictatePromptDefaults.punctuationPromptFor(prefs.dictate.activeInputLanguage.get())
-        DictatePromptDefaults.SELECTION_CUSTOM ->
-            prefs.dictate.stylePromptCustom.get().takeIf { it.isNotBlank() }
-        else -> null
-    }
 
     /**
      * The instruction sent alongside the audio in the single-call multimodal path (issue #130). Folds
@@ -4865,7 +4960,7 @@ object DictateController {
         // Everything from here on is an *instruction*, and the wrapper this ends up inside tells the
         // model they "may change the wording or even the language".
         val instructionsFrom = parts.size
-        transcriptionStylePrompt()?.takeIf { it.isNotBlank() }?.let { parts.add(it) }
+        transcriptionStylePrompt(prefs)?.takeIf { it.isNotBlank() }?.let { parts.add(it) }
         // Formatting/rewording is folded in only when the user has rewording enabled (mirrors
         // postProcessTranscript's gating), so single-call output matches the two-call output.
         if (prefs.dictate.rewordingEnabled.get()) {
@@ -4933,13 +5028,42 @@ object DictateController {
         return prefs.dictate.providerAccounts.get().getOrEmpty(id)
     }
 
-    /** Effective rewording key: the rewording account's, falling back to the transcription account's. */
-    private fun rewordingApiKey(): String =
-        rewordingAccount().apiKey.ifBlank { transcriptionAccount().apiKey }
+    /** Effective rewording key — see [rewordingKeyFor] for when the transcription key may stand in. */
+    private fun rewordingApiKey(): String = rewordingKeyFor(rewordingAccount(), transcriptionAccount())
 
-    /** Whether a rewording can be sent at all: the condition [requestRewordRaw] refuses on, asked first. */
-    private fun rewordingHasCredential(): Boolean =
-        rewordingApiKey().isNotBlank() || !requiresKey(rewordingAccount())
+    /** What stops a rewording from being sent, if anything: the condition [requestRewordRaw] refuses on. */
+    private fun currentRewordingBlocker(): RewordingBlocker? {
+        val account = rewordingAccount()
+        return rewordingBlocker(account, presetFor(account), rewordingApiKey())
+    }
+
+    /** Whether the automatic rewording steps may send anything at all — see [rewordingBlocker]. */
+    private fun rewordingCanRun(): Boolean = currentRewordingBlocker() == null
+
+    /**
+     * Records why an automatic step was skipped, for the notice after the commit ([reportSwallowedRewording]).
+     * Only a missing model is worth it: a missing key has always been silent here, while a server that has
+     * no model chosen otherwise just stops reworking with nothing to say why.
+     */
+    private fun noteSkippedRewording(context: Context) {
+        val blocker = currentRewordingBlocker() ?: return
+        if (blocker != RewordingBlocker.NO_MODEL || swallowedRewording != null) return
+        swallowedRewording = DictateApiException(
+            DictateApiException.Kind.UNKNOWN, rewordingBlockedMessage(context, blocker),
+        )
+    }
+
+    /** The one-line reason for [blocker], naming the provider when the model is what is missing. */
+    private fun rewordingBlockedMessage(context: Context, blocker: RewordingBlocker): String = when (blocker) {
+        RewordingBlocker.NO_KEY -> context.getString(R.string.dictate__error_no_api_key)
+        RewordingBlocker.NO_MODEL -> {
+            val account = rewordingAccount()
+            context.getString(
+                R.string.dictate__error_no_rewording_model,
+                account.displayName.ifBlank { presetFor(account).displayName },
+            )
+        }
+    }
 
     private fun promptsDb(context: Context) = PromptsDatabaseHelper.getInstance(context)
 

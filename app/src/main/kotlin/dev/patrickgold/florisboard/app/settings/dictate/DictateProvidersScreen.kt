@@ -11,6 +11,7 @@
 package dev.patrickgold.florisboard.app.settings.dictate
 
 import android.content.Context
+import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -18,13 +19,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.ScrollState
@@ -33,8 +39,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.AltRoute
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.Dns
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Key
 import androidx.compose.material.icons.filled.Lan
@@ -53,11 +61,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -69,9 +76,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -85,12 +101,14 @@ import dev.patrickgold.florisboard.app.settings.search.settingsSearchAnchor
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.app.LocalNavController
 import dev.patrickgold.florisboard.app.Routes
+import dev.patrickgold.florisboard.dictate.data.prefs.DictateLegacyMigrator
 import dev.patrickgold.florisboard.dictate.dictateProxyConfig
 import dev.patrickgold.florisboard.dictate.provider.ConnectionCheck
 import dev.patrickgold.florisboard.dictate.provider.ConnectionCheckSample
 import dev.patrickgold.florisboard.dictate.provider.ConnectionCheckScope
 import dev.patrickgold.florisboard.dictate.provider.DictateApiException
 import dev.patrickgold.florisboard.dictate.provider.LocalModelCatalog
+import dev.patrickgold.florisboard.dictate.provider.ModelCatalog
 import dev.patrickgold.florisboard.dictate.provider.LocalModelManager
 import dev.patrickgold.florisboard.dictate.provider.OpenAiCompatibleClient
 import dev.patrickgold.florisboard.dictate.provider.ProviderAccount
@@ -105,6 +123,7 @@ import dev.patrickgold.florisboard.dictate.provider.chatModelFor
 import dev.patrickgold.florisboard.dictate.provider.singleCallApplies
 import dev.patrickgold.florisboard.lib.compose.FlorisHyperlinkText
 import dev.patrickgold.florisboard.lib.compose.FlorisScreen
+import dev.patrickgold.florisboard.lib.compose.SwitchRow
 import dev.patrickgold.florisboard.lib.util.launchUrl
 import dev.patrickgold.jetpref.datastore.model.collectAsState
 import dev.patrickgold.jetpref.datastore.ui.DialogSliderPreference
@@ -118,6 +137,7 @@ import org.florisboard.lib.android.stringRes
 import org.florisboard.lib.compose.florisDialogScroll
 import org.florisboard.lib.compose.persistentVerticalScrollbar
 import org.florisboard.lib.compose.stringRes
+import org.florisboard.lib.kotlin.curlyFormat
 
 /**
  * What the setup wizard asked this screen to open as it appears (issue #273).
@@ -352,7 +372,10 @@ fun DictateProvidersScreen() = FlorisScreen {
                     localFromSetup = false
                 },
                 onSave = { updated, makeActive ->
-                    writeKeyring(accounts.put(updated))
+                    val keyring = accounts.put(updated)
+                    writeKeyring(keyring)
+                    // Moved to a region without speech-to-text, it cannot stay the transcription provider.
+                    scope.launch { DictateLegacyMigrator.moveTranscriptionOffUnsupportedAccounts(keyring) }
                     // A server of the user's own speaks both halves of the OpenAI API, and someone who
                     // added one during setup meant it to be the way the app works from now on.
                     if (activateOnSave) {
@@ -754,10 +777,10 @@ private fun providerSummary(
     // Resolved the way a dictation resolves them: an empty field is the preset default showing through,
     // and the rewording model follows the merged single-call field when that is on (#313).
     val models = buildList {
-        if (preset.capabilities.transcription) {
+        if (ProviderRegistry.transcribesAt(preset, stored.customBaseUrl)) {
             add(stored.transcriptionModel.ifBlank { preset.defaultTranscriptionModel.orEmpty() })
         }
-        if (preset.capabilities.chat) add(chatModelFor(stored, preset, fallback = ""))
+        if (preset.capabilities.chat) add(chatModelFor(stored, preset))
     }.filter { it.isNotBlank() }.distinct()
     return models.joinToString(" · ").ifBlank { providerCapabilities(preset) }
 }
@@ -804,7 +827,6 @@ internal fun ProviderEditorDialog(
     // Data residency (#403): where the provider publishes regional addresses, the base URL is chosen from
     // that list rather than typed. Empty for everyone who serves the world from one address.
     val regions = preset?.regions.orEmpty()
-    val showTranscription = preset?.capabilities?.transcription ?: true
     val showChat = preset?.capabilities?.chat ?: true
 
     var displayName by remember { mutableStateOf(account.displayName) }
@@ -818,6 +840,8 @@ internal fun ProviderEditorDialog(
             account.customBaseUrl.ifBlank { if (preset?.allowsCustomBaseUrl == true) preset.baseUrl else "" },
         )
     }
+    // Follows the region as it is picked: SiliconFlow International has no speech-to-text to configure.
+    val showTranscription = preset?.let { ProviderRegistry.transcribesAt(it, baseUrl) } ?: true
     // Model fields hold what the *user* chose and nothing else; the preset default appears greyed out
     // behind an empty one, which says what is running without pretending someone picked it. Filling the
     // default in as a value was the older answer to the same question, and it cost more than it gave: it
@@ -847,6 +871,8 @@ internal fun ProviderEditorDialog(
         )
     }
     var chatModel by remember { mutableStateOf(account.chatModel) }
+    // The rewording model's reasoning effort, in its own words (provider catalog, 2026-11-04).
+    var chatReasoning by remember { mutableStateOf(account.chatReasoning) }
     var realtimeModel by remember {
         mutableStateOf(if (legacyStreamingPick) account.transcriptionModel else account.realtimeModel)
     }
@@ -872,6 +898,20 @@ internal fun ProviderEditorDialog(
         preset.allowsCustomBaseUrl -> preset.copy(baseUrl = baseUrl.ifBlank { preset.baseUrl })
         else -> preset
     }
+
+    // The model rewording runs on as the dialog stands now, worked out as the rewording itself will, and what
+    // the catalog knows about its reasoning. A choice the model does not take (it was changed since) is
+    // shown and saved as the default, and so is the word the default sends anyway: Luna's "none" would
+    // otherwise be listed twice, as "No thinking (default)" and "No thinking".
+    val reasoningModel = chatModelFor(
+        account.copy(chatModel = chatModel, transcriptionModel = transcriptionModel, transcriptionViaChat = transcriptionViaChat),
+        effectivePreset,
+    )
+    val reasoningSpec = ModelCatalog.spec(effectivePreset.id, reasoningModel)
+    val reasoningValues = reasoningSpec?.reasoning?.values
+    val reasoningAppDefault = reasoningSpec?.reasoning?.sentByDefault
+    val cleanReasoning = chatReasoning.trim()
+        .takeIf { reasoningValues == null || (it in reasoningValues && it != reasoningAppDefault) }.orEmpty()
 
     // Nothing here asks what a model can do. Which fields are shown is the switch's business alone, and
     // what belongs in the merged field is the user's — the app cannot know, and a version that guessed
@@ -934,6 +974,7 @@ internal fun ProviderEditorDialog(
                     trustUserCerts = trustUserCerts,
                     transcriptionModel = transcriptionModel.trim(),
                     chatModel = chatModel.trim(),
+                    chatReasoning = cleanReasoning,
                     realtimeModel = realtimeModel.trim(),
                     cachedModels = cachedModels,
                     cachedAudioModels = cachedAudioModels,
@@ -1126,26 +1167,12 @@ internal fun ProviderEditorDialog(
                 // protocol under /v1/realtime — which several self-hosted transcription servers do. There
                 // is no way to tell without connecting, so this is a switch rather than a guess.
                 if (isCustom) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { customRealtime = !customRealtime }
-                            .padding(top = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                            Text(
-                                text = stringRes(R.string.dictate__providers_custom_realtime),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                            Text(
-                                text = stringRes(R.string.dictate__providers_custom_realtime_summary),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                        Switch(checked = customRealtime, onCheckedChange = { customRealtime = it })
-                    }
+                    SwitchRow(
+                        title = stringRes(R.string.dictate__providers_custom_realtime),
+                        summary = stringRes(R.string.dictate__providers_custom_realtime_summary),
+                        checked = customRealtime,
+                        onCheckedChange = { customRealtime = it },
+                    )
                     // Optional: many self-hosted servers serve whatever model they were started with, so a
                     // blank box means "whatever you have".
                     if (customRealtime) {
@@ -1164,9 +1191,21 @@ internal fun ProviderEditorDialog(
                     label = stringRes(R.string.dictate__providers_field_chat_model),
                     value = chatModel,
                     onValueChange = { chatModel = it },
+                    // No default of its own means none at all — an empty box no longer borrows OpenAI's —
+                    // so the hint says a model is needed instead of promising a default.
                     placeholder = preset?.defaultChatModel
-                        ?: stringRes(R.string.dictate__model_placeholder),
+                        ?: stringRes(R.string.dictate__model_placeholder_required),
                     onBrowse = { pickerKind = ModelKind.CHAT },
+                )
+            }
+            // Reasoning effort, beside the model it belongs to; also with single call on, where the merged
+            // model rewords. Not offered for a model the catalog knows to have no setting that does anything.
+            if (showChat && !(reasoningSpec != null && reasoningValues == null)) {
+                ReasoningField(
+                    values = reasoningValues,
+                    value = if (reasoningValues == null) chatReasoning else cleanReasoning,
+                    appDefault = reasoningAppDefault,
+                    onValueChange = { chatReasoning = it },
                 )
             }
             // Single-call multimodal (issue #130): kept below the models; when on, this one model transcribes
@@ -1178,26 +1217,13 @@ internal fun ProviderEditorDialog(
             // mislead, and a wrong warning about a model that works is worse than none. Picking a model
             // that can do both is the user's job here, and it is one the app cannot do for them.
             if (showTranscription && showChat) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            stringRes(R.string.dictate__providers_single_call_title),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-                        Text(
-                            stringRes(R.string.dictate__providers_single_call_summary),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    Switch(
-                        checked = transcriptionViaChat,
-                        onCheckedChange = { transcriptionViaChat = it },
-                    )
-                }
+                SwitchRow(
+                    modifier = Modifier.padding(top = 4.dp),
+                    title = stringRes(R.string.dictate__providers_single_call_title),
+                    summary = stringRes(R.string.dictate__providers_single_call_summary),
+                    checked = transcriptionViaChat,
+                    onCheckedChange = { transcriptionViaChat = it },
+                )
             }
             // Wake-on-demand (#189): a machine that sleeps between jobs, or a server that unloads its model
             // when idle, only starts coming back once something reaches it, so the first request otherwise
@@ -1207,50 +1233,22 @@ internal fun ProviderEditorDialog(
             // when single-call folds the two into one request. Offered only for endpoints of the user's
             // own — nowhere else is there a machine to wake.
             if (isCustom) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { customWarmUp = !customWarmUp }
-                        .padding(top = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                        Text(
-                            text = stringRes(R.string.dictate__providers_custom_warm_up),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-                        Text(
-                            text = stringRes(R.string.dictate__providers_custom_warm_up_summary),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    Switch(checked = customWarmUp, onCheckedChange = { customWarmUp = it })
-                }
+                SwitchRow(
+                    title = stringRes(R.string.dictate__providers_custom_warm_up),
+                    summary = stringRes(R.string.dictate__providers_custom_warm_up_summary),
+                    checked = customWarmUp,
+                    onCheckedChange = { customWarmUp = it },
+                )
             }
             // Per account since #383: the app-wide switch it replaces also opened every cloud provider's
             // traffic to whoever holds a certificate from the CA it was turned on for. Any account may need
             // it, not only a server of the user's own — a company's TLS-inspecting proxy sits in front of all.
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { trustUserCerts = !trustUserCerts }
-                    .padding(top = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
-                    Text(
-                        text = stringRes(R.string.dictate__trust_user_certs_title),
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                    Text(
-                        text = stringRes(R.string.dictate__trust_user_certs_summary),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                Switch(checked = trustUserCerts, onCheckedChange = { trustUserCerts = it })
-            }
+            SwitchRow(
+                title = stringRes(R.string.dictate__trust_user_certs_title),
+                summary = stringRes(R.string.dictate__trust_user_certs_summary),
+                checked = trustUserCerts,
+                onCheckedChange = { trustUserCerts = it },
+            )
         }
         }
     }
@@ -1379,7 +1377,8 @@ private fun ProviderCheckSection(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val prefs by FlorisPreferenceStore
-    var running by remember { mutableStateOf(false) }
+    // The check in flight: true for the transcription test, false for the connection test, null for none.
+    var running by remember { mutableStateOf<Boolean?>(null) }
     var result by remember { mutableStateOf<CheckOutcome?>(null) }
     // Green and red, not the scheme's primary and error. A verdict is the one place in this app where
     // the colour carries meaning rather than decoration, and `primary` is the user's own accent (#387) —
@@ -1402,7 +1401,7 @@ private fun ProviderCheckSection(
             result = CheckOutcome(false, context.stringRes(R.string.dictate__providers_check_no_key), null)
             return
         }
-        running = true
+        running = transcription
         result = null
         scope.launch {
             result = try {
@@ -1420,29 +1419,35 @@ private fun ProviderCheckSection(
             } catch (e: Exception) {
                 failureOutcome(context, e, transcription)
             } finally {
-                running = false
+                running = null
             }
         }
     }
 
-    Column(modifier = Modifier.fillMaxWidth().padding(top = 4.dp)) {
+    Column(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+        // Side by side, half the width each. They used to sit in a flow, right-aligned, because two text
+        // buttons do not fit in the dialog's ~230 dp and a row squeezed the second label until it broke
+        // mid-word ("Test transcriptio / n") — so the flow put each on a line of its own, two full rows for
+        // two buttons (Jannis, 2026-11-05: too much room). Now a label that does not fit wraps between its
+        // words inside its own button, in the smaller label size that keeps every word of the 21 languages
+        // whole, and the row takes the height of the taller one.
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End,
+            modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            if (running) {
-                CircularProgressIndicator(modifier = Modifier.padding(end = 8.dp).size(16.dp))
-            }
-            TextButton(
-                enabled = !running,
+            CheckButton(
+                label = stringRes(R.string.dictate__providers_test),
+                running = running == false,
+                enabled = running == null,
+                modifier = Modifier.weight(1f).fillMaxHeight(),
                 onClick = { startCheck(transcription = false) { it.checkCredentials() } },
-            ) {
-                Text(stringRes(R.string.dictate__providers_test))
-            }
+            )
             if (showTranscription) {
-                TextButton(
-                    enabled = !running,
+                CheckButton(
+                    label = stringRes(R.string.dictate__providers_test_transcribe),
+                    running = running == true,
+                    enabled = running == null,
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
                     onClick = {
                         startCheck(transcription = true) { client ->
                             client.checkTranscription(
@@ -1452,23 +1457,70 @@ private fun ProviderCheckSection(
                             )
                         }
                     },
-                ) {
-                    Text(stringRes(R.string.dictate__providers_test_transcribe))
-                }
+                )
             }
         }
+        // One block instead of two lines in two sizes: the verdict in its colour, then the detail, after a
+        // mark that says pass or fail before a word is read. Announced when it appears, since the buttons
+        // that started it do not move.
         result?.let { outcome ->
-            Text(
-                text = outcome.headline,
-                color = if (outcome.ok) okColor else errColor,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            outcome.detail?.let { detail ->
+            val color = if (outcome.ok) okColor else errColor
+            Row(
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .semantics { liveRegion = LiveRegionMode.Polite },
+                verticalAlignment = Alignment.Top,
+            ) {
+                Icon(
+                    imageVector = if (outcome.ok) Icons.Default.CheckCircle else Icons.Default.Error,
+                    contentDescription = null,
+                    tint = color,
+                    modifier = Modifier.padding(top = 1.dp).size(16.dp),
+                )
+                Spacer(Modifier.width(8.dp))
                 Text(
-                    text = detail,
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(color = color, fontWeight = FontWeight.Medium)) {
+                            append(outcome.headline)
+                        }
+                        outcome.detail?.let {
+                            append(" – ")
+                            append(it)
+                        }
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+            }
+        }
+    }
+}
+
+/** One of the two check buttons; while its check runs, a spinner stands in for the label at the same size. */
+@Composable
+private fun CheckButton(
+    label: String,
+    running: Boolean,
+    enabled: Boolean,
+    modifier: Modifier,
+    onClick: () -> Unit,
+) {
+    OutlinedButton(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier,
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                modifier = Modifier.alpha(if (running) 0f else 1f),
+            )
+            if (running) {
+                CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
             }
         }
     }
@@ -1489,20 +1541,21 @@ private fun checkOutcome(context: Context, check: ConnectionCheck): CheckOutcome
     ConnectionCheckScope.CREDENTIALS -> CheckOutcome(
         ok = true,
         headline = check.liveModelCount
-            ?.let { context.stringRes(R.string.dictate__providers_check_credentials_ok, "count" to it.toString()) }
+            ?.let { context.modelCount(R.plurals.dictate__providers_check_credentials_ok, it) }
             ?: context.stringRes(R.string.dictate__providers_check_credentials_ok_nocount),
         detail = context.stringRes(R.string.dictate__providers_check_credentials_untested),
     )
     // Keyless by design, so there is nothing to verify and the honest verdict is smaller, not bigger.
     ConnectionCheckScope.ENDPOINT -> CheckOutcome(
         ok = true,
-        headline = context.stringRes(
-            R.string.dictate__providers_check_endpoint_ok,
-            "count" to (check.liveModelCount ?: 0),
-        ),
+        headline = context.modelCount(R.plurals.dictate__providers_check_endpoint_ok, check.liveModelCount ?: 0),
         detail = context.stringRes(R.string.dictate__providers_check_credentials_untested),
     )
 }
+
+/** A verdict that counts models, in the plural form [count] asks for: a server with one model said "1 models". */
+private fun Context.modelCount(@PluralsRes id: Int, count: Int): String =
+    resources.getQuantityString(id, count).curlyFormat("count" to count)
 
 /**
  * Turns a failed check into a verdict plus the next thing to do.
@@ -1517,6 +1570,7 @@ private fun failureOutcome(context: Context, e: Exception, transcription: Boolea
     val advice = context.stringRes(
         when (kind) {
             DictateApiException.Kind.INVALID_API_KEY -> R.string.dictate__providers_check_err_auth
+            DictateApiException.Kind.MODEL_UNAVAILABLE -> R.string.dictate__providers_check_err_model
             DictateApiException.Kind.QUOTA_EXCEEDED -> R.string.dictate__providers_check_err_quota
             DictateApiException.Kind.NETWORK -> R.string.dictate__providers_check_err_network
             DictateApiException.Kind.TIMEOUT -> R.string.dictate__providers_check_err_timeout
@@ -1539,6 +1593,50 @@ private fun failureOutcome(context: Context, e: Exception, transcription: Boolea
         ),
         detail = listOfNotNull(advice, raw).joinToString(" "),
     )
+}
+
+/**
+ * The account's reasoning effort. For a model the catalog knows, a choice among [values], the model's own
+ * words, plus the default; for any other, free text. [appDefault] names what the default sends, where the app
+ * sends one of its own.
+ */
+@Composable
+private fun ReasoningField(
+    values: List<String>?,
+    value: String,
+    appDefault: String?,
+    onValueChange: (String) -> Unit,
+) {
+    val label = stringRes(R.string.dictate__reasoning_effort_title)
+    val defaultLabel = reasoningWordLabel("", appDefault)
+    if (values == null) {
+        // A model the catalog does not know, or a server of the user's own: its words are unknown, so the
+        // field takes whatever the server expects (`none`, `max`…), and blank is the default.
+        EditorField(label = label, value = value, onValueChange = onValueChange, placeholder = defaultLabel)
+        return
+    }
+    var dialogOpen by remember { mutableStateOf(false) }
+    Box(modifier = Modifier.padding(top = 8.dp)) {
+        OutlinedTextField(
+            value = reasoningWordLabel(value, appDefault),
+            onValueChange = {},
+            readOnly = true,
+            singleLine = true,
+            label = { Text(label) },
+            trailingIcon = { Icon(Icons.Default.ArrowDropDown, contentDescription = null) },
+        )
+        // A read-only text field does not take a click itself; this layer does, over all of it.
+        Box(modifier = Modifier.matchParentSize().clickable { dialogOpen = true })
+    }
+    if (dialogOpen) {
+        ReasoningChoiceDialog(
+            options = listOf("") + values.filter { it != appDefault },
+            initial = value,
+            label = { reasoningWordLabel(it, appDefault) },
+            onConfirm = { onValueChange(it); dialogOpen = false },
+            onDismiss = { dialogOpen = false },
+        )
+    }
 }
 
 /**
@@ -1670,6 +1768,7 @@ private fun RegionField(
  */
 @StringRes
 private fun regionLabelOf(id: String): Int = when (id) {
+    "cn" -> R.string.dictate__providers_region_cn
     "us" -> R.string.dictate__providers_region_us
     "eu" -> R.string.dictate__providers_region_eu
     "jp" -> R.string.dictate__providers_region_jp

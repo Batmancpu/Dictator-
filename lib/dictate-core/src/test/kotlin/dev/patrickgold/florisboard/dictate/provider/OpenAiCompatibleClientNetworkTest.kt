@@ -13,6 +13,7 @@ package dev.patrickgold.florisboard.dictate.provider
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.inspectors.forAll
+import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.ints.shouldBeLessThan
 import io.kotest.matchers.shouldBe
@@ -395,6 +396,47 @@ class OpenAiCompatibleClientNetworkTest : FunSpec({
         }
     }
 
+    test("a project that may not use the model is told so, not to check its key") {
+        // OpenAI's own answers, asked of the endpoint on 2026-11-02 (project id shortened): a project with a
+        // model allow-list, and a model that does not exist.
+        val answers = listOf(
+            403 to """{"error":{"message":"Project `proj_x` does not have access to model `gpt-6-luna`",""" +
+                """"type":"invalid_request_error","param":null,"code":"model_not_found"}}""",
+            404 to """{"error":{"message":"The model `no-such-model` does not exist or you do not have access to it.",""" +
+                """"type":"invalid_request_error","param":null,"code":"model_not_found"}}""",
+        )
+        for ((status, body) in answers) {
+            MockWebServer().use { server ->
+                server.enqueue(MockResponse().setResponseCode(status).setBody(body))
+                val client = OpenAiCompatibleClient(
+                    ProviderConfig(baseUrl = server.url("/v1/").toString(), apiKey = "test"),
+                )
+
+                val error = shouldThrow<DictateApiException> {
+                    client.complete(ChatRequest.ofUser("gpt-6-luna", "Fix my typos"))
+                }
+                error.kind shouldBe DictateApiException.Kind.MODEL_UNAVAILABLE
+                error.kind.isRetryable shouldBe false
+            }
+        }
+    }
+
+    test("a rejected key is still a key problem") {
+        MockWebServer().use { server ->
+            server.enqueue(
+                MockResponse().setResponseCode(401).setBody(
+                    """{"error":{"message":"Incorrect API key provided.","type":"invalid_request_error",""" +
+                        """"code":"invalid_api_key"}}""",
+                ),
+            )
+            val client = OpenAiCompatibleClient(ProviderConfig(baseUrl = server.url("/v1/").toString(), apiKey = "x"))
+
+            shouldThrow<DictateApiException> {
+                client.complete(ChatRequest.ofUser("gpt-6-luna", "Fix my typos"))
+            }.kind shouldBe DictateApiException.Kind.INVALID_API_KEY
+        }
+    }
+
     test("Deepgram offers only models the file endpoint can serve") {
         MockWebServer().use { server ->
             server.enqueue(
@@ -420,6 +462,23 @@ class OpenAiCompatibleClientNetworkTest : FunSpec({
             // its endpoints is kept, so a changed catalog leaves the user with a list rather than none.
             client.listModels().map { it.id } shouldBe listOf("nova-3", "whisper-large")
             server.takeRequest().getHeader("Authorization") shouldBe "Token test"
+        }
+    }
+
+    // Together's /models, shortened from the live answer of 2026-11-03: an array, no `data` around it.
+    test("a model list sent as a bare array is read like one wrapped in data") {
+        MockWebServer().use { server ->
+            server.enqueue(
+                MockResponse().setResponseCode(200).setBody(
+                    """[{"id":"openai/gpt-oss-120b","object":"model","type":"chat","running":false},""" +
+                        """{"id":"deepseek-ai/DeepSeek-V4.1-Flash","object":"model","type":"chat"}]""",
+                ),
+            )
+            val client = OpenAiCompatibleClient(
+                ProviderConfig(baseUrl = server.url("/v1/").toString(), apiKey = "test"),
+            )
+
+            client.listModels().map { it.id } shouldBe listOf("deepseek-ai/DeepSeek-V4.1-Flash", "openai/gpt-oss-120b")
         }
     }
 
@@ -634,6 +693,89 @@ class OpenAiCompatibleClientNetworkTest : FunSpec({
         }
     }
 
+    // Gemini's answer to "none" on gemini-3.5-flash-lite, verbatim from 2026-11-03: an array, and not a word
+    // about the field. Low, minimal and high go through on the same model.
+    val bareInvalidArgument = MockResponse().setResponseCode(400).setBody(
+        """[{"error":{"code":400,"message":"Request contains an invalid argument.","status":"INVALID_ARGUMENT"}}]""",
+    )
+
+    test("a bare 400 is asked once more without the effort, and that is kept when it answers") {
+        MockWebServer().use { server ->
+            server.enqueue(bareInvalidArgument)
+            repeat(2) {
+                server.enqueue(
+                    MockResponse().setResponseCode(200).setBody("""{"choices":[{"message":{"content":"Hi."}}]}"""),
+                )
+            }
+            val client = OpenAiCompatibleClient(
+                ProviderConfig(baseUrl = server.url("/v1beta/openai/").toString(), apiKey = "test"),
+            )
+            val request = ChatRequest.ofUser("gemini-3.5-flash-lite", "Fix my typos", reasoningEffort = "none")
+
+            client.complete(request).text shouldBe "Hi."
+            client.complete(request).text shouldBe "Hi."
+
+            server.takeRequest().body.readUtf8() shouldContain "\"reasoning_effort\":\"none\""
+            server.takeRequest().body.readUtf8() shouldNotContain "reasoning_effort"
+            server.takeRequest().body.readUtf8() shouldNotContain "reasoning_effort"
+            server.requestCount shouldBe 3
+        }
+    }
+
+    // Mistral at "high", the shape asked of the endpoint on 2026-11-04 (thinking text shortened).
+    fun mistralParts(text: String?) = MockResponse().setResponseCode(200).setBody(
+        """{"choices":[{"finish_reason":"${if (text == null) "length" else "stop"}","message":{"role":"assistant",""" +
+            """"content":[{"type":"thinking","thinking":[{"type":"text","text":"The user wants"}],"closed":true}""" +
+            (if (text == null) "" else """,{"type":"text","text":"$text"}""") + "]}}]}",
+    )
+
+    test("an answer sent as parts is read from its text parts, without the thinking") {
+        MockWebServer().use { server ->
+            server.enqueue(mistralParts("This is a test."))
+            val client = OpenAiCompatibleClient(
+                ProviderConfig(baseUrl = server.url("/v1/").toString(), apiKey = "test"),
+            )
+
+            client.complete(ChatRequest.ofUser("mistral-small-latest", "Fix: this are a test.", reasoningEffort = "high"))
+                .text shouldBe "This is a test."
+        }
+    }
+
+    test("parts that hold nothing but thinking count as an answer thought away") {
+        MockWebServer().use { server ->
+            server.enqueue(mistralParts(null))
+            server.enqueue(MockResponse().setResponseCode(200).setBody("""{"choices":[{"message":{"content":"Hi."}}]}"""))
+            val client = OpenAiCompatibleClient(
+                ProviderConfig(baseUrl = server.url("/v1/").toString(), apiKey = "test"),
+            )
+
+            client.complete(ChatRequest.ofUser("mistral-small-latest", "Fix my typos", reasoningEffort = "high"))
+                .text shouldBe "Hi."
+            server.takeRequest()
+            server.takeRequest().body.readUtf8() shouldContain "\"reasoning_effort\":\"low\""
+        }
+    }
+
+    test("a bare 400 that the effort did not cause reaches the user as it was, and nothing is kept") {
+        MockWebServer().use { server ->
+            server.enqueue(bareInvalidArgument)
+            server.enqueue(MockResponse().setResponseCode(400).setBody("""{"error":{"message":"Second refusal"}}"""))
+            server.enqueue(MockResponse().setResponseCode(200).setBody("""{"choices":[{"message":{"content":"Hi."}}]}"""))
+            val client = OpenAiCompatibleClient(
+                ProviderConfig(baseUrl = server.url("/v1beta/openai/").toString(), apiKey = "test"),
+            )
+            val request = ChatRequest.ofUser("gemini-3.6-flash", "Fix my typos", reasoningEffort = "low")
+
+            val e = shouldThrow<DictateApiException> { client.complete(request) }
+            e.message shouldContain "Request contains an invalid argument."
+            client.complete(request).text shouldBe "Hi."
+
+            server.takeRequest()
+            server.takeRequest()
+            server.takeRequest().body.readUtf8() shouldContain "\"reasoning_effort\":\"low\""
+        }
+    }
+
     test("the nearest supported effort: ties go lower, and nothing is made up") {
         val luna = "Supported values are: 'none', 'low', 'medium', 'high', and 'xhigh'."
         OpenAiCompatibleClient.nearestSupportedEffort("minimal", luna) shouldBe "none"
@@ -748,9 +890,10 @@ class OpenAiCompatibleClientNetworkTest : FunSpec({
                     audioFile = audio,
                     model = "MAI-Transcribe-2",
                     language = "de",
-                    // The hint the app actually composes: the punctuation sample sentence with the
-                    // user's glossary appended behind it (DictatePromptDefaults.appendCustomWords).
+                    // What the app sends: the punctuation sample sentence with the user's glossary appended
+                    // behind it (DictatePromptDefaults.appendCustomWords), and the glossary on its own.
                     prompt = "Hallo. Vielen Dank. DevEmperor, Dictate",
+                    vocabulary = listOf("DevEmperor", "Dictate"),
                 ),
             )
             val recorded = server.takeRequest()
@@ -771,10 +914,9 @@ class OpenAiCompatibleClientNetworkTest : FunSpec({
             // The point of the whole provider: fillers and false starts dropped before we ever see them.
             body shouldContain "\"transcribeStyle\":\"clean\""
             body shouldContain "\"locales\":[\"de\"]"
-            // The style hint has no prose slot on a dedicated STT model, so its terms bias recognition —
-            // and the sample sentence in front of them must not come along. Azure calls this field
-            // keyword biasing, so "Hallo. Vielen Dank." in it would nudge every dictation towards a
-            // greeting nobody asked for.
+            // A dedicated STT model has no prose slot, so the custom words bias recognition and the sample
+            // sentence stays behind. Azure calls this field keyword biasing, so "Hallo. Vielen Dank." in
+            // it would nudge every dictation towards a greeting nobody asked for.
             body shouldContain "\"phrases\":[\"DevEmperor\",\"Dictate\"]"
             body shouldNotContain "Vielen Dank"
         }
@@ -907,21 +1049,6 @@ class OpenAiCompatibleClientNetworkTest : FunSpec({
         OpenAiCompatibleClient.azureSupportsTranscribeStyle("MAI-Transcribe-3") shouldBe true
         OpenAiCompatibleClient.azureSupportsTranscribeStyle("mai-transcribe-1.5") shouldBe false
         OpenAiCompatibleClient.azureSupportsTranscribeStyle("MAI-Transcribe-1") shouldBe false
-    }
-
-    // A vocabulary term is a name, and a name has no full stop with a space behind it. Shared by Azure's
-    // phraseList (#349) and Google's custom_vocabulary (#292), which had the same leak.
-    test("a bias term never carries the sentence that stood in front of it") {
-        // What the leak looked like: the glossary's first entry arrives welded to the sample sentence.
-        OpenAiCompatibleClient.afterLastSentenceEnd("Hallo. Vielen Dank. DevEmperor") shouldBe "DevEmperor"
-        OpenAiCompatibleClient.afterLastSentenceEnd("你好。谢谢。 Dictate") shouldBe "Dictate"
-        OpenAiCompatibleClient.afterLastSentenceEnd("नमस्ते। धन्यवाद। Dictate") shouldBe "Dictate"
-
-        // Everything that was already a term comes through untouched — including the abbreviation that
-        // ends in a stop, which is why the rule asks for the space rather than the stop alone.
-        listOf("DevEmperor", "FlorisBoard", "Dr.", "z.B.", "Anna-Lena Müller").forAll {
-            OpenAiCompatibleClient.afterLastSentenceEnd(it) shouldBe it
-        }
     }
 
     // --- Scaleway (issue #423) ---
@@ -1124,14 +1251,14 @@ class OpenAiCompatibleClientNetworkTest : FunSpec({
         xai.supportsRealtime shouldBe true
         xai.realtimeApi shouldBe RealtimeApi.XAI
         xai.defaultTranscriptionModel shouldBe "grok-voice-transcribe-2.0"
-        // Documented: MKV only with MP3, AAC or FLAC inside, so WebM's Opus is not promised; AMR not named.
-        xai.acceptedAudioContainers shouldNotContain AudioContainer.WEBM
+        // WebM is not in the docs but measured (2026-11-04); AMR is refused by the endpoint.
+        xai.acceptedAudioContainers shouldContain AudioContainer.WEBM
         xai.acceptedAudioContainers shouldNotContain AudioContainer.AMR
         ProviderRegistry.maxUploadBytes("xai") shouldBe 500_000_000L
     }
 
     // The three ways this endpoint differs from OpenAI's, each held here: the path and its fields, the
-    // file part last, and the vocabulary as `keyterm` with the sample sentence left behind.
+    // file part last, and the custom words as `keyterm` with the sample sentence left behind.
     test("xAI sends every field before the file, and the glossary as key terms") {
         val audio = createTempFile(suffix = ".wav").toFile().apply {
             writeBytes("RIFF-test-audio".encodeToByteArray())
@@ -1157,6 +1284,9 @@ class OpenAiCompatibleClientNetworkTest : FunSpec({
                         language = "de",
                         prompt = "Hallo. Vielen Dank. DevEmperor, Dictate, " +
                             "Donaudampfschifffahrtsgesellschaftskapitänswitwenrente",
+                        vocabulary = listOf(
+                            "DevEmperor", "Dictate", "Donaudampfschifffahrtsgesellschaftskapitänswitwenrente",
+                        ),
                     ),
                 )
                 val recorded = server.takeRequest()
@@ -1256,26 +1386,6 @@ class OpenAiCompatibleClientNetworkTest : FunSpec({
         }
     }
 
-    // The bare sample sentence is the whole hint whenever the glossary is empty, and its last sentence
-    // used to come through as a two-word bias term for every dedicated STT model (#435).
-    test("a hint with no glossary behind its sample sentence yields no bias term") {
-        listOf(
-            "Hallo. Vielen Dank.",
-            "Hello. Thank you very much.",
-            "สวัสดี. ขอบคุณมาก.",
-            "你好。非常感谢。",
-            "こんにちは。どうもありがとうございます。",
-            "नमस्ते। बहुत-बहुत धन्यवाद।",
-        ).forAll { OpenAiCompatibleClient.vocabularyTermOf(it) shouldBe null }
-
-        OpenAiCompatibleClient.vocabularyTermOf("Hallo. Vielen Dank. DevEmperor") shouldBe "DevEmperor"
-        OpenAiCompatibleClient.vocabularyTermOf("你好。非常感谢。 DevEmperor") shouldBe "DevEmperor"
-        OpenAiCompatibleClient.vocabularyTermOf("Dr. Meier") shouldBe "Meier"
-        listOf("DevEmperor", "Dr.", "z.B.", "Anna-Lena Müller", "FlorisBoard").forAll {
-            OpenAiCompatibleClient.vocabularyTermOf(" $it ") shouldBe it
-        }
-    }
-
     // #455: only a server that was never reached may be handed to another provider. Once a connection was
     // made, the provider has (some of) the audio, and a timeout or a reset there is #391's slow answer.
     test("a connection that could not be made is told apart from one that broke or went quiet") {
@@ -1358,5 +1468,75 @@ class OpenAiCompatibleClientNetworkTest : FunSpec({
 
         connectMillis(handOver = true) shouldBe 4_000
         connectMillis(handOver = false) shouldBe 8_000
+    }
+
+    // #447: Google's dedicated transcription model refused every request of a free-tier key on 2026-10-07,
+    // and the chat model transcribed the same clip. The answers below are Google's own error shapes.
+    fun geminiClient(server: MockWebServer) = OpenAiCompatibleClient(
+        ProviderConfig(
+            baseUrl = server.url("/v1beta/openai/").toString(),
+            apiKey = "test",
+            transcriptionApi = TranscriptionApi.GEMINI_GENERATE_CONTENT,
+        ),
+    )
+    val geminiText = """{"candidates":[{"content":{"parts":[{"text":"Hallo Welt"}]}}]}"""
+
+    test("a refusal of Google's transcription model hands the recording to the chat model once") {
+        val refusals = listOf(
+            400 to """{"error":{"code":400,"message":"Thinking is not enabled for this model","status":"INVALID_ARGUMENT"}}""",
+            429 to """{"error":{"code":429,"message":"You exceeded your current quota.","status":"RESOURCE_EXHAUSTED"}}""",
+            404 to """{"error":{"code":404,"message":"models/gemini-3.5-transcribe is not found","status":"NOT_FOUND"}}""",
+        )
+        val audio = createTempFile(suffix = ".wav").toFile().apply { writeBytes("RIFF-test-audio".encodeToByteArray()) }
+        try {
+            for ((status, body) in refusals) {
+                MockWebServer().use { server ->
+                    server.enqueue(MockResponse().setResponseCode(status).setBody(body))
+                    server.enqueue(MockResponse().setResponseCode(200).setBody(geminiText))
+
+                    val result = geminiClient(server).transcribe(TranscriptionRequest(audio, "gemini-3.5-transcribe"))
+
+                    result.text shouldBe "Hallo Welt"
+                    server.takeRequest().path shouldBe "/v1beta/interactions"
+                    server.takeRequest().path shouldBe "/v1beta/models/${ProviderRegistry.GEMINI.defaultChatModel}:generateContent"
+                    server.requestCount shouldBe 2
+                }
+            }
+        } finally {
+            audio.delete()
+        }
+    }
+
+    test("a rejected Gemini key is not sent to the chat model as well") {
+        val audio = createTempFile(suffix = ".wav").toFile().apply { writeBytes("RIFF-test-audio".encodeToByteArray()) }
+        try {
+            MockWebServer().use { server ->
+                server.enqueue(
+                    MockResponse().setResponseCode(400).setBody(
+                        """{"error":{"code":400,"message":"API key not valid. Please pass a valid API key.",""" +
+                            """"status":"INVALID_ARGUMENT"}}""",
+                    ),
+                )
+                shouldThrow<DictateApiException> {
+                    geminiClient(server).transcribe(TranscriptionRequest(audio, "gemini-3.5-transcribe"))
+                }.kind shouldBe DictateApiException.Kind.INVALID_API_KEY
+                server.requestCount shouldBe 1
+            }
+        } finally {
+            audio.delete()
+        }
+    }
+
+    test("a model this key cannot use reads as that, not as an unknown error") {
+        DictateApiException.fromHttp(400, "Thinking is not enabled for this model").kind shouldBe
+            DictateApiException.Kind.MODEL_UNAVAILABLE
+        DictateApiException.fromHttp(
+            404,
+            "Model 'gemini-3.5-transcribe-x' not found. Did you mean 'gemini-3.5-transcribe'?",
+            code = "not_found",
+        ).kind shouldBe DictateApiException.Kind.MODEL_UNAVAILABLE
+        // The same words in a 5xx are the server's trouble, and a plain bad request stays unknown.
+        DictateApiException.fromHttp(503, "Overloaded for this model").kind shouldBe DictateApiException.Kind.SERVER_ERROR
+        DictateApiException.fromHttp(400, "Invalid JSON payload").kind shouldBe DictateApiException.Kind.UNKNOWN
     }
 })

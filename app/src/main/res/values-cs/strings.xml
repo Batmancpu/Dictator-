@@ -144,7 +144,9 @@
     <string name="settings__search__keywords__text_expansion" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the typing-shortcut setting, which lets a short trigger expand into a saved block of text. Translate as the words people in your language would actually type when looking for that feature, separated by spaces. Do not translate word for word; add or drop terms as makes sense.">textová zkratka rozbalení textu úryvek makro automatický text šablona snippet text expansion</string>
     <string name="settings__search__keywords__selection_metrics" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which shows how many words and characters are selected. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">počet slov počítadlo slov znaky délka statistika</string>
     <string name="settings__search__keywords__trim_on_copy" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which removes spaces and line breaks at the ends of copied text. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">oříznutí mezery odstranit vyčistit kopírovat vyjmout</string>
+    <string name="settings__search__keywords__final_full_stop" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which leaves the full stop off a dictation of one sentence. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">tečka interpunkce znaménka konec věty bez tečky</string>
     <string name="settings__search__keywords__clear_cache">mezipaměť cache úložiště místo dočasné soubory uvolnit smazat vyčistit</string>
+    <string name="settings__search__keywords__keyboard_size">výška vysoká nízká větší menší zmenšit zvětšit změnit velikost</string>
     <string name="settings__search__keywords__momentary_layer">podržet přeject symbol vrstva interpunkce dočasně okamžitě 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">emodži emoji řádek lišta nedávné použité nad klávesnicí rychlý</string>
     <string name="settings__search__keywords__request_timeout">časový limit timeout pomalé čekání spojení sekundy</string>
@@ -483,6 +485,7 @@
     <string name="pref__keyboard__font_size_multiplier__label" comment="Preference title">Násobitel velikosti písma</string>
     <string name="pref__keyboard__group_layout__label" comment="Preference group title">Rozložení</string>
     <string name="pref__keyboard__landscape_input_ui_mode__label" comment="Preference value">Vstupní okno v celoobrazovkovém režimu na šířku</string>
+    <string name="pref__keyboard__keyboard_size__label">Velikost klávesnice</string>
     <string name="pref__keyboard__key_spacing__label" comment="Preference title">Mezera mezi klávesami</string>
     <string name="pref__keyboard__key_spacing__summary" comment="Preference summary">{v} % svisle, {h} % vodorovně — větší mezera zmenší klávesy, ne klávesnici.</string>
     <string name="pref__keyboard__group_keypress__label" comment="Preference group title">Stisk klávesy</string>
@@ -615,6 +618,7 @@
     <string name="pref__gestures__delete_key_long_press__label" comment="Preference title">Dlouhé stisknutí klávesy ke smazání</string>
     <string name="pref__gestures__swipe_velocity_threshold__label" comment="Preference title">Práh rychlosti přejetí</string>
     <string name="pref__gestures__swipe_distance_threshold__label" comment="Preference title">Práh vzdálenosti přejetí</string>
+    <string name="settings__help__title">Nápověda</string>
     <string name="settings__other__title" comment="Title of Other settings">Ostatní</string>
     <string name="pref__other__settings_theme__label" comment="Label of Settings theme preference in Other">Motiv nastavení</string>
     <string name="pref__other__settings_theme__auto_amoled" comment="Possible value of Settings theme preference in Other">Podle systému (AMOLED)</string>
@@ -665,11 +669,8 @@
     <string name="setup__select_ime__title">Vyberte {app_name}</string>
     <string name="setup__select_ime__description">{app_name} je nyní povolena ve vašem systému. Pro její aktivní používání přepněte na {app_name} jejím vybráním v dialogu výběru vstupu!</string>
     <string name="setup__select_ime__switch_keyboard_btn">Přepnout klávesnici</string>
-    <string name="setup__grant_notification_permission__title">Povolit oznámení o hlášení pádu</string>
-    <string name="setup__grant_notification_permission__description">Počínaje systémem Android 13 musí aplikace žádat o oprávnění
-        k posílání oznámení. V aplikaci Dictate je toto oprávnění použito pouze pro otevření obrazovky hlášení
-        o pádu. Toto oprávnění lze kdykoli změnit v systémových nastaveních.
-    </string>
+    <string name="setup__grant_notification_permission__title">Povolit oznámení</string>
+    <string name="setup__grant_notification_permission__description">Od Androidu 13 se aplikace musí zeptat, než zobrazí oznámení. Dictate Keyboard jedno zobrazí, když plovoucí tlačítko nahrává, když se stahuje model řeči a když vaše hodinky diktují přes telefon, a při pádu aplikace otevře hlášení o chybě. Kdykoli to můžete změnit v systémových nastaveních.</string>
     <string name="setup__grant_notification_permission__btn">Udělit oprávnění</string>
     <string name="setup__finish_up__title">Dokončit</string>
     <string name="setup__finish_up__description_p1">{app_name} je nyní povolena ve vašem systému a je připravena na přizpůsobení.</string>
@@ -695,6 +696,17 @@
     <string name="backup_and_restore__back_up__credentials_warning">Tento archiv obsahuje tvoje klíče API a hesla v čitelné podobě i tvůj kredit Dictate Cloud — kdokoli ho dostane, může diktovat na tvůj účet. Nepředávej ho dál, a pokud jsi to už udělal, změň klíč u svého poskytovatele. Všechno ostatní zaškrtnuté níže jde s ním, včetně historie přepisů a schránky.</string>
     <string name="backup_and_restore__back_up__credentials_excluded_note">Tento archiv neobsahuje žádné klíče API, hesla ani kredit Dictate Cloud, takže ho můžeš předat dál, ale tvoje také neobnoví. Všechno ostatní zaškrtnuté níže v něm zůstává, včetně historie přepisů a schránky.</string>
     <string name="backup_and_restore__back_up__personal_content_note">Tento archiv neobsahuje klíče API ani hesla, ale obsahuje všechno zaškrtnuté níže: historii přepisů i s uchovanými nahrávkami, schránku, tvoje prompty a slova, která se klávesnice od tebe naučila.</string>
+    <string name="backup_and_restore__back_up__encrypted_note">Tento archiv je zašifrovaný tvým heslem a vše zaškrtnuté níže lze obnovit jen s ním. Pokud heslo zapomeneš, tuto zálohu nikdo neobnoví – ani ty.</string>
+    <string name="backup_and_restore__back_up__password">Ochrana heslem</string>
+    <string name="backup_and_restore__back_up__password_enabled">Zašifrovat heslem</string>
+    <string name="backup_and_restore__back_up__password_too_short">Alespoň {count} znaků</string>
+    <string name="backup_and_restore__back_up__password_mismatch">Hesla se neshodují</string>
+    <string name="backup_and_restore__password">Heslo</string>
+    <string name="backup_and_restore__password_repeat">Zopakuj heslo</string>
+    <string name="backup_and_restore__restore__encrypted">Tento archiv zálohy je chráněný heslem. Zadej ho a uvidíš, co archiv obsahuje.</string>
+    <string name="backup_and_restore__restore__unlock">Odemknout</string>
+    <string name="backup_and_restore__restore__wrong_password">Špatné heslo</string>
+    <string name="backup_and_restore__restore__encrypted_unreadable">Tento archiv nelze otevřít. Je poškozený, nebo byl vytvořen novější verzí Dictate.</string>
     <string name="backup_and_restore__back_up__files_ime_keyboard">Rozšíření klávesnice</string>
     <string name="backup_and_restore__back_up__files_ime_spelling">Rozšíření kontroly pravopisu / slovníky</string>
     <string name="backup_and_restore__back_up__files_ime_theme">Rozšíření témat</string>
@@ -922,7 +934,7 @@
     <string name="ext__addon_management_box__managing_placeholder">Správa {extensions}</string>
     <string name="ext__addon_management_box__addon_manager_info">Všechny úlohy spojené s importováním, exportováním, vytvářením, přizpůsobováním a odstraňováním rozšíření mohou být prováděny skrze centralizovaného správce doplňků.</string>
     <string name="ext__addon_management_box__go_to_page">Přejít na {ext_home_title}</string>
-    <string name="ext__home__info">Rozšíření můžete stahovat a instalovat z Obchodu s doplňky Dictate nebo importovat jakýkoli soubor rozšíření, který jste si stáhli z internetu.</string>
+    <string name="ext__home__info">Rozšíření přidávají motivy, rozložení klávesnice a jazykové balíčky. Rozšíření přidáte importem jeho souboru; ta, která máte, jsou uvedena níže.</string>
     <string name="ext__home__visit_store">Navštívit Obchod s doplňky</string>
     <string name="ext__home__manage_extensions">Správa nainstalovaných doplňků</string>
     <string name="ext__list__view_details">Zobrazit podrobnosti</string>
@@ -1327,8 +1339,6 @@
     <string name="dictate__remember_last_dictation_summary">Uchová poslední diktát, aby jej plovoucí tlačítko mohlo vrátit zpět a klasické rozvržení znovu vložit.</string>
     <string name="dictate__remember_last_dictation_title">Zapamatovat poslední diktování</string>
     <string name="changelog__v4_2_0">• NOVÉ: plovoucí tlačítko diktování — diktujte přímo v jakékoli aplikaci, i když je aktivní jiná klávesnice. Vyberte si ze tří stylů (Pilulka, Prstenec, Koule), sledujte živý průběh zvuku, když mluvíte, přetáhněte ho kamkoli s přichytáváním k okrajům, nastavte barvu a velikost a podržením přeformulujte. Zapněte ho v Nastavení ▸ Dictate ▸ Plovoucí tlačítko.\n• NOVÉ: Google Gemini — použijte vlastní klíč API z AI Studia pro přepis i přeformulování.\n• Výzvy se nyní ve výchozím nastavení zobrazují ve stálém řádku nad klávesami.\n• Spolehlivější vkládání textu napříč aplikacemi, včetně prohlížečů a jiných klávesnic.</string>
-    <string name="dictate__promo_floating_button_message">Nové: diktujte kdekoli</string>
-    <string name="dictate__promo_floating_button_action">Vyzkoušet</string>
     <string name="setup__floating_button__btn">Nastavit plovoucí tlačítko</string>
     <string name="setup__nav_back">Zpět</string>
     <string name="setup__nav_next">Další</string>
@@ -1437,6 +1447,7 @@
     <string name="dictate__providers_region_eu">Evropská unie</string>
     <string name="dictate__providers_region_jp">Japonsko</string>
     <string name="dictate__providers_region_in">Indie</string>
+    <string name="dictate__providers_region_cn">Čína (pevninská)</string>
     <string name="dictate__providers_region_global">Celosvětově</string>
     <string name="dictate__providers_custom_title">Vlastní server</string>
     <string name="dictate__providers_get_key">Získat API klíč</string>
@@ -1446,9 +1457,19 @@
     <string name="dictate__providers_test">Otestovat připojení</string>
     <string name="dictate__providers_test_transcribe">Otestovat přepis</string>
     <string name="dictate__providers_check_no_key">Nejprve zadejte svůj API klíč.</string>
-    <string name="dictate__providers_check_credentials_ok">Přihlašovací údaje ověřeny · {count} modelů</string>
+    <plurals name="dictate__providers_check_credentials_ok">
+        <item quantity="one">Přihlašovací údaje ověřeny · {count} model</item>
+        <item quantity="few">Přihlašovací údaje ověřeny · {count} modely</item>
+        <item quantity="many">Přihlašovací údaje ověřeny · {count} modelů</item>
+        <item quantity="other">Přihlašovací údaje ověřeny · {count} modelů</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_ok_nocount">Přihlašovací údaje ověřeny</string>
-    <string name="dictate__providers_check_endpoint_ok">Server byl dosažen · {count} modelů</string>
+    <plurals name="dictate__providers_check_endpoint_ok">
+        <item quantity="one">Server byl dosažen · {count} model</item>
+        <item quantity="few">Server byl dosažen · {count} modely</item>
+        <item quantity="many">Server byl dosažen · {count} modelů</item>
+        <item quantity="other">Server byl dosažen · {count} modelů</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_untested">Přepis nebyl otestován.</string>
     <string name="dictate__providers_check_transcription_ok">Přepis ověřen</string>
     <string name="dictate__providers_check_transcription_text">Vrátilo se jako: „{text}“</string>
@@ -1456,6 +1477,8 @@
     <string name="dictate__providers_check_failed_connection">Test spojení selhal</string>
     <string name="dictate__providers_check_failed_transcription">Test přepisu selhal</string>
     <string name="dictate__providers_check_err_auth">Klíč byl odmítnut. Zkontrolujte jej i to, zda adresa patří ke stejnému účtu.</string>
+    <string name="dictate__providers_check_err_model">Klíč funguje, ale tento model používat nesmí. Vyberte jiný model, nebo jej povolte v nastavení projektu u poskytovatele.</string>
+    <string name="dictate__error_model_unavailable">Model není pro tento klíč dostupný</string>
     <string name="dictate__providers_check_err_quota">Klíč funguje, ale účet nemá kvótu nebo překročil limit. Zkontrolujte svůj tarif u poskytovatele.</string>
     <string name="dictate__providers_check_err_network">Server nebylo možné kontaktovat. Zkontrolujte adresu a připojení k internetu.</string>
     <string name="dictate__providers_check_err_timeout">Žádná odpověď včas. Poskytovatel může být vytížený – zkuste to znovu.</string>
@@ -1486,7 +1509,12 @@
     <string name="dictate__model_picker_title">Vyberte model</string>
     <string name="dictate__model_picker_search">Vyhledejte nebo zadejte id modelu</string>
     <string name="dictate__model_picker_loading">Načítání modelů…</string>
-    <string name="dictate__model_picker_count">{count} modelů</string>
+    <plurals name="dictate__model_picker_count">
+        <item quantity="one">{count} model</item>
+        <item quantity="few">{count} modely</item>
+        <item quantity="many">{count} modelů</item>
+        <item quantity="other">{count} modelů</item>
+    </plurals>
     <string name="dictate__model_picker_refresh">Obnovit</string>
     <string name="dictate__model_picker_use_custom">Použít „{model}\"</string>
     <string name="dictate__recording_group">Nahrávání</string>
@@ -1522,6 +1550,8 @@
     <string name="dictate__paragraph_split_title">Rozdělit na odstavce</string>
     <string name="dictate__paragraph_split_off">Vypnuto</string>
     <string name="dictate__paragraph_split_value">Po {n} slovech</string>
+    <string name="dictate__drop_final_full_stop_title">Vynechat tečku na konci</string>
+    <string name="dictate__drop_final_full_stop_summary">Jen když je diktát jedna věta; více vět si ponechá všechna znaménka</string>
     <string name="dictate__realtime_title">Přepis v reálném čase</string>
     <string name="dictate__realtime_summary">Přepisuje už během mluvení, ne až po zastavení, u poskytovatelů, kteří to podporují</string>
     <string name="dictate__realtime_mode_off">Vypnuto</string>
@@ -1655,7 +1685,9 @@
     <string name="dictate__prompt_auto_apply_title">Použít automaticky</string>
     <string name="dictate__prompt_auto_apply_summary">Spouštět tento prompt automaticky u každého přepisu</string>
     <string name="dictate__prompt_reasoning_title">Uvažování</string>
-    <string name="dictate__prompt_reasoning_default">Výchozí</string>
+    <string name="dictate__prompt_reasoning_default">Nastavení poskytovatele</string>
+    <string name="dictate__prompt_reasoning_little">Málo uvažování</string>
+    <string name="dictate__prompt_reasoning_much">Hodně uvažování</string>
     <string name="dictate__prompt_badge_selection">Vyžaduje výběr</string>
     <string name="dictate__prompt_badge_auto">Použije se automaticky</string>
     <string name="dictate__example_prompt_fix_grammar_name">Opravit gramatiku</string>
@@ -1939,7 +1971,8 @@
     <string name="dictate__promo_milestone_count">%s diktátů s Dictate! 🎉</string>
     <string name="dictate__promo_milestone_action">Statistiky</string>
     <string name="dictate__reasoning_effort_title">Úsilí uvažování</string>
-    <string name="dictate__reasoning_effort_off">Vypnuto</string>
+    <string name="dictate__reasoning_effort_off">Výchozí poskytovatele</string>
+    <string name="dictate__reasoning_effort_none">Bez uvažování</string>
     <string name="dictate__reasoning_effort_off_summary">Výchozí u poskytovatele — u neuvažovacích modelů nechte vypnuté</string>
     <string name="dictate__reasoning_effort_minimal">Minimální</string>
     <string name="dictate__reasoning_effort_minimal_summary">Nejrychlejší, minimum přemýšlení</string>
@@ -1948,6 +1981,9 @@
     <string name="dictate__reasoning_effort_medium">Střední</string>
     <string name="dictate__reasoning_effort_medium_summary">Vyvážené přemýšlení a rychlost</string>
     <string name="dictate__reasoning_effort_high">Vysoké</string>
+    <string name="dictate__reasoning_effort_xhigh">Velmi vysoké</string>
+    <string name="dictate__reasoning_effort_max">Maximální</string>
+    <string name="dictate__reasoning_effort_app_default">{name} (výchozí)</string>
     <string name="dictate__reasoning_effort_high_summary">Nejvíce přemýšlení, pomalejší</string>
     <string name="dictate__reasoning_effort_custom">Vlastní</string>
     <string name="dictate__action_save_audio">Uložit zvuk</string>
@@ -2329,6 +2365,10 @@
     <string name="gif__error">GIFs se nepodařilo načíst. Zkontrolujte připojení a API klíč.</string>
     <string name="gif__setup_needed">Přidejte v Nastavení bezplatný klíč KLIPY API pro vyhledávání GIFs</string>
     <string name="gif__setup_needed_action">Nastavit vyhledávání GIFs</string>
+    <string name="gif__search_off">Vyhledávání GIFů je vypnuté</string>
+    <string name="quick_action__forward_delete__tooltip">Smazat znak za kurzorem</string>
+    <string name="dictate__error_no_rewording_model">Vyberte model přeformulování pro %1$s</string>
+    <string name="dictate__model_placeholder_required">povinné: vyberte nebo zadejte model</string>
     <string name="gif__copied_to_clipboard">GIF zkopírován do schránky — vložíte dlouhým stisknutím</string>
     <string name="gif__insert_failed">GIF se nepodařilo vložit</string>
     <string name="quick_action__ime_ui_mode_gif">GIF</string>
@@ -2425,6 +2465,25 @@
     <string name="dictate__action_top_up">Dobít kredit</string>
     <string name="dictate__promo_low_credit_message">Kredit skoro došel.</string>
     <string name="dictate__promo_low_credit_action">Dobít</string>
+    <string name="dictate__promo_sayova_message">Nová aplikace: AI na hodinkách</string>
+    <string name="dictate__promo_sayova_action">Objevit</string>
+    <string name="about__more_apps__title">Další aplikace</string>
+    <string name="about__more_apps__summary">SayOVA a TunerToGo pro vaše hodinky</string>
+    <string name="about__more_apps__tunertogo_tagline">Ladička pro Wear OS</string>
+    <string name="about__more_apps__tunertogo_description">Přesná ladička vždy na zápěstí, připravená, jakmile vezmete nástroj do ruky.</string>
+    <string name="about__more_apps__tunertogo_feature_instruments">Kytara, baskytara, ukulele, housle a další, s automatickým rozpoznáním strun</string>
+    <string name="about__more_apps__tunertogo_feature_chromatic">Chromatický režim pro všechny ostatní nástroje i pro váš hlas</string>
+    <string name="about__more_apps__tunertogo_feature_vibration">Krátká vibrace, když je struna naladěná, oči zůstanou u ladicích kolíků</string>
+    <string name="about__more_apps__tunertogo_feature_privacy">Bez přístupu k internetu, bez reklam: zvuk se analyzuje v hodinkách a nikdy se neukládá</string>
+    <string name="about__more_apps__tunertogo_requirements">Vyžaduje hodinky s Wear OS 3 nebo novějším a mikrofonem. Funguje bez aplikace v telefonu.</string>
+    <string name="about__more_apps__intro">Také od DevEmperora, vývojáře Dictate:</string>
+    <string name="about__more_apps__sayova_tagline">Hlasový asistent s AI pro Wear OS</string>
+    <string name="about__more_apps__sayova_description">Mluvte s Google Gemini nebo OpenAI přímo z hodinek: přirozeně, přerušte kdykoli a čtěte odpověď, zatímco ji posloucháte.</string>
+    <string name="about__more_apps__sayova_feature_interpreter">Tlumočník mezi 21 jazyky, obě strany jako text</string>
+    <string name="about__more_apps__sayova_feature_tasks">Nastaví minutky a budíky, uloží poznámky a hledá na webu</string>
+    <string name="about__more_apps__sayova_feature_phone">Připraví zprávy, schůzky a trasy v telefonu, odeslání necháte na sobě</string>
+    <string name="about__more_apps__sayova_feature_privacy">Vlastní klíč API: žádný účet, žádné sledování, open source</string>
+    <string name="about__more_apps__sayova_requirements">Vyžaduje hodinky s Wear OS 3 nebo novějším a mikrofonem a klíč API od Google Gemini nebo OpenAI. Používání účtuje váš poskytovatel.</string>
     <string name="prefs__media__sticker__title">Samolepky</string>
     <string name="prefs__media__sticker_folder__title">Složka se samolepkami</string>
     <string name="prefs__media__sticker_folder__summary_unset">Vyberte složku s vlastními obrázky</string>

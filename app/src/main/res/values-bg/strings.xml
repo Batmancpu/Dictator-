@@ -145,7 +145,9 @@
     <string name="settings__search__keywords__text_expansion" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the typing-shortcut setting, which lets a short trigger expand into a saved block of text. Translate as the words people in your language would actually type when looking for that feature, separated by spaces. Do not translate word for word; add or drop terms as makes sense.">текстов шаблон разширяване на текст съкращение макрос автотекст snippet text expansion</string>
     <string name="settings__search__keywords__selection_metrics" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which shows how many words and characters are selected. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">брой думи брояч на думи знаци дължина статистика</string>
     <string name="settings__search__keywords__trim_on_copy" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which removes spaces and line breaks at the ends of copied text. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">изрязване интервали премахване почистване копиране</string>
+    <string name="settings__search__keywords__final_full_stop" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which leaves the full stop off a dictation of one sentence. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">точка пунктуация препинателни знаци край на изречението без точка</string>
     <string name="settings__search__keywords__clear_cache">кеш памет място временни файлове освобождаване изтриване почистване</string>
+    <string name="settings__search__keywords__keyboard_size">височина висока ниска по-голяма по-малка преоразмеряване размер</string>
     <string name="settings__search__keywords__momentary_layer">задръжане плъзгане символ слой пунктуация временно 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">емоджи ред лента наскоро използвани над клавиатурата бърз смайлик</string>
     <string name="settings__search__keywords__request_timeout">изчакване таймаут бавно чакане връзка секунди прекъсване</string>
@@ -484,6 +486,7 @@
     <string name="pref__keyboard__font_size_multiplier__label" comment="Preference title">Размер на надписите на клавишите</string>
     <string name="pref__keyboard__group_layout__label" comment="Preference group title">Оформление</string>
     <string name="pref__keyboard__landscape_input_ui_mode__label" comment="Preference value">Клавиатура на цял екран (пейзаж)</string>
+    <string name="pref__keyboard__keyboard_size__label">Размер на клавиатурата</string>
     <string name="pref__keyboard__key_spacing__label" comment="Preference title">Разстояние между клавишите</string>
     <string name="pref__keyboard__key_spacing__summary" comment="Preference summary">{v}% вертикално, {h}% хоризонтално — по-голямото разстояние смалява клавишите, а не клавиатурата.</string>
     <string name="pref__keyboard__group_keypress__label" comment="Preference group title">Докосване на клавишите</string>
@@ -616,6 +619,7 @@
     <string name="pref__gestures__delete_key_long_press__label" comment="Preference title">Задържане на клавиш „изтриване“</string>
     <string name="pref__gestures__swipe_velocity_threshold__label" comment="Preference title">Праг за скоростта на плъзгане</string>
     <string name="pref__gestures__swipe_distance_threshold__label" comment="Preference title">Минимално разстояние на плъзване</string>
+    <string name="settings__help__title">Помощ</string>
     <string name="settings__other__title" comment="Title of Other settings">Други</string>
     <string name="pref__other__settings_theme__label" comment="Label of Settings theme preference in Other">Тема на настройките</string>
     <string name="pref__other__settings_theme__auto_amoled" comment="Possible value of Settings theme preference in Other">Според системата (AMOLED)</string>
@@ -665,9 +669,8 @@
     <string name="setup__select_ime__title">Избиране на {app_name}</string>
     <string name="setup__select_ime__description">Клавиатурата на {app_name} вече е включена от системата. За да я използвате активно, превключете на {app_name}, като я изберете в диалоговия прозорец с методи за въвеждане!</string>
     <string name="setup__select_ime__switch_keyboard_btn">Смяна на клавиатура</string>
-    <string name="setup__grant_notification_permission__title">Разрешаване на известия при срив</string>
-    <string name="setup__grant_notification_permission__description">От Андроид 13 нататък, приложенията трябва да поискат разрешение да изпращат известия. Във Dictate те се използват само за отваряне на екран в случай на срив.
-Можете да промените разрешението по всяко време в системните настройки.</string>
+    <string name="setup__grant_notification_permission__title">Разрешаване на известия</string>
+    <string name="setup__grant_notification_permission__description">От Android 13 нататък приложенията трябва да питат, преди да показват известия. Dictate Keyboard показва известие, докато плаващият бутон записва, докато се изтегля речев модел и докато часовникът ви диктува през телефона, а при срив отваря доклад за грешка. Можете да промените това по всяко време в системните настройки.</string>
     <string name="setup__grant_notification_permission__btn">Даване на разрешение</string>
     <string name="setup__finish_up__title">Завършване</string>
     <string name="setup__finish_up__description_p1">Клавииатурата на {app_name} вече е включена в системата и готова да я настроите според вашите предпочитения.</string>
@@ -693,6 +696,17 @@
     <string name="backup_and_restore__back_up__credentials_warning">Този архив съдържа вашите API ключове и пароли в явен текст, както и кредита ви в Dictate Cloud — всеки, който го получи, може да диктува за ваша сметка. Не го предавайте, а ако вече сте го направили, сменете ключа при доставчика си. Всичко друго, отметнато по-долу, пътува с него, включително историята на транскрипциите и клипборда.</string>
     <string name="backup_and_restore__back_up__credentials_excluded_note">Този архив не съдържа API ключове, пароли или кредит в Dictate Cloud, така че може да бъде предаден, но и вашите няма да възстанови. Всичко друго, отметнато по-долу, остава в него, включително историята на транскрипциите и клипборда.</string>
     <string name="backup_and_restore__back_up__personal_content_note">Този архив не съдържа API ключове и пароли, но съдържа всичко, отметнато по-долу: историята на транскрипциите заедно със запазените записи, клипборда, вашите промптове и думите, които клавиатурата е научила от вас.</string>
+    <string name="backup_and_restore__back_up__encrypted_note">Този архив е шифрован с вашата парола и всичко, отметнато по-долу, може да бъде възстановено само с нея. Ако забравите паролата, никой не може да възстанови това резервно копие – дори вие.</string>
+    <string name="backup_and_restore__back_up__password">Защита с парола</string>
+    <string name="backup_and_restore__back_up__password_enabled">Шифроване с парола</string>
+    <string name="backup_and_restore__back_up__password_too_short">Поне {count} знака</string>
+    <string name="backup_and_restore__back_up__password_mismatch">Паролите не съвпадат</string>
+    <string name="backup_and_restore__password">Парола</string>
+    <string name="backup_and_restore__password_repeat">Повторете паролата</string>
+    <string name="backup_and_restore__restore__encrypted">Този архив с резервно копие е защитен с парола. Въведете я, за да видите какво съдържа архивът.</string>
+    <string name="backup_and_restore__restore__unlock">Отключване</string>
+    <string name="backup_and_restore__restore__wrong_password">Грешна парола</string>
+    <string name="backup_and_restore__restore__encrypted_unreadable">Този архив не може да бъде отворен. Повреден е или е създаден с по-нова версия на Dictate.</string>
     <string name="backup_and_restore__back_up__files_ime_keyboard">Добавки за клавиатури</string>
     <string name="backup_and_restore__back_up__files_ime_spelling">Добавки за правопис / речници</string>
     <string name="backup_and_restore__back_up__files_ime_theme">Добавки за теми</string>
@@ -920,7 +934,7 @@
     <string name="ext__addon_management_box__managing_placeholder">Управление на {extensions}</string>
     <string name="ext__addon_management_box__addon_manager_info">Всички дейности, свързани с внасяне, изнасяне, създаване, промяна и премахване на разширения могат да бъдат извършване през Управление на разширения.</string>
     <string name="ext__addon_management_box__go_to_page">Към {ext_home_title}</string>
-    <string name="ext__home__info">Можете да изтегляте и инсталирате разширения от магазина за добавки на Dictate или да внесете файл на разширение, който сте изтеглили от интернет.</string>
+    <string name="ext__home__info">Разширенията добавят теми, клавиатурни подредби и езикови пакети. Внесете файл на разширение, за да добавите такова; наличните са изброени по-долу.</string>
     <string name="ext__home__visit_store">Магазин за добавки</string>
     <string name="ext__home__manage_extensions">Управление на инсталирани разширения</string>
     <string name="ext__list__view_details">Подробности</string>
@@ -1311,8 +1325,6 @@
     <string name="dictate__remember_last_dictation_summary">Запазва последната диктовка, за да може плаващият бутон да я отмени, а класическата подредба да я вмъкне отново.</string>
     <string name="dictate__remember_last_dictation_title">Запомни последното диктуване</string>
     <string name="changelog__v4_2_0">• НОВО: плаващ бутон за диктовка — диктувайте директно във всяко приложение, дори когато е активна друга клавиатура. Изберете от три стила (Капсула, Пръстен, Сфера), гледайте форма на вълната на живо, докато говорите, плъзгайте го навсякъде с прилепване към ръбовете, задайте цвят и размер и задръжте за преформулиране. Включете го в Настройки ▸ Dictate ▸ Плаващ бутон.\n• НОВО: Google Gemini — използвайте свой собствен API ключ от AI Studio за транскрипция и преформулиране.\n• Подканите вече се показват по подразбиране в постоянен ред над клавишите.\n• По-надеждно вмъкване на текст в приложенията, включително браузъри и други клавиатури.</string>
-    <string name="dictate__promo_floating_button_message">Ново: диктувайте навсякъде</string>
-    <string name="dictate__promo_floating_button_action">Опитайте</string>
     <string name="setup__floating_button__btn">Настройка на плаващия бутон</string>
     <string name="setup__nav_back">Назад</string>
     <string name="setup__nav_next">Напред</string>
@@ -1421,6 +1433,7 @@
     <string name="dictate__providers_region_eu">Европейски съюз</string>
     <string name="dictate__providers_region_jp">Япония</string>
     <string name="dictate__providers_region_in">Индия</string>
+    <string name="dictate__providers_region_cn">Китай (континентален)</string>
     <string name="dictate__providers_region_global">Целият свят</string>
     <string name="dictate__providers_custom_title">Персонализиран сървър</string>
     <string name="dictate__providers_get_key">Вземете API ключ</string>
@@ -1430,9 +1443,15 @@
     <string name="dictate__providers_test">Тествай връзката</string>
     <string name="dictate__providers_test_transcribe">Тест на транскрибирането</string>
     <string name="dictate__providers_check_no_key">Първо въведете своя API ключ.</string>
-    <string name="dictate__providers_check_credentials_ok">Данните за достъп са проверени · {count} модела</string>
+    <plurals name="dictate__providers_check_credentials_ok">
+        <item quantity="one">Данните за достъп са проверени · {count} модел</item>
+        <item quantity="other">Данните за достъп са проверени · {count} модела</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_ok_nocount">Данните за достъп са проверени</string>
-    <string name="dictate__providers_check_endpoint_ok">Сървърът е достигнат · {count} модела</string>
+    <plurals name="dictate__providers_check_endpoint_ok">
+        <item quantity="one">Сървърът е достигнат · {count} модел</item>
+        <item quantity="other">Сървърът е достигнат · {count} модела</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_untested">Транскрибирането не е тествано.</string>
     <string name="dictate__providers_check_transcription_ok">Транскрибирането е проверено</string>
     <string name="dictate__providers_check_transcription_text">Върна се като: „{text}“</string>
@@ -1440,6 +1459,8 @@
     <string name="dictate__providers_check_failed_connection">Тестът на връзката е неуспешен</string>
     <string name="dictate__providers_check_failed_transcription">Тестът на транскрибирането е неуспешен</string>
     <string name="dictate__providers_check_err_auth">Ключът беше отхвърлен. Проверете него и дали адресът принадлежи на същия акаунт.</string>
+    <string name="dictate__providers_check_err_model">Ключът работи, но не може да използва този модел. Изберете друг модел или го разрешете в настройките на проекта при доставчика.</string>
+    <string name="dictate__error_model_unavailable">Моделът не е достъпен за този ключ</string>
     <string name="dictate__providers_check_err_quota">Ключът работи, но акаунтът е изчерпал квотата си или е над лимита. Проверете плана си при доставчика.</string>
     <string name="dictate__providers_check_err_network">Сървърът не можа да бъде достигнат. Проверете адреса и интернет връзката си.</string>
     <string name="dictate__providers_check_err_timeout">Няма отговор навреме. Доставчикът може да е зает — опитайте отново.</string>
@@ -1470,7 +1491,10 @@
     <string name="dictate__model_picker_title">Изберете модел</string>
     <string name="dictate__model_picker_search">Търсете или въведете идентификатор на модел</string>
     <string name="dictate__model_picker_loading">Зареждане на модели…</string>
-    <string name="dictate__model_picker_count">{count} модела</string>
+    <plurals name="dictate__model_picker_count">
+        <item quantity="one">{count} модел</item>
+        <item quantity="other">{count} модела</item>
+    </plurals>
     <string name="dictate__model_picker_refresh">Опресни</string>
     <string name="dictate__model_picker_use_custom">Използвай „{model}“</string>
     <string name="dictate__recording_group">Записване</string>
@@ -1506,6 +1530,8 @@
     <string name="dictate__paragraph_split_title">Разделяне на абзаци</string>
     <string name="dictate__paragraph_split_off">Изкл.</string>
     <string name="dictate__paragraph_split_value">След {n} думи</string>
+    <string name="dictate__drop_final_full_stop_title">Без точка накрая</string>
+    <string name="dictate__drop_final_full_stop_summary">Само когато диктовката е едно изречение; няколко изречения запазват всички знаци</string>
     <string name="dictate__realtime_title">Транскрипция в реално време</string>
     <string name="dictate__realtime_summary">Транскрибира още докато говорите, а не след спирането, за доставчици, които го поддържат</string>
     <string name="dictate__realtime_mode_off">Изключено</string>
@@ -1639,7 +1665,9 @@
     <string name="dictate__prompt_auto_apply_title">Прилагай автоматично</string>
     <string name="dictate__prompt_auto_apply_summary">Изпълнявай тази подкана автоматично при всяко транскрибиране</string>
     <string name="dictate__prompt_reasoning_title">Разсъждение</string>
-    <string name="dictate__prompt_reasoning_default">По подразбиране</string>
+    <string name="dictate__prompt_reasoning_default">Настройката на доставчика</string>
+    <string name="dictate__prompt_reasoning_little">Малко разсъждение</string>
+    <string name="dictate__prompt_reasoning_much">Много разсъждение</string>
     <string name="dictate__prompt_badge_selection">Изисква селекция</string>
     <string name="dictate__prompt_badge_auto">Прилага се автоматично</string>
     <string name="dictate__example_prompt_fix_grammar_name">Поправи граматиката</string>
@@ -1921,7 +1949,8 @@
     <string name="dictate__promo_milestone_count">%s диктовки с Dictate! 🎉</string>
     <string name="dictate__promo_milestone_action">Статистика</string>
     <string name="dictate__reasoning_effort_title">Усилие за разсъждение</string>
-    <string name="dictate__reasoning_effort_off">Изкл.</string>
+    <string name="dictate__reasoning_effort_off">По подразбиране на доставчика</string>
+    <string name="dictate__reasoning_effort_none">Без разсъждение</string>
     <string name="dictate__reasoning_effort_off_summary">Стандарт на доставчика — изключете за не-разсъждаващи модели</string>
     <string name="dictate__reasoning_effort_minimal">Минимално</string>
     <string name="dictate__reasoning_effort_minimal_summary">Най-бързо, минимум мислене</string>
@@ -1930,6 +1959,9 @@
     <string name="dictate__reasoning_effort_medium">Средно</string>
     <string name="dictate__reasoning_effort_medium_summary">Баланс между мислене и скорост</string>
     <string name="dictate__reasoning_effort_high">Високо</string>
+    <string name="dictate__reasoning_effort_xhigh">Много високо</string>
+    <string name="dictate__reasoning_effort_max">Максимално</string>
+    <string name="dictate__reasoning_effort_app_default">{name} (по подразбиране)</string>
     <string name="dictate__reasoning_effort_high_summary">Най-много мислене, по-бавно</string>
     <string name="dictate__reasoning_effort_custom">По избор</string>
     <string name="dictate__action_save_audio">Запази аудиото</string>
@@ -2311,6 +2343,10 @@
     <string name="gif__error">GIFs не могат да се заредят. Проверете връзката и API ключа си.</string>
     <string name="gif__setup_needed">Добавете безплатен ключ за KLIPY API в Настройки, за да търсите GIFs</string>
     <string name="gif__setup_needed_action">Настройване на търсенето на GIF</string>
+    <string name="gif__search_off">Търсенето на GIF е изключено</string>
+    <string name="quick_action__forward_delete__tooltip">Изтриване на знака след курсора</string>
+    <string name="dictate__error_no_rewording_model">Изберете модел за преформулиране за %1$s</string>
+    <string name="dictate__model_placeholder_required">задължително: изберете или въведете модел</string>
     <string name="gif__copied_to_clipboard">GIF е копиран в клипборда — задръжте натиснато за поставяне</string>
     <string name="gif__insert_failed">GIF не може да бъде вмъкнат</string>
     <string name="quick_action__ime_ui_mode_gif">GIF</string>
@@ -2407,6 +2443,25 @@
     <string name="dictate__action_top_up">Захрани кредита</string>
     <string name="dictate__promo_low_credit_message">Кредитът е на изчерпване.</string>
     <string name="dictate__promo_low_credit_action">Захрани</string>
+    <string name="dictate__promo_sayova_message">Ново: ИИ на вашия часовник</string>
+    <string name="dictate__promo_sayova_action">Разгледайте</string>
+    <string name="about__more_apps__title">Още приложения</string>
+    <string name="about__more_apps__summary">SayOVA и TunerToGo за вашия часовник</string>
+    <string name="about__more_apps__tunertogo_tagline">Тунер за инструменти за Wear OS</string>
+    <string name="about__more_apps__tunertogo_description">Прецизен тунер, винаги на китката ви, готов в момента, в който вземете инструмента.</string>
+    <string name="about__more_apps__tunertogo_feature_instruments">Китара, бас, укулеле, цигулка и още, с автоматично разпознаване на струните</string>
+    <string name="about__more_apps__tunertogo_feature_chromatic">Хроматичен режим за всички други инструменти и за гласа ви</string>
+    <string name="about__more_apps__tunertogo_feature_vibration">Кратка вибрация, когато струната е настроена, за да гледате ключовете</string>
+    <string name="about__more_apps__tunertogo_feature_privacy">Без достъп до интернет, без реклами: звукът се анализира на часовника и никога не се запазва</string>
+    <string name="about__more_apps__tunertogo_requirements">Изисква часовник с Wear OS 3 или по-нова версия и микрофон. Работи без приложение на телефона.</string>
+    <string name="about__more_apps__intro">Също от DevEmperor, разработчика на Dictate:</string>
+    <string name="about__more_apps__sayova_tagline">Гласов асистент с ИИ за Wear OS</string>
+    <string name="about__more_apps__sayova_description">Говорете с Google Gemini или OpenAI направо от часовника: естествено, прекъсвайте, когато пожелаете, и четете отговора, докато го слушате.</string>
+    <string name="about__more_apps__sayova_feature_interpreter">Преводач между 21 езика, двете страни като текст</string>
+    <string name="about__more_apps__sayova_feature_tasks">Задава таймери и аларми, запазва бележки и търси в интернет</string>
+    <string name="about__more_apps__sayova_feature_phone">Подготвя съобщения, срещи и маршрути на телефона ви, готови за изпращане</string>
+    <string name="about__more_apps__sayova_feature_privacy">Ваш собствен API ключ: без акаунт, без проследяване, с отворен код</string>
+    <string name="about__more_apps__sayova_requirements">Изисква часовник с Wear OS 3 или по-нова версия и микрофон, както и API ключ от Google Gemini или OpenAI. Използването се таксува от вашия доставчик.</string>
     <string name="prefs__media__sticker__title">Стикери</string>
     <string name="prefs__media__sticker_folder__title">Папка със стикери</string>
     <string name="prefs__media__sticker_folder__summary_unset">Изберете папка със свои изображения</string>

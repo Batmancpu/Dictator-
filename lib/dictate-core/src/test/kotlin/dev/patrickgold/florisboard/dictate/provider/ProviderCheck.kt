@@ -1,0 +1,565 @@
+/*
+ * Copyright (C) 2026 DevEmperor (Dictate)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+package dev.patrickgold.florisboard.dictate.provider
+
+import dev.patrickgold.florisboard.dictate.data.prompts.DictatePromptDefaults
+import io.kotest.core.spec.style.FunSpec
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.io.File
+import java.time.LocalDate
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicLong
+import kotlin.time.Duration.Companion.hours
+
+/**
+ * The provider check: every provider the app ships, every model it offers, every feature it uses, asked of
+ * the live endpoints through the app's own clients, so what is measured is what the app sends.
+ *
+ * It never runs on its own. Jannis decided (2026-11-03) that it is run by hand, once a month, together,
+ * with the results looked at before anything changes. The unit-test task skips it unless
+ * `DICTATE_PROVIDER_CHECK` names the keys file; `private/testing/provider-check/run.sh` (outside the public repo)
+ * sets that up and says how.
+ *
+ * Environment:
+ * - `DICTATE_PROVIDER_CHECK`: the keys file, `NAME=value` per line (OPENAI, GROQ, …, AZURE_URL).
+ * - `DICTATE_PROVIDER_CHECK_FIXTURES`: en.wav, de.wav, names.wav, en.{mp3,m4a,ogg,flac,webm,aac,amr}, {en,de}_<rate>.pcm.
+ * - `DICTATE_PROVIDER_CHECK_OUT`: where report.md and results.json go.
+ * - `DICTATE_PROVIDER_CHECK_ONLY`: preset ids to check, comma-separated; all when unset.
+ * - `DICTATE_PROVIDER_CHECK_PARTS`: models,batch,formats,chat,reasoning,realtime; all when unset.
+ * - `DICTATE_PROVIDER_CHECK_MODELS`: optional file of `preset<TAB>role<TAB>model` lines for models to check
+ *   on top of the curated ones (role: chat, transcription, realtime). For providers that curate none.
+ * - `DICTATE_PROVIDER_CHECK_PREVIOUS`: optional folder of an earlier run; its models.json says which live ids
+ *   are new or gone since then.
+ * - `DICTATE_PROVIDER_CHECK_REPLAY`: optional folder of an earlier run to read instead of asking anything, so
+ *   its results can be held against the catalog as it stands now (after editing it, say) at no cost.
+ *
+ * The report opens with what the run found that [ModelCatalog] does not say, which is the month's list of
+ * decisions; the full table follows. Nothing it writes contains a key: provider messages are cut short and
+ * scrubbed of the key before they are kept, because some providers quote a key back in their refusal.
+ */
+class ProviderCheck : FunSpec({
+
+    val keysPath = System.getenv("DICTATE_PROVIDER_CHECK")
+
+    test("every provider, model and feature against the live endpoints")
+        .config(enabled = keysPath != null, timeout = 3.hours, invocationTimeout = 3.hours) {
+            val check = Check(
+                keys = File(keysPath!!).readLines()
+                    .mapNotNull { line -> line.split("=", limit = 2).takeIf { it.size == 2 } }
+                    .associate { (k, v) -> k.trim() to v.trim() },
+                fixtures = File(System.getenv("DICTATE_PROVIDER_CHECK_FIXTURES")),
+                out = File(System.getenv("DICTATE_PROVIDER_CHECK_OUT")).apply { mkdirs() },
+                only = System.getenv("DICTATE_PROVIDER_CHECK_ONLY")?.split(",")?.map { it.trim() }?.toSet(),
+                parts = System.getenv("DICTATE_PROVIDER_CHECK_PARTS")?.split(",")?.map { it.trim() }?.toSet()
+                    ?: setOf("models", "batch", "formats", "chat", "reasoning", "realtime"),
+                extraModels = System.getenv("DICTATE_PROVIDER_CHECK_MODELS")?.let { File(it) }?.takeIf { it.isFile }
+                    ?.readLines()?.filter { it.isNotBlank() && !it.startsWith("#") }
+                    ?.mapNotNull { l -> l.split("\t").takeIf { it.size >= 3 }?.map { it.trim() } }
+                    ?: emptyList(),
+                previous = System.getenv("DICTATE_PROVIDER_CHECK_PREVIOUS")?.let { File(it, "models.json") }
+                    ?.takeIf { it.isFile },
+                replay = System.getenv("DICTATE_PROVIDER_CHECK_REPLAY")?.let { File(it) }?.takeIf { it.isDirectory },
+            )
+            check.run()
+        }
+})
+
+@Serializable
+private data class Row(
+    val provider: String,
+    val part: String,
+    val model: String,
+    val probe: String,
+    /** OK, FAIL, REFUSED, EMPTY, SKIP or INFO. */
+    val outcome: String,
+    val detail: String,
+    val ms: Long = 0,
+)
+
+private class Check(
+    val keys: Map<String, String>,
+    val fixtures: File,
+    val out: File,
+    val only: Set<String>?,
+    val parts: Set<String>,
+    val extraModels: List<List<String>>,
+    val previous: File?,
+    val replay: File?,
+) {
+    private val rows = mutableListOf<Row>()
+    private val facts = StringBuilder()
+    private val warnings = mutableListOf<String>()
+
+    /** Every live id per provider, kept as models.json so the next run can say what is new. */
+    private val liveIds = sortedMapOf<String, List<String>>()
+    private val previousIds: Map<String, List<String>>? =
+        previous?.let { Json.decodeFromString<Map<String, List<String>>>(it.readText()) }
+
+    /** Whether the host each provider was checked at transcribes (SiliconFlow International does not). */
+    private val transcribesHere = mutableMapOf<String, Boolean>()
+
+    private val enText = "Hello, this is a short test of the Dictate keyboard. Please meet me at the station " +
+        "tomorrow at half past nine."
+    private val deText = "Hallo, das ist ein kurzer Test der Dictate Tastatur. Wir treffen uns morgen um halb " +
+        "zehn am Bahnhof."
+
+    /** Scale the reasoning matrix walks; null is the field left out. */
+    private val efforts = listOf(null, "none", "minimal", "low", "medium", "high", "xhigh", "max")
+
+    private val keyNames = mapOf("ovhcloud" to "OVH")
+
+    suspend fun run() {
+        if (replay != null) {
+            rows += Json.decodeFromString<List<Row>>(File(replay, "results.json").readText())
+                .filter { only == null || it.provider in only }
+            File(replay, "models.json").takeIf { it.isFile }
+                ?.let { liveIds.putAll(Json.decodeFromString<Map<String, List<String>>>(it.readText())) }
+            // The host a provider was checked at is in its setup row, as the run noted it.
+            rows.filter { it.part == "setup" && it.probe == "base URL" }.forEach { r ->
+                val host = r.detail.substringAfter("checked at ").substringBefore(" ")
+                ProviderRegistry.byId(r.provider)?.let { transcribesHere[r.provider] = ProviderRegistry.transcribesAt(it, host) }
+            }
+            facts.appendLine("Replayed from `${replay.name}`; nothing was asked of any endpoint.")
+            write()
+            return
+        }
+        DictateHttpLog.warnSink = { synchronized(warnings) { warnings += it } }
+        try {
+            ProviderRegistry.presets
+                .filter { it.id !in setOf("cloud", "ollama", "local") }
+                .filter { only == null || it.id in only }
+                // Written after every provider, so a run that dies half-way still leaves what it found.
+                .forEach { preset -> checkProvider(preset); write() }
+        } finally {
+            DictateHttpLog.warnSink = null
+            write()
+        }
+    }
+
+    private suspend fun checkProvider(preset: ProviderPreset) {
+        val keyName = keyNames[preset.id] ?: preset.id.uppercase()
+        val key = keys[keyName]
+        // Azure has no address of its own; elsewhere a `<NAME>_URL` stands for the host the account lives on
+        // (SiliconFlow's international accounts are on .com, the preset knows only .cn).
+        val baseUrl = keys["${keyName}_URL"]?.takeIf { it.isNotBlank() }
+        if (baseUrl != null) add(preset, "setup", "-", "base URL", "INFO", "checked at $baseUrl instead of ${preset.baseUrl.ifEmpty { "–" }}")
+        describe(preset)
+        if (key.isNullOrBlank()) {
+            add(preset, "setup", "-", "key", "SKIP", "no key in the keys file")
+            return
+        }
+        val client = OpenAiCompatibleClient.from(preset, key, baseUrlOverride = baseUrl, timeoutSeconds = 90)
+        val scrub = { s: String -> scrub(s, key) }
+
+        val live = if ("models" in parts || preset.capabilities.chat) models(preset, client, scrub) else emptyList()
+
+        transcribesHere[preset.id] = ProviderRegistry.transcribesAt(preset, baseUrl.orEmpty())
+        if (transcribesHere[preset.id] == true) {
+            val sttModels = (listOfNotNull(preset.defaultTranscriptionModel) + preset.curatedTranscriptionModels +
+                extra(preset, "transcription")).distinct()
+            if ("batch" in parts) sttModels.forEach { batch(preset, client, it, scrub) }
+            if ("formats" in parts) sttModels.firstOrNull()?.let { formats(preset, client, it, scrub) }
+        }
+        if (preset.capabilities.chat) {
+            val chatModels = (listOfNotNull(preset.defaultChatModel) + preset.curatedChatModels +
+                extra(preset, "chat")).distinct()
+            if (chatModels.isEmpty()) {
+                add(preset, "chat", "-", "models", "INFO",
+                    "no curated chat model; live list has ${live.size}. Name some in the models file to check them.")
+            }
+            chatModels.forEach { model ->
+                if ("chat" in parts) chat(preset, client, model, scrub)
+                if ("reasoning" in parts) reasoning(preset, client, model, scrub)
+            }
+        }
+        val rtApi = preset.realtimeApi
+        if ("realtime" in parts && preset.supportsRealtime && rtApi != null) {
+            (listOfNotNull(preset.defaultRealtimeModel) + preset.curatedRealtimeModels + extra(preset, "realtime"))
+                .distinct()
+                .forEach { model ->
+                    try {
+                        realtime(preset, rtApi, key, baseUrl, model, scrub)
+                    } catch (e: Exception) {
+                        add(preset, "realtime", model, "session", "FAIL", scrub(e.toString()))
+                    }
+                }
+        }
+    }
+
+    /** False for a language an English-only model was never meant to hear (the catalog's `languages`). */
+    private fun speaks(preset: ProviderPreset, model: String, language: String) =
+        ModelCatalog.spec(preset.id, model)?.languages?.contains(language) != false
+
+    private fun extra(preset: ProviderPreset, role: String) =
+        extraModels.filter { it[0] == preset.id && it[1] == role }.map { it[2] }
+
+    /** What the code claims about [preset], before anything is asked of it. */
+    private fun describe(p: ProviderPreset) {
+        facts.appendLine("### ${p.displayName} (`${p.id}`)")
+        facts.appendLine()
+        facts.appendLine("- chat: ${p.capabilities.chat}, transcription: ${p.capabilities.transcription}, " +
+            "wire format: `${p.transcriptionApi}`, live model list: ${p.supportsDynamicModels}")
+        facts.appendLine("- default chat: `${p.defaultChatModel}`, " +
+            "curated chat: ${p.curatedChatModels.joinToString { "`$it`" }.ifEmpty { "–" }}")
+        facts.appendLine("- default transcription: `${p.defaultTranscriptionModel}`, curated: " +
+            p.curatedTranscriptionModels.joinToString { "`$it`" }.ifEmpty { "–" })
+        facts.appendLine("- realtime: ${p.supportsRealtime} (`${p.realtimeApi}`), default `${p.defaultRealtimeModel}`, " +
+            "curated: ${p.curatedRealtimeModels.joinToString { "`$it`" }.ifEmpty { "–" }}")
+        facts.appendLine("- containers: ${p.acceptedAudioContainers.joinToString().ifEmpty { "unknown" }}; " +
+            "regions: ${p.regions.joinToString { it.id }.ifEmpty { "–" }}; EU by default: ${p.hostedInEu}; " +
+            "custom base URL: ${p.allowsCustomBaseUrl}")
+        facts.appendLine()
+    }
+
+    private suspend fun models(preset: ProviderPreset, client: OpenAiCompatibleClient, scrub: (String) -> String): List<String> {
+        val (ids, ms, error) = timed { client.listModels().map { it.id } }
+        if (ids == null) {
+            add(preset, "models", "-", "list", "FAIL", scrub(error.orEmpty()), ms)
+            return emptyList()
+        }
+        liveIds[preset.id] = ids.sorted()
+        val curated = (preset.curatedChatModels + preset.curatedTranscriptionModels + preset.curatedRealtimeModels +
+            listOfNotNull(preset.defaultChatModel, preset.defaultTranscriptionModel, preset.defaultRealtimeModel)).toSet()
+        val missing = curated.filter { it !in ids }
+        val new = ids.filter { it !in curated }.sorted()
+        add(preset, "models", "-", "list", "OK", "${ids.size} live", ms)
+        if (preset.supportsDynamicModels || missing.isNotEmpty()) {
+            add(preset, "models", "-", "curated not listed", if (missing.isEmpty()) "OK" else "INFO",
+                missing.joinToString().ifEmpty { "none" })
+        }
+        add(preset, "models", "-", "listed, not curated", "INFO",
+            if (new.size > 60) "${new.size} ids (too many to list)" else new.joinToString().ifEmpty { "none" })
+        return ids
+    }
+
+    private suspend fun batch(preset: ProviderPreset, client: OpenAiCompatibleClient, model: String, scrub: (String) -> String) {
+        suspend fun once(
+            probe: String, file: String, language: String?, words: List<String>, expected: String?, mustHave: List<String>,
+        ) {
+            val (text, ms, error) = timed {
+                client.transcribe(
+                    TranscriptionRequest(
+                        audioFile = File(fixtures, file), model = model, language = language,
+                        // As the app sends custom words with no style prompt: in the prompt and as the list.
+                        prompt = DictatePromptDefaults.appendCustomWords(null, words.joinToString(", ")),
+                        vocabulary = words,
+                    ),
+                    onRetry = {},
+                ).text
+            }
+            if (text == null) {
+                add(preset, "batch", model, probe, "FAIL", scrub(error.orEmpty()), ms)
+                return
+            }
+            val score = expected?.let { " · ${overlap(expected, text)}% of words" }.orEmpty()
+            val found = mustHave.takeIf { it.isNotEmpty() }?.let { w ->
+                " · words: " + w.joinToString { if (text.contains(it, ignoreCase = true)) "$it ✓" else "$it ✗" }
+            }.orEmpty()
+            add(preset, "batch", model, probe, "OK", "\"${scrub(text).take(140)}\"$score$found", ms)
+        }
+        once("en, auto", "en.wav", null, emptyList(), enText, emptyList())
+        if (speaks(preset, model, "de")) {
+            once("de, language=de", "de.wav", "de", emptyList(), deText, emptyList())
+            once("de, auto", "de.wav", null, emptyList(), deText, emptyList())
+        }
+        for (probe in wordProbes) {
+            once("${probe.name}, no words", "${probe.name}.wav", null, emptyList(), null, probe.words)
+            once("${probe.name}, custom words", "${probe.name}.wav", null, probe.words, null, probe.words)
+        }
+    }
+
+    /**
+     * Speech with words a model rarely spells right on its own, and the custom words that should fix them
+     * (#466). Names: Irish names said properly. Terms: an invented brand and two Irish names, spoken as they
+     * sound ("Kwindra", "Eevin", "Keeva") for models that already know the names.
+     */
+    private class WordProbe(val name: String, val words: List<String>)
+
+    private val wordProbes = listOf(
+        WordProbe("names", listOf("Siobhan", "Niamh")),
+        WordProbe("terms", listOf("Qwyndra", "Aoibheann", "Caoimhe")),
+    ).filter { File(fixtures, "${it.name}.wav").exists() }
+
+    private suspend fun formats(preset: ProviderPreset, client: OpenAiCompatibleClient, model: String, scrub: (String) -> String) {
+        for (ext in listOf("wav", "mp3", "m4a", "ogg", "flac", "webm", "aac", "amr")) {
+            val (text, ms, error) = timed {
+                client.transcribe(TranscriptionRequest(audioFile = File(fixtures, "en.$ext"), model = model), onRetry = {}).text
+            }
+            val claimed = preset.acceptedAudioContainers.joinToString { it.name.lowercase() }.ifEmpty { "unknown" }
+            if (text == null) add(preset, "formats", model, ext, "FAIL", "${scrub(error.orEmpty())} · claimed: $claimed", ms)
+            else add(preset, "formats", model, ext, "OK", "${overlap(enText, text)}% of words · claimed: $claimed", ms)
+        }
+    }
+
+    /** A real rewording, so a reasoning model has something to think about and its tokens show it. */
+    private val rewording = DictatePromptDefaults.buildRewordingRequest(
+        "Correct all spelling and grammar mistakes. Return only the corrected text.",
+        null,
+        "this are a short test sentense with two mistake.",
+    )
+
+    private suspend fun chat(preset: ProviderPreset, client: OpenAiCompatibleClient, model: String, scrub: (String) -> String) {
+        val request = rewording
+        val (reply, ms, error) = timed { client.complete(ChatRequest.ofUser(model, request)).text }
+        if (reply == null) add(preset, "chat", model, "rewording", "FAIL", scrub(error.orEmpty()), ms)
+        else add(preset, "chat", model, "rewording", "OK", "\"${scrub(DictatePromptDefaults.stripTextTags(reply)).take(120)}\"", ms)
+    }
+
+    /** One request per value, none of [OpenAiCompatibleClient.complete]'s retries: what the endpoint itself does. */
+    private suspend fun reasoning(preset: ProviderPreset, client: OpenAiCompatibleClient, model: String, scrub: (String) -> String) {
+        for (effort in efforts) {
+            val label = effort ?: "(left out)"
+            val (result, ms, error) = timed {
+                client.completeOnce(ChatRequest.ofUser(model, rewording, effort))
+            }
+            when (result) {
+                is OpenAiCompatibleClient.Completion.Answer -> add(preset, "reasoning", model, label, "OK",
+                    "completion tokens: ${result.result.usage?.completionTokens ?: "?"}", ms)
+                is OpenAiCompatibleClient.Completion.Empty -> add(preset, "reasoning", model, label, "EMPTY",
+                    scrub(result.message), ms)
+                null -> add(preset, "reasoning", model, label, "REFUSED", scrub(error.orEmpty()), ms)
+            }
+        }
+    }
+
+    private fun realtime(
+        preset: ProviderPreset,
+        api: RealtimeApi,
+        key: String,
+        baseUrl: String?,
+        model: String,
+        scrub: (String) -> String,
+    ) {
+        class Stream(val label: String, val file: String, val lang: String, val expected: String?, val words: List<String>)
+        val rate = RealtimeClient.sampleRateFor(api)
+        val streams = listOf(Stream("en", "en", "en", enText, emptyList()), Stream("de", "de", "de", deText, emptyList())) +
+            wordProbes.filter { File(fixtures, "${it.name}_$rate.pcm").exists() }.flatMap { probe ->
+                listOf(
+                    Stream("${probe.name}, no words", probe.name, "en", null, emptyList()),
+                    Stream("${probe.name}, custom words", probe.name, "en", null, probe.words),
+                )
+            }
+        for (stream in streams) {
+            val lang = stream.lang
+            if (!speaks(preset, model, lang)) continue
+            val pcm = File(fixtures, "${stream.file}_$rate.pcm").readBytes()
+            val finals = StringBuilder()
+            var lastPartial = ""
+            var failure: Throwable? = null
+            val lastText = AtomicLong(0)
+            val closed = CountDownLatch(1)
+            val started = System.currentTimeMillis()
+            val session = RealtimeClient.open(
+                api = api, apiKey = key, model = model, language = lang,
+                callbacks = object : RealtimeCallbacks {
+                    override fun onPartial(text: String) { lastPartial = text; lastText.set(System.currentTimeMillis()) }
+                    override fun onFinalSegment(text: String) {
+                        synchronized(finals) { finals.append(text).append(' ') }
+                        lastText.set(System.currentTimeMillis())
+                    }
+                    override fun onError(t: Throwable) { failure = t; closed.countDown() }
+                    override fun onClosed() { closed.countDown() }
+                },
+                baseUrl = baseUrl,
+                vocabulary = stream.words,
+            )
+            // 100 ms chunks in real time, as a microphone delivers them: at twice the speed Gemini Live heard
+            // nothing and AssemblyAI's multilingual model next to nothing (2026-11-03).
+            val chunk = rate / 10 * 2
+            var at = 0
+            while (at < pcm.size) {
+                val len = minOf(chunk, pcm.size - at)
+                session.sendAudio(pcm.copyOfRange(at, at + len), len)
+                at += len
+                Thread.sleep(100)
+            }
+            session.finish()
+            // Some sockets stay open after the last final (the app closes them itself): a final followed by
+            // 3 s of quiet counts as the end, a socket that says nothing at all gets 30 s.
+            var ended = false
+            val giveUp = System.currentTimeMillis() + 30_000
+            while (System.currentTimeMillis() < giveUp) {
+                if (closed.await(250, TimeUnit.MILLISECONDS)) { ended = true; break }
+                val quiet = System.currentTimeMillis() - lastText.get()
+                if (synchronized(finals) { finals.isNotEmpty() } && quiet > 3_000) break
+            }
+            if (!ended) session.cancel()
+            val ms = System.currentTimeMillis() - started
+            val text = finals.toString().trim().ifEmpty { lastPartial }
+            val score = stream.expected?.let { " · ${overlap(it, text)}% of words" }
+                ?: wordProbes.first { it.name == stream.file }.words
+                    .joinToString(prefix = " · words: ") { if (text.contains(it, ignoreCase = true)) "$it ✓" else "$it ✗" }
+            val label = stream.label
+            when {
+                failure != null -> add(preset, "realtime", model, label, "FAIL", scrub(failure.toString()), ms)
+                text.isBlank() -> add(preset, "realtime", model, label, "EMPTY", if (ended) "closed without text" else "no end after 30 s", ms)
+                else -> add(preset, "realtime", model, label, "OK",
+                    "\"${scrub(text).take(120)}\"$score${if (ended) "" else " · no close"}", ms)
+            }
+        }
+    }
+
+    private data class Timed<T>(val value: T?, val ms: Long, val error: String?)
+
+    private suspend fun <T> timed(block: suspend () -> T): Timed<T> {
+        synchronized(warnings) { warnings.clear() }
+        val start = System.currentTimeMillis()
+        return try {
+            Timed(block(), System.currentTimeMillis() - start, null)
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            val status = (e as? DictateApiException)?.let { " [${it.httpStatus ?: it.kind}]" }.orEmpty()
+            Timed(null, System.currentTimeMillis() - start, "${e.message ?: e::class.simpleName}$status")
+        }
+    }
+
+    private fun add(preset: ProviderPreset, part: String, model: String, probe: String, outcome: String, detail: String, ms: Long = 0) {
+        // A warning the client logged on the way is how a refused request taking another route shows.
+        val warned = synchronized(warnings) { warnings.toList().also { warnings.clear() } }
+            .filter { "fallingBack" in it || "refused" in it || "rejected" in it }
+            .joinToString(" | ") { it.take(160) }
+        val row = Row(preset.id, part, model, probe, outcome, (detail + if (warned.isEmpty()) "" else " ⚠ $warned").replace("\n", " "), ms)
+        rows += row
+        println("[check] ${row.provider} ${row.part} ${row.model} ${row.probe}: ${row.outcome} ${row.detail.take(160)}")
+    }
+
+    private fun overlap(expected: String, actual: String): Int {
+        fun words(s: String) = s.lowercase().replace(Regex("[^\\p{L}\\p{N} ]"), " ").split(" ").filter { it.isNotBlank() }
+        val want = words(expected)
+        val got = words(actual).toMutableList()
+        val hit = want.count { got.remove(it) }
+        return if (want.isEmpty()) 0 else hit * 100 / want.size
+    }
+
+    private fun scrub(text: String, key: String): String {
+        var s = text.replace(key, "<key>")
+        // Keys quoted back in part, as OpenAI does ("sk-proj-…abcd").
+        if (key.length > 12) s = s.replace(key.take(10), "<key>").replace(key.takeLast(6), "<key>")
+        return s.replace(Regex("(sk|gsk|xai|sk-or|sk-ant)-[A-Za-z0-9_*\\-]{6,}"), "<key>").take(400)
+    }
+
+    /**
+     * What this run found that [ModelCatalog] and the presets do not say (catalog design, section 5): one line
+     * per provider and finding, so a month's review is a short list of decisions rather than 700 rows. A part
+     * that did not run cannot disagree, and new ids are only named against an earlier run's list, because
+     * the first look at a live list is all of it.
+     */
+    private fun disagreements(): List<String> {
+        val lines = mutableListOf<String>()
+        fun ids(list: Collection<String>) = if (list.size > 25) "${list.size} ids" else list.joinToString { "`$it`" }
+        // A rate limit, a timeout or a server error says nothing about the model: reported as unmeasured,
+        // never as a refusal (Together's Kimi-K3 and OpenRouter's MAI were throttled on 2026-11-04).
+        fun transient(r: Row) = Regex("""\[(429|5\d\d|TIMEOUT)]|too many requests|rate limit""", RegexOption.IGNORE_CASE)
+            .containsMatchIn(r.detail)
+        for ((provider, all) in rows.groupBy { it.provider }) {
+            fun note(text: String) { lines += "- **$provider**: $text" }
+            val preset = ProviderRegistry.byId(provider)
+            // Rows left by an earlier run that asked an English-only model in German are not held against it.
+            val list = all.filter { r ->
+                val language = r.probe.substringBefore(",").trim().takeIf { it == "de" } ?: "en"
+                preset == null || r.part !in setOf("batch", "realtime") || speaks(preset, r.model, language)
+            }
+            if (list.any { it.part == "setup" && it.outcome == "SKIP" }) note("not checked, no key")
+            list.filter(::transient).takeIf { it.isNotEmpty() }?.let { t ->
+                note("not measured (rate limit or timeout): ${t.joinToString { "`${it.model}` ${it.part} ${it.probe}" }}")
+            }
+            // A speech model is not missed where the region has no speech-to-text to list.
+            val sttHere = transcribesHere[provider] != false
+            val specs = ModelCatalog.modelsOf(provider)
+                .filter { sttHere || it.roles.any { r -> r == ModelRole.CHAT || r == ModelRole.CHAT_AUDIO } }
+            liveIds[provider]?.takeIf { preset?.supportsDynamicModels == true }?.let { live ->
+                // Only kinds the list is seen to carry: Soniox, Deepgram and xAI list no streaming models at all,
+                // and their absence there says nothing about whether they still run.
+                fun listed(s: ModelSpec) = s.id in live || s.aliases.any { it in live }
+                val gone = specs.filter { s -> !listed(s) && specs.any { o -> o.roles == s.roles && listed(o) } }
+                    .map { it.id }
+                if (gone.isNotEmpty()) note("in the catalog, missing from the live list: ${ids(gone)}")
+                previousIds?.get(provider)?.let { before ->
+                    val added = live - before.toSet()
+                    val removed = before - live.toSet()
+                    if (added.isNotEmpty()) note("new in the live list since the last run: ${ids(added)}")
+                    if (removed.isNotEmpty()) note("gone from the live list since the last run: ${ids(removed)}")
+                }
+            }
+            for ((model, tried) in list.filter { it.part == "reasoning" }.groupBy { it.model }) {
+                val values = ModelCatalog.spec(provider, model)?.reasoning?.values ?: continue
+                val refused = tried.filter { it.outcome == "REFUSED" && it.probe in values && !transient(it) }.map { it.probe }
+                if (refused.isNotEmpty()) note("`$model` refuses ${refused.joinToString()}, which the catalog offers")
+            }
+            // A role the catalog promises that did not hold: failures, and transcripts that kept under half
+            // the words (espeak is hard on some models, so read these against real speech before acting).
+            for ((key, tried) in list.filter { it.part in setOf("batch", "chat", "realtime") }.groupBy { it.part to it.model }) {
+                val (part, model) = key
+                if (ModelCatalog.spec(provider, model) == null || (part != "chat" && !sttHere)) continue
+                val failed = tried.filter { it.outcome in setOf("FAIL", "EMPTY", "REFUSED") && !transient(it) }
+                val weak = tried.filter { r ->
+                    r.outcome == "OK" && Regex("""(\d+)% of words""").find(r.detail)?.groupValues?.get(1)?.toInt()?.let { it < 50 } == true
+                }
+                if (failed.isNotEmpty()) {
+                    note("`$model` $part: ${failed.size} of ${tried.size} failed (${failed.first().probe}: ${failed.first().detail.take(120)})")
+                }
+                weak.forEach { note("`$model` $part ${it.probe}: ${Regex("""\d+% of words""").find(it.detail)!!.value}") }
+                // The client asked again without the custom words: the field or one of its limits has changed.
+                tried.filter { "fallingBack=without them" in it.detail }.forEach {
+                    note("`$model` $part ${it.probe}: refused the custom words (${it.detail.substringAfter("⚠").take(120)})")
+                }
+            }
+            val claimed = ProviderRegistry.byId(provider)?.acceptedAudioContainers?.map { it.name.lowercase() }.orEmpty()
+            val formats = list.filter { it.part == "formats" }
+            if (claimed.isNotEmpty() && formats.isNotEmpty()) {
+                val refusedClaimed = formats.filter { it.outcome == "FAIL" && it.probe in claimed }.map { it.probe }
+                val takenUnclaimed = formats.filter { it.outcome == "OK" && it.probe !in claimed }.map { it.probe }
+                if (refusedClaimed.isNotEmpty()) note("refuses ${refusedClaimed.joinToString()}, which the preset claims")
+                if (takenUnclaimed.isNotEmpty()) note("takes ${takenUnclaimed.joinToString()}, which the preset does not claim")
+            }
+        }
+        return lines
+    }
+
+    private fun write() {
+        val json = Json { prettyPrint = true }
+        File(out, "results.json").writeText(json.encodeToString(rows.toList()))
+        File(out, "models.json").writeText(json.encodeToString<Map<String, List<String>>>(liveIds))
+        val md = StringBuilder()
+        md.appendLine("# Provider check ${LocalDate.now()}")
+        md.appendLine()
+        val counts = rows.groupingBy { it.outcome }.eachCount()
+        md.appendLine("Rows: ${rows.size} · " + counts.entries.sortedBy { it.key }.joinToString(" · ") { "${it.key} ${it.value}" })
+        md.appendLine()
+        md.appendLine("## Against the catalog")
+        md.appendLine()
+        if (previousIds == null) md.appendLine("No earlier run to compare the live lists with; new ids are not named.\n")
+        disagreements().ifEmpty { listOf("Nothing: every model, value and format the catalog names did what it says.") }
+            .forEach { md.appendLine(it) }
+        md.appendLine()
+        md.appendLine("## Results")
+        for ((provider, list) in rows.groupBy { it.provider }) {
+            md.appendLine()
+            md.appendLine("### $provider")
+            md.appendLine()
+            md.appendLine("| part | model | probe | outcome | ms | detail |")
+            md.appendLine("|---|---|---|---|---|---|")
+            list.forEach { r ->
+                md.appendLine("| ${r.part} | `${r.model}` | ${r.probe} | **${r.outcome}** | ${r.ms} | ${r.detail.replace("|", "\\|")} |")
+            }
+        }
+        md.appendLine()
+        md.appendLine("## What the code claims")
+        md.appendLine()
+        md.append(facts)
+        File(out, "report.md").writeText(md.toString())
+    }
+}

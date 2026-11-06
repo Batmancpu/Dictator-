@@ -138,7 +138,9 @@
     <string name="settings__search__keywords__text_expansion" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the typing-shortcut setting, which lets a short trigger expand into a saved block of text. Translate as the words people in your language would actually type when looking for that feature, separated by spaces. Do not translate word for word; add or drop terms as makes sense.">定型文 テキスト展開 短縮 スニペット マクロ 単語登録 snippet text expansion</string>
     <string name="settings__search__keywords__selection_metrics" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which shows how many words and characters are selected. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">文字数 単語数 カウント 統計</string>
     <string name="settings__search__keywords__trim_on_copy" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which removes spaces and line breaks at the ends of copied text. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">トリミング 空白 削除 コピー 切り取り</string>
+    <string name="settings__search__keywords__final_full_stop" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which leaves the full stop off a dictation of one sentence. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">句点 句読点 ピリオド まる 文末 句点なし</string>
     <string name="settings__search__keywords__clear_cache">キャッシュ ストレージ 空き容量 一時ファイル 削除 クリア 掃除</string>
+    <string name="settings__search__keywords__keyboard_size">高さ 大きく 小さく サイズ変更 リサイズ</string>
     <string name="settings__search__keywords__momentary_layer">長押し スライド 記号 レイヤー 一時 句読点 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">絵文字 行 バー 最近 使った キーボード 上 クイック</string>
     <string name="settings__search__keywords__request_timeout">タイムアウト 時間切れ 遅い 待機 接続 秒</string>
@@ -456,6 +458,7 @@
     <string name="pref__keyboard__font_size_multiplier__label" comment="Preference title">フォントサイズ倍率</string>
     <string name="pref__keyboard__group_layout__label" comment="Preference group title">レイアウト</string>
     <string name="pref__keyboard__landscape_input_ui_mode__label" comment="Preference value">横向き時のフルスクリーン入力</string>
+    <string name="pref__keyboard__keyboard_size__label">キーボードのサイズ</string>
     <string name="pref__keyboard__key_spacing__label" comment="Preference title">キーの間隔</string>
     <string name="pref__keyboard__key_spacing__summary" comment="Preference summary">縦 {v}%、横 {h}% — 間隔を広げるとキーボードではなくキーが小さくなります。</string>
     <string name="pref__keyboard__group_keypress__label" comment="Preference group title">キー入力</string>
@@ -588,6 +591,7 @@
     <string name="pref__gestures__delete_key_long_press__label" comment="Preference title">削除キーを長押し</string>
     <string name="pref__gestures__swipe_velocity_threshold__label" comment="Preference title">スワイプ速度の閾値</string>
     <string name="pref__gestures__swipe_distance_threshold__label" comment="Preference title">スワイプ距離の閾値</string>
+    <string name="settings__help__title">ヘルプ</string>
     <string name="settings__other__title" comment="Title of Other settings">その他</string>
     <string name="pref__other__settings_theme__label" comment="Label of Settings theme preference in Other">設定テーマ</string>
     <string name="pref__other__settings_theme__auto_amoled" comment="Possible value of Settings theme preference in Other">システムデフォルト (AMOLED)</string>
@@ -637,8 +641,8 @@
     <string name="setup__select_ime__title">{app_name}を選択</string>
     <string name="setup__select_ime__description">{app_name}はシステムで有効になりました。アクティブに使用するには、入力セレクターダイアログで{app_name}を選択して切り替えてください！</string>
     <string name="setup__select_ime__switch_keyboard_btn">キーボードを切り替える</string>
-    <string name="setup__grant_notification_permission__title">クラッシュレポート通知を許可</string>
-    <string name="setup__grant_notification_permission__description">Android 13以降、アプリは通知を送信するために許可を求める必要があります。\n Dictateでは、これはクラッシュ発生時にクラッシュレポート画面を開くためにのみ使用されます。\n この許可はシステム設定でいつでも変更できます。\n </string>
+    <string name="setup__grant_notification_permission__title">通知を許可</string>
+    <string name="setup__grant_notification_permission__description">Android 13 以降、アプリは通知を表示する前に許可を求める必要があります。Dictate Keyboard は、フローティングボタンの録音中、音声モデルのダウンロード中、ウォッチがスマートフォン経由で音声入力しているときに通知を表示し、アプリがクラッシュした場合はクラッシュレポートを開きます。この設定はシステム設定でいつでも変更できます。</string>
     <string name="setup__grant_notification_permission__btn">許可を与える</string>
     <string name="setup__finish_up__title">完了</string>
     <string name="setup__finish_up__description_p1">{app_name}はシステムで有効になり、カスタマイズの準備ができました。</string>
@@ -659,6 +663,17 @@
     <string name="backup_and_restore__back_up__credentials_warning">このアーカイブには API キーとパスワードが平文で入っており、Dictate Cloud の残高も含まれます。受け取った人は誰でもあなたの負担で音声入力できます。他人に渡さないでください。すでに渡してしまった場合は、プロバイダー側でキーを変更してください。下でチェックされているものはすべて一緒に入ります。文字起こしの履歴やクリップボードも含まれます。</string>
     <string name="backup_and_restore__back_up__credentials_excluded_note">このアーカイブには API キー、パスワード、Dictate Cloud の残高は含まれていないので、他人に渡せます。ただし、あなたのキーも復元されません。下でチェックされているものはそのまま入っており、文字起こしの履歴やクリップボードも含まれます。</string>
     <string name="backup_and_restore__back_up__personal_content_note">このアーカイブに API キーとパスワードは含まれていませんが、下でチェックされているものはすべて入ります。保存された録音を含む文字起こしの履歴、クリップボード、プロンプト、キーボードがあなたから学習した単語です。</string>
+    <string name="backup_and_restore__back_up__encrypted_note">このアーカイブはパスワードで暗号化され、下でチェックされているものはすべてそのパスワードでしか復元できません。パスワードを忘れると、誰もこのバックアップを復元できません。あなた自身も同じです。</string>
+    <string name="backup_and_restore__back_up__password">パスワード保護</string>
+    <string name="backup_and_restore__back_up__password_enabled">パスワードで暗号化</string>
+    <string name="backup_and_restore__back_up__password_too_short">{count} 文字以上</string>
+    <string name="backup_and_restore__back_up__password_mismatch">パスワードが一致しません</string>
+    <string name="backup_and_restore__password">パスワード</string>
+    <string name="backup_and_restore__password_repeat">パスワード（確認）</string>
+    <string name="backup_and_restore__restore__encrypted">このバックアップアーカイブはパスワードで保護されています。内容を表示するにはパスワードを入力してください。</string>
+    <string name="backup_and_restore__restore__unlock">ロック解除</string>
+    <string name="backup_and_restore__restore__wrong_password">パスワードが違います</string>
+    <string name="backup_and_restore__restore__encrypted_unreadable">このアーカイブを開けません。破損しているか、新しいバージョンの Dictate で作成されています。</string>
     <string name="backup_and_restore__back_up__files_ime_keyboard">キーボード拡張機能</string>
     <string name="backup_and_restore__back_up__files_ime_spelling">スペル拡張機能 / 辞書</string>
     <string name="backup_and_restore__back_up__files_ime_theme">テーマ拡張機能</string>
@@ -873,7 +888,7 @@
     <string name="ext__addon_management_box__managing_placeholder">{extensions}を管理中</string>
     <string name="ext__addon_management_box__addon_manager_info">拡張機能のインポート、エクスポート、作成、カスタマイズ、削除に関連するすべてのタスクは、集中管理されたアドオンマネージャーを通じて処理できます。</string>
     <string name="ext__addon_management_box__go_to_page">{ext_home_title} に移動</string>
-    <string name="ext__home__info">Dictateアドオンストアから拡張機能をダウンロードしてインストールしたり、インターネットからダウンロードした拡張機能ファイルをインポートしたりできます。</string>
+    <string name="ext__home__info">拡張機能でテーマ、キーボードレイアウト、言語パックを追加できます。拡張機能ファイルをインポートすると追加され、インストール済みのものは下に表示されます。</string>
     <string name="ext__home__visit_store">アドオンストアにアクセス</string>
     <string name="ext__home__manage_extensions">インストール済み拡張機能を管理</string>
     <string name="ext__list__view_details">詳細を表示</string>
@@ -1243,8 +1258,6 @@
     <string name="dictate__remember_last_dictation_summary">直前の音声入力を保持し、フローティングボタンで取り消したり、クラシックレイアウトで再挿入したりできるようにします。</string>
     <string name="dictate__remember_last_dictation_title">最後の音声入力を記憶</string>
     <string name="changelog__v4_2_0">• 新機能: フローティング音声入力ボタン — 別のキーボードが有効でも、どのアプリにも直接音声入力できます。3つのスタイル（ピル、リング、オーブ）から選び、話すとライブ波形が表示され、端に吸着させながらどこへでもドラッグでき、色とサイズを設定し、長押しで言い換えられます。設定 ▸ Dictate ▸ フローティングボタンでオンにできます。\n• 新機能：Google Gemini — 文字起こしと書き換えに自分の AI Studio API キーを使えます。\n• プロンプトがデフォルトでキーの上の常時表示の行に表示されるようになりました。\n• ブラウザーや他のキーボードを含む、アプリ全体でのより確実なテキスト挿入。</string>
-    <string name="dictate__promo_floating_button_message">新機能：どのアプリでも音声入力</string>
-    <string name="dictate__promo_floating_button_action">試す</string>
     <string name="setup__floating_button__btn">フローティングボタンを設定</string>
     <string name="setup__nav_back">戻る</string>
     <string name="setup__nav_next">次へ</string>
@@ -1353,6 +1366,7 @@
     <string name="dictate__providers_region_eu">欧州連合</string>
     <string name="dictate__providers_region_jp">日本</string>
     <string name="dictate__providers_region_in">インド</string>
+    <string name="dictate__providers_region_cn">中国（本土）</string>
     <string name="dictate__providers_region_global">全世界</string>
     <string name="dictate__providers_custom_title">カスタムサーバー</string>
     <string name="dictate__providers_get_key">APIキーを取得</string>
@@ -1362,9 +1376,13 @@
     <string name="dictate__providers_test">接続をテスト</string>
     <string name="dictate__providers_test_transcribe">文字起こしをテスト</string>
     <string name="dictate__providers_check_no_key">先にAPIキーを入力してください。</string>
-    <string name="dictate__providers_check_credentials_ok">認証情報を確認 · {count} 個のモデル</string>
+    <plurals name="dictate__providers_check_credentials_ok">
+        <item quantity="other">認証情報を確認 · {count} 個のモデル</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_ok_nocount">認証情報を確認</string>
-    <string name="dictate__providers_check_endpoint_ok">サーバーに到達 · {count} 個のモデル</string>
+    <plurals name="dictate__providers_check_endpoint_ok">
+        <item quantity="other">サーバーに到達 · {count} 個のモデル</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_untested">文字起こしは未テストです。</string>
     <string name="dictate__providers_check_transcription_ok">文字起こしを確認</string>
     <string name="dictate__providers_check_transcription_text">返ってきた内容：「{text}」</string>
@@ -1372,6 +1390,8 @@
     <string name="dictate__providers_check_failed_connection">接続テストに失敗しました</string>
     <string name="dictate__providers_check_failed_transcription">文字起こしテストに失敗しました</string>
     <string name="dictate__providers_check_err_auth">キーが拒否されました。キーと、アドレスが同じアカウントのものかを確認してください。</string>
+    <string name="dictate__providers_check_err_model">キーは有効ですが、このモデルは使用できません。別のモデルを選ぶか、プロバイダーのプロジェクト設定でこのモデルを許可してください。</string>
+    <string name="dictate__error_model_unavailable">このキーではモデルを利用できません</string>
     <string name="dictate__providers_check_err_quota">キーは有効ですが、アカウントの残量がないか上限を超えています。プロバイダーでプランを確認してください。</string>
     <string name="dictate__providers_check_err_network">サーバーに接続できませんでした。アドレスとインターネット接続を確認してください。</string>
     <string name="dictate__providers_check_err_timeout">時間内に応答がありませんでした。プロバイダーが混雑している可能性があります。もう一度お試しください。</string>
@@ -1402,7 +1422,9 @@
     <string name="dictate__model_picker_title">モデルを選択</string>
     <string name="dictate__model_picker_search">モデルIDを検索または入力</string>
     <string name="dictate__model_picker_loading">モデルを読み込み中…</string>
-    <string name="dictate__model_picker_count">{count}モデル</string>
+    <plurals name="dictate__model_picker_count">
+        <item quantity="other">{count}モデル</item>
+    </plurals>
     <string name="dictate__model_picker_refresh">更新</string>
     <string name="dictate__model_picker_use_custom">「{model}」を使用</string>
     <string name="dictate__recording_group">録音</string>
@@ -1438,6 +1460,8 @@
     <string name="dictate__paragraph_split_title">段落に分割</string>
     <string name="dictate__paragraph_split_off">オフ</string>
     <string name="dictate__paragraph_split_value">{n}語以降</string>
+    <string name="dictate__drop_final_full_stop_title">文末の句点を省く</string>
+    <string name="dictate__drop_final_full_stop_summary">音声入力が1文だけのときに限ります。複数の文では句読点をすべて残します</string>
     <string name="dictate__realtime_title">リアルタイム文字起こし</string>
     <string name="dictate__realtime_summary">対応するプロバイダーで、停止後ではなく話しながら文字起こしします。</string>
     <string name="dictate__realtime_mode_off">オフ</string>
@@ -1571,7 +1595,9 @@
     <string name="dictate__prompt_auto_apply_title">自動的に適用</string>
     <string name="dictate__prompt_auto_apply_summary">このプロンプトをすべての文字起こしに自動的に実行します</string>
     <string name="dictate__prompt_reasoning_title">推論</string>
-    <string name="dictate__prompt_reasoning_default">デフォルト</string>
+    <string name="dictate__prompt_reasoning_default">プロバイダーの設定</string>
+    <string name="dictate__prompt_reasoning_little">推論少なめ</string>
+    <string name="dictate__prompt_reasoning_much">推論多め</string>
     <string name="dictate__prompt_badge_selection">選択が必要</string>
     <string name="dictate__prompt_badge_auto">自動的に適用</string>
     <string name="dictate__example_prompt_fix_grammar_name">文法を修正</string>
@@ -1852,7 +1878,8 @@
     <string name="dictate__promo_milestone_count">Dictate で %s 回! 🎉</string>
     <string name="dictate__promo_milestone_action">統計</string>
     <string name="dictate__reasoning_effort_title">推論の労力</string>
-    <string name="dictate__reasoning_effort_off">オフ</string>
+    <string name="dictate__reasoning_effort_off">プロバイダーの既定</string>
+    <string name="dictate__reasoning_effort_none">推論なし</string>
     <string name="dictate__reasoning_effort_off_summary">プロバイダー既定 — 非推論モデルではオフのまま</string>
     <string name="dictate__reasoning_effort_minimal">最小</string>
     <string name="dictate__reasoning_effort_minimal_summary">最速、思考は最小</string>
@@ -1861,6 +1888,9 @@
     <string name="dictate__reasoning_effort_medium">中</string>
     <string name="dictate__reasoning_effort_medium_summary">思考と速度のバランス</string>
     <string name="dictate__reasoning_effort_high">高</string>
+    <string name="dictate__reasoning_effort_xhigh">極高</string>
+    <string name="dictate__reasoning_effort_max">最大</string>
+    <string name="dictate__reasoning_effort_app_default">{name}（既定）</string>
     <string name="dictate__reasoning_effort_high_summary">最も思考、低速</string>
     <string name="dictate__reasoning_effort_custom">カスタム</string>
     <string name="dictate__action_save_audio">音声を保存</string>
@@ -2242,6 +2272,10 @@
     <string name="gif__error">GIF を読み込めませんでした。接続と API キーを確認してください。</string>
     <string name="gif__setup_needed">GIF を検索するには設定で無料の KLIPY API キーを追加してください</string>
     <string name="gif__setup_needed_action">GIF 検索を設定</string>
+    <string name="gif__search_off">GIF 検索はオフになっています</string>
+    <string name="quick_action__forward_delete__tooltip">カーソルの後ろの文字を削除</string>
+    <string name="dictate__error_no_rewording_model">%1$s の言い換えモデルを選択してください</string>
+    <string name="dictate__model_placeholder_required">必須：モデルを選択または入力</string>
     <string name="gif__copied_to_clipboard">GIF をクリップボードにコピーしました — 長押しで貼り付け</string>
     <string name="gif__insert_failed">GIF を挿入できませんでした</string>
     <string name="quick_action__ime_ui_mode_gif">GIF</string>
@@ -2338,6 +2372,25 @@
     <string name="dictate__action_top_up">クレジットをチャージ</string>
     <string name="dictate__promo_low_credit_message">クレジット残りわずか。</string>
     <string name="dictate__promo_low_credit_action">チャージ</string>
+    <string name="dictate__promo_sayova_message">新アプリ：ウォッチでAIと会話</string>
+    <string name="dictate__promo_sayova_action">見てみる</string>
+    <string name="about__more_apps__title">その他のアプリ</string>
+    <string name="about__more_apps__summary">ウォッチ向けの SayOVA と TunerToGo</string>
+    <string name="about__more_apps__tunertogo_tagline">Wear OS 向けチューナー</string>
+    <string name="about__more_apps__tunertogo_description">いつも手首にある正確なチューナー。楽器を手に取ったらすぐに使えます。</string>
+    <string name="about__more_apps__tunertogo_feature_instruments">ギター、ベース、ウクレレ、バイオリンなどに対応。弦は自動で判別</string>
+    <string name="about__more_apps__tunertogo_feature_chromatic">そのほかの楽器や声にはクロマチックモード</string>
+    <string name="about__more_apps__tunertogo_feature_vibration">弦が合うと短く振動。視線をペグから離さずに済みます</string>
+    <string name="about__more_apps__tunertogo_feature_privacy">インターネット接続なし、広告なし。音はウォッチ上で解析され、保存されません</string>
+    <string name="about__more_apps__tunertogo_requirements">マイク付きの Wear OS 3 以降のウォッチが必要です。スマートフォンのアプリは不要です。</string>
+    <string name="about__more_apps__intro">Dictate の開発者 DevEmperor のアプリ：</string>
+    <string name="about__more_apps__sayova_tagline">Wear OS 向け AI 音声アシスタント</string>
+    <string name="about__more_apps__sayova_description">ウォッチから Google Gemini や OpenAI と直接話せます。自然に話しかけ、好きなときに遮り、回答を聞きながら文字でも追えます。</string>
+    <string name="about__more_apps__sayova_feature_interpreter">21 言語の通訳。双方の発言を文字でも表示</string>
+    <string name="about__more_apps__sayova_feature_tasks">タイマーやアラームの設定、メモの保存、ウェブ検索</string>
+    <string name="about__more_apps__sayova_feature_phone">メッセージ・予定・ルートをスマートフォンに用意。送信はご自身で</string>
+    <string name="about__more_apps__sayova_feature_privacy">ご自身の API キー：アカウント不要、トラッキングなし、オープンソース</string>
+    <string name="about__more_apps__sayova_requirements">マイク付きの Wear OS 3 以降のウォッチと、Google Gemini または OpenAI の API キーが必要です。利用料金はプロバイダから請求されます。</string>
     <string name="prefs__media__sticker__title">ステッカー</string>
     <string name="prefs__media__sticker_folder__title">ステッカーのフォルダ</string>
     <string name="prefs__media__sticker_folder__summary_unset">自分の画像が入ったフォルダを選択</string>

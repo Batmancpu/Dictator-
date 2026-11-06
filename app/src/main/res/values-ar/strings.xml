@@ -138,7 +138,9 @@
     <string name="settings__search__keywords__text_expansion" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the typing-shortcut setting, which lets a short trigger expand into a saved block of text. Translate as the words people in your language would actually type when looking for that feature, separated by spaces. Do not translate word for word; add or drop terms as makes sense.">توسيع النص اختصار قصاصة ماكرو نص تلقائي snippet text expansion</string>
     <string name="settings__search__keywords__selection_metrics" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which shows how many words and characters are selected. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">عدد الكلمات عداد الأحرف الطول إحصائيات</string>
     <string name="settings__search__keywords__trim_on_copy" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which removes spaces and line breaks at the ends of copied text. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">اقتصاص مسافات إزالة تنظيف نسخ قص</string>
+    <string name="settings__search__keywords__final_full_stop" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which leaves the full stop off a dictation of one sentence. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">نقطة ترقيم علامات الترقيم نهاية الجملة بدون نقطة</string>
     <string name="settings__search__keywords__clear_cache">ذاكرة مؤقتة تخزين مساحة ملفات مؤقتة تحرير حذف تنظيف</string>
+    <string name="settings__search__keywords__keyboard_size">ارتفاع طول أكبر أصغر تكبير تصغير تغيير الحجم</string>
     <string name="settings__search__keywords__momentary_layer">ضغط مطول سحب رمز طبقة ترقيم مؤقت 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">رموز تعبيرية صف شريط مؤخرا مستخدمة فوق لوحة المفاتيح سريع</string>
     <string name="settings__search__keywords__request_timeout">مهلة انتهت المهلة بطيء انتظار اتصال ثواني</string>
@@ -366,6 +368,7 @@
     <string name="pref__keyboard__font_size_multiplier__label" comment="Preference title">مضاعف حجم الخط</string>
     <string name="pref__keyboard__group_layout__label" comment="Preference group title">التخطيط</string>
     <string name="pref__keyboard__landscape_input_ui_mode__label" comment="Preference value">إدخال ملء الشاشة الأفقي</string>
+    <string name="pref__keyboard__keyboard_size__label">حجم لوحة المفاتيح</string>
     <string name="pref__keyboard__key_spacing__label" comment="Preference title">المسافة بين المفاتيح</string>
     <string name="pref__keyboard__key_spacing__summary" comment="Preference summary">{v}% رأسيًا، {h}% أفقيًا — المسافة الأكبر تجعل المفاتيح أصغر، لا لوحة المفاتيح.</string>
     <string name="pref__keyboard__group_keypress__label" comment="Preference group title">ضغط المفتاح</string>
@@ -498,6 +501,7 @@
     <string name="pref__gestures__delete_key_long_press__label" comment="Preference title">الضغطة المطولة لمفتاح الحذف</string>
     <string name="pref__gestures__swipe_velocity_threshold__label" comment="Preference title">عتبة سرعة السحب</string>
     <string name="pref__gestures__swipe_distance_threshold__label" comment="Preference title">عتبة مسافة السحب</string>
+    <string name="settings__help__title">مساعدة</string>
     <string name="settings__other__title" comment="Title of Other settings">أخرى</string>
     <string name="pref__other__settings_theme__label" comment="Label of Settings theme preference in Other">إعدادات المظهر</string>
     <string name="pref__other__settings_theme__auto_amoled" comment="Possible value of Settings theme preference in Other">افتراضي النظام (أموليد)</string>
@@ -547,10 +551,8 @@
     <string name="setup__select_ime__title">اختيار {app_name}</string>
     <string name="setup__select_ime__description">تم تمكين {app_name} الآن في نظامك. لاستخدامه بشكل دائم ، قم بالتبديل إلى {app_name} عن طريق تحديده في مربع حوار محدد الإدخال!</string>
     <string name="setup__select_ime__switch_keyboard_btn">تبديل لوحة المفاتيح</string>
-    <string name="setup__grant_notification_permission__title">السماح بإخطارات تقرير الأعطال</string>
-    <string name="setup__grant_notification_permission__description">اعتبارًا من نظام التشغيل Android 13+، يجب أن تطلب التطبيقات الإذن بذلك
-         إرسال الإخطارات. في Dictate، يُستخدم هذا فقط لفتح شاشة تقرير الأعطال في حالة حدوث عطل.
-         يمكن تغيير هذا الإذن في أي وقت في إعدادات النظام.    </string>
+    <string name="setup__grant_notification_permission__title">السماح بالإشعارات</string>
+    <string name="setup__grant_notification_permission__description">بدءًا من Android 13، يجب أن تطلب التطبيقات الإذن قبل عرض الإشعارات. يعرض Dictate Keyboard إشعارًا أثناء تسجيل الزر العائم، وأثناء تنزيل نموذج كلام، وأثناء إملاء ساعتك عبر الهاتف، ويفتح تقرير عطل إذا تعطل التطبيق. يمكنك تغيير ذلك في أي وقت من إعدادات النظام.</string>
     <string name="setup__grant_notification_permission__btn">منح الإذن</string>
     <string name="setup__finish_up__title">تم انهاء الاعداد</string>
     <string name="setup__finish_up__description_p1">تم تمكين{app_name} في النظام وجاهز للتخصيص بأسلوبك.</string>
@@ -571,6 +573,17 @@
     <string name="backup_and_restore__back_up__credentials_warning">يحتوي هذا الأرشيف على مفاتيح API وكلمات المرور الخاصة بك بنص واضح، إلى جانب رصيدك في Dictate Cloud — ومن يحصل عليه يمكنه الإملاء على حسابك. لا تُشاركه، وإذا كنت قد شاركته بالفعل فغيِّر المفتاح عند مزوّدك. كل ما هو محدَّد أدناه يرحل معه أيضًا، بما في ذلك سجل النسخ النصي والحافظة.</string>
     <string name="backup_and_restore__back_up__credentials_excluded_note">لا يحتوي هذا الأرشيف على مفاتيح API أو كلمات مرور أو رصيد Dictate Cloud، فيمكن مشاركته، لكنه لن يستعيد مفاتيحك كذلك. كل ما هو محدَّد أدناه لا يزال فيه، بما في ذلك سجل النسخ النصي والحافظة.</string>
     <string name="backup_and_restore__back_up__personal_content_note">لا يحتوي هذا الأرشيف على مفاتيح API أو كلمات مرور، لكنه يحتوي على كل ما هو محدَّد أدناه: سجل النسخ النصي مع التسجيلات المحفوظة، والحافظة، ومطالباتك، والكلمات التي تعلّمتها لوحة المفاتيح منك.</string>
+    <string name="backup_and_restore__back_up__encrypted_note">هذا الأرشيف مشفَّر بكلمة المرور الخاصة بك، ولا يمكن استعادة كل ما هو محدَّد أدناه إلا بها. إذا نسيت كلمة المرور، فلن يتمكن أحد من استعادة هذه النسخة الاحتياطية، ولا حتى أنت.</string>
+    <string name="backup_and_restore__back_up__password">الحماية بكلمة مرور</string>
+    <string name="backup_and_restore__back_up__password_enabled">التشفير بكلمة مرور</string>
+    <string name="backup_and_restore__back_up__password_too_short">{count} أحرف على الأقل</string>
+    <string name="backup_and_restore__back_up__password_mismatch">كلمتا المرور غير متطابقتين</string>
+    <string name="backup_and_restore__password">كلمة المرور</string>
+    <string name="backup_and_restore__password_repeat">أعد إدخال كلمة المرور</string>
+    <string name="backup_and_restore__restore__encrypted">أرشيف النسخ الاحتياطي هذا محميّ بكلمة مرور. أدخلها لترى محتواه.</string>
+    <string name="backup_and_restore__restore__unlock">فتح القفل</string>
+    <string name="backup_and_restore__restore__wrong_password">كلمة المرور غير صحيحة</string>
+    <string name="backup_and_restore__restore__encrypted_unreadable">لا يمكن فتح هذا الأرشيف. إما أنه تالف، أو أنه أُنشئ بإصدار أحدث من Dictate.</string>
     <string name="backup_and_restore__back_up__files_ime_keyboard">ملحقات لوحة المفاتيح</string>
     <string name="backup_and_restore__back_up__files_ime_spelling">ملحقات التهجئة/ القاموس</string>
     <string name="backup_and_restore__back_up__files_ime_theme">ملحقات السمات</string>
@@ -780,7 +793,7 @@
     <string name="ext__addon_management_box__managing_placeholder">إدارة {extensions}</string>
     <string name="ext__addon_management_box__addon_manager_info">يمكن التعامل مع جميع المهام المتعلقة باستيراد الملحقات وتصديرها وإنشائها وتخصيصها وإزالتها بواسطة مدير الإضافات المركزي.</string>
     <string name="ext__addon_management_box__go_to_page">انتقل إلى {ext_home_title}</string>
-    <string name="ext__home__info">يمكنك تنزيل الإضافات وتثبيتها من متجر إضافات Dictate أو استيراد أي مِلَفّ ملحق قمت بتنزيله من الإنترنت.</string>
+    <string name="ext__home__info">تضيف الملحقات سمات وتخطيطات لوحة مفاتيح وحزم لغات. استورد ملف ملحق لإضافته؛ الملحقات المثبتة مدرجة أدناه.</string>
     <string name="ext__home__visit_store">زيارة متجر الإضافات</string>
     <string name="ext__home__manage_extensions">إدارة الإضافات المثبتة</string>
     <string name="ext__list__view_details">عرض التفاصيل</string>
@@ -1169,8 +1182,6 @@
     <string name="dictate__remember_last_dictation_summary">يحتفظ بآخر إملاء لك حتى يتمكن الزر العائم من التراجع عنه والتخطيط الكلاسيكي من إدراجه مجددًا.</string>
     <string name="dictate__remember_last_dictation_title">تذكّر آخر إملاء</string>
     <string name="changelog__v4_2_0">• جديد: زر إملاء عائم — أملِ مباشرةً في أي تطبيق، حتى عندما تكون لوحة مفاتيح أخرى نشطة. اختر من بين ثلاثة أنماط (كبسولة، حلقة، كرة)، وشاهد موجة صوتية حية أثناء التحدث، واسحبه إلى أي مكان مع الالتصاق بالحواف، واضبط لونه وحجمه، واضغط مطولاً لإعادة الصياغة. فعّله من الإعدادات ▸ Dictate ▸ الزر العائم.\n• جديد: Google Gemini — استخدم مفتاح API الخاص بك من AI Studio للنسخ وإعادة الصياغة.\n• تظهر المطالبات الآن افتراضيًا في صف ثابت فوق المفاتيح.\n• إدراج نص أكثر موثوقية عبر التطبيقات، بما في ذلك المتصفحات ولوحات المفاتيح الأخرى.</string>
-    <string name="dictate__promo_floating_button_message">جديد: أملِ في أي تطبيق</string>
-    <string name="dictate__promo_floating_button_action">جرّبه</string>
     <string name="setup__floating_button__btn">إعداد الزر العائم</string>
     <string name="setup__nav_back">رجوع</string>
     <string name="setup__nav_next">التالي</string>
@@ -1279,6 +1290,7 @@
     <string name="dictate__providers_region_eu">الاتحاد الأوروبي</string>
     <string name="dictate__providers_region_jp">اليابان</string>
     <string name="dictate__providers_region_in">الهند</string>
+    <string name="dictate__providers_region_cn">الصين (البر الرئيسي)</string>
     <string name="dictate__providers_region_global">عالميًا</string>
     <string name="dictate__providers_custom_title">خادم مخصّص</string>
     <string name="dictate__providers_get_key">الحصول على مفتاح API</string>
@@ -1288,9 +1300,23 @@
     <string name="dictate__providers_test">اختبار الاتصال</string>
     <string name="dictate__providers_test_transcribe">اختبار التفريغ النصي</string>
     <string name="dictate__providers_check_no_key">أدخل مفتاح واجهة البرمجة أولاً.</string>
-    <string name="dictate__providers_check_credentials_ok">تم التحقق من بيانات الاعتماد · {count} نموذجًا</string>
+    <plurals name="dictate__providers_check_credentials_ok">
+        <item quantity="zero">تم التحقق من بيانات الاعتماد · {count} نموذج</item>
+        <item quantity="one">تم التحقق من بيانات الاعتماد · {count} نموذج</item>
+        <item quantity="two">تم التحقق من بيانات الاعتماد · {count} نموذجان</item>
+        <item quantity="few">تم التحقق من بيانات الاعتماد · {count} نماذج</item>
+        <item quantity="many">تم التحقق من بيانات الاعتماد · {count} نموذجًا</item>
+        <item quantity="other">تم التحقق من بيانات الاعتماد · {count} نموذج</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_ok_nocount">تم التحقق من بيانات الاعتماد</string>
-    <string name="dictate__providers_check_endpoint_ok">تم الوصول إلى الخادم · {count} نموذجًا</string>
+    <plurals name="dictate__providers_check_endpoint_ok">
+        <item quantity="zero">تم الوصول إلى الخادم · {count} نموذج</item>
+        <item quantity="one">تم الوصول إلى الخادم · {count} نموذج</item>
+        <item quantity="two">تم الوصول إلى الخادم · {count} نموذجان</item>
+        <item quantity="few">تم الوصول إلى الخادم · {count} نماذج</item>
+        <item quantity="many">تم الوصول إلى الخادم · {count} نموذجًا</item>
+        <item quantity="other">تم الوصول إلى الخادم · {count} نموذج</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_untested">لم يُختبر التفريغ النصي.</string>
     <string name="dictate__providers_check_transcription_ok">تم التحقق من التفريغ النصي</string>
     <string name="dictate__providers_check_transcription_text">جاء الرد: “{text}”</string>
@@ -1298,6 +1324,8 @@
     <string name="dictate__providers_check_failed_connection">فشل اختبار الاتصال</string>
     <string name="dictate__providers_check_failed_transcription">فشل اختبار التفريغ النصي</string>
     <string name="dictate__providers_check_err_auth">رُفض المفتاح. تحقق منه ومن أن العنوان يخص الحساب نفسه.</string>
+    <string name="dictate__providers_check_err_model">المفتاح يعمل، لكن لا يُسمح له باستخدام هذا النموذج. اختر نموذجًا آخر أو اسمح بهذا النموذج في إعدادات المشروع لدى المزوّد.</string>
+    <string name="dictate__error_model_unavailable">النموذج غير متاح لهذا المفتاح</string>
     <string name="dictate__providers_check_err_quota">المفتاح يعمل، لكن الحساب استنفد حصته أو تجاوز حد الاستخدام. راجع خطتك لدى المزوّد.</string>
     <string name="dictate__providers_check_err_network">تعذّر الوصول إلى الخادم. تحقق من العنوان ومن اتصالك بالإنترنت.</string>
     <string name="dictate__providers_check_err_timeout">لا استجابة في الوقت المحدد. قد يكون المزوّد مشغولًا — أعد المحاولة.</string>
@@ -1328,7 +1356,14 @@
     <string name="dictate__model_picker_title">اختر نموذجًا</string>
     <string name="dictate__model_picker_search">ابحث أو اكتب معرّف نموذج</string>
     <string name="dictate__model_picker_loading">جارٍ تحميل النماذج…</string>
-    <string name="dictate__model_picker_count">{count} نماذج</string>
+    <plurals name="dictate__model_picker_count">
+        <item quantity="zero">{count} نموذج</item>
+        <item quantity="one">{count} نموذج</item>
+        <item quantity="two">{count} نموذجان</item>
+        <item quantity="few">{count} نماذج</item>
+        <item quantity="many">{count} نموذجًا</item>
+        <item quantity="other">{count} نموذج</item>
+    </plurals>
     <string name="dictate__model_picker_refresh">تحديث</string>
     <string name="dictate__model_picker_use_custom">استخدام ”{model}“</string>
     <string name="dictate__recording_group">التسجيل</string>
@@ -1364,6 +1399,8 @@
     <string name="dictate__paragraph_split_title">التقسيم إلى فقرات</string>
     <string name="dictate__paragraph_split_off">إيقاف</string>
     <string name="dictate__paragraph_split_value">بعد {n} كلمة</string>
+    <string name="dictate__drop_final_full_stop_title">حذف النقطة في النهاية</string>
+    <string name="dictate__drop_final_full_stop_summary">فقط عندما يكون الإملاء جملة واحدة؛ تحتفظ الجمل المتعددة بكل علامات الترقيم</string>
     <string name="dictate__realtime_title">النسخ الفوري</string>
     <string name="dictate__realtime_summary">يُفرِّغ الكلام أثناء التحدث بدلاً من الانتظار حتى التوقف، للمزوّدين الذين يدعمون ذلك</string>
     <string name="dictate__realtime_mode_off">إيقاف</string>
@@ -1497,7 +1534,9 @@
     <string name="dictate__prompt_auto_apply_title">تطبيق تلقائي</string>
     <string name="dictate__prompt_auto_apply_summary">شغّل هذه المطالبة تلقائيًا على كل عملية تفريغ نصي</string>
     <string name="dictate__prompt_reasoning_title">التفكير</string>
-    <string name="dictate__prompt_reasoning_default">افتراضي</string>
+    <string name="dictate__prompt_reasoning_default">إعداد المزوّد</string>
+    <string name="dictate__prompt_reasoning_little">تفكير قليل</string>
+    <string name="dictate__prompt_reasoning_much">تفكير كثير</string>
     <string name="dictate__prompt_badge_selection">يتطلّب تحديدًا</string>
     <string name="dictate__prompt_badge_auto">يُطبَّق تلقائيًا</string>
     <string name="dictate__example_prompt_fix_grammar_name">تصحيح القواعد</string>
@@ -1783,7 +1822,8 @@
     <string name="dictate__promo_milestone_count">%s إملاء مع Dictate! 🎉</string>
     <string name="dictate__promo_milestone_action">الإحصاءات</string>
     <string name="dictate__reasoning_effort_title">مقدار التفكير</string>
-    <string name="dictate__reasoning_effort_off">إيقاف</string>
+    <string name="dictate__reasoning_effort_off">الافتراضي للمزوّد</string>
+    <string name="dictate__reasoning_effort_none">بلا تفكير</string>
     <string name="dictate__reasoning_effort_off_summary">الإعداد الافتراضي للمزوّد — اتركه مطفأً للنماذج غير الاستدلالية</string>
     <string name="dictate__reasoning_effort_minimal">الأدنى</string>
     <string name="dictate__reasoning_effort_minimal_summary">الأسرع، أقل تفكير</string>
@@ -1792,6 +1832,9 @@
     <string name="dictate__reasoning_effort_medium">متوسط</string>
     <string name="dictate__reasoning_effort_medium_summary">توازن بين التفكير والسرعة</string>
     <string name="dictate__reasoning_effort_high">مرتفع</string>
+    <string name="dictate__reasoning_effort_xhigh">مرتفع جدًا</string>
+    <string name="dictate__reasoning_effort_max">أقصى</string>
+    <string name="dictate__reasoning_effort_app_default">{name} (افتراضي)</string>
     <string name="dictate__reasoning_effort_high_summary">أكثر تفكيرًا، أبطأ</string>
     <string name="dictate__reasoning_effort_custom">مخصص</string>
     <string name="dictate__action_save_audio">حفظ الصوت</string>
@@ -2173,6 +2216,10 @@
     <string name="gif__error">تعذّر تحميل GIFs. تحقّق من اتصالك ومفتاح API.</string>
     <string name="gif__setup_needed">أضِف مفتاح KLIPY API مجاني في الإعدادات للبحث عن GIFs</string>
     <string name="gif__setup_needed_action">إعداد البحث عن GIF</string>
+    <string name="gif__search_off">البحث عن GIF متوقف</string>
+    <string name="quick_action__forward_delete__tooltip">حذف الحرف الذي يلي المؤشر</string>
+    <string name="dictate__error_no_rewording_model">اختر نموذج إعادة الصياغة لـ %1$s</string>
+    <string name="dictate__model_placeholder_required">مطلوب: اختر نموذجًا أو اكتبه</string>
     <string name="gif__copied_to_clipboard">تم نسخ GIF إلى الحافظة — اضغط مطولًا للصق</string>
     <string name="gif__insert_failed">تعذّر إدراج GIF</string>
     <string name="quick_action__ime_ui_mode_gif">GIF</string>
@@ -2269,6 +2316,25 @@
     <string name="dictate__action_top_up">شحن الرصيد</string>
     <string name="dictate__promo_low_credit_message">الرصيد شارف على النفاد.</string>
     <string name="dictate__promo_low_credit_action">شحن</string>
+    <string name="dictate__promo_sayova_message">تطبيق جديد: ذكاء اصطناعي في ساعتك</string>
+    <string name="dictate__promo_sayova_action">اكتشف</string>
+    <string name="about__more_apps__title">تطبيقات أخرى</string>
+    <string name="about__more_apps__summary">SayOVA وTunerToGo لساعتك</string>
+    <string name="about__more_apps__tunertogo_tagline">مُدوزن آلات موسيقية لنظام Wear OS</string>
+    <string name="about__more_apps__tunertogo_description">مُدوزن دقيق على معصمك دائمًا، جاهز لحظة تمسك آلتك.</string>
+    <string name="about__more_apps__tunertogo_feature_instruments">الغيتار والباص واليوكوليلي والكمان وغيرها، مع التعرّف التلقائي على الأوتار</string>
+    <string name="about__more_apps__tunertogo_feature_chromatic">وضع كروماتي لأي آلة أخرى ولصوتك</string>
+    <string name="about__more_apps__tunertogo_feature_vibration">اهتزاز قصير عند ضبط الوتر، فتبقى عيناك على المفاتيح</string>
+    <string name="about__more_apps__tunertogo_feature_privacy">بلا اتصال بالإنترنت وبلا إعلانات: يُحلَّل الصوت على الساعة ولا يُحفظ أبدًا</string>
+    <string name="about__more_apps__tunertogo_requirements">يتطلب ساعة بنظام Wear OS 3 أو أحدث مزوّدة بميكروفون. يعمل دون تطبيق على الهاتف.</string>
+    <string name="about__more_apps__intro">من DevEmperor أيضًا، مطوّر Dictate:</string>
+    <string name="about__more_apps__sayova_tagline">مساعد صوتي بالذكاء الاصطناعي لنظام Wear OS</string>
+    <string name="about__more_apps__sayova_description">تحدّث مع Google Gemini أو OpenAI مباشرةً من ساعتك: تكلّم بطبيعية، وقاطِع متى شئت، واقرأ الإجابة أثناء سماعها.</string>
+    <string name="about__more_apps__sayova_feature_interpreter">مترجم فوري بين 21 لغة، مع عرض الطرفين نصًا</string>
+    <string name="about__more_apps__sayova_feature_tasks">يضبط المؤقتات والمنبهات، ويحفظ الملاحظات، ويبحث في الويب</string>
+    <string name="about__more_apps__sayova_feature_phone">يجهّز الرسائل والمواعيد والمسارات على هاتفك لترسلها بنفسك</string>
+    <string name="about__more_apps__sayova_feature_privacy">مفتاح API الخاص بك: بلا حساب، بلا تتبّع، مفتوح المصدر</string>
+    <string name="about__more_apps__sayova_requirements">يتطلب ساعة بنظام Wear OS 3 أو أحدث مزوّدة بميكروفون، ومفتاح API من Google Gemini أو OpenAI. يحاسبك مزوّد الخدمة على الاستخدام.</string>
     <string name="prefs__media__sticker__title">الملصقات</string>
     <string name="prefs__media__sticker_folder__title">مجلد الملصقات</string>
     <string name="prefs__media__sticker_folder__summary_unset">اختر مجلدًا يحتوي على صورك الخاصة</string>

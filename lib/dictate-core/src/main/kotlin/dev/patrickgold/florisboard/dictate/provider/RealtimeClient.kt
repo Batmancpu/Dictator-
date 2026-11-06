@@ -10,7 +10,6 @@
 
 package dev.patrickgold.florisboard.dictate.provider
 
-import android.util.Base64
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonPrimitive
@@ -30,8 +29,12 @@ import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString.Companion.toByteString
+import java.net.InetAddress
+import java.net.Socket
 import java.net.URLEncoder
+import java.util.Base64
 import java.util.concurrent.TimeUnit
+import javax.net.SocketFactory
 
 /**
  * Opens real-time transcription sessions (issue #128). Implements all eight [RealtimeApi] wire formats:
@@ -44,8 +47,21 @@ import java.util.concurrent.TimeUnit
  */
 object RealtimeClient {
 
+    /**
+     * The send buffer every realtime socket asks for (#447); Linux doubles it, so 64 KiB are in flight.
+     *
+     * Left to itself, Android grows a socket's send buffer up to megabytes, and on an uplink slower than
+     * the stream the backlog disappears into it: on the #447 bench OkHttp's queue read 0 while seconds of
+     * speech had not left the phone, and a stop cannot tell a slow stream from a finished one. With the
+     * buffer this small the backlog stays in OkHttp's queue, where [RealtimeSession.pendingUploadBytes] can
+     * see it, and what can be on its way at once is bounded. 64 KiB still carry more than 1 Mbit/s at a
+     * 500 ms round trip, and the fastest stream here (OpenAI, base64 at 24 kHz) needs about 520 kbit/s.
+     */
+    internal const val SEND_BUFFER_BYTES = 32 * 1024
+
     private val wsClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
+            .socketFactory(SendBufferSocketFactory(SEND_BUFFER_BYTES))
             .connectTimeout(8, TimeUnit.SECONDS)   // fail a dead route fast instead of stalling the session
             // Race IPv6/IPv4 with OkHttp 5 Happy Eyeballs instead of forcing either address family.
             .fastFallback(true)
@@ -78,6 +94,13 @@ object RealtimeClient {
      * [expectedLanguages] is read only by the providers whose language field is a list (OpenAI's
      * gpt-transcribe generation, Soniox, Gemini, AssemblyAI's Pro model), and only when no language is
      * pinned: it turns auto-detect into detection among the languages the user dictates in (issue #99).
+     *
+     * [vocabulary] is the user's custom words (issue #466), which every socket here takes as a list of
+     * terms in its setup, and none as prose; each keeps what its field allows ([VocabularyField]). A
+     * session is set up once, so the list is the one the dictation started with.
+     *
+     * [proxy] and [trustUserCerts] are the same network settings the batch client gets, so the socket
+     * leaves through the user's proxy and accepts their own CA like every other request does.
      */
     fun open(
         api: RealtimeApi,
@@ -87,24 +110,85 @@ object RealtimeClient {
         callbacks: RealtimeCallbacks,
         baseUrl: String? = null,
         expectedLanguages: List<String> = emptyList(),
+        vocabulary: List<String> = emptyList(),
+        proxy: ProxyConfig? = null,
+        trustUserCerts: Boolean = false,
+    ): RealtimeSession = openWith(
+        clientFor(proxy, trustUserCerts), api, apiKey, model, language, callbacks, baseUrl, expectedLanguages,
+        vocabulary,
+    )
+
+    /**
+     * The shared socket client, or a sibling of it for a proxy or a user CA. `newBuilder()` keeps the
+     * connection pool and dispatcher, so the sibling costs no more than the settings it adds.
+     */
+    internal fun clientFor(proxy: ProxyConfig?, trustUserCerts: Boolean): OkHttpClient =
+        if (proxy == null && !trustUserCerts) {
+            wsClient
+        } else {
+            wsClient.newBuilder().applyNetworkSettings(proxy, trustUserCerts).build()
+        }
+
+    private fun openWith(
+        wsClient: OkHttpClient,
+        api: RealtimeApi,
+        apiKey: String,
+        model: String,
+        language: String?,
+        callbacks: RealtimeCallbacks,
+        baseUrl: String?,
+        expectedLanguages: List<String>,
+        vocabulary: List<String>,
     ): RealtimeSession = when (api) {
         RealtimeApi.OPENAI ->
-            OpenAiRealtimeSession(wsClient, apiKey, model, language, callbacks, baseUrl, expectedLanguages)
+            OpenAiRealtimeSession(wsClient, apiKey, model, language, callbacks, baseUrl, expectedLanguages, vocabulary)
                 .also { it.connect() }
-        RealtimeApi.DEEPGRAM -> DeepgramRealtimeSession(wsClient, apiKey, model, language, callbacks).also { it.connect() }
+        RealtimeApi.DEEPGRAM ->
+            DeepgramRealtimeSession(wsClient, apiKey, model, language, callbacks, vocabulary).also { it.connect() }
         RealtimeApi.SONIOX ->
-            SonioxRealtimeSession(wsClient, apiKey, model, language, callbacks, baseUrl, expectedLanguages)
+            SonioxRealtimeSession(wsClient, apiKey, model, language, callbacks, baseUrl, expectedLanguages, vocabulary)
                 .also { it.connect() }
         RealtimeApi.ASSEMBLYAI ->
-            AssemblyAiRealtimeSession(wsClient, apiKey, model, language, callbacks, expectedLanguages)
+            AssemblyAiRealtimeSession(wsClient, apiKey, model, language, callbacks, expectedLanguages, vocabulary)
                 .also { it.connect() }
-        RealtimeApi.ELEVENLABS -> ElevenLabsRealtimeSession(wsClient, apiKey, model, language, callbacks).also { it.connect() }
+        RealtimeApi.ELEVENLABS ->
+            ElevenLabsRealtimeSession(wsClient, apiKey, model, language, callbacks, vocabulary).also { it.connect() }
         RealtimeApi.GEMINI ->
-            GeminiRealtimeSession(wsClient, apiKey, model, language, callbacks, expectedLanguages)
+            GeminiRealtimeSession(wsClient, apiKey, model, language, callbacks, expectedLanguages, vocabulary)
                 .also { it.connect() }
+        // Off in the preset (#128) and its protocol unconfirmed, so it gets no words: Voxtral's documented
+        // `context_bias` belongs to a session message this one does not send.
         RealtimeApi.MISTRAL_VOXTRAL -> MistralRealtimeSession(wsClient, apiKey, model, language, callbacks).also { it.connect() }
-        RealtimeApi.XAI -> XaiRealtimeSession(wsClient, apiKey, model, language, callbacks).also { it.connect() }
+        RealtimeApi.XAI -> XaiRealtimeSession(wsClient, apiKey, model, language, callbacks, vocabulary).also { it.connect() }
     }
+}
+
+/**
+ * Sockets with a fixed send buffer, for [RealtimeClient.SEND_BUFFER_BYTES]. OkHttp asks for an unconnected
+ * socket and connects it itself, so the buffer is set before the first byte; the other overloads are here
+ * because the contract has them. A platform that refuses the size keeps its own, and the stream works as
+ * before, only without a visible backlog.
+ *
+ * A SOCKS proxy is the one route that bypasses this: OkHttp builds that socket itself.
+ */
+internal class SendBufferSocketFactory(
+    private val sendBufferBytes: Int,
+    private val delegate: SocketFactory = SocketFactory.getDefault(),
+) : SocketFactory() {
+
+    private fun Socket.limited(): Socket = apply { runCatching { sendBufferSize = sendBufferBytes } }
+
+    override fun createSocket(): Socket = delegate.createSocket().limited()
+
+    override fun createSocket(host: String?, port: Int): Socket = delegate.createSocket(host, port).limited()
+
+    override fun createSocket(host: String?, port: Int, localHost: InetAddress?, localPort: Int): Socket =
+        delegate.createSocket(host, port, localHost, localPort).limited()
+
+    override fun createSocket(host: InetAddress?, port: Int): Socket = delegate.createSocket(host, port).limited()
+
+    override fun createSocket(address: InetAddress?, port: Int, localAddress: InetAddress?, localPort: Int): Socket =
+        delegate.createSocket(address, port, localAddress, localPort).limited()
 }
 
 /**
@@ -122,9 +206,13 @@ private class OpenAiRealtimeSession(
     private val callbacks: RealtimeCallbacks,
     private val baseUrl: String? = null,
     expectedLanguages: List<String> = emptyList(),
+    vocabulary: List<String> = emptyList(),
 ) : RealtimeSession {
 
     private val languageHints = languageHintsOf(language, expectedLanguages)
+
+    // The gpt-transcribe generation takes `keywords`; gpt-realtime-whisper takes neither it nor a prompt.
+    private val keywords = if (usesLanguagesField(model)) VocabularyField.OPENAI.fit(vocabulary) else emptyList()
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
     private var ws: WebSocket? = null
@@ -231,6 +319,9 @@ private class OpenAiRealtimeSession(
                         } else if (!language.isNullOrBlank() && language != "detect") {
                             put("language", language)
                         }
+                        if (keywords.isNotEmpty()) {
+                            put("keywords", buildJsonArray { keywords.forEach { add(JsonPrimitive(it)) } })
+                        }
                     })
                     // No server-side turn detection: Dictate decides when a dictation ends and commits the
                     // buffer itself, so letting the server also cut turns would segment the same audio a
@@ -248,7 +339,7 @@ private class OpenAiRealtimeSession(
     }
 
     private fun sendAudioFrame(socket: WebSocket, pcm16: ByteArray, len: Int) {
-        val b64 = Base64.encodeToString(pcm16, 0, len, Base64.NO_WRAP)
+        val b64 = base64Of(pcm16, len)
         val msg = buildJsonObject {
             put("type", "input_audio_buffer.append")
             put("audio", b64)
@@ -267,6 +358,11 @@ private class OpenAiRealtimeSession(
             ws?.let { sendCommit(it) }
         }
     }
+
+    override fun pendingUploadBytes(): Long = audioGate.pendingBytes() + (ws?.queueSize() ?: 0L)
+
+    // With turn detection off there is one item, and its `completed` answers the commit behind the audio.
+    override val endsWithAnswer: Boolean get() = true
 
     override fun cancel() {
         audioGate.close()
@@ -311,9 +407,11 @@ private class SonioxRealtimeSession(
     private val callbacks: RealtimeCallbacks,
     private val wsUrl: String? = null,
     expectedLanguages: List<String> = emptyList(),
+    vocabulary: List<String> = emptyList(),
 ) : RealtimeSession {
 
     private val languageHints = languageHintsOf(language, expectedLanguages)
+    private val terms = VocabularyField.SONIOX.fit(vocabulary)
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
     private var ws: WebSocket? = null
@@ -370,6 +468,10 @@ private class SonioxRealtimeSession(
         if (languageHints.isNotEmpty()) {
             put("language_hints", buildJsonArray { languageHints.forEach { add(it) } })
         }
+        // The custom words (#466) in the documented object; the file endpoint still takes a plain string.
+        if (terms.isNotEmpty()) {
+            putJsonObject("context") { put("terms", buildJsonArray { terms.forEach { add(it) } }) }
+        }
     }.toString()
 
     override fun sendAudio(pcm16: ByteArray, len: Int) {
@@ -383,6 +485,10 @@ private class SonioxRealtimeSession(
             runCatching { ws?.send("") }   // empty frame → flush + finished
         }
     }
+
+    override fun pendingUploadBytes(): Long = audioGate.pendingBytes() + (ws?.queueSize() ?: 0L)
+
+    override val endsWithAnswer: Boolean get() = true
 
     override fun cancel() {
         audioGate.close()
@@ -428,9 +534,13 @@ internal class AssemblyAiRealtimeSession(
     language: String?,
     private val callbacks: RealtimeCallbacks,
     expectedLanguages: List<String> = emptyList(),
+    vocabulary: List<String> = emptyList(),
     /** The socket address without its query — AssemblyAI's own, except in tests. */
     private val endpoint: String = URL,
 ) : RealtimeSession {
+
+    // Included in the price on the Pro and multilingual models, $0.04 an hour on Universal-Streaming English.
+    private val keyterms = VocabularyField.ASSEMBLYAI_STREAMING.fit(vocabulary)
 
     // Blank, or the id this preset used to show: neither is a value the server accepts (it refuses the
     // session with error 3006), and both meant "the provider's default".
@@ -484,6 +594,11 @@ internal class AssemblyAiRealtimeSession(
         if (languageCodes.isNotEmpty()) {
             val list = buildJsonArray { languageCodes.forEach { add(it) } }.toString()
             append("&language_codes=").append(URLEncoder.encode(list, "UTF-8"))
+        }
+        // A JSON array as well, for the same reason (#466).
+        if (keyterms.isNotEmpty()) {
+            val list = buildJsonArray { keyterms.forEach { add(it) } }.toString()
+            append("&keyterms_prompt=").append(URLEncoder.encode(list, "UTF-8"))
         }
         if (speechModel in FORMAT_TURNS_MODELS) append("&format_turns=true")
     }
@@ -543,6 +658,11 @@ internal class AssemblyAiRealtimeSession(
         runCatching { socket.send("""{"type":"Terminate"}""") }
     }
 
+    override fun pendingUploadBytes(): Long = ws?.queueSize() ?: 0L
+
+    // `Termination` answers `Terminate`, after the turn in progress has settled.
+    override val endsWithAnswer: Boolean get() = true
+
     override fun cancel() {
         done = true
         runCatching { ws?.close(1000, null) }
@@ -569,7 +689,8 @@ internal class AssemblyAiRealtimeSession(
  * ElevenLabs Scribe realtime over `wss://api.elevenlabs.io/v1/speech-to-text/realtime` (config in query
  * params, `xi-api-key` header). 16 kHz mono PCM16 is sent base64 in `input_audio_chunk` messages;
  * `partial_transcript`/`committed_transcript` messages carry the text in `text`. `finish()` sends a final
- * chunk with `commit:true` so the server flushes the last committed transcript.
+ * chunk with `commit:true` so the server flushes the last committed transcript. The custom words go as
+ * `keyterms`, repeated in the query (#466), at a surcharge.
  */
 private class ElevenLabsRealtimeSession(
     private val client: OkHttpClient,
@@ -577,17 +698,20 @@ private class ElevenLabsRealtimeSession(
     private val model: String,
     private val language: String?,
     private val callbacks: RealtimeCallbacks,
+    vocabulary: List<String> = emptyList(),
 ) : RealtimeSession {
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
     private var ws: WebSocket? = null
     private val audioGate = RealtimeAudioGate()
+    private val keyterms = VocabularyField.ELEVENLABS_STREAMING.fit(vocabulary)
     @Volatile private var done = false
 
     fun connect() {
         val lang = if (!language.isNullOrBlank() && language != "detect") "&language_code=$language" else ""
+        val terms = keyterms.joinToString("") { "&keyterms=" + URLEncoder.encode(it, "UTF-8") }
         val url = "wss://api.elevenlabs.io/v1/speech-to-text/realtime" +
-            "?model_id=$model&audio_format=pcm_16000&commit_strategy=vad$lang"
+            "?model_id=$model&audio_format=pcm_16000&commit_strategy=vad$lang$terms"
         val request = Request.Builder().url(url).header("xi-api-key", apiKey).build()
         ws = client.newWebSocket(request, listener)
     }
@@ -625,7 +749,7 @@ private class ElevenLabsRealtimeSession(
     private fun sendAudioFrame(socket: WebSocket, pcm16: ByteArray, len: Int) {
         val msg = buildJsonObject {
             put("message_type", "input_audio_chunk")
-            put("audio_base_64", Base64.encodeToString(pcm16, 0, len, Base64.NO_WRAP))
+            put("audio_base_64", base64Of(pcm16, len))
             put("commit", false)
             put("sample_rate", 16_000)
         }.toString()
@@ -646,6 +770,10 @@ private class ElevenLabsRealtimeSession(
             ws?.let { sendCommit(it) }
         }
     }
+
+    // No answer to wait for: the commit comes back as one more committed transcript, like every pause the
+    // server's own voice detection commits, so the stop ends on silence.
+    override fun pendingUploadBytes(): Long = audioGate.pendingBytes() + (ws?.queueSize() ?: 0L)
 
     override fun cancel() {
         audioGate.close()
@@ -692,9 +820,11 @@ private class GeminiRealtimeSession(
     private val language: String?,
     private val callbacks: RealtimeCallbacks,
     expectedLanguages: List<String> = emptyList(),
+    vocabulary: List<String> = emptyList(),
 ) : RealtimeSession {
 
     private val languageHints = languageHintsOf(language, expectedLanguages)
+    private val customVocabulary = VocabularyField.GEMINI.fit(vocabulary)
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
     private var ws: WebSocket? = null
@@ -756,7 +886,11 @@ private class GeminiRealtimeSession(
         // the stop is sent — and closing on it would drop everything spoken since. Audio that no
         // transcription has covered yet is the exact test: while some is outstanding this marker is not
         // ours, and the one that answers our own end of stream is still to come.
-        if (ended && finishing && !audioSinceFinal) finalizeAndClose(webSocket)
+        //
+        // "Sent" has to mean left the phone (#447). On a slow uplink the frames are handed to the socket
+        // long before Google hears them, and a turn that ends in that backlog settles its final and its
+        // marker after the stop, with the rest of the dictation still queued here.
+        if (ended && finishing && !audioSinceFinal && pendingUploadBytes() == 0L) finalizeAndClose(webSocket)
     }
 
     /**
@@ -790,6 +924,10 @@ private class GeminiRealtimeSession(
                 // VERBATIM would hand all of that to the rewording step instead — for a keyboard, clean
                 // text on arrival is worth more than a faithful record of the stumbles.
                 put("mode", "SMART")
+                // The custom words (#466), beside the languages as Google documents them.
+                if (customVocabulary.isNotEmpty()) {
+                    put("customVocabulary", buildJsonArray { customVocabulary.forEach { add(it) } })
+                }
             }
         }
     }.toString()
@@ -805,7 +943,7 @@ private class GeminiRealtimeSession(
         val msg = buildJsonObject {
             putJsonObject("realtimeInput") {
                 putJsonObject("audio") {
-                    put("data", Base64.encodeToString(pcm16, 0, len, Base64.NO_WRAP))
+                    put("data", base64Of(pcm16, len))
                     put("mimeType", "audio/pcm;rate=16000")
                 }
             }
@@ -823,6 +961,14 @@ private class GeminiRealtimeSession(
             ws?.let { sendAudioEnd(it) }
         }
     }
+
+    override fun pendingUploadBytes(): Long = audioGate.pendingBytes() + (ws?.queueSize() ?: 0L)
+
+    override val endsWithAnswer: Boolean get() = true
+
+    // Its marker ends a turn of speech, not the stream: a dictation that ends in a pause has no turn left
+    // to end, and after a 3.5 s pause before the stop nothing came at all (both runs, 2026-11-02).
+    override val answersAfterPause: Boolean get() = false
 
     override fun cancel() {
         audioGate.close()
@@ -927,6 +1073,9 @@ private class MistralRealtimeSession(
         runCatching { socket.send("""{"type":"transcription_session.close"}""") }
     }
 
+    // The protocol here is reconstructed, so its `Done` is not trusted as an answer.
+    override fun pendingUploadBytes(): Long = ws?.queueSize() ?: 0L
+
     override fun cancel() {
         done = true
         runCatching { ws?.close(1000, null) }
@@ -964,12 +1113,15 @@ private class MistralRealtimeSession(
  * Text that is still unsettled when the socket closes is emitted as a final segment, so the tail of a
  * dictation survives a close that arrives before the last `is_final`/`EndOfTurn`.
  */
-private class DeepgramRealtimeSession(
+internal class DeepgramRealtimeSession(
     private val client: OkHttpClient,
     private val apiKey: String,
     private val model: String,
     private val language: String?,
     private val callbacks: RealtimeCallbacks,
+    private val vocabulary: List<String> = emptyList(),
+    /** Scheme and host — Deepgram's own, except in tests. */
+    private val host: String = HOST,
 ) : RealtimeSession {
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
@@ -991,8 +1143,9 @@ private class DeepgramRealtimeSession(
 
     private fun listenUrl(): String {
         val lang = pinnedLanguage?.let { "&language=$it" }.orEmpty()
-        return "wss://api.deepgram.com/v1/listen?model=$model" +
-            "&encoding=linear16&sample_rate=16000&channels=1&interim_results=true&punctuate=true$lang"
+        return "$host/v1/listen?model=$model" +
+            "&encoding=linear16&sample_rate=16000&channels=1&interim_results=true&punctuate=true$lang" +
+            OpenAiCompatibleClient.deepgramVocabularyQuery(model, vocabulary)
     }
 
     /**
@@ -1005,8 +1158,11 @@ private class DeepgramRealtimeSession(
             ?.takeIf { model.endsWith("multi") }
             ?.let { "&language_hint=${it.substringBefore('-')}" }
             .orEmpty()
-        return "wss://api.deepgram.com/v2/listen?model=$model&encoding=linear16&sample_rate=16000$hint"
+        return "$host/v2/listen?model=$model&encoding=linear16&sample_rate=16000$hint" +
+            OpenAiCompatibleClient.deepgramVocabularyQuery(model, vocabulary)
     }
+
+    private companion object { const val HOST = "wss://api.deepgram.com" }
 
     private val listener = object : WebSocketListener() {
         override fun onMessage(webSocket: WebSocket, text: String) {
@@ -1029,6 +1185,21 @@ private class DeepgramRealtimeSession(
             android.util.Log.w("DictateRT", "deepgram realtime WS failed (http=${response?.code}): ${t.message}")
             emitError(t)
         }
+
+        // The close *is* Deepgram's end of stream: it answers CloseStream with the last Results, a Metadata
+        // message and its own close frame, 0.18 s after the stop (measured 2026-11-02). OkHttp reports a
+        // close the server starts as onClosing and waits for ours before onClosed, so taken only there the
+        // end went unnoticed and every dictation sat out the 1.2 s silence window instead (#447).
+        // Nova closes with 1000, Flux with an empty close frame, which OkHttp reads as 1005 (both measured,
+        // with and without a pause before the stop). Any other code is Deepgram failing or refusing the
+        // stream, and the recording is worth more than what it settled before that.
+        override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+            if (code == 1000 || code == 1005) {
+                finishClosed(webSocket)
+            } else {
+                emitError(RuntimeException("Deepgram closed the realtime stream ($code): $reason"))
+            }
+        }
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) = finishClosed(webSocket)
     }
 
@@ -1041,6 +1212,11 @@ private class DeepgramRealtimeSession(
         // Ask Deepgram to flush the last segment; it then emits it and closes.
         runCatching { socket.send("""{"type":"CloseStream"}""") }
     }
+
+    override fun pendingUploadBytes(): Long = ws?.queueSize() ?: 0L
+
+    // Deepgram closes the socket itself once it has transcribed everything before `CloseStream`.
+    override val endsWithAnswer: Boolean get() = true
 
     override fun cancel() {
         done = true
@@ -1099,6 +1275,7 @@ internal class XaiRealtimeSession(
     private val model: String,
     private val language: String?,
     private val callbacks: RealtimeCallbacks,
+    private val vocabulary: List<String> = emptyList(),
     /** The socket address without its query — xAI's own, except in tests. */
     private val endpoint: String = URL,
 ) : RealtimeSession {
@@ -1118,6 +1295,8 @@ internal class XaiRealtimeSession(
         append(endpoint).append("?sample_rate=16000&encoding=pcm&interim_results=true")
         if (model.isNotBlank()) append("&model=").append(URLEncoder.encode(model, "UTF-8"))
         OpenAiCompatibleClient.xaiLanguage(language)?.let { append("&language=").append(it) }
+        // The custom words (#466), repeated as on the file endpoint.
+        VocabularyField.XAI.fit(vocabulary).forEach { append("&keyterm=").append(URLEncoder.encode(it, "UTF-8")) }
     }
 
     fun connect() {
@@ -1175,6 +1354,12 @@ internal class XaiRealtimeSession(
             ws?.let { sendEnd(it) }
         }
     }
+
+    override fun pendingUploadBytes(): Long = audioGate.pendingBytes() + (ws?.queueSize() ?: 0L)
+
+    // `transcript.done` answers `audio.done`: 0.31 s after the stop, 0.11 s after a 3.5 s pause before it
+    // (grok-voice-transcribe-2.0, measured 2026-11-02).
+    override val endsWithAnswer: Boolean get() = true
 
     override fun cancel() {
         audioGate.close()
@@ -1338,3 +1523,11 @@ internal fun languageHintsOf(language: String?, expectedLanguages: List<String>)
     return (if (pinned != null) listOf(pinned) else expectedLanguages)
         .filter { it.isNotBlank() && it != "detect" }
 }
+
+/**
+ * The first [len] bytes of [pcm16] in Base64, unwrapped, as the sockets that frame audio as JSON want it.
+ * java.util's encoder, as the batch client uses (minSdk 26): android.util's only exists on a device, and
+ * the provider check streams through these sessions on the JVM.
+ */
+private fun base64Of(pcm16: ByteArray, len: Int): String =
+    Base64.getEncoder().encodeToString(if (len == pcm16.size) pcm16 else pcm16.copyOf(len))

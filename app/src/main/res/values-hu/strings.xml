@@ -145,7 +145,9 @@
     <string name="settings__search__keywords__text_expansion" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the typing-shortcut setting, which lets a short trigger expand into a saved block of text. Translate as the words people in your language would actually type when looking for that feature, separated by spaces. Do not translate word for word; add or drop terms as makes sense.">szövegkiegészítés rövidítés szövegrészlet makró automatikus szöveg sablon snippet text expansion</string>
     <string name="settings__search__keywords__selection_metrics" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which shows how many words and characters are selected. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">szavak száma karakterszám hossz statisztika</string>
     <string name="settings__search__keywords__trim_on_copy" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which removes spaces and line breaks at the ends of copied text. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">vágás szóköz eltávolítás tisztítás másolás kivágás</string>
+    <string name="settings__search__keywords__final_full_stop" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which leaves the full stop off a dictation of one sentence. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">pont írásjel központozás mondat vége pont nélkül</string>
     <string name="settings__search__keywords__clear_cache">gyorsítótár tárhely hely ideiglenes fájlok felszabadítás törlés takarítás</string>
+    <string name="settings__search__keywords__keyboard_size">magasság magas alacsony nagyobb kisebb átméretezés méret</string>
     <string name="settings__search__keywords__momentary_layer">nyomva tartás húzás szimbólum réteg írásjel ideiglenes 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">emodzsi emoji sor sáv nemrég használt billentyűzet felett gyors</string>
     <string name="settings__search__keywords__request_timeout">időkorlát időtúllépés lassú várakozás kapcsolat másodperc</string>
@@ -483,6 +485,7 @@
     <string name="pref__keyboard__font_size_multiplier__label" comment="Preference title">Betűméret szorzó</string>
     <string name="pref__keyboard__group_layout__label" comment="Preference group title">Elrendezés</string>
     <string name="pref__keyboard__landscape_input_ui_mode__label" comment="Preference value">Teljes képernyős fekvő elrendezés bemenet</string>
+    <string name="pref__keyboard__keyboard_size__label">Billentyűzet mérete</string>
     <string name="pref__keyboard__key_spacing__label" comment="Preference title">Billentyűk közötti térköz</string>
     <string name="pref__keyboard__key_spacing__summary" comment="Preference summary">{v}% függőlegesen, {h}% vízszintesen — a nagyobb térköz a billentyűket teszi kisebbé, nem a billentyűzetet.</string>
     <string name="pref__keyboard__group_keypress__label" comment="Preference group title">Gombnyomás</string>
@@ -615,6 +618,7 @@
     <string name="pref__gestures__delete_key_long_press__label" comment="Preference title">Törlés gomb hosszan nyomása</string>
     <string name="pref__gestures__swipe_velocity_threshold__label" comment="Preference title">Húzási sebesség küszöbe</string>
     <string name="pref__gestures__swipe_distance_threshold__label" comment="Preference title">Húzási távolság küszöbe</string>
+    <string name="settings__help__title">Súgó</string>
     <string name="settings__other__title" comment="Title of Other settings">Egyéb</string>
     <string name="pref__other__settings_theme__label" comment="Label of Settings theme preference in Other">Beállítások témája</string>
     <string name="pref__other__settings_theme__auto_amoled" comment="Possible value of Settings theme preference in Other">Rendszer alapértelmezett (AMOLED)</string>
@@ -665,12 +669,8 @@
     <string name="setup__select_ime__title">{app_name} kiválasztása</string>
     <string name="setup__select_ime__description">A {app_name} most már engedélyezve van a rendszerben. Hogy aktívan használja, váltson erre a bevitelválasztó párbeszédablakban: {app_name}.</string>
     <string name="setup__select_ime__switch_keyboard_btn">Billentyűzet váltása</string>
-    <string name="setup__grant_notification_permission__title">Összeomlási jelentések értesítéseinek engedélyezése</string>
-    <string name="setup__grant_notification_permission__description">Az Android 13+ rendszertől kezdve az alkalmazásoknak engedélyt kell kérniük az
-        értesítések küldéséhez. A Dictateban ez csak arra szolgál, hogy
-        összeomlás esetén megnyíjon az összeomlási jelentés képernyője. Ez az
-        engedély bármikor megváltoztatható a rendszerbeállításokban.
-    </string>
+    <string name="setup__grant_notification_permission__title">Értesítések engedélyezése</string>
+    <string name="setup__grant_notification_permission__description">Az Android 13-tól az alkalmazásoknak engedélyt kell kérniük, mielőtt értesítést jelenítenek meg. A Dictate Keyboard akkor jelenít meg egyet, amikor a lebegő gomb rögzít, amikor egy beszédmodell letöltődik, és amikor az órája a telefonon keresztül diktál, összeomláskor pedig hibajelentést nyit meg. Ezt bármikor módosíthatja a rendszerbeállításokban.</string>
     <string name="setup__grant_notification_permission__btn">Engedély megadása</string>
     <string name="setup__finish_up__title">Befejezés</string>
     <string name="setup__finish_up__description_p1">A {app_name} most már engedélyezve van a rendszerben, és csak arra vár, hogy személyre szabja.</string>
@@ -696,6 +696,17 @@
     <string name="backup_and_restore__back_up__credentials_warning">Ez az archívum tisztán olvasható formában tartalmazza az API-kulcsaidat és jelszavaidat, valamint a Dictate Cloud egyenlegedet — aki megkapja, a te költségedre diktálhat. Ne add tovább, és ha már megtetted, változtasd meg a kulcsot a szolgáltatónál. Minden más, ami alább be van jelölve, vele együtt utazik, beleértve az átírási előzményeket és a vágólapot.</string>
     <string name="backup_and_restore__back_up__credentials_excluded_note">Ez az archívum nem tartalmaz API-kulcsot, jelszót és Dictate Cloud egyenleget, így továbbadható, de a tiédet sem állítja vissza. Minden más, ami alább be van jelölve, továbbra is benne van, az átírási előzmények és a vágólap is.</string>
     <string name="backup_and_restore__back_up__personal_content_note">Ez az archívum nem tartalmaz API-kulcsot és jelszót, de tartalmaz mindent, ami alább be van jelölve: az átírási előzményeket a megtartott felvételekkel, a vágólapot, a promptjaidat és azokat a szavakat, amelyeket a billentyűzet tőled tanult.</string>
+    <string name="backup_and_restore__back_up__encrypted_note">Ez az archívum a jelszavaddal van titkosítva, és mindent, ami alább be van jelölve, csak vele lehet visszaállítani. Ha elfelejted a jelszót, senki sem tudja visszaállítani ezt a biztonsági mentést – még te sem.</string>
+    <string name="backup_and_restore__back_up__password">Jelszavas védelem</string>
+    <string name="backup_and_restore__back_up__password_enabled">Titkosítás jelszóval</string>
+    <string name="backup_and_restore__back_up__password_too_short">Legalább {count} karakter</string>
+    <string name="backup_and_restore__back_up__password_mismatch">A jelszavak nem egyeznek</string>
+    <string name="backup_and_restore__password">Jelszó</string>
+    <string name="backup_and_restore__password_repeat">Jelszó megismétlése</string>
+    <string name="backup_and_restore__restore__encrypted">Ez a biztonsági mentés jelszóval védett. Add meg a jelszót, hogy lásd, mit tartalmaz.</string>
+    <string name="backup_and_restore__restore__unlock">Feloldás</string>
+    <string name="backup_and_restore__restore__wrong_password">Hibás jelszó</string>
+    <string name="backup_and_restore__restore__encrypted_unreadable">Ez az archívum nem nyitható meg. Sérült, vagy a Dictate egy újabb verziójával készült.</string>
     <string name="backup_and_restore__back_up__files_ime_keyboard">Billentyűzetkiterjesztések</string>
     <string name="backup_and_restore__back_up__files_ime_spelling">Helyesírási kiterjesztések / szótárak</string>
     <string name="backup_and_restore__back_up__files_ime_theme">Témakiterjesztések</string>
@@ -919,7 +930,7 @@
     <string name="ext__addon_management_box__managing_placeholder">{extensions} kezelése</string>
     <string name="ext__addon_management_box__addon_manager_info">A kiterjesztések importálásával, exportálásával, létrehozásával, testreszabásával és eltávolításával kapcsolatos összes feladat a központi kiterjesztéskezelőn keresztül kezelhető.</string>
     <string name="ext__addon_management_box__go_to_page">Ugrás erre: {ext_home_title}</string>
-    <string name="ext__home__info">Letöltheti és telepítheti a kiterjesztéseket a Dictate kiegészítőboltból, vagy importálhat bármely, az internetről letöltött kiterjesztés fájlt.</string>
+    <string name="ext__home__info">A kiterjesztések témákat, billentyűzetkiosztásokat és nyelvi csomagokat adnak hozzá. Egy kiterjesztésfájl importálásával vehet fel újat; a meglévők alább láthatók.</string>
     <string name="ext__home__visit_store">Kiegészítőbolt meglátogatása</string>
     <string name="ext__home__manage_extensions">Telepített kiterjesztések kezelése</string>
     <string name="ext__list__view_details">Részletek megtekintése</string>
@@ -1310,8 +1321,6 @@
     <string name="dictate__remember_last_dictation_summary">Megőrzi az utolsó diktálást, hogy a lebegő gomb visszavonhassa, a klasszikus elrendezés pedig újra beszúrhassa.</string>
     <string name="dictate__remember_last_dictation_title">Utolsó diktálás megjegyzése</string>
     <string name="changelog__v4_2_0">• ÚJ: lebegő diktálógomb — diktáljon közvetlenül bármelyik appba, akkor is, ha másik billentyűzet aktív. Válasszon a három stílus közül (Pirula, Gyűrű, Gömb), nézze az élő hullámformát beszéd közben, húzza bárhová a szélhez illesztéssel, állítsa be a színét és méretét, és tartsa lenyomva az átfogalmazáshoz. Kapcsolja be a Beállítások ▸ Dictate ▸ Lebegő gomb alatt.\n• ÚJ: Google Gemini — használd saját AI Studio API-kulcsodat átíráshoz és újrafogalmazáshoz.\n• A parancsok mostantól alapértelmezetten egy állandó sorban jelennek meg a billentyűk fölött.\n• Megbízhatóbb szövegbeszúrás az appokban, beleértve a böngészőket és más billentyűzeteket.</string>
-    <string name="dictate__promo_floating_button_message">Új: diktálj bárhol</string>
-    <string name="dictate__promo_floating_button_action">Kipróbálom</string>
     <string name="setup__floating_button__btn">Lebegő gomb beállítása</string>
     <string name="setup__nav_back">Vissza</string>
     <string name="setup__nav_next">Tovább</string>
@@ -1420,6 +1429,7 @@
     <string name="dictate__providers_region_eu">Európai Unió</string>
     <string name="dictate__providers_region_jp">Japán</string>
     <string name="dictate__providers_region_in">India</string>
+    <string name="dictate__providers_region_cn">Kína (szárazföldi)</string>
     <string name="dictate__providers_region_global">Világszerte</string>
     <string name="dictate__providers_custom_title">Egyéni szerver</string>
     <string name="dictate__providers_get_key">API-kulcs beszerzése</string>
@@ -1429,9 +1439,15 @@
     <string name="dictate__providers_test">Kapcsolat tesztelése</string>
     <string name="dictate__providers_test_transcribe">Átírás tesztelése</string>
     <string name="dictate__providers_check_no_key">Először add meg az API-kulcsodat.</string>
-    <string name="dictate__providers_check_credentials_ok">Hitelesítő adatok ellenőrizve · {count} modell</string>
+    <plurals name="dictate__providers_check_credentials_ok">
+        <item quantity="one">Hitelesítő adatok ellenőrizve · {count} modell</item>
+        <item quantity="other">Hitelesítő adatok ellenőrizve · {count} modell</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_ok_nocount">Hitelesítő adatok ellenőrizve</string>
-    <string name="dictate__providers_check_endpoint_ok">Kiszolgáló elérve · {count} modell</string>
+    <plurals name="dictate__providers_check_endpoint_ok">
+        <item quantity="one">Kiszolgáló elérve · {count} modell</item>
+        <item quantity="other">Kiszolgáló elérve · {count} modell</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_untested">Az átírás nincs tesztelve.</string>
     <string name="dictate__providers_check_transcription_ok">Átírás ellenőrizve</string>
     <string name="dictate__providers_check_transcription_text">Ez jött vissza: „{text}”</string>
@@ -1439,6 +1455,8 @@
     <string name="dictate__providers_check_failed_connection">A kapcsolat tesztje sikertelen</string>
     <string name="dictate__providers_check_failed_transcription">Az átírás tesztje sikertelen</string>
     <string name="dictate__providers_check_err_auth">A kulcsot elutasították. Ellenőrizd a kulcsot, és hogy a cím ugyanahhoz a fiókhoz tartozik-e.</string>
+    <string name="dictate__providers_check_err_model">A kulcs működik, de ezt a modellt nem használhatja. Válasszon másik modellt, vagy engedélyezze ezt a szolgáltató projektbeállításaiban.</string>
+    <string name="dictate__error_model_unavailable">A modell nem érhető el ehhez a kulcshoz</string>
     <string name="dictate__providers_check_err_quota">A kulcs működik, de a fiók kerete elfogyott, vagy túllépted a korlátot. Nézd meg a csomagodat a szolgáltatónál.</string>
     <string name="dictate__providers_check_err_network">A kiszolgáló nem érhető el. Ellenőrizd a címet és az internetkapcsolatot.</string>
     <string name="dictate__providers_check_err_timeout">Nem érkezett válasz időben. A szolgáltató lehet, hogy leterhelt – próbáld újra.</string>
@@ -1469,7 +1487,10 @@
     <string name="dictate__model_picker_title">Válasszon modellt</string>
     <string name="dictate__model_picker_search">Keressen vagy írjon be egy modellazonosítót</string>
     <string name="dictate__model_picker_loading">Modellek betöltése…</string>
-    <string name="dictate__model_picker_count">{count} modell</string>
+    <plurals name="dictate__model_picker_count">
+        <item quantity="one">{count} modell</item>
+        <item quantity="other">{count} modell</item>
+    </plurals>
     <string name="dictate__model_picker_refresh">Frissítés</string>
     <string name="dictate__model_picker_use_custom">„{model}” használata</string>
     <string name="dictate__recording_group">Felvétel</string>
@@ -1505,6 +1526,8 @@
     <string name="dictate__paragraph_split_title">Bekezdésekre bontás</string>
     <string name="dictate__paragraph_split_off">Ki</string>
     <string name="dictate__paragraph_split_value">{n} szó után</string>
+    <string name="dictate__drop_final_full_stop_title">Záró pont elhagyása</string>
+    <string name="dictate__drop_final_full_stop_summary">Csak ha a diktálás egyetlen mondat; több mondat minden írásjelét megtartja</string>
     <string name="dictate__realtime_title">Valós idejű átírás</string>
     <string name="dictate__realtime_summary">Már beszéd közben átírja a szöveget, nem csak a leállítás után, az ezt támogató szolgáltatóknál</string>
     <string name="dictate__realtime_mode_off">Ki</string>
@@ -1638,7 +1661,9 @@
     <string name="dictate__prompt_auto_apply_title">Automatikus alkalmazás</string>
     <string name="dictate__prompt_auto_apply_summary">Az utasítás automatikus futtatása minden átíráson</string>
     <string name="dictate__prompt_reasoning_title">Gondolkodás</string>
-    <string name="dictate__prompt_reasoning_default">Alapértelmezett</string>
+    <string name="dictate__prompt_reasoning_default">Szolgáltatói beállítás</string>
+    <string name="dictate__prompt_reasoning_little">Kevés gondolkodás</string>
+    <string name="dictate__prompt_reasoning_much">Sok gondolkodás</string>
     <string name="dictate__prompt_badge_selection">Kijelölést igényel</string>
     <string name="dictate__prompt_badge_auto">Automatikusan alkalmazódik</string>
     <string name="dictate__example_prompt_fix_grammar_name">Nyelvtan javítása</string>
@@ -1920,7 +1945,8 @@
     <string name="dictate__promo_milestone_count">%s diktálás a Dictate-tel! 🎉</string>
     <string name="dictate__promo_milestone_action">Statisztika</string>
     <string name="dictate__reasoning_effort_title">Gondolkodási ráfordítás</string>
-    <string name="dictate__reasoning_effort_off">Ki</string>
+    <string name="dictate__reasoning_effort_off">Szolgáltató alapértelmezett</string>
+    <string name="dictate__reasoning_effort_none">Nincs gondolkodás</string>
     <string name="dictate__reasoning_effort_off_summary">Szolgáltatói alapérték — nem gondolkodó modelleknél hagyd kikapcsolva</string>
     <string name="dictate__reasoning_effort_minimal">Minimális</string>
     <string name="dictate__reasoning_effort_minimal_summary">Leggyorsabb, legkevesebb gondolkodás</string>
@@ -1929,6 +1955,9 @@
     <string name="dictate__reasoning_effort_medium">Közepes</string>
     <string name="dictate__reasoning_effort_medium_summary">Kiegyensúlyozott gondolkodás és sebesség</string>
     <string name="dictate__reasoning_effort_high">Magas</string>
+    <string name="dictate__reasoning_effort_xhigh">Nagyon magas</string>
+    <string name="dictate__reasoning_effort_max">Maximális</string>
+    <string name="dictate__reasoning_effort_app_default">{name} (alapértelmezett)</string>
     <string name="dictate__reasoning_effort_high_summary">Legtöbb gondolkodás, lassabb</string>
     <string name="dictate__reasoning_effort_custom">Egyéni</string>
     <string name="dictate__action_save_audio">Hang mentése</string>
@@ -2310,6 +2339,10 @@
     <string name="gif__error">Nem sikerült betölteni a GIF-eket. Ellenőrizd a kapcsolatot és az API-kulcsot.</string>
     <string name="gif__setup_needed">Adj hozzá egy ingyenes KLIPY API-kulcsot a Beállításokban a GIF-ek kereséséhez</string>
     <string name="gif__setup_needed_action">GIF-keresés beállítása</string>
+    <string name="gif__search_off">A GIF-keresés ki van kapcsolva</string>
+    <string name="quick_action__forward_delete__tooltip">A kurzor utáni karakter törlése</string>
+    <string name="dictate__error_no_rewording_model">Válasszon átfogalmazási modellt ehhez: %1$s</string>
+    <string name="dictate__model_placeholder_required">kötelező: válasszon vagy írjon be egy modellt</string>
     <string name="gif__copied_to_clipboard">GIF a vágólapra másolva — a beillesztéshez tartsd lenyomva</string>
     <string name="gif__insert_failed">Nem sikerült beszúrni a GIF-et</string>
     <string name="quick_action__ime_ui_mode_gif">GIF</string>
@@ -2406,6 +2439,25 @@
     <string name="dictate__action_top_up">Egyenleg feltöltése</string>
     <string name="dictate__promo_low_credit_message">Az egyenleg fogytán.</string>
     <string name="dictate__promo_low_credit_action">Feltöltés</string>
+    <string name="dictate__promo_sayova_message">Új app: MI az órádon</string>
+    <string name="dictate__promo_sayova_action">Megnézem</string>
+    <string name="about__more_apps__title">További appok</string>
+    <string name="about__more_apps__summary">SayOVA és TunerToGo az órádra</string>
+    <string name="about__more_apps__tunertogo_tagline">Hangszerhangoló Wear OS-re</string>
+    <string name="about__more_apps__tunertogo_description">Pontos hangoló mindig a csuklódon, készen áll, amint kézbe veszed a hangszert.</string>
+    <string name="about__more_apps__tunertogo_feature_instruments">Gitár, basszusgitár, ukulele, hegedű és más, automatikus húrfelismeréssel</string>
+    <string name="about__more_apps__tunertogo_feature_chromatic">Kromatikus mód minden más hangszerhez és a hangodhoz</string>
+    <string name="about__more_apps__tunertogo_feature_vibration">Rövid rezgés, ha a húr be van hangolva, így a szemed a hangolókulcsokon maradhat</string>
+    <string name="about__more_apps__tunertogo_feature_privacy">Nincs internet-hozzáférés, nincs reklám: a hangot az óra elemzi, és sosem menti</string>
+    <string name="about__more_apps__tunertogo_requirements">Wear OS 3 vagy újabb rendszerű, mikrofonos óra szükséges. Telefonos app nélkül is működik.</string>
+    <string name="about__more_apps__intro">Szintén DevEmperortól, a Dictate fejlesztőjétől:</string>
+    <string name="about__more_apps__sayova_tagline">MI-alapú hangasszisztens Wear OS-re</string>
+    <string name="about__more_apps__sayova_description">Beszélj a Google Geminivel vagy az OpenAI-jal közvetlenül az órádról: természetesen, bármikor közbeszólhatsz, és olvashatod a választ, miközben hallod.</string>
+    <string name="about__more_apps__sayova_feature_interpreter">Tolmács 21 nyelv között, mindkét fél szövegként</string>
+    <string name="about__more_apps__sayova_feature_tasks">Időzítőt és ébresztőt állít, jegyzetet ment és keres a weben</string>
+    <string name="about__more_apps__sayova_feature_phone">Üzeneteket, időpontokat és útvonalakat készít elő a telefonodon, küldésre készen</string>
+    <string name="about__more_apps__sayova_feature_privacy">Saját API-kulcs: nincs fiók, nincs követés, nyílt forráskód</string>
+    <string name="about__more_apps__sayova_requirements">Wear OS 3 vagy újabb rendszerű, mikrofonos óra és Google Gemini- vagy OpenAI API-kulcs szükséges. A használatot a szolgáltatód számlázza.</string>
     <string name="prefs__media__sticker__title">Matricák</string>
     <string name="prefs__media__sticker_folder__title">Matricamappa</string>
     <string name="prefs__media__sticker_folder__summary_unset">Válassz egy mappát a saját képeiddel</string>

@@ -138,7 +138,9 @@
     <string name="settings__search__keywords__text_expansion" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the typing-shortcut setting, which lets a short trigger expand into a saved block of text. Translate as the words people in your language would actually type when looking for that feature, separated by spaces. Do not translate word for word; add or drop terms as makes sense.">espansione testo abbreviazione scorciatoia frammento macro testo automatico modello snippet text expansion</string>
     <string name="settings__search__keywords__selection_metrics" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which shows how many words and characters are selected. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">conta parole numero di parole caratteri lunghezza statistiche</string>
     <string name="settings__search__keywords__trim_on_copy" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which removes spaces and line breaks at the ends of copied text. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">rifilare spazi rimuovere pulire copiare tagliare</string>
+    <string name="settings__search__keywords__final_full_stop" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which leaves the full stop off a dictation of one sentence. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">punto punteggiatura fine frase senza punto</string>
     <string name="settings__search__keywords__clear_cache">cache archiviazione spazio file temporanei liberare eliminare pulire</string>
+    <string name="settings__search__keywords__keyboard_size">altezza alta bassa più grande più piccola ridimensionare</string>
     <string name="settings__search__keywords__momentary_layer">tenere premuto scorrere simbolo livello punteggiatura temporaneo momentaneo 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">emoji riga barra recenti usate sopra tastiera rapido</string>
     <string name="settings__search__keywords__request_timeout">timeout tempo scaduto lento attesa connessione secondi</string>
@@ -384,6 +386,7 @@
     <string name="pref__keyboard__font_size_multiplier__label" comment="Preference title">Moltiplicatore dimensione carattere</string>
     <string name="pref__keyboard__group_layout__label" comment="Preference group title">Layout</string>
     <string name="pref__keyboard__landscape_input_ui_mode__label" comment="Preference value">Inserimento a schermo intero orizzontale</string>
+    <string name="pref__keyboard__keyboard_size__label">Dimensione della tastiera</string>
     <string name="pref__keyboard__key_spacing__label" comment="Preference title">Spazio tra i tasti</string>
     <string name="pref__keyboard__key_spacing__summary" comment="Preference summary">{v}% verticale, {h}% orizzontale — uno spazio più ampio rimpicciolisce i tasti, non la tastiera.</string>
     <string name="pref__keyboard__group_keypress__label" comment="Preference group title">Pressione tasti</string>
@@ -516,6 +519,7 @@
     <string name="pref__gestures__delete_key_long_press__label" comment="Preference title">Pressione prolungata del tasto Elimina</string>
     <string name="pref__gestures__swipe_velocity_threshold__label" comment="Preference title">Soglia di velocità dello swipe</string>
     <string name="pref__gestures__swipe_distance_threshold__label" comment="Preference title">Soglia di distanza dello swipe</string>
+    <string name="settings__help__title">Guida</string>
     <string name="settings__other__title" comment="Title of Other settings">Altro</string>
     <string name="pref__other__settings_theme__label" comment="Label of Settings theme preference in Other">Impostazioni tema</string>
     <string name="pref__other__settings_theme__auto_amoled" comment="Possible value of Settings theme preference in Other">Predefinito di sistema (AMOLED)</string>
@@ -580,6 +584,17 @@
     <string name="backup_and_restore__back_up__credentials_warning">Questo archivio contiene le tue chiavi API e le tue password in chiaro, insieme al tuo credito Dictate Cloud: chi lo riceve può dettare a tue spese. Non condividerlo e, se lo hai già fatto, cambia la chiave presso il tuo fornitore. Tutto ciò che è selezionato qui sotto viaggia con lui, compresa la cronologia delle trascrizioni e gli appunti.</string>
     <string name="backup_and_restore__back_up__credentials_excluded_note">Questo archivio non contiene chiavi API, password né credito Dictate Cloud, quindi puoi condividerlo, ma non ripristinerà nemmeno i tuoi. Tutto ciò che è selezionato qui sotto è comunque incluso, compresa la cronologia delle trascrizioni e gli appunti.</string>
     <string name="backup_and_restore__back_up__personal_content_note">Questo archivio non contiene chiavi API né password, ma contiene tutto ciò che è selezionato qui sotto: la cronologia delle trascrizioni con le registrazioni conservate, gli appunti, i tuoi prompt e le parole che la tastiera ha imparato da te.</string>
+    <string name="backup_and_restore__back_up__encrypted_note">Questo archivio è cifrato con la tua password, e tutto ciò che è selezionato qui sotto può essere ripristinato solo con essa. Se dimentichi la password, nessuno potrà ripristinare questo backup, nemmeno tu.</string>
+    <string name="backup_and_restore__back_up__password">Protezione con password</string>
+    <string name="backup_and_restore__back_up__password_enabled">Cifra con una password</string>
+    <string name="backup_and_restore__back_up__password_too_short">Almeno {count} caratteri</string>
+    <string name="backup_and_restore__back_up__password_mismatch">Le password non coincidono</string>
+    <string name="backup_and_restore__password">Password</string>
+    <string name="backup_and_restore__password_repeat">Ripeti la password</string>
+    <string name="backup_and_restore__restore__encrypted">Questo archivio di backup è protetto da una password. Inseriscila per vedere cosa contiene.</string>
+    <string name="backup_and_restore__restore__unlock">Sblocca</string>
+    <string name="backup_and_restore__restore__wrong_password">Password errata</string>
+    <string name="backup_and_restore__restore__encrypted_unreadable">Impossibile aprire questo archivio. È danneggiato oppure è stato creato con una versione più recente di Dictate.</string>
     <string name="backup_and_restore__back_up__files_ime_keyboard">Estensioni della tastiera</string>
     <string name="backup_and_restore__back_up__files_ime_spelling">Estensioni ortografiche / dizionari</string>
     <string name="backup_and_restore__back_up__files_ime_theme">Estensioni del tema</string>
@@ -752,7 +767,7 @@
     <string name="ext__validation__enter_component_id">Inserisci l\'ID corretto</string>
     <string name="ext__validation__hint_value_above_50_percent">Qualsiasi valore superiore al 50% si comporterà come se impostassi il 50%, prendi in considerazione di ridurre la dimensione percentuale</string>
     <string name="ext__addon_management_box__addon_manager_info">Tutte le attività relative all\'importazione, all\'esportazione, alla creazione, alla personalizzazione e alla rimozione delle estensioni possono essere gestite tramite il gestore interno</string>
-    <string name="ext__home__info">Puoi scaricare e installare estensioni dallo Store di Dictate o importare qualsiasi addon</string>
+    <string name="ext__home__info">Le estensioni aggiungono temi, layout di tastiera e pacchetti lingua. Importa un file di estensione per aggiungerne una; quelle che hai sono elencate qui sotto.</string>
     <string name="ext__home__visit_store">Vai allo Store degli addons</string>
     <string name="ext__home__manage_extensions">Gestisci temi installati</string>
     <string name="ext__list__view_details">Visualizza dettagli</string>
@@ -1094,8 +1109,6 @@
     <string name="dictate__remember_last_dictation_summary">Conserva l’ultima dettatura così il pulsante flottante può annullarla e il layout classico può reinserirla.</string>
     <string name="dictate__remember_last_dictation_title">Ricorda ultima dettatura</string>
     <string name="changelog__v4_2_0">• NOVITÀ: pulsante di dettatura flottante — detta direttamente in qualsiasi app, anche con un’altra tastiera attiva. Scegli tra tre stili (Pillola, Anello, Sfera), guarda una forma d’onda in tempo reale mentre parli, trascinalo ovunque con l’aggancio ai bordi, imposta colore e dimensione e tieni premuto per riformulare. Attivalo in Impostazioni ▸ Dictate ▸ Pulsante flottante.\n• NOVITÀ: Google Gemini — usa la tua chiave API di AI Studio per trascrizione e riformulazione.\n• I prompt ora appaiono per impostazione predefinita in una riga sempre visibile sopra i tasti.\n• Inserimento del testo più affidabile tra le app, inclusi browser e altre tastiere.</string>
-    <string name="dictate__promo_floating_button_message">Novità: detta ovunque</string>
-    <string name="dictate__promo_floating_button_action">Prova</string>
     <string name="setup__floating_button__btn">Configura il pulsante flottante</string>
     <string name="setup__nav_back">Indietro</string>
     <string name="setup__nav_next">Avanti</string>
@@ -1204,6 +1217,7 @@
     <string name="dictate__providers_region_eu">Unione Europea</string>
     <string name="dictate__providers_region_jp">Giappone</string>
     <string name="dictate__providers_region_in">India</string>
+    <string name="dictate__providers_region_cn">Cina (continentale)</string>
     <string name="dictate__providers_region_global">Tutto il mondo</string>
     <string name="dictate__providers_custom_title">Server personalizzato</string>
     <string name="dictate__providers_get_key">Ottieni una chiave API</string>
@@ -1213,9 +1227,15 @@
     <string name="dictate__providers_test">Prova connessione</string>
     <string name="dictate__providers_test_transcribe">Prova la trascrizione</string>
     <string name="dictate__providers_check_no_key">Inserisci prima la tua chiave API.</string>
-    <string name="dictate__providers_check_credentials_ok">Credenziali verificate · {count} modelli</string>
+    <plurals name="dictate__providers_check_credentials_ok">
+        <item quantity="one">Credenziali verificate · {count} modello</item>
+        <item quantity="other">Credenziali verificate · {count} modelli</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_ok_nocount">Credenziali verificate</string>
-    <string name="dictate__providers_check_endpoint_ok">Server raggiunto · {count} modelli</string>
+    <plurals name="dictate__providers_check_endpoint_ok">
+        <item quantity="one">Server raggiunto · {count} modello</item>
+        <item quantity="other">Server raggiunto · {count} modelli</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_untested">Trascrizione non testata.</string>
     <string name="dictate__providers_check_transcription_ok">Trascrizione verificata</string>
     <string name="dictate__providers_check_transcription_text">È tornato come: «{text}»</string>
@@ -1223,6 +1243,8 @@
     <string name="dictate__providers_check_failed_connection">Prova di connessione fallita</string>
     <string name="dictate__providers_check_failed_transcription">Prova di trascrizione fallita</string>
     <string name="dictate__providers_check_err_auth">La chiave è stata rifiutata. Controllala e verifica che l’indirizzo appartenga allo stesso account.</string>
+    <string name="dictate__providers_check_err_model">La chiave funziona, ma non può usare questo modello. Scegli un altro modello o abilita questo nelle impostazioni del progetto presso il fornitore.</string>
+    <string name="dictate__error_model_unavailable">Modello non disponibile per questa chiave</string>
     <string name="dictate__providers_check_err_quota">La chiave funziona, ma l’account ha esaurito la quota o ha superato un limite. Controlla il tuo piano presso il provider.</string>
     <string name="dictate__providers_check_err_network">Impossibile raggiungere il server. Controlla l’indirizzo e la connessione a internet.</string>
     <string name="dictate__providers_check_err_timeout">Nessuna risposta in tempo. Il provider potrebbe essere occupato: riprova.</string>
@@ -1253,7 +1275,10 @@
     <string name="dictate__model_picker_title">Scegli un modello</string>
     <string name="dictate__model_picker_search">Cerca o digita un id di modello</string>
     <string name="dictate__model_picker_loading">Caricamento dei modelli…</string>
-    <string name="dictate__model_picker_count">{count} modelli</string>
+    <plurals name="dictate__model_picker_count">
+        <item quantity="one">{count} modello</item>
+        <item quantity="other">{count} modelli</item>
+    </plurals>
     <string name="dictate__model_picker_refresh">Aggiorna</string>
     <string name="dictate__model_picker_use_custom">Usa «{model}»</string>
     <string name="dictate__recording_group">Registrazione</string>
@@ -1289,6 +1314,8 @@
     <string name="dictate__paragraph_split_title">Dividi in paragrafi</string>
     <string name="dictate__paragraph_split_off">Disattivato</string>
     <string name="dictate__paragraph_split_value">Dopo {n} parole</string>
+    <string name="dictate__drop_final_full_stop_title">Ometti il punto finale</string>
+    <string name="dictate__drop_final_full_stop_summary">Solo quando una dettatura è una sola frase; più frasi mantengono tutti i segni</string>
     <string name="dictate__realtime_title">Trascrizione in tempo reale</string>
     <string name="dictate__realtime_summary">Trascrive mentre parli invece che dopo l\'arresto, per i provider che lo supportano</string>
     <string name="dictate__realtime_mode_off">Disattivato</string>
@@ -1422,7 +1449,9 @@
     <string name="dictate__prompt_auto_apply_title">Applica automaticamente</string>
     <string name="dictate__prompt_auto_apply_summary">Esegui questo prompt automaticamente su ogni trascrizione</string>
     <string name="dictate__prompt_reasoning_title">Ragionamento</string>
-    <string name="dictate__prompt_reasoning_default">Predefinito</string>
+    <string name="dictate__prompt_reasoning_default">Impostazione del fornitore</string>
+    <string name="dictate__prompt_reasoning_little">Poco ragionamento</string>
+    <string name="dictate__prompt_reasoning_much">Molto ragionamento</string>
     <string name="dictate__prompt_badge_selection">Richiede una selezione</string>
     <string name="dictate__prompt_badge_auto">Si applica automaticamente</string>
     <string name="dictate__example_prompt_fix_grammar_name">Correggi grammatica</string>
@@ -1704,7 +1733,8 @@
     <string name="dictate__promo_milestone_count">%s dettature con Dictate! 🎉</string>
     <string name="dictate__promo_milestone_action">Statistiche</string>
     <string name="dictate__reasoning_effort_title">Sforzo di ragionamento</string>
-    <string name="dictate__reasoning_effort_off">Disattivato</string>
+    <string name="dictate__reasoning_effort_off">Predefinito del fornitore</string>
+    <string name="dictate__reasoning_effort_none">Nessun ragionamento</string>
     <string name="dictate__reasoning_effort_off_summary">Predefinito del provider — lascia disattivato per i modelli non di ragionamento</string>
     <string name="dictate__reasoning_effort_minimal">Minimo</string>
     <string name="dictate__reasoning_effort_minimal_summary">Il più veloce, minimo ragionamento</string>
@@ -1713,6 +1743,9 @@
     <string name="dictate__reasoning_effort_medium">Medio</string>
     <string name="dictate__reasoning_effort_medium_summary">Bilanciato tra ragionamento e velocità</string>
     <string name="dictate__reasoning_effort_high">Alto</string>
+    <string name="dictate__reasoning_effort_xhigh">Molto alto</string>
+    <string name="dictate__reasoning_effort_max">Massimo</string>
+    <string name="dictate__reasoning_effort_app_default">{name} (predefinito)</string>
     <string name="dictate__reasoning_effort_high_summary">Massimo ragionamento, più lento</string>
     <string name="dictate__reasoning_effort_custom">Personalizzato</string>
     <string name="dictate__action_save_audio">Salva audio</string>
@@ -2094,6 +2127,12 @@
     <string name="gif__error">Impossibile caricare le GIF. Controlla la connessione e la chiave API.</string>
     <string name="gif__setup_needed">Aggiungi una chiave API KLIPY gratuita nelle Impostazioni per cercare GIF</string>
     <string name="gif__setup_needed_action">Configura la ricerca di GIF</string>
+    <string name="gif__search_off">La ricerca di GIF è disattivata</string>
+    <string name="quick_action__forward_delete__tooltip">Elimina il carattere dopo il cursore</string>
+    <string name="dictate__error_no_rewording_model">Scegli un modello di riformulazione per %1$s</string>
+    <string name="dictate__model_placeholder_required">obbligatorio: scegli o digita un modello</string>
+    <string name="setup__grant_notification_permission__title">Consenti le notifiche</string>
+    <string name="setup__grant_notification_permission__description">Da Android 13 le app devono chiedere prima di mostrare notifiche. Dictate Keyboard ne mostra una mentre il pulsante flottante registra, mentre si scarica un modello vocale e mentre il tuo orologio detta tramite il telefono, e apre un rapporto di arresto anomalo se l’app si blocca. Puoi cambiarlo in qualsiasi momento nelle impostazioni di sistema.</string>
     <string name="gif__copied_to_clipboard">GIF copiata negli appunti — tieni premuto per incollare</string>
     <string name="gif__insert_failed">Impossibile inserire la GIF</string>
     <string name="quick_action__ime_ui_mode_gif">GIF</string>
@@ -2190,6 +2229,25 @@
     <string name="dictate__action_top_up">Ricarica il credito</string>
     <string name="dictate__promo_low_credit_message">Credito quasi esaurito.</string>
     <string name="dictate__promo_low_credit_action">Ricarica</string>
+    <string name="dictate__promo_sayova_message">Nuova app: l’IA al polso</string>
+    <string name="dictate__promo_sayova_action">Scopri</string>
+    <string name="about__more_apps__title">Altre app</string>
+    <string name="about__more_apps__summary">SayOVA e TunerToGo per il tuo orologio</string>
+    <string name="about__more_apps__tunertogo_tagline">Accordatore per Wear OS</string>
+    <string name="about__more_apps__tunertogo_description">Un accordatore preciso sempre al polso, pronto appena prendi in mano lo strumento.</string>
+    <string name="about__more_apps__tunertogo_feature_instruments">Chitarra, basso, ukulele, violino e altro, con riconoscimento automatico delle corde</string>
+    <string name="about__more_apps__tunertogo_feature_chromatic">Modalità cromatica per ogni altro strumento e per la voce</string>
+    <string name="about__more_apps__tunertogo_feature_vibration">Una breve vibrazione quando la corda è intonata, così gli occhi restano sulle meccaniche</string>
+    <string name="about__more_apps__tunertogo_feature_privacy">Nessun accesso a Internet, nessuna pubblicità: il suono viene analizzato sull’orologio e mai salvato</string>
+    <string name="about__more_apps__tunertogo_requirements">Richiede un orologio Wear OS 3 o successivo con microfono. Funziona senza app sul telefono.</string>
+    <string name="about__more_apps__intro">Sempre da DevEmperor, lo sviluppatore di Dictate:</string>
+    <string name="about__more_apps__sayova_tagline">Assistente vocale IA per Wear OS</string>
+    <string name="about__more_apps__sayova_description">Parla con Google Gemini o OpenAI dal tuo orologio: in modo naturale, interrompi quando vuoi e leggi la risposta mentre la ascolti.</string>
+    <string name="about__more_apps__sayova_feature_interpreter">Interprete tra 21 lingue, con il dialogo come testo</string>
+    <string name="about__more_apps__sayova_feature_tasks">Imposta timer e sveglie, salva note e cerca sul web</string>
+    <string name="about__more_apps__sayova_feature_phone">Prepara messaggi, appuntamenti e percorsi sul telefono, pronti da inviare</string>
+    <string name="about__more_apps__sayova_feature_privacy">La tua chiave API: nessun account, nessun tracciamento, open source</string>
+    <string name="about__more_apps__sayova_requirements">Richiede un orologio Wear OS 3 o successivo con microfono e una chiave API di Google Gemini o OpenAI. L’utilizzo viene fatturato dal tuo provider.</string>
     <string name="prefs__media__sticker__title">Adesivi</string>
     <string name="prefs__media__sticker_folder__title">Cartella degli adesivi</string>
     <string name="prefs__media__sticker_folder__summary_unset">Scegli una cartella con immagini tue</string>

@@ -14,12 +14,17 @@ import android.content.Context
 import androidx.compose.ui.graphics.toArgb
 import dev.patrickgold.florisboard.app.FlorisPreferenceModel
 import dev.patrickgold.florisboard.dictate.DictateLanguages
+import dev.patrickgold.florisboard.dictate.customWordList
 import dev.patrickgold.florisboard.dictate.data.prompts.DictatePromptDefaults
 import dev.patrickgold.florisboard.dictate.data.prompts.PromptsDatabaseHelper
+import dev.patrickgold.florisboard.dictate.promptReasoningWire
 import dev.patrickgold.florisboard.dictate.provider.ProviderAccount
 import dev.patrickgold.florisboard.dictate.provider.ProviderRegistry
 import dev.patrickgold.florisboard.dictate.provider.chatModelFor
+import dev.patrickgold.florisboard.dictate.provider.rewordingKeyFor
+import dev.patrickgold.florisboard.dictate.rewordingReasoningWire
 import dev.patrickgold.florisboard.dictate.sync.DictateSyncedSettings
+import dev.patrickgold.florisboard.dictate.transcriptionStylePrompt
 import dev.patrickgold.florisboard.dictate.sync.DictateWearProtocol
 import dev.patrickgold.florisboard.dictate.sync.SyncedPrompt
 import kotlinx.coroutines.Dispatchers
@@ -54,13 +59,20 @@ object PhoneWearSettingsResolver {
         val rewordingId = prefs.dictate.rewordingProviderId.get()
         val rewordingAccount = prefs.dictate.providerAccounts.get().getOrEmpty(rewordingId)
         val rewordingPreset = presetFor(rewordingAccount)
-        val chatModel = chatModelFor(rewordingAccount, rewordingPreset, fallback = "")
+        val chatModel = chatModelFor(rewordingAccount, rewordingPreset)
         val rewordingBaseUrl = if ((rewordingAccount.isCustom || rewordingPreset.allowsCustomBaseUrl) && rewordingAccount.customBaseUrl.isNotBlank()) rewordingAccount.customBaseUrl else rewordingPreset.baseUrl
-        val rewordingKey = rewordingAccount.apiKey.ifBlank { account.apiKey }
+        val rewordingKey = rewordingKeyFor(rewordingAccount, account)
         val autoApply = withContext(Dispatchers.IO) {
             PromptsDatabaseHelper.getInstance(context).getAll()
                 .filter { it.autoApply }
-                .mapNotNull { p -> p.prompt?.takeIf { it.isNotBlank() }?.let { SyncedPrompt(it, p.requiresSelection) } }
+                .mapNotNull { p ->
+                    p.prompt?.takeIf { it.isNotBlank() }?.let {
+                        SyncedPrompt(
+                            it, p.requiresSelection,
+                            reasoningEffort = promptReasoningWire(rewordingAccount, rewordingPreset, chatModel, p),
+                        )
+                    }
+                }
         }
 
         return DictateSyncedSettings(
@@ -73,7 +85,9 @@ object PhoneWearSettingsResolver {
             keySyncEnabled = syncKey,
             language = language,
             languageName = DictateLanguages.englishNameFor(prefs.dictate.activeInputLanguage.get()),
-            stylePrompt = stylePrompt(prefs),
+            // The phone's own, so a standalone watch dictation biases recognition exactly like the phone.
+            stylePrompt = transcriptionStylePrompt(prefs),
+            customWords = customWordList(prefs),
             // The watch is a keyboard, so mirror the *keyboard* accent (theme.accentColor, set on the
             // Theme screen) — not the separate settings-app accent (other.accentColor) — so the watch
             // matches what the user actually sees on the phone keyboard.
@@ -86,7 +100,7 @@ object PhoneWearSettingsResolver {
             // Rewording key only travels under the same opt-in as the transcription key.
             rewordingApiKey = if (syncKey) rewordingKey else "",
             rewordingApi = rewordingPreset.transcriptionApi,
-            rewordingReasoningEffort = rewordingPreset.reasoningEffortWhenOff(chatModel),
+            rewordingReasoningEffort = rewordingReasoningWire(rewordingAccount, rewordingPreset, chatModel),
             systemPrompt = systemPrompt(prefs),
             autoApplyPrompts = autoApply,
             hapticFeedback = prefs.dictate.hapticFeedback.get(),
@@ -107,20 +121,5 @@ object PhoneWearSettingsResolver {
         else -> ProviderRegistry.byId(account.providerId) ?: ProviderRegistry.OPENAI
     }
 
-    /**
-     * The style/punctuation prompt the watch should send with a standalone transcription. Mirrors
-     * `DictateController.transcriptionStylePrompt()` so the watch biases recognition exactly like the
-     * phone (predefined punctuation prompt or the user's custom one, plus the custom-words list).
-     */
-    private fun stylePrompt(prefs: FlorisPreferenceModel): String? {
-        val base = when (prefs.dictate.stylePromptSelection.get()) {
-            DictatePromptDefaults.SELECTION_PREDEFINED ->
-                DictatePromptDefaults.punctuationPromptFor(prefs.dictate.activeInputLanguage.get())
-            DictatePromptDefaults.SELECTION_CUSTOM ->
-                prefs.dictate.stylePromptCustom.get().takeIf { it.isNotBlank() }
-            else -> null
-        }
-        return DictatePromptDefaults.appendCustomWords(base, prefs.dictate.customWords.get())
-    }
 }
 

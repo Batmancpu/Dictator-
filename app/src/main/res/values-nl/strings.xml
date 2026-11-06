@@ -138,7 +138,9 @@
     <string name="settings__search__keywords__text_expansion" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the typing-shortcut setting, which lets a short trigger expand into a saved block of text. Translate as the words people in your language would actually type when looking for that feature, separated by spaces. Do not translate word for word; add or drop terms as makes sense.">tekstuitbreiding afkorting snelkoppeling fragment macro autotekst sjabloon snippet text expansion</string>
     <string name="settings__search__keywords__selection_metrics" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which shows how many words and characters are selected. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">woorden tellen aantal woorden tekens lengte statistieken</string>
     <string name="settings__search__keywords__trim_on_copy" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which removes spaces and line breaks at the ends of copied text. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">bijsnijden spaties verwijderen opschonen kopiëren knippen</string>
+    <string name="settings__search__keywords__final_full_stop" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which leaves the full stop off a dictation of one sentence. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">punt leestekens interpunctie einde zin zonder punt</string>
     <string name="settings__search__keywords__clear_cache">cache opslag ruimte tijdelijke bestanden vrijmaken verwijderen opschonen</string>
+    <string name="settings__search__keywords__keyboard_size">hoogte hoog laag groter kleiner formaat wijzigen vergroten verkleinen</string>
     <string name="settings__search__keywords__momentary_layer">vasthouden schuiven symbool laag leesteken tijdelijk kort 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">emoji rij balk recent gebruikt boven toetsenbord snel</string>
     <string name="settings__search__keywords__request_timeout">time-out verlopen traag wachten verbinding seconden</string>
@@ -406,6 +408,7 @@
     <string name="pref__keyboard__font_size_multiplier__label" comment="Preference title">Vermenigvuldigingsfactor tekengrootte</string>
     <string name="pref__keyboard__group_layout__label" comment="Preference group title">Indeling</string>
     <string name="pref__keyboard__landscape_input_ui_mode__label" comment="Preference value">Landschapsmodus volledig scherm invoer</string>
+    <string name="pref__keyboard__keyboard_size__label">Toetsenbordgrootte</string>
     <string name="pref__keyboard__key_spacing__label" comment="Preference title">Ruimte tussen toetsen</string>
     <string name="pref__keyboard__key_spacing__summary" comment="Preference summary">{v}% verticaal, {h}% horizontaal — meer ruimte maakt de toetsen kleiner, niet het toetsenbord.</string>
     <string name="pref__keyboard__group_keypress__label" comment="Preference group title">Test druk</string>
@@ -538,6 +541,7 @@
     <string name="pref__gestures__delete_key_long_press__label" comment="Preference title">Verwijdertoets lang indrukken</string>
     <string name="pref__gestures__swipe_velocity_threshold__label" comment="Preference title">Drempelwaarde voor veegsnelheid</string>
     <string name="pref__gestures__swipe_distance_threshold__label" comment="Preference title">Drempelwaarde voor veegafstand</string>
+    <string name="settings__help__title">Help</string>
     <string name="settings__other__title" comment="Title of Other settings">Overige</string>
     <string name="pref__other__settings_theme__label" comment="Label of Settings theme preference in Other">Thema-instellingen</string>
     <string name="pref__other__settings_theme__auto_amoled" comment="Possible value of Settings theme preference in Other">Systeemstandaard (AMOLED)</string>
@@ -588,9 +592,8 @@
     <string name="setup__select_ime__title">Selecteer {app_name}</string>
     <string name="setup__select_ime__description">{app_name} is nu ingeschakeld in uw systeem. Om het actief te gebruiken, schakel over naar {app_name} door het te selecteren in het invoerkeuzedialoogvenster!</string>
     <string name="setup__select_ime__switch_keyboard_btn">Van toetsenbord wisselen</string>
-    <string name="setup__grant_notification_permission__title">Meldingen van crashrapporten toestaan</string>
-    <string name="setup__grant_notification_permission__description">Vanaf Android 13+ moeten apps toestemming vragen om meldingen te verzenden. In Dictate wordt dit alleen gebruikt om bij een crash een crashrapportage te openen.
-Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.    </string>
+    <string name="setup__grant_notification_permission__title">Meldingen toestaan</string>
+    <string name="setup__grant_notification_permission__description">Vanaf Android 13 moeten apps vragen voordat ze meldingen tonen. Dictate Keyboard toont er een terwijl de zwevende knop opneemt, terwijl een spraakmodel wordt gedownload en terwijl je horloge via de telefoon dicteert, en opent een crashrapport als de app crasht. Je kunt dit altijd wijzigen in de systeeminstellingen.</string>
     <string name="setup__grant_notification_permission__btn">Toestemming verlenen</string>
     <string name="setup__finish_up__title">Afronden</string>
     <string name="setup__finish_up__description_p1">{app_name} is nu ingeschakeld in het systeem en kan door jou worden aangepast.</string>
@@ -615,6 +618,17 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="backup_and_restore__back_up__credentials_warning">Dit archief bevat je API-sleutels en wachtwoorden in leesbare tekst, plus je Dictate Cloud-krediet: wie het krijgt, kan op jouw kosten dicteren. Geef het niet door, en als je dat al hebt gedaan, wijzig dan de sleutel bij je aanbieder. Al het andere dat hieronder is aangevinkt gaat mee, ook je transcriptiegeschiedenis en je klembord.</string>
     <string name="backup_and_restore__back_up__credentials_excluded_note">Dit archief bevat geen API-sleutels, wachtwoorden of Dictate Cloud-krediet, dus je kunt het doorgeven, maar het zet die van jou ook niet terug. Al het andere dat hieronder is aangevinkt zit er nog in, ook je transcriptiegeschiedenis en je klembord.</string>
     <string name="backup_and_restore__back_up__personal_content_note">Dit archief bevat geen API-sleutels of wachtwoorden, maar wel alles wat hieronder is aangevinkt: je transcriptiegeschiedenis met bewaarde opnames, je klembord, je prompts en de woorden die het toetsenbord van je heeft geleerd.</string>
+    <string name="backup_and_restore__back_up__encrypted_note">Dit archief is versleuteld met je wachtwoord, en alles wat hieronder is aangevinkt kan alleen daarmee worden hersteld. Vergeet je het wachtwoord, dan kan niemand deze back-up herstellen – ook jij niet.</string>
+    <string name="backup_and_restore__back_up__password">Wachtwoordbeveiliging</string>
+    <string name="backup_and_restore__back_up__password_enabled">Versleutelen met een wachtwoord</string>
+    <string name="backup_and_restore__back_up__password_too_short">Minstens {count} tekens</string>
+    <string name="backup_and_restore__back_up__password_mismatch">De wachtwoorden komen niet overeen</string>
+    <string name="backup_and_restore__password">Wachtwoord</string>
+    <string name="backup_and_restore__password_repeat">Herhaal het wachtwoord</string>
+    <string name="backup_and_restore__restore__encrypted">Dit back-uparchief is beveiligd met een wachtwoord. Voer het in om te zien wat het archief bevat.</string>
+    <string name="backup_and_restore__restore__unlock">Ontgrendelen</string>
+    <string name="backup_and_restore__restore__wrong_password">Onjuist wachtwoord</string>
+    <string name="backup_and_restore__restore__encrypted_unreadable">Dit archief kan niet worden geopend. Het is beschadigd, of het is gemaakt met een nieuwere versie van Dictate.</string>
     <string name="backup_and_restore__back_up__files_ime_keyboard">Toetsenbordextensies</string>
     <string name="backup_and_restore__back_up__files_ime_spelling">Spellingextensies /woordenboeken</string>
     <string name="backup_and_restore__back_up__files_ime_theme">Thema-extensies</string>
@@ -830,7 +844,7 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="ext__addon_management_box__managing_placeholder">{extensions} beheren</string>
     <string name="ext__addon_management_box__addon_manager_info">Alle taken met betrekking tot het importeren, exporteren, maken, aanpassen en verwijderen van extensies kunnen worden afgehandeld via de gecentraliseerde beheer van add-ons.</string>
     <string name="ext__addon_management_box__go_to_page">Ga naar {ext_home_title}</string>
-    <string name="ext__home__info">Je kunt extensies downloaden en installeren uit de Dictate Addons Store of een extensiebestand importeren dat van internet is gedownload.</string>
+    <string name="ext__home__info">Extensies voegen thema’s, toetsenbordindelingen en taalpakketten toe. Importeer een extensiebestand om er een toe te voegen; je huidige extensies staan hieronder.</string>
     <string name="ext__home__visit_store">Bezoek de Addons Store</string>
     <string name="ext__home__manage_extensions">Geïnstalleerde extensies beheren</string>
     <string name="ext__list__view_details">Details weergeven</string>
@@ -1211,8 +1225,6 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__remember_last_dictation_summary">Bewaart je laatste dictaat zodat de zwevende knop het ongedaan kan maken en de klassieke lay-out het opnieuw kan invoegen.</string>
     <string name="dictate__remember_last_dictation_title">Laatste dictaat onthouden</string>
     <string name="changelog__v4_2_0">• NIEUW: zwevende dicteerknop — dicteer rechtstreeks in elke app, zelfs met een ander toetsenbord actief. Kies uit drie stijlen (Pil, Ring, Bol), zie een live golfvorm terwijl je praat, sleep hem overal heen met randmagnetisme, stel kleur en grootte in en houd ingedrukt om te herformuleren. Schakel hem in via Instellingen ▸ Dictate ▸ Zwevende knop.\n• NIEUW: Google Gemini — gebruik je eigen AI Studio-API-sleutel voor transcriptie en herformuleren.\n• Prompts verschijnen nu standaard in een vaste rij boven de toetsen.\n• Betrouwbaardere tekstinvoer in apps, inclusief browsers en andere toetsenborden.</string>
-    <string name="dictate__promo_floating_button_message">Nieuw: overal dicteren</string>
-    <string name="dictate__promo_floating_button_action">Proberen</string>
     <string name="setup__floating_button__btn">Zwevende knop instellen</string>
     <string name="setup__nav_back">Terug</string>
     <string name="setup__nav_next">Volgende</string>
@@ -1321,6 +1333,7 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__providers_region_eu">Europese Unie</string>
     <string name="dictate__providers_region_jp">Japan</string>
     <string name="dictate__providers_region_in">India</string>
+    <string name="dictate__providers_region_cn">China (vasteland)</string>
     <string name="dictate__providers_region_global">Wereldwijd</string>
     <string name="dictate__providers_custom_title">Aangepaste server</string>
     <string name="dictate__providers_get_key">API-sleutel ophalen</string>
@@ -1330,9 +1343,15 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__providers_test">Verbinding testen</string>
     <string name="dictate__providers_test_transcribe">Transcriptie testen</string>
     <string name="dictate__providers_check_no_key">Voer eerst je API-sleutel in.</string>
-    <string name="dictate__providers_check_credentials_ok">Inloggegevens geverifieerd · {count} modellen</string>
+    <plurals name="dictate__providers_check_credentials_ok">
+        <item quantity="one">Inloggegevens geverifieerd · {count} model</item>
+        <item quantity="other">Inloggegevens geverifieerd · {count} modellen</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_ok_nocount">Inloggegevens geverifieerd</string>
-    <string name="dictate__providers_check_endpoint_ok">Server bereikt · {count} modellen</string>
+    <plurals name="dictate__providers_check_endpoint_ok">
+        <item quantity="one">Server bereikt · {count} model</item>
+        <item quantity="other">Server bereikt · {count} modellen</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_untested">Transcriptie niet getest.</string>
     <string name="dictate__providers_check_transcription_ok">Transcriptie geverifieerd</string>
     <string name="dictate__providers_check_transcription_text">Kwam terug als: “{text}”</string>
@@ -1340,6 +1359,8 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__providers_check_failed_connection">Verbindingstest mislukt</string>
     <string name="dictate__providers_check_failed_transcription">Transcriptietest mislukt</string>
     <string name="dictate__providers_check_err_auth">De sleutel is geweigerd. Controleer hem, en of het adres bij hetzelfde account hoort.</string>
+    <string name="dictate__providers_check_err_model">De sleutel werkt, maar mag dit model niet gebruiken. Kies een ander model of sta dit model toe in de projectinstellingen van de aanbieder.</string>
+    <string name="dictate__error_model_unavailable">Model niet beschikbaar voor deze sleutel</string>
     <string name="dictate__providers_check_err_quota">De sleutel werkt, maar het account heeft geen tegoed meer of zit boven een limiet. Controleer je abonnement bij de aanbieder.</string>
     <string name="dictate__providers_check_err_network">De server was niet bereikbaar. Controleer het adres en je internetverbinding.</string>
     <string name="dictate__providers_check_err_timeout">Geen antwoord op tijd. De aanbieder is misschien druk — probeer het opnieuw.</string>
@@ -1370,7 +1391,10 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__model_picker_title">Kies een model</string>
     <string name="dictate__model_picker_search">Zoek of typ een model-id</string>
     <string name="dictate__model_picker_loading">Modellen laden…</string>
-    <string name="dictate__model_picker_count">{count} modellen</string>
+    <plurals name="dictate__model_picker_count">
+        <item quantity="one">{count} model</item>
+        <item quantity="other">{count} modellen</item>
+    </plurals>
     <string name="dictate__model_picker_refresh">Vernieuwen</string>
     <string name="dictate__model_picker_use_custom">«{model}» gebruiken</string>
     <string name="dictate__recording_group">Opname</string>
@@ -1406,6 +1430,8 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__paragraph_split_title">In alinea\'s opsplitsen</string>
     <string name="dictate__paragraph_split_off">Uit</string>
     <string name="dictate__paragraph_split_value">Na {n} woorden</string>
+    <string name="dictate__drop_final_full_stop_title">Laatste punt weglaten</string>
+    <string name="dictate__drop_final_full_stop_summary">Alleen als een dictaat één zin is; meerdere zinnen houden alle leestekens</string>
     <string name="dictate__realtime_title">Realtime-transcriptie</string>
     <string name="dictate__realtime_summary">Transcribeert al tijdens het spreken in plaats van pas na het stoppen, voor providers die dit ondersteunen</string>
     <string name="dictate__realtime_mode_off">Uit</string>
@@ -1539,7 +1565,9 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__prompt_auto_apply_title">Automatisch toepassen</string>
     <string name="dictate__prompt_auto_apply_summary">Deze prompt automatisch op elke transcriptie uitvoeren</string>
     <string name="dictate__prompt_reasoning_title">Redeneren</string>
-    <string name="dictate__prompt_reasoning_default">Standaard</string>
+    <string name="dictate__prompt_reasoning_default">Instelling van de aanbieder</string>
+    <string name="dictate__prompt_reasoning_little">Weinig redeneren</string>
+    <string name="dictate__prompt_reasoning_much">Veel redeneren</string>
     <string name="dictate__prompt_badge_selection">Vereist selectie</string>
     <string name="dictate__prompt_badge_auto">Wordt automatisch toegepast</string>
     <string name="dictate__example_prompt_fix_grammar_name">Grammatica corrigeren</string>
@@ -1821,7 +1849,8 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__promo_milestone_count">%s dictaten met Dictate! 🎉</string>
     <string name="dictate__promo_milestone_action">Statistieken</string>
     <string name="dictate__reasoning_effort_title">Redeneerinspanning</string>
-    <string name="dictate__reasoning_effort_off">Uit</string>
+    <string name="dictate__reasoning_effort_off">Standaard van de aanbieder</string>
+    <string name="dictate__reasoning_effort_none">Geen redeneren</string>
     <string name="dictate__reasoning_effort_off_summary">Standaard van provider — laat uit voor niet-redenerende modellen</string>
     <string name="dictate__reasoning_effort_minimal">Minimaal</string>
     <string name="dictate__reasoning_effort_minimal_summary">Snelst, minst nadenken</string>
@@ -1830,6 +1859,9 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__reasoning_effort_medium">Gemiddeld</string>
     <string name="dictate__reasoning_effort_medium_summary">Balans tussen nadenken en snelheid</string>
     <string name="dictate__reasoning_effort_high">Hoog</string>
+    <string name="dictate__reasoning_effort_xhigh">Zeer hoog</string>
+    <string name="dictate__reasoning_effort_max">Maximaal</string>
+    <string name="dictate__reasoning_effort_app_default">{name} (standaard)</string>
     <string name="dictate__reasoning_effort_high_summary">Meest nadenken, langzamer</string>
     <string name="dictate__reasoning_effort_custom">Aangepast</string>
     <string name="dictate__action_save_audio">Audio opslaan</string>
@@ -2211,6 +2243,10 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="gif__error">Kon GIFs niet laden. Controleer je verbinding en API-sleutel.</string>
     <string name="gif__setup_needed">Voeg een gratis KLIPY-API-sleutel toe in Instellingen om GIFs te zoeken</string>
     <string name="gif__setup_needed_action">GIF-zoeken instellen</string>
+    <string name="gif__search_off">Zoeken naar GIF’s staat uit</string>
+    <string name="quick_action__forward_delete__tooltip">Het teken na de cursor verwijderen</string>
+    <string name="dictate__error_no_rewording_model">Kies een herformuleringsmodel voor %1$s</string>
+    <string name="dictate__model_placeholder_required">verplicht: kies of typ een model</string>
     <string name="gif__copied_to_clipboard">GIF gekopieerd naar klembord — houd ingedrukt om te plakken</string>
     <string name="gif__insert_failed">Kon de GIF niet invoegen</string>
     <string name="quick_action__ime_ui_mode_gif">GIF</string>
@@ -2307,6 +2343,25 @@ Deze toestemming kan op elk moment worden gewijzigd in de systeeminstellingen.  
     <string name="dictate__action_top_up">Tegoed opwaarderen</string>
     <string name="dictate__promo_low_credit_message">Tegoed bijna op.</string>
     <string name="dictate__promo_low_credit_action">Opwaarderen</string>
+    <string name="dictate__promo_sayova_message">Nieuwe app: AI op je horloge</string>
+    <string name="dictate__promo_sayova_action">Ontdekken</string>
+    <string name="about__more_apps__title">Meer apps</string>
+    <string name="about__more_apps__summary">SayOVA en TunerToGo voor je horloge</string>
+    <string name="about__more_apps__tunertogo_tagline">Stemapparaat voor Wear OS</string>
+    <string name="about__more_apps__tunertogo_description">Een nauwkeurig stemapparaat dat altijd om je pols zit, klaar zodra je je instrument pakt.</string>
+    <string name="about__more_apps__tunertogo_feature_instruments">Gitaar, bas, ukelele, viool en meer, met automatische snaarherkenning</string>
+    <string name="about__more_apps__tunertogo_feature_chromatic">Chromatische modus voor elk ander instrument en voor je stem</string>
+    <string name="about__more_apps__tunertogo_feature_vibration">Een korte trilling als een snaar gestemd is, zodat je ogen bij de stemmechanieken blijven</string>
+    <string name="about__more_apps__tunertogo_feature_privacy">Geen internettoegang, geen advertenties: het geluid wordt op het horloge geanalyseerd en nooit opgeslagen</string>
+    <string name="about__more_apps__tunertogo_requirements">Vereist een horloge met Wear OS 3 of nieuwer en een microfoon. Werkt zonder app op de telefoon.</string>
+    <string name="about__more_apps__intro">Ook van DevEmperor, de ontwikkelaar van Dictate:</string>
+    <string name="about__more_apps__sayova_tagline">AI-spraakassistent voor Wear OS</string>
+    <string name="about__more_apps__sayova_description">Praat met Google Gemini of OpenAI vanaf je horloge: gewoon praten, onderbreken wanneer je wilt en het antwoord meelezen terwijl je het hoort.</string>
+    <string name="about__more_apps__sayova_feature_interpreter">Tolk tussen 21 talen, beide kanten als tekst</string>
+    <string name="about__more_apps__sayova_feature_tasks">Zet timers en wekkers, bewaart notities en zoekt op het web</string>
+    <string name="about__more_apps__sayova_feature_phone">Zet berichten, afspraken en routes klaar op je telefoon, versturen doe je zelf</string>
+    <string name="about__more_apps__sayova_feature_privacy">Je eigen API-sleutel: geen account, geen tracking, open source</string>
+    <string name="about__more_apps__sayova_requirements">Vereist een horloge met Wear OS 3 of nieuwer en een microfoon, plus een API-sleutel van Google Gemini of OpenAI. Je aanbieder factureert het gebruik.</string>
     <string name="prefs__media__sticker__title">Stickers</string>
     <string name="prefs__media__sticker_folder__title">Stickermap</string>
     <string name="prefs__media__sticker_folder__summary_unset">Kies een map met je eigen afbeeldingen</string>

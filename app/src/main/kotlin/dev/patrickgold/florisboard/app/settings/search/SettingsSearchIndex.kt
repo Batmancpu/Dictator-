@@ -17,7 +17,7 @@ import dev.patrickgold.florisboard.app.settings.dictionary.UserDictionaryType
 
 /**
  * One searchable settings entry (issue #187). GENERATED from the settings screens by
- * scripts/gen_settings_search_index — do not curate by hand; rerun the generator when settings
+ * tools/gen_settings_search_index — do not curate by hand; rerun the generator when settings
  * change so the search stays complete. Each entry maps a localized [titleRes] to the [route]
  * that shows it, with [sectionRes] (the screen) and optional [parentRes] forming the breadcrumb.
  * When [anchor] is set the destination row is tagged with Modifier.settingsSearchAnchor and the
@@ -83,6 +83,7 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.settings__typing__title, R.string.settings__typing__title, Routes.Settings.Typing),
         SettingsSearchEntry(R.string.about__version__title, R.string.about__title, Routes.Settings.About, anchor = "about__version__title"),
         SettingsSearchEntry(R.string.about__whats_new__title, R.string.about__title, Routes.Settings.About, anchor = "about__whats_new__title"),
+        SettingsSearchEntry(R.string.about__more_apps__title, R.string.about__title, Routes.Settings.About, anchor = "about__more_apps__title"),
         SettingsSearchEntry(R.string.about__website__title, R.string.about__title, Routes.Settings.About, anchor = "about__website__title"),
         SettingsSearchEntry(R.string.about__changelog__title, R.string.about__title, Routes.Settings.About, anchor = "about__changelog__title"),
         SettingsSearchEntry(R.string.about__repository__title, R.string.about__title, Routes.Settings.About, anchor = "about__repository__title"),
@@ -190,7 +191,9 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.dictate__prompt_trigger_title, R.string.dictate__prompts_title, Routes.Settings.DictatePrompts(), parentRes = R.string.dictate__title,
             keywordsRes = R.string.settings__search__keywords__text_expansion),
         SettingsSearchEntry(R.string.dictate__auto_formatting_title, R.string.dictate__rewording_title, Routes.Settings.DictateRewording, parentRes = R.string.dictate__title, anchor = "dictate__auto_formatting_title"),
-        SettingsSearchEntry(R.string.dictate__reasoning_effort_title, R.string.dictate__rewording_title, Routes.Settings.DictateRewording, parentRes = R.string.dictate__title, anchor = "dictate__reasoning_effort_title"),
+        // Hand-added: reasoning effort is set in each provider account since 2026-11-04, inside the account's
+        // dialog, which has no anchor; the search opens the providers screen it is reached from.
+        SettingsSearchEntry(R.string.dictate__reasoning_effort_title, R.string.dictate__providers_title, Routes.Settings.DictateProviders, parentRes = R.string.dictate__title),
         SettingsSearchEntry(R.string.dictate__system_prompt_title, R.string.dictate__rewording_title, Routes.Settings.DictateRewording, parentRes = R.string.dictate__title),
         SettingsSearchEntry(R.string.dictate__stats_title, R.string.dictate__title, Routes.Settings.Dictate, anchor = "dictate__stats_title"),
         SettingsSearchEntry(R.string.dictate__history_title, R.string.dictate__title, Routes.Settings.Dictate, anchor = "dictate__history_title"),
@@ -228,6 +231,10 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.dictate__instant_output_title, R.string.dictate__output_group, Routes.Settings.DictateOutput, parentRes = R.string.dictate__title, anchor = "dictate__instant_output_title"),
         SettingsSearchEntry(R.string.dictate__output_speed_title, R.string.dictate__output_group, Routes.Settings.DictateOutput, parentRes = R.string.dictate__title, anchor = "dictate__output_speed_title"),
         SettingsSearchEntry(R.string.dictate__paragraph_split_title, R.string.dictate__output_group, Routes.Settings.DictateOutput, parentRes = R.string.dictate__title, anchor = "dictate__paragraph_split_title"),
+        // Hand-added (issue #468): a rerun of the generator no longer compiles. "Period" is what half the
+        // English speakers call the mark the title names.
+        SettingsSearchEntry(R.string.dictate__drop_final_full_stop_title, R.string.dictate__output_group, Routes.Settings.DictateOutput, parentRes = R.string.dictate__title, anchor = "dictate__drop_final_full_stop_title",
+            keywordsRes = R.string.settings__search__keywords__final_full_stop),
         SettingsSearchEntry(R.string.dictate__resend_button_title, R.string.dictate__output_group, Routes.Settings.DictateOutput, parentRes = R.string.dictate__title, anchor = "dictate__resend_button_title"),
         SettingsSearchEntry(R.string.dictate__haptic_feedback_title, R.string.dictate__output_group, Routes.Settings.DictateOutput, parentRes = R.string.dictate__title, anchor = "dictate__haptic_feedback_title"),
         SettingsSearchEntry(R.string.dictate__remember_last_dictation_title, R.string.dictate__output_group, Routes.Settings.DictateOutput, parentRes = R.string.dictate__title, anchor = "dictate__remember_last_dictation_title"),
@@ -305,6 +312,7 @@ object SettingsSearchIndex {
         SettingsSearchEntry(R.string.pref__keyboard__group_layout__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard),
         SettingsSearchEntry(R.string.pref__keyboard__landscape_input_ui_mode__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__landscape_input_ui_mode__label"),
         SettingsSearchEntry(R.string.pref__keyboard__font_size_multiplier__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__font_size_multiplier__label"),
+        SettingsSearchEntry(R.string.pref__keyboard__keyboard_size__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__keyboard_size__label", keywordsRes = R.string.settings__search__keywords__keyboard_size),
         SettingsSearchEntry(R.string.pref__keyboard__key_spacing__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__key_spacing__label"),
         SettingsSearchEntry(R.string.settings__input_feedback__title, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "settings__input_feedback__title"),
         SettingsSearchEntry(R.string.pref__keyboard__popup_enabled__label, R.string.settings__keyboard__title, Routes.Settings.Keyboard, anchor = "pref__keyboard__popup_enabled__label"),

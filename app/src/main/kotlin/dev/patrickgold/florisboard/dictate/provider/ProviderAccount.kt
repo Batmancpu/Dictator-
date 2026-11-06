@@ -10,6 +10,7 @@
 
 package dev.patrickgold.florisboard.dictate.provider
 
+import dev.patrickgold.florisboard.app.PreferenceJson
 import dev.patrickgold.florisboard.lib.devtools.flogError
 import dev.patrickgold.jetpref.datastore.model.PreferenceSerializer
 import kotlinx.serialization.Serializable
@@ -36,6 +37,13 @@ data class ProviderAccount(
     val customBaseUrl: String = "",
     val transcriptionModel: String = "",
     val chatModel: String = "",
+    /**
+     * How much the rewording model thinks, in the provider's own word (`none`, `low`, `xhigh`…); empty is the
+     * default, which sends no field except where the app has its own (gpt-6-luna: none). Lives here and not
+     * in a global setting because the words belong to the model (provider catalog, 2026-11-04). Additive,
+     * empty for accounts stored before it; older versions skip it, the keyring JSON ignores unknown keys.
+     */
+    val chatReasoning: String = "",
     /**
      * Chosen real-time streaming model for this provider (issue #128); empty = use the preset's
      * defaultRealtimeModel. Additive field, defaults empty for older stored accounts. Only meaningful
@@ -247,16 +255,52 @@ fun singleCallApplies(transcriptionViaChat: Boolean, preset: ProviderPreset, mod
  * fold leaves blank forever, so every rewording went to the preset default and no setting could change
  * it. So the merged field wins when it holds something ([sharedSingleCallModel]); otherwise the rewording
  * field's own value, and failing that the preset default — which is what an empty box has always meant.
- * A preset without one (a server of the user's own) is asked for whatever OpenAI's default is: read from
- * that preset rather than spelled out here, where a copy of `gpt-4o-mini` outlived its retirement notice.
+ *
+ * Blank when there is none of the three. A preset without a default (Mistral, xAI, DeepSeek, Together,
+ * DeepInfra, Ollama, a server of the user's own) used to be asked for OpenAI's default instead, which none
+ * of them serve: every rewording failed with a model the user had never chosen, from a vendor they were
+ * not using. Their catalogs move too fast to pin a default of ours, so the user picks one, and a blank
+ * answer here is what makes the app say so ([rewordingBlocker]).
  */
-fun chatModelFor(
-    account: ProviderAccount,
-    preset: ProviderPreset,
-    fallback: String = ProviderRegistry.OPENAI.defaultChatModel.orEmpty(),
-): String {
+fun chatModelFor(account: ProviderAccount, preset: ProviderPreset): String {
     sharedSingleCallModel(account)?.let { return it }
-    return account.chatModel.ifBlank { preset.defaultChatModel ?: fallback }
+    return account.chatModel.ifBlank { preset.defaultChatModel.orEmpty() }
+}
+
+/**
+ * The key a rewording through [rewording] is sent with: its own, or — when it has none — the one of
+ * [transcription], but only if both talk to the same server.
+ *
+ * That fallback is the old "reuse the transcription key", from when both sides were one vendor. Applied
+ * across vendors, it handed the transcription provider's key to whatever the rewording pointed at: a
+ * keyless Ollama box or a server of the user's own, possibly over plain http, which then held a secret it
+ * never needed and the user never meant to give it. Built-in providers keep one account each, so "the
+ * same server" means the same account, or two servers of the user's own at the same address.
+ */
+fun rewordingKeyFor(rewording: ProviderAccount, transcription: ProviderAccount): String {
+    if (rewording.apiKey.isNotBlank()) return rewording.apiKey
+    val sameServer = rewording.providerId == transcription.providerId ||
+        (rewording.isCustom && transcription.isCustom &&
+            rewording.customBaseUrl.isNotBlank() &&
+            rewording.customBaseUrl.trim().trimEnd('/').equals(
+                transcription.customBaseUrl.trim().trimEnd('/'), ignoreCase = true,
+            ))
+    return if (sameServer) transcription.apiKey else ""
+}
+
+/** Why a rewording through [account] cannot be sent, or null when it can. */
+enum class RewordingBlocker { NO_KEY, NO_MODEL }
+
+/**
+ * The two things a rewording needs before it is worth sending: a key, where the provider wants one
+ * ([ProviderAccount.requiresCredential] — Ollama and servers of the user's own do not), and a model. Asked
+ * up front so a prompt chip says which one is missing instead of "No API key set" for a keyless server
+ * that only lacked a model, or a provider error about a model nobody chose.
+ */
+fun rewordingBlocker(account: ProviderAccount, preset: ProviderPreset, key: String): RewordingBlocker? = when {
+    key.isBlank() && account.requiresCredential -> RewordingBlocker.NO_KEY
+    chatModelFor(account, preset).isBlank() -> RewordingBlocker.NO_MODEL
+    else -> null
 }
 
 /**
@@ -320,7 +364,7 @@ data class ProviderAccounts(
         private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
         override fun serialize(value: ProviderAccounts): String =
-            json.encodeToString(value)
+            PreferenceJson.encode(json.encodeToString(value))
 
         override fun deserialize(value: String): ProviderAccounts =
             deserializeOrNull(value) ?: Empty
@@ -335,7 +379,7 @@ data class ProviderAccounts(
          * two can never drift apart.
          */
         fun deserializeOrNull(value: String): ProviderAccounts? = try {
-            json.decodeFromString<ProviderAccounts>(value)
+            json.decodeFromString<ProviderAccounts>(PreferenceJson.decode(value))
         } catch (e: Exception) {
             flogError { "Failed to deserialize ProviderAccounts: $e" }
             null

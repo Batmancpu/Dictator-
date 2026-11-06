@@ -484,6 +484,13 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "dictate__paragraph_split_words",
             default = 0,
         )
+        // Leave the full stop off a dictation that is a single sentence (issue #468) — notes, list items,
+        // chat replies. Off by default: in running text the stop belongs there. Several sentences keep every
+        // mark, and a dictation right behind one puts its stop back (see FinalFullStop, DictateController.leadFor).
+        val dropFinalFullStop = boolean(
+            key = "dictate__drop_final_full_stop",
+            default = false,
+        )
         // Long-press the send (mic) button while recording to transcribe with the on-device model instead
         // of the configured cloud provider (issue #228), for a quick offline one-off without digging
         // through the provider settings. Toggled from the on-device model dialog. Off by default. Only
@@ -678,16 +685,6 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
         val floatingButtonMenuSettings = boolean(
             key = "dictate__floating_button_menu_settings",
             default = false,
-        )
-        // Whether the user has opened the floating-button screen at least once (clears the "New" badge).
-        val floatingButtonHintSeen = boolean(
-            key = "dictate__floating_button_hint_seen",
-            default = false,
-        )
-        // App version whose one-time floating-button Smartbar spotlight has already been shown.
-        val floatingButtonSpotlightVersion = string(
-            key = "dictate__floating_button_spotlight_version",
-            default = "",
         )
         // --- Output behavior (roadmap section 10) ------------------------------------------------
         // Press Enter / trigger the editor action automatically after committing a transcription.
@@ -898,6 +895,18 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "dictate__changelog_nudge_version",
             default = "",
         )
+        // When the Smartbar nudge for SayOVA falls due, in epoch milliseconds. 0 until the first keyboard
+        // open with no other nudge to show; that open schedules it a few days later, so it never arrives
+        // together with the update notice. See DictateController.maybePromptSayova.
+        val sayovaNudgeDueAt = long(
+            key = "dictate__sayova_nudge_due_at",
+            default = 0L,
+        )
+        // Set once the SayOVA nudge was tapped or waved away, so it never reappears.
+        val sayovaNudgeDone = boolean(
+            key = "dictate__sayova_nudge_done",
+            default = false,
+        )
         // Comma-separated dictation language codes the user cycles through on the recording bar
         // (see DictateLanguages; "detect" = auto-detect). Default mirrors the legacy app.
         val inputLanguages = string(
@@ -982,14 +991,14 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             key = "dictate__command_trigger_word",
             default = "",
         )
-        // Reasoning effort sent as OpenAI-compatible `reasoning_effort` on rewording chat calls for
-        // reasoning models (issue #141). OFF omits the field, so non-reasoning models are unaffected.
+        // The old global reasoning effort (#141). Since 2026-11-04 each account holds its own
+        // (ProviderAccount.chatReasoning); this is only read once, by migrateReasoningToAccountsIfNeeded,
+        // which then resets it to OFF. Kept so a backup from an older version still moves into the accounts.
         val rewordingReasoningEffort = enum(
             key = "dictate__rewording_reasoning_effort",
             default = DictateReasoningEffort.OFF,
         )
-        // The wire value sent as `reasoning_effort` when the setting is CUSTOM (issue #186), e.g. a value
-        // a specific provider expects. Blank → the field is omitted.
+        // The old global setting's Custom word (#186), migrated with it.
         val rewordingReasoningEffortCustom = string(
             key = "dictate__rewording_reasoning_effort_custom",
             default = "",
@@ -1188,9 +1197,13 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
 
     val gif = Gif()
     inner class Gif {
+        // "gif__enabled" (default off) was read by nothing but the settings summary, so GIF search ran
+        // with it off. Made to work, it would have switched GIFs off for everyone who had added a key
+        // without touching it; a new key that starts on keeps them working, and off now means off. The
+        // old key is dropped in migrate().
         val enabled = boolean(
-            key = "gif__enabled",
-            default = false,
+            key = "gif__search_enabled",
+            default = true,
         )
         // Bring-your-own KLIPY API key (see KlipyGifProvider). Empty = GIF search disabled.
         val klipyApiKey = string(
@@ -1899,6 +1912,9 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
     override fun migrate(entry: PreferenceMigrationEntry): PreferenceMigrationEntry {
         return when (entry.key) {
 
+            // The GIF switch that never switched anything; see Gif.enabled.
+            "gif__enabled" -> entry.reset()
+
             // Migrate media prefs to emoji prefs
             // Keep migration rule until: 0.6 dev cycle
             "media__emoji_recently_used" -> {
@@ -2086,6 +2102,13 @@ abstract class FlorisPreferenceModel : PreferenceModel() {
             // keyboard's key presses do (Sounds & Vibration), the way the keyboard's microphone always has.
             // Nothing reads the old value any more, so it is dropped rather than carried along.
             "dictate__floating_button_haptic" -> entry.reset()
+
+            // The floating button's Smartbar spotlight is gone (2026-11-05): since 4.2.0 it came back with
+            // every feature release to exactly the people who had already waved it away, and the setup
+            // wizard introduces the button to new users anyway.
+            "dictate__floating_button_spotlight_version" -> entry.reset()
+            // Its "New" badge in the Dictate settings went the same day, and with it the flag that cleared it.
+            "dictate__floating_button_hint_seen" -> entry.reset()
 
             // The offline-fallback switch became one choice of the transcription fallback (issue #455):
             // switched on, it meant the on-device engine; switched off, nothing at all. Runs on load and on

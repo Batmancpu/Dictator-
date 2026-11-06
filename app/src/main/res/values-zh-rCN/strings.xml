@@ -145,7 +145,9 @@
     <string name="settings__search__keywords__text_expansion" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the typing-shortcut setting, which lets a short trigger expand into a saved block of text. Translate as the words people in your language would actually type when looking for that feature, separated by spaces. Do not translate word for word; add or drop terms as makes sense.">文本扩展 短语 缩写 快捷短语 宏 自动文本 模板 snippet text expansion</string>
     <string name="settings__search__keywords__selection_metrics" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which shows how many words and characters are selected. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">字数 词数 统计 字符数</string>
     <string name="settings__search__keywords__trim_on_copy" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which removes spaces and line breaks at the ends of copied text. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">去除空格 空白 修剪 复制 剪切</string>
+    <string name="settings__search__keywords__final_full_stop" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which leaves the full stop off a dictation of one sentence. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">句号 句点 标点 句末 不加句号</string>
     <string name="settings__search__keywords__clear_cache">缓存 存储 空间 临时文件 释放 删除 清理</string>
+    <string name="settings__search__keywords__keyboard_size">高度 高 矮 变大 变小 调整大小 尺寸</string>
     <string name="settings__search__keywords__momentary_layer">长按 滑动 符号 层 临时 瞬时 标点 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">表情 emoji 行 栏 最近 使用 键盘 上方 快捷</string>
     <string name="settings__search__keywords__request_timeout">超时 等待 慢 连接 秒 断开</string>
@@ -484,6 +486,7 @@
     <string name="pref__keyboard__font_size_multiplier__label" comment="Preference title">字体大小缩放倍率</string>
     <string name="pref__keyboard__group_layout__label" comment="Preference group title">布局</string>
     <string name="pref__keyboard__landscape_input_ui_mode__label" comment="Preference value">横向全屏输入</string>
+    <string name="pref__keyboard__keyboard_size__label">键盘大小</string>
     <string name="pref__keyboard__key_spacing__label" comment="Preference title">按键间距</string>
     <string name="pref__keyboard__key_spacing__summary" comment="Preference summary">垂直 {v}%、水平 {h}% — 间距越大按键越小，键盘大小不变。</string>
     <string name="pref__keyboard__group_keypress__label" comment="Preference group title">按键</string>
@@ -616,6 +619,7 @@
     <string name="pref__gestures__delete_key_long_press__label" comment="Preference title">删除键长按</string>
     <string name="pref__gestures__swipe_velocity_threshold__label" comment="Preference title">滑动触发速度阈值</string>
     <string name="pref__gestures__swipe_distance_threshold__label" comment="Preference title">滑动触发距离阈值</string>
+    <string name="settings__help__title">帮助</string>
     <string name="settings__other__title" comment="Title of Other settings">其他杂项...</string>
     <string name="pref__other__settings_theme__label" comment="Label of Settings theme preference in Other">软件设置页主题</string>
     <string name="pref__other__settings_theme__auto_amoled" comment="Possible value of Settings theme preference in Other">系统默认(AMOLED)</string>
@@ -665,11 +669,8 @@
     <string name="setup__select_ime__title">选择 {app_name}</string>
     <string name="setup__select_ime__description">{app_name} 现在已在您的系统中启用。要使用它，请在输入法选择对话框中选择{app_name} 来切换到它！</string>
     <string name="setup__select_ime__switch_keyboard_btn">切换键盘</string>
-    <string name="setup__grant_notification_permission__title">允许崩溃报告消息通知</string>
-    <string name="setup__grant_notification_permission__description">自安卓 13 以来，应用在发送通知前
-    必须向用户申请权限。在 Dictate 中，这一权限仅用于在崩溃时打开一个崩溃报告页面。
-    这一权限可以随时在系统设置中更改。
-    </string>
+    <string name="setup__grant_notification_permission__title">允许通知</string>
+    <string name="setup__grant_notification_permission__description">从 Android 13 开始，应用在显示通知前必须先请求许可。Dictate Keyboard 会在悬浮按钮录音时、下载语音模型时以及手表通过手机听写时显示通知，并在应用崩溃时打开崩溃报告。你可以随时在系统设置中更改此权限。</string>
     <string name="setup__grant_notification_permission__btn">授予权限</string>
     <string name="setup__finish_up__title">完成</string>
     <string name="setup__finish_up__description_p1">{app_name} 现在已在系统中启用，可供您自定义。</string>
@@ -695,6 +696,17 @@
     <string name="backup_and_restore__back_up__credentials_warning">该归档以明文保存你的 API 密钥和密码，还包含你的 Dictate Cloud 余额——拿到它的人都能用你的账户来听写。不要转交；如果已经转交过，请在服务商处更换密钥。下面勾选的其他内容也会一同带走，包括听写历史和剪贴板。</string>
     <string name="backup_and_restore__back_up__credentials_excluded_note">该归档不含 API 密钥、密码和 Dictate Cloud 余额，因此可以转交——但也不会恢复你的密钥。下面勾选的其他内容仍在其中，包括听写历史和剪贴板。</string>
     <string name="backup_and_restore__back_up__personal_content_note">该归档不含 API 密钥和密码，但包含下面勾选的一切：听写历史及保留的录音、剪贴板、你的提示词，以及键盘从你这里学到的词。</string>
+    <string name="backup_and_restore__back_up__encrypted_note">该归档已用你的密码加密，下面勾选的一切都只能凭此密码恢复。如果忘记密码，任何人都无法恢复这份备份，包括你自己。</string>
+    <string name="backup_and_restore__back_up__password">密码保护</string>
+    <string name="backup_and_restore__back_up__password_enabled">使用密码加密</string>
+    <string name="backup_and_restore__back_up__password_too_short">至少 {count} 个字符</string>
+    <string name="backup_and_restore__back_up__password_mismatch">两次输入的密码不一致</string>
+    <string name="backup_and_restore__password">密码</string>
+    <string name="backup_and_restore__password_repeat">再次输入密码</string>
+    <string name="backup_and_restore__restore__encrypted">该备份归档受密码保护。输入密码即可查看其中的内容。</string>
+    <string name="backup_and_restore__restore__unlock">解锁</string>
+    <string name="backup_and_restore__restore__wrong_password">密码错误</string>
+    <string name="backup_and_restore__restore__encrypted_unreadable">无法打开该归档。它已损坏，或是由更新版本的 Dictate 创建的。</string>
     <string name="backup_and_restore__back_up__files_ime_keyboard">键盘扩展</string>
     <string name="backup_and_restore__back_up__files_ime_spelling">拼写扩展 / 词典</string>
     <string name="backup_and_restore__back_up__files_ime_theme">主题扩展</string>
@@ -922,7 +934,7 @@
     <string name="ext__addon_management_box__managing_placeholder">管理 {extensions}</string>
     <string name="ext__addon_management_box__addon_manager_info">所有与导入、导出、创建、自定义和删除扩展相关的任务都可以通过集中的插件管理器来处理。</string>
     <string name="ext__addon_management_box__go_to_page">跳转到{ext_home_title}</string>
-    <string name="ext__home__info">您可以从 Dictate 插件商店下载并安装扩展，或者导入您从互联网上下载的任何匹配和兼容的扩展文件。</string>
+    <string name="ext__home__info">扩展可添加主题、键盘布局和语言包。导入扩展文件即可添加；已安装的扩展列在下方。</string>
     <string name="ext__home__visit_store">访问插件商店</string>
     <string name="ext__home__manage_extensions">管理已安装的扩展</string>
     <string name="ext__list__view_details">查看详细信息</string>
@@ -1306,8 +1318,6 @@
     <string name="dictate__remember_last_dictation_summary">保留你最近一次的听写，以便悬浮按钮可以撤销它、经典布局可以重新插入它。</string>
     <string name="dictate__remember_last_dictation_title">记住上次听写</string>
     <string name="changelog__v4_2_0">• 新功能：悬浮听写按钮——即使其他键盘处于激活状态，也能直接在任何应用中听写。可从三种样式（胶囊、圆环、光球）中选择，说话时显示实时波形，可拖到任意位置并吸附到边缘，设置颜色和大小，长按即可改写。在 设置 ▸ Dictate ▸ 悬浮按钮 中开启。\n• 新功能：Google Gemini — 使用你自己的 AI Studio API 密钥进行转录和改写。\n• 提示词现在默认显示在按键上方的常驻行中。\n• 跨应用的文本插入更可靠，包括浏览器和其他键盘。</string>
-    <string name="dictate__promo_floating_button_message">新功能：在任何应用中听写</string>
-    <string name="dictate__promo_floating_button_action">试用</string>
     <string name="setup__floating_button__btn">设置悬浮按钮</string>
     <string name="setup__nav_back">返回</string>
     <string name="setup__nav_next">下一步</string>
@@ -1416,6 +1426,7 @@
     <string name="dictate__providers_region_eu">欧盟</string>
     <string name="dictate__providers_region_jp">日本</string>
     <string name="dictate__providers_region_in">印度</string>
+    <string name="dictate__providers_region_cn">中国大陆</string>
     <string name="dictate__providers_region_global">全球</string>
     <string name="dictate__providers_custom_title">自定义服务器</string>
     <string name="dictate__providers_get_key">获取 API 密钥</string>
@@ -1425,9 +1436,13 @@
     <string name="dictate__providers_test">测试连接</string>
     <string name="dictate__providers_test_transcribe">测试转录</string>
     <string name="dictate__providers_check_no_key">请先输入 API 密钥。</string>
-    <string name="dictate__providers_check_credentials_ok">凭据已验证 · {count} 个模型</string>
+    <plurals name="dictate__providers_check_credentials_ok">
+        <item quantity="other">凭据已验证 · {count} 个模型</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_ok_nocount">凭据已验证</string>
-    <string name="dictate__providers_check_endpoint_ok">已连接服务器 · {count} 个模型</string>
+    <plurals name="dictate__providers_check_endpoint_ok">
+        <item quantity="other">已连接服务器 · {count} 个模型</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_untested">尚未测试转录。</string>
     <string name="dictate__providers_check_transcription_ok">转录已验证</string>
     <string name="dictate__providers_check_transcription_text">返回内容：“{text}”</string>
@@ -1435,6 +1450,8 @@
     <string name="dictate__providers_check_failed_connection">连接测试失败</string>
     <string name="dictate__providers_check_failed_transcription">转录测试失败</string>
     <string name="dictate__providers_check_err_auth">密钥被拒绝。请检查密钥，以及地址是否属于同一账户。</string>
+    <string name="dictate__providers_check_err_model">密钥有效，但无权使用此模型。请选择其他模型，或在服务商的项目设置中允许此模型。</string>
+    <string name="dictate__error_model_unavailable">此密钥无法使用该模型</string>
     <string name="dictate__providers_check_err_quota">密钥有效，但账户额度用尽或超出限制。请在服务商处查看你的套餐。</string>
     <string name="dictate__providers_check_err_network">无法连接服务器。请检查地址和网络连接。</string>
     <string name="dictate__providers_check_err_timeout">未在限定时间内收到回应。服务商可能繁忙，请重试。</string>
@@ -1465,7 +1482,9 @@
     <string name="dictate__model_picker_title">选择模型</string>
     <string name="dictate__model_picker_search">搜索或输入模型 ID</string>
     <string name="dictate__model_picker_loading">正在加载模型…</string>
-    <string name="dictate__model_picker_count">{count} 个模型</string>
+    <plurals name="dictate__model_picker_count">
+        <item quantity="other">{count} 个模型</item>
+    </plurals>
     <string name="dictate__model_picker_refresh">刷新</string>
     <string name="dictate__model_picker_use_custom">使用“{model}”</string>
     <string name="dictate__recording_group">录音</string>
@@ -1501,6 +1520,8 @@
     <string name="dictate__paragraph_split_title">分段</string>
     <string name="dictate__paragraph_split_off">关闭</string>
     <string name="dictate__paragraph_split_value">{n} 个词后</string>
+    <string name="dictate__drop_final_full_stop_title">省略句末句号</string>
+    <string name="dictate__drop_final_full_stop_summary">仅在听写只有一句话时生效；多句话会保留所有标点</string>
     <string name="dictate__realtime_title">实时转录</string>
     <string name="dictate__realtime_summary">在您说话时即时转写，而不是停止后才开始，适用于支持此功能的提供商</string>
     <string name="dictate__realtime_mode_off">关闭</string>
@@ -1634,7 +1655,9 @@
     <string name="dictate__prompt_auto_apply_title">自动应用</string>
     <string name="dictate__prompt_auto_apply_summary">对每次转录自动运行此提示词</string>
     <string name="dictate__prompt_reasoning_title">推理</string>
-    <string name="dictate__prompt_reasoning_default">默认</string>
+    <string name="dictate__prompt_reasoning_default">服务商设置</string>
+    <string name="dictate__prompt_reasoning_little">少量推理</string>
+    <string name="dictate__prompt_reasoning_much">大量推理</string>
     <string name="dictate__prompt_badge_selection">需要选中文本</string>
     <string name="dictate__prompt_badge_auto">自动应用</string>
     <string name="dictate__example_prompt_fix_grammar_name">修正语法</string>
@@ -1914,7 +1937,8 @@
     <string name="dictate__promo_milestone_count">用 Dictate 达成 %s 次！🎉</string>
     <string name="dictate__promo_milestone_action">统计</string>
     <string name="dictate__reasoning_effort_title">推理力度</string>
-    <string name="dictate__reasoning_effort_off">关闭</string>
+    <string name="dictate__reasoning_effort_off">服务商默认</string>
+    <string name="dictate__reasoning_effort_none">不推理</string>
     <string name="dictate__reasoning_effort_off_summary">提供商默认 — 非推理模型请保持关闭</string>
     <string name="dictate__reasoning_effort_minimal">最小</string>
     <string name="dictate__reasoning_effort_minimal_summary">最快，思考最少</string>
@@ -1923,6 +1947,9 @@
     <string name="dictate__reasoning_effort_medium">中</string>
     <string name="dictate__reasoning_effort_medium_summary">思考与速度平衡</string>
     <string name="dictate__reasoning_effort_high">高</string>
+    <string name="dictate__reasoning_effort_xhigh">极高</string>
+    <string name="dictate__reasoning_effort_max">最大</string>
+    <string name="dictate__reasoning_effort_app_default">{name}（默认）</string>
     <string name="dictate__reasoning_effort_high_summary">思考最多，更慢</string>
     <string name="dictate__reasoning_effort_custom">自定义</string>
     <string name="dictate__action_save_audio">保存音频</string>
@@ -2304,6 +2331,10 @@
     <string name="gif__error">无法加载 GIF。请检查你的网络连接和 API 密钥。</string>
     <string name="gif__setup_needed">在设置中添加免费的 KLIPY API 密钥以搜索 GIF</string>
     <string name="gif__setup_needed_action">设置 GIF 搜索</string>
+    <string name="gif__search_off">GIF 搜索已关闭</string>
+    <string name="quick_action__forward_delete__tooltip">删除光标后的字符</string>
+    <string name="dictate__error_no_rewording_model">请为 %1$s 选择改写模型</string>
+    <string name="dictate__model_placeholder_required">必填：选择或输入模型</string>
     <string name="gif__copied_to_clipboard">GIF 已复制到剪贴板 — 长按即可粘贴</string>
     <string name="gif__insert_failed">无法插入 GIF</string>
     <string name="quick_action__ime_ui_mode_gif">GIF</string>
@@ -2400,6 +2431,25 @@
     <string name="dictate__action_top_up">充值额度</string>
     <string name="dictate__promo_low_credit_message">额度快用完了。</string>
     <string name="dictate__promo_low_credit_action">充值</string>
+    <string name="dictate__promo_sayova_message">新应用：手表上的 AI 助手</string>
+    <string name="dictate__promo_sayova_action">了解</string>
+    <string name="about__more_apps__title">更多应用</string>
+    <string name="about__more_apps__summary">适用于手表的 SayOVA 和 TunerToGo</string>
+    <string name="about__more_apps__tunertogo_tagline">适用于 Wear OS 的乐器调音器</string>
+    <string name="about__more_apps__tunertogo_description">精准的调音器始终戴在手腕上，拿起乐器即可使用。</string>
+    <string name="about__more_apps__tunertogo_feature_instruments">支持吉他、贝斯、尤克里里、小提琴等，自动识别琴弦</string>
+    <string name="about__more_apps__tunertogo_feature_chromatic">半音阶模式适用于其他所有乐器和人声</string>
+    <string name="about__more_apps__tunertogo_feature_vibration">琴弦调准时短促振动，视线无需离开弦钮</string>
+    <string name="about__more_apps__tunertogo_feature_privacy">无网络访问、无广告：声音在手表上分析，绝不保存</string>
+    <string name="about__more_apps__tunertogo_requirements">需要配备麦克风、搭载 Wear OS 3 或更高版本的手表。无需手机应用。</string>
+    <string name="about__more_apps__intro">同样来自 Dictate 的开发者 DevEmperor：</string>
+    <string name="about__more_apps__sayova_tagline">适用于 Wear OS 的 AI 语音助手</string>
+    <string name="about__more_apps__sayova_description">直接在手表上与 Google Gemini 或 OpenAI 对话：自然开口，随时打断，一边听回答一边阅读文字。</string>
+    <string name="about__more_apps__sayova_feature_interpreter">支持 21 种语言的口译，双方内容均以文字显示</string>
+    <string name="about__more_apps__sayova_feature_tasks">设置计时器和闹钟、保存笔记、搜索网络</string>
+    <string name="about__more_apps__sayova_feature_phone">在手机上准备好消息、日程和路线，由您亲自发送</string>
+    <string name="about__more_apps__sayova_feature_privacy">使用您自己的 API 密钥：无需账号，无跟踪，开源</string>
+    <string name="about__more_apps__sayova_requirements">需要配备麦克风、搭载 Wear OS 3 或更高版本的手表，以及 Google Gemini 或 OpenAI 的 API 密钥。使用费用由您的服务商收取。</string>
     <string name="prefs__media__sticker__title">贴纸</string>
     <string name="prefs__media__sticker_folder__title">贴纸文件夹</string>
     <string name="prefs__media__sticker_folder__summary_unset">选择一个存放你自己图片的文件夹</string>

@@ -39,7 +39,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.automirrored.filled.AltRoute
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Close
@@ -118,6 +117,7 @@ import dev.patrickgold.florisboard.dictate.DictateLanguages
 import dev.patrickgold.florisboard.dictate.DictateRecordingAnimation
 import dev.patrickgold.florisboard.dictate.PushToTalkPhase
 import dev.patrickgold.florisboard.dictate.provider.DictateApiException
+import dev.patrickgold.florisboard.dictate.provider.LocalTranscriptionProvider
 import dev.patrickgold.florisboard.ime.keyboard.FlorisImeSizing
 import dev.patrickgold.florisboard.ime.theme.FlorisImeUi
 import dev.patrickgold.jetpref.datastore.model.collectAsState
@@ -536,12 +536,20 @@ private fun TranscribingContent(state: DictateController.UiState.Transcribing) {
     // phone alongside them says only where: this one is running here, not on a provider's machine. It
     // matters most right after holding the button to escape a hanging request (#270), where it is the
     // confirmation that the escape worked.
-    if (state.onDevice) {
+    //
+    // In the accent once the model is in memory, in the bar's own colour while it is still being loaded:
+    // after the idle unload a 670 MB model takes seconds to come back, and the colour tells that wait
+    // apart from the decode itself, which is the short part.
+    state.localModel?.let { model ->
+        val prefs by FlorisPreferenceStore
+        val resident by LocalTranscriptionProvider.residentModels.collectFlowAsState()
+        val accent by prefs.theme.accentColor.collectAsState()
         Spacer(modifier = Modifier.width(8.dp))
         SnyggIcon(
             imageVector = Icons.Default.PhoneAndroid,
             modifier = Modifier.size(16.dp),
             contentDescription = stringRes(R.string.dictate__status_transcribing_local),
+            tint = accent.takeIf { model in resident },
         )
     }
     // The same idea for a fallback provider (#455): the active one could not be reached, and this one took
@@ -863,7 +871,11 @@ private fun ErrorDetailPopup(detail: String, onDismiss: () -> Unit) {
     }
 }
 
-/** Kind-specific icon for the error chip; the open-settings action gets a key icon regardless of kind. */
+/**
+ * Kind-specific icon for the error chip. The key icon is for a missing or refused key only: a missing
+ * rewording model or on-device model opens the settings too, and a key next to it pointed the user at the
+ * wrong field.
+ */
 private fun errorIcon(
     kind: DictateApiException.Kind?,
     action: DictateController.ErrorAction,
@@ -873,7 +885,7 @@ private fun errorIcon(
     // the other offer of a kept recording, rather than a warning sign over something the user chose.
     neutral && action == DictateController.ErrorAction.RESEND -> Icons.Default.GraphicEq
     action == DictateController.ErrorAction.TOP_UP -> Icons.Default.AddCard
-    action == DictateController.ErrorAction.OPEN_SETTINGS -> Icons.Default.VpnKey
+    kind == DictateApiException.Kind.INVALID_API_KEY -> Icons.Default.VpnKey
     kind == DictateApiException.Kind.QUOTA_EXCEEDED -> Icons.Default.DataUsage
     kind == DictateApiException.Kind.CONTENT_SIZE_LIMIT -> Icons.Default.WarningAmber
     kind == DictateApiException.Kind.TEXT_SIZE_LIMIT -> Icons.Default.WarningAmber
@@ -900,28 +912,28 @@ private fun PromoContent(kind: DictateController.PromoKind, message: String? = n
         DictateController.PromoKind.RATE -> Icons.Default.Star
         DictateController.PromoKind.DONATE -> Icons.Default.Favorite
         DictateController.PromoKind.CHANGELOG -> Icons.Default.NewReleases
-        DictateController.PromoKind.FLOATING_BUTTON -> Icons.Default.Adjust
         DictateController.PromoKind.MILESTONE -> Icons.Default.EmojiEvents
         // The mark of what is running low, not of the action — the accent pill beside it already
         // says "top up".
         DictateController.PromoKind.LOW_CREDIT -> ImageVector.vectorResource(R.drawable.ic_dictate_cloud)
+        DictateController.PromoKind.SAYOVA -> ImageVector.vectorResource(R.drawable.ic_sayova_mono)
     }
     // Milestone text is dynamic (which milestone), so it arrives via [message]; the rest map to a res.
     val messageRes = when (kind) {
         DictateController.PromoKind.RATE -> R.string.dictate__promo_rate_message
         DictateController.PromoKind.DONATE -> R.string.dictate__promo_donate_message
         DictateController.PromoKind.CHANGELOG -> R.string.dictate__promo_changelog_message
-        DictateController.PromoKind.FLOATING_BUTTON -> R.string.dictate__promo_floating_button_message
         DictateController.PromoKind.MILESTONE -> R.string.dictate__stats_milestone_title
         DictateController.PromoKind.LOW_CREDIT -> R.string.dictate__promo_low_credit_message
+        DictateController.PromoKind.SAYOVA -> R.string.dictate__promo_sayova_message
     }
     val actionRes = when (kind) {
         DictateController.PromoKind.RATE -> R.string.dictate__promo_rate_action
         DictateController.PromoKind.DONATE -> R.string.dictate__promo_donate_action
         DictateController.PromoKind.CHANGELOG -> R.string.dictate__promo_changelog_action
-        DictateController.PromoKind.FLOATING_BUTTON -> R.string.dictate__promo_floating_button_action
         DictateController.PromoKind.MILESTONE -> R.string.dictate__promo_milestone_action
         DictateController.PromoKind.LOW_CREDIT -> R.string.dictate__promo_low_credit_action
+        DictateController.PromoKind.SAYOVA -> R.string.dictate__promo_sayova_action
     }
 
     // Gentle pop-in (fade + slight scale) on top of the Smartbar's own slide transition.

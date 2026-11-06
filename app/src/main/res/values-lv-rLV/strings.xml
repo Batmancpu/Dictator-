@@ -138,7 +138,9 @@
     <string name="settings__search__keywords__text_expansion" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the typing-shortcut setting, which lets a short trigger expand into a saved block of text. Translate as the words people in your language would actually type when looking for that feature, separated by spaces. Do not translate word for word; add or drop terms as makes sense.">teksta izvēršana saīsinājums fragments makro automātiskais teksts veidne snippet text expansion</string>
     <string name="settings__search__keywords__selection_metrics" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which shows how many words and characters are selected. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">vārdu skaits rakstzīmju skaits garums statistika</string>
     <string name="settings__search__keywords__trim_on_copy" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which removes spaces and line breaks at the ends of copied text. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">apgriezt atstarpes noņemt tīrīt kopēt izgriezt</string>
+    <string name="settings__search__keywords__final_full_stop" comment="NOT SHOWN ANYWHERE — extra search terms that lead to the setting which leaves the full stop off a dictation of one sentence. Translate as the words people in your language would actually type when looking for it, separated by spaces. Do not translate word for word.">punkts pieturzīmes interpunkcija teikuma beigas bez punkta</string>
     <string name="settings__search__keywords__clear_cache">kešatmiņa krātuve vieta pagaidu faili atbrīvot dzēst tīrīt</string>
+    <string name="settings__search__keywords__keyboard_size">augstums augsts zems lielāks mazāks mainīt izmēru palielināt samazināt</string>
     <string name="settings__search__keywords__momentary_layer">turēt vilkt simbols slānis pieturzīmes pagaidu Īsā brīdī 123 iphone</string>
     <string name="settings__search__keywords__emoji_row">emocijzīmes rinda josla nesen izmantotās virs tastatūras ātri</string>
     <string name="settings__search__keywords__request_timeout">noildze taimauts lēns gaidīšana savienojums sekundes</string>
@@ -436,6 +438,7 @@
     <string name="pref__keyboard__font_size_multiplier__label" comment="Preference title">Fonta izmēra reizinātājs</string>
     <string name="pref__keyboard__group_layout__label" comment="Preference group title">Izkārtojums</string>
     <string name="pref__keyboard__landscape_input_ui_mode__label" comment="Preference value">Līmeniska pilnekrāna ievade</string>
+    <string name="pref__keyboard__keyboard_size__label">Tastatūras izmērs</string>
     <string name="pref__keyboard__key_spacing__label" comment="Preference title">Atstarpe starp taustiņiem</string>
     <string name="pref__keyboard__key_spacing__summary" comment="Preference summary">{v}% vertikāli, {h}% horizontāli — lielāka atstarpe padara mazākus taustiņus, nevis tastatūru.</string>
     <string name="pref__keyboard__group_keypress__label" comment="Preference group title">Taustiņa piespiešana</string>
@@ -568,6 +571,7 @@
     <string name="pref__gestures__delete_key_long_press__label" comment="Preference title">Dzēšanas taustiņa ilga piespiešana</string>
     <string name="pref__gestures__swipe_velocity_threshold__label" comment="Preference title">Pavilkšanas ātruma slieksnis</string>
     <string name="pref__gestures__swipe_distance_threshold__label" comment="Preference title">Pavilkšanas attāluma slieksnis</string>
+    <string name="settings__help__title">Palīdzība</string>
     <string name="settings__other__title" comment="Title of Other settings">Cits</string>
     <string name="pref__other__settings_theme__label" comment="Label of Settings theme preference in Other">Iestatījumu izskats</string>
     <string name="pref__other__settings_theme__auto_amoled" comment="Possible value of Settings theme preference in Other">Sistēmas noklusējums (AMOLED)</string>
@@ -618,11 +622,8 @@
     <string name="setup__select_ime__title">Atlasīt {app_name}</string>
     <string name="setup__select_ime__description">{app_name} tagad ir iespējots. Lai to izmantotu, jāpārslēdzas uz {app_name}, atlasot to ievades izvēles logā.</string>
     <string name="setup__select_ime__switch_keyboard_btn">Pārslēgt tastatūru</string>
-    <string name="setup__grant_notification_permission__title">Atļaut avārijas atskaišu paziņojumus</string>
-    <string name="setup__grant_notification_permission__description">Sākot ar Android 13, lietotnēm ir jāprasa atļauja, lai
-        nosūtītu paziņojumus. Dictate tā tiek izmantota tikai, lai atvērtu avārijas ziņojuma ekrānu avārijas gadījumā.
-        Šo atļauju sistēmas iestatījumos var mainīt jebkurā laikā.
-    </string>
+    <string name="setup__grant_notification_permission__title">Atļaut paziņojumus</string>
+    <string name="setup__grant_notification_permission__description">Sākot ar Android 13, lietotnēm ir jāprasa atļauja, pirms tās rāda paziņojumus. Dictate Keyboard rāda paziņojumu, kamēr peldošā poga ieraksta, kamēr tiek lejupielādēts runas modelis un kamēr jūsu pulkstenis diktē caur tālruni, un avārijas gadījumā atver avārijas ziņojumu. To var jebkurā laikā mainīt sistēmas iestatījumos.</string>
     <string name="setup__grant_notification_permission__btn">Piešķirt atļauju</string>
     <string name="setup__finish_up__title">Pabeigt</string>
     <string name="setup__finish_up__description_p1">{app_name} tagad ir iespējots un ir gatavs pielāgojumiem.</string>
@@ -648,6 +649,17 @@
     <string name="backup_and_restore__back_up__credentials_warning">Šis arhīvs satur tavas API atslēgas un paroles atklātā tekstā, kā arī tavu Dictate Cloud kredītu — ikviens, kas to saņem, var diktēt uz tava rēķina. Nenodod to tālāk, un, ja jau esi nodevis, nomaini atslēgu pie sava pakalpojuma sniedzēja. Viss pārējais, kas atzīmēts zemāk, ceļo kopā ar to, tostarp transkripcijas vēsture un starpliktuve.</string>
     <string name="backup_and_restore__back_up__credentials_excluded_note">Šajā arhīvā nav ne API atslēgu, ne paroļu, ne Dictate Cloud kredīta, tāpēc to var nodot tālāk, taču tavas tas arī neatjaunos. Viss pārējais, kas atzīmēts zemāk, tajā joprojām ir, tostarp transkripcijas vēsture un starpliktuve.</string>
     <string name="backup_and_restore__back_up__personal_content_note">Šajā arhīvā nav API atslēgu un paroļu, bet ir viss, kas atzīmēts zemāk: transkripcijas vēsture kopā ar saglabātajiem ierakstiem, starpliktuve, tavi uzvedņi un vārdi, ko tastatūra no tevis iemācījusies.</string>
+    <string name="backup_and_restore__back_up__encrypted_note">Šis arhīvs ir šifrēts ar tavu paroli, un visu, kas atzīmēts zemāk, var atjaunot tikai ar to. Ja aizmirsīsi paroli, neviens nevarēs atjaunot šo dublējumu – pat ne tu.</string>
+    <string name="backup_and_restore__back_up__password">Aizsardzība ar paroli</string>
+    <string name="backup_and_restore__back_up__password_enabled">Šifrēt ar paroli</string>
+    <string name="backup_and_restore__back_up__password_too_short">Vismaz {count} rakstzīmes</string>
+    <string name="backup_and_restore__back_up__password_mismatch">Paroles nesakrīt</string>
+    <string name="backup_and_restore__password">Parole</string>
+    <string name="backup_and_restore__password_repeat">Atkārto paroli</string>
+    <string name="backup_and_restore__restore__encrypted">Šis dublējuma arhīvs ir aizsargāts ar paroli. Ievadi to, lai redzētu, kas ir arhīvā.</string>
+    <string name="backup_and_restore__restore__unlock">Atbloķēt</string>
+    <string name="backup_and_restore__restore__wrong_password">Nepareiza parole</string>
+    <string name="backup_and_restore__restore__encrypted_unreadable">Šo arhīvu nevar atvērt. Tas ir bojāts vai izveidots ar jaunāku Dictate versiju.</string>
     <string name="backup_and_restore__back_up__files_ime_keyboard">Tastatūras paplašinājumi</string>
     <string name="backup_and_restore__back_up__files_ime_spelling">Pareizrakstības paplašinājumi / vārdnīcas</string>
     <string name="backup_and_restore__back_up__files_ime_theme">Izskata paplašinājumi</string>
@@ -868,7 +880,7 @@
     <string name="ext__addon_management_box__managing_placeholder">Pārvalda {extensions}</string>
     <string name="ext__addon_management_box__addon_manager_info">Visi uzdevumi, kas saistīti ar paplašinājumu ievietošanu, izgūšanu, izveidošanu, pielāgošanu un noņemšanu, ir paveicami centralizētajā papildinājumu pārvaldniekā.</string>
     <string name="ext__addon_management_box__go_to_page">Doties uz {ext_home_title}</string>
-    <string name="ext__home__info">Paplašinājumus var lejupielādēt un uzstādīt no Dictate papildinājumu glabātavas vai ievietot jebkuru paplašinājuma datni, kas ir lejupielādēta internetā.</string>
+    <string name="ext__home__info">Paplašinājumi pievieno izskatus, tastatūras izkārtojumus un valodu pakotnes. Importējiet paplašinājuma datni, lai to pievienotu; esošie ir uzskaitīti zemāk.</string>
     <string name="ext__home__visit_store">Apmeklēt papildinājumu glabātavu</string>
     <string name="ext__home__manage_extensions">Pārvaldīt uzstādītos paplašinājumus</string>
     <string name="ext__list__view_details">Skatīt izvērsumu</string>
@@ -1256,8 +1268,6 @@
     <string name="dictate__remember_last_dictation_summary">Saglabā jūsu pēdējo diktātu, lai peldošā poga to varētu atsaukt un klasiskais izkārtojums — ievietot atkārtoti.</string>
     <string name="dictate__remember_last_dictation_title">Atcerēties pēdējo diktātu</string>
     <string name="changelog__v4_2_0">• JAUNS: peldošā diktēšanas poga — diktējiet tieši jebkurā lietotnē, pat ja aktīva ir cita tastatūra. Izvēlieties no trim stiliem (Kapsula, Gredzens, Lode), vērojiet tiešraides viļņu formu runājot, velciet to jebkur ar piesaisti malām, iestatiet tās krāsu un izmēru un turiet nospiestu, lai pārformulētu. Ieslēdziet to sadaļā Iestatījumi ▸ Dictate ▸ Peldošā poga.\n• JAUNS: Google Gemini — izmanto savu AI Studio API atslēgu transkripcijai un pārformulēšanai.\n• Uzvednes tagad pēc noklusējuma tiek rādītas pastāvīgā rindā virs taustiņiem.\n• Uzticamāka teksta ievietošana lietotnēs, tostarp pārlūkos un citās tastatūrās.</string>
-    <string name="dictate__promo_floating_button_message">Jauns: diktē jebkurā lietotnē</string>
-    <string name="dictate__promo_floating_button_action">Izmēģināt</string>
     <string name="setup__floating_button__btn">Iestatīt peldošo pogu</string>
     <string name="setup__nav_back">Atpakaļ</string>
     <string name="setup__nav_next">Tālāk</string>
@@ -1366,6 +1376,7 @@
     <string name="dictate__providers_region_eu">Eiropas Savienība</string>
     <string name="dictate__providers_region_jp">Japāna</string>
     <string name="dictate__providers_region_in">Indija</string>
+    <string name="dictate__providers_region_cn">Ķīna (kontinentālā)</string>
     <string name="dictate__providers_region_global">Visā pasaulē</string>
     <string name="dictate__providers_custom_title">Pielāgots serveris</string>
     <string name="dictate__providers_get_key">Iegūt API atslēgu</string>
@@ -1375,9 +1386,17 @@
     <string name="dictate__providers_test">Pārbaudīt savienojumu</string>
     <string name="dictate__providers_test_transcribe">Pārbaudīt transkribēšanu</string>
     <string name="dictate__providers_check_no_key">Vispirms ievadiet savu API atslēgu.</string>
-    <string name="dictate__providers_check_credentials_ok">Akreditācijas dati pārbaudīti · {count} modeļi</string>
+    <plurals name="dictate__providers_check_credentials_ok">
+        <item quantity="zero">Akreditācijas dati pārbaudīti · {count} modeļu</item>
+        <item quantity="one">Akreditācijas dati pārbaudīti · {count} modelis</item>
+        <item quantity="other">Akreditācijas dati pārbaudīti · {count} modeļi</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_ok_nocount">Akreditācijas dati pārbaudīti</string>
-    <string name="dictate__providers_check_endpoint_ok">Serveris sasniegts · {count} modeļi</string>
+    <plurals name="dictate__providers_check_endpoint_ok">
+        <item quantity="zero">Serveris sasniegts · {count} modeļu</item>
+        <item quantity="one">Serveris sasniegts · {count} modelis</item>
+        <item quantity="other">Serveris sasniegts · {count} modeļi</item>
+    </plurals>
     <string name="dictate__providers_check_credentials_untested">Transkribēšana nav pārbaudīta.</string>
     <string name="dictate__providers_check_transcription_ok">Transkribēšana pārbaudīta</string>
     <string name="dictate__providers_check_transcription_text">Atgriezās kā: „{text}“</string>
@@ -1385,6 +1404,8 @@
     <string name="dictate__providers_check_failed_connection">Savienojuma pārbaude neizdevās</string>
     <string name="dictate__providers_check_failed_transcription">Transkribēšanas pārbaude neizdevās</string>
     <string name="dictate__providers_check_err_auth">Atslēga tika noraidīta. Pārbaudiet to un to, vai adrese pieder tam pašam kontam.</string>
+    <string name="dictate__providers_check_err_model">Atslēga darbojas, bet nedrīkst izmantot šo modeli. Izvēlieties citu modeli vai atļaujiet šo pakalpojuma sniedzēja projekta iestatījumos.</string>
+    <string name="dictate__error_model_unavailable">Modelis šai atslēgai nav pieejams</string>
     <string name="dictate__providers_check_err_quota">Atslēga darbojas, bet kontam vairs nav kvotas vai ir pārsniegts ierobežojums. Pārbaudiet savu plānu pie pakalpojuma sniedzēja.</string>
     <string name="dictate__providers_check_err_network">Serveri neizdevās sasniegt. Pārbaudiet adresi un interneta savienojumu.</string>
     <string name="dictate__providers_check_err_timeout">Nav atbildes noteiktajā laikā. Pakalpojuma sniedzējs var būt noslogots — mēģiniet vēlreiz.</string>
@@ -1415,7 +1436,11 @@
     <string name="dictate__model_picker_title">Izvēlieties modeli</string>
     <string name="dictate__model_picker_search">Meklējiet vai ievadiet modeļa ID</string>
     <string name="dictate__model_picker_loading">Ielādē modeļus…</string>
-    <string name="dictate__model_picker_count">{count} modeļi</string>
+    <plurals name="dictate__model_picker_count">
+        <item quantity="zero">{count} modeļu</item>
+        <item quantity="one">{count} modelis</item>
+        <item quantity="other">{count} modeļi</item>
+    </plurals>
     <string name="dictate__model_picker_refresh">Atsvaidzināt</string>
     <string name="dictate__model_picker_use_custom">Izmantot “{model}”</string>
     <string name="dictate__recording_group">Ierakstīšana</string>
@@ -1451,6 +1476,8 @@
     <string name="dictate__paragraph_split_title">Sadalīt rindkopās</string>
     <string name="dictate__paragraph_split_off">Izslēgts</string>
     <string name="dictate__paragraph_split_value">Pēc {n} vārdiem</string>
+    <string name="dictate__drop_final_full_stop_title">Izlaist punktu beigās</string>
+    <string name="dictate__drop_final_full_stop_summary">Tikai tad, ja diktāts ir viens teikums; vairāki teikumi saglabā visas pieturzīmes</string>
     <string name="dictate__realtime_title">Reāllaika transkripcija</string>
     <string name="dictate__realtime_summary">Atšifrē jau runāšanas laikā, nevis pēc apturēšanas, pakalpojumiem, kas to atbalsta</string>
     <string name="dictate__realtime_mode_off">Izslēgts</string>
@@ -1584,7 +1611,9 @@
     <string name="dictate__prompt_auto_apply_title">Lietot automātiski</string>
     <string name="dictate__prompt_auto_apply_summary">Automātiski palaist šo uzvedni katrai transkripcijai</string>
     <string name="dictate__prompt_reasoning_title">Spriešana</string>
-    <string name="dictate__prompt_reasoning_default">Noklusējums</string>
+    <string name="dictate__prompt_reasoning_default">Pakalpojuma sniedzēja iestatījums</string>
+    <string name="dictate__prompt_reasoning_little">Maz spriešanas</string>
+    <string name="dictate__prompt_reasoning_much">Daudz spriešanas</string>
     <string name="dictate__prompt_badge_selection">Nepieciešama atlase</string>
     <string name="dictate__prompt_badge_auto">Tiek lietota automātiski</string>
     <string name="dictate__example_prompt_fix_grammar_name">Labot gramatiku</string>
@@ -1867,7 +1896,8 @@
     <string name="dictate__promo_milestone_count">%s diktāti ar Dictate! 🎉</string>
     <string name="dictate__promo_milestone_action">Statistika</string>
     <string name="dictate__reasoning_effort_title">Spriešanas piepūle</string>
-    <string name="dictate__reasoning_effort_off">Izslēgts</string>
+    <string name="dictate__reasoning_effort_off">Pakalpojuma sniedzēja noklusējums</string>
+    <string name="dictate__reasoning_effort_none">Bez spriešanas</string>
     <string name="dictate__reasoning_effort_off_summary">Nodrošinātāja noklusējums — nespriešanas modeļiem atstāj izslēgtu</string>
     <string name="dictate__reasoning_effort_minimal">Minimāla</string>
     <string name="dictate__reasoning_effort_minimal_summary">Ātrākais, vismazāk domāšanas</string>
@@ -1876,6 +1906,9 @@
     <string name="dictate__reasoning_effort_medium">Vidēja</string>
     <string name="dictate__reasoning_effort_medium_summary">Līdzsvars starp domāšanu un ātrumu</string>
     <string name="dictate__reasoning_effort_high">Augsta</string>
+    <string name="dictate__reasoning_effort_xhigh">Ļoti augsta</string>
+    <string name="dictate__reasoning_effort_max">Maksimāla</string>
+    <string name="dictate__reasoning_effort_app_default">{name} (noklusējums)</string>
     <string name="dictate__reasoning_effort_high_summary">Visvairāk domāšanas, lēnāk</string>
     <string name="dictate__reasoning_effort_custom">Pielāgots</string>
     <string name="dictate__action_save_audio">Saglabāt audio</string>
@@ -2257,6 +2290,10 @@
     <string name="gif__error">Neizdevās ielādēt GIF. Pārbaudi savienojumu un API atslēgu.</string>
     <string name="gif__setup_needed">Iestatījumos pievieno bezmaksas KLIPY API atslēgu, lai meklētu GIF</string>
     <string name="gif__setup_needed_action">Iestatīt GIF meklēšanu</string>
+    <string name="gif__search_off">GIF meklēšana ir izslēgta</string>
+    <string name="quick_action__forward_delete__tooltip">Dzēst rakstzīmi aiz kursora</string>
+    <string name="dictate__error_no_rewording_model">Izvēlieties pārformulēšanas modeli pakalpojumam %1$s</string>
+    <string name="dictate__model_placeholder_required">obligāti: izvēlieties vai ierakstiet modeli</string>
     <string name="gif__copied_to_clipboard">GIF nokopēts starpliktuvē — turi nospiestu, lai ielīmētu</string>
     <string name="gif__insert_failed">Neizdevās ievietot GIF</string>
     <string name="quick_action__ime_ui_mode_gif">GIF</string>
@@ -2353,6 +2390,25 @@
     <string name="dictate__action_top_up">Papildināt kredītu</string>
     <string name="dictate__promo_low_credit_message">Kredīts gandrīz beidzies.</string>
     <string name="dictate__promo_low_credit_action">Papildināt</string>
+    <string name="dictate__promo_sayova_message">Jauna lietotne: MI pulkstenī</string>
+    <string name="dictate__promo_sayova_action">Apskatīt</string>
+    <string name="about__more_apps__title">Citas lietotnes</string>
+    <string name="about__more_apps__summary">SayOVA un TunerToGo jūsu pulkstenim</string>
+    <string name="about__more_apps__tunertogo_tagline">Instrumentu skaņotājs Wear OS ierīcēm</string>
+    <string name="about__more_apps__tunertogo_description">Precīzs skaņotājs vienmēr uz jūsu plaukstas, gatavs, tiklīdz paņemat instrumentu.</string>
+    <string name="about__more_apps__tunertogo_feature_instruments">Ģitāra, basģitāra, ukulele, vijole un citi, ar automātisku stīgu noteikšanu</string>
+    <string name="about__more_apps__tunertogo_feature_chromatic">Hromatiskais režīms visiem citiem instrumentiem un jūsu balsij</string>
+    <string name="about__more_apps__tunertogo_feature_vibration">Īsa vibrācija, kad stīga ir noskaņota, lai skatiens paliek pie tapām</string>
+    <string name="about__more_apps__tunertogo_feature_privacy">Bez interneta piekļuves, bez reklāmām: skaņa tiek analizēta pulkstenī un nekad netiek saglabāta</string>
+    <string name="about__more_apps__tunertogo_requirements">Nepieciešams pulkstenis ar Wear OS 3 vai jaunāku versiju un mikrofonu. Darbojas bez tālruņa lietotnes.</string>
+    <string name="about__more_apps__intro">Arī no DevEmperor, Dictate izstrādātāja:</string>
+    <string name="about__more_apps__sayova_tagline">MI balss asistents Wear OS ierīcēm</string>
+    <string name="about__more_apps__sayova_description">Runājiet ar Google Gemini vai OpenAI tieši no pulksteņa: dabiski, pārtrauciet jebkurā brīdī un lasiet atbildi, kamēr to klausāties.</string>
+    <string name="about__more_apps__sayova_feature_interpreter">Tulks starp 21 valodu, abas puses kā teksts</string>
+    <string name="about__more_apps__sayova_feature_tasks">Iestata taimerus un modinātājus, saglabā piezīmes un meklē tīmeklī</string>
+    <string name="about__more_apps__sayova_feature_phone">Sagatavo ziņas, tikšanās un maršrutus jūsu tālrunī, gatavus nosūtīšanai</string>
+    <string name="about__more_apps__sayova_feature_privacy">Jūsu pašu API atslēga: bez konta, bez izsekošanas, atvērtā koda</string>
+    <string name="about__more_apps__sayova_requirements">Nepieciešams pulkstenis ar Wear OS 3 vai jaunāku versiju un mikrofonu, kā arī API atslēga no Google Gemini vai OpenAI. Lietošanas maksu iekasē jūsu pakalpojumu sniedzējs.</string>
     <string name="prefs__media__sticker__title">Uzlīmes</string>
     <string name="prefs__media__sticker_folder__title">Uzlīmju mape</string>
     <string name="prefs__media__sticker_folder__summary_unset">Izvēlieties mapi ar saviem attēliem</string>
