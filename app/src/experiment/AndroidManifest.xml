@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
-        <!-- Only the debug-signed experiment APK exposes this second launcher entry. Keeping
-             its microphone in another process tests that the RecognitionService consumes
-             caller-owned PCM, rather than accidentally recording from its own process. -->
+        <!-- Reachable from the brrSpeak settings screen only. Do not add a second launcher
+             icon: the user needs to configure providers first, and some launchers hide or
+             rearrange additional MAIN/LAUNCHER activities after setup or a settings restore.
+             The separate process ensures the RecognitionService cannot silently substitute
+             its own microphone for caller-supplied PCM. -->
         <activity
             android:name="dev.patrickgold.florisboard.dictate.recognition.AudioSourceProbeActivity"
             android:process=":audio_source_probe"
             android:label="brrSpeak audio-source test"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:exported="false" />
     </application>
 </manifest>

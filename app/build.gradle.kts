@@ -41,6 +41,10 @@ val projectVersionNameSuffix = projectVersionName.substringAfter("-", "").let { 
         suffix
     }
 }
+// Give each CI experiment its own Android versionCode and versionName. Obtainium and Android
+// otherwise see identical metadata for successive test APKs and may refuse to update them.
+val brrSpeakExperimentRunNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 0
+val buildingBrrSpeakExperiment = providers.gradleProperty("brrSpeakExperiment").orNull == "true"
 
 kotlin {
     compilerOptions {
@@ -71,7 +75,11 @@ configure<ApplicationExtension> {
         applicationId = "com.mangoloads.speak"
         minSdk = projectMinSdk.toInt()
         targetSdk = projectTargetSdk.toInt()
-        versionCode = projectVersionCode.toInt()
+        versionCode = if (buildingBrrSpeakExperiment) {
+            projectVersionCode.toInt() * 1_000 + brrSpeakExperimentRunNumber
+        } else {
+            projectVersionCode.toInt()
+        }
         versionName = projectVersionName.substringBefore("-")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -148,7 +156,7 @@ configure<ApplicationExtension> {
         create("experiment") {
             initWith(getByName("debug"))
             applicationIdSuffix = ""
-            versionNameSuffix = "-audio-source-experiment"
+            versionNameSuffix = "-audio-source-experiment.$brrSpeakExperimentRunNumber"
             signingConfig = signingConfigs.getByName("debug")
             matchingFallbacks += listOf("debug")
         }

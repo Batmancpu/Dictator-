@@ -10,6 +10,7 @@
 
 package dev.patrickgold.florisboard.app.settings.dictate
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -86,6 +87,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import dev.patrickgold.florisboard.R
+import dev.patrickgold.florisboard.BuildConfig
 import dev.patrickgold.florisboard.app.settings.search.settingsSearchAnchor
 import dev.patrickgold.florisboard.app.FlorisPreferenceStore
 import dev.patrickgold.florisboard.app.LocalNavController
@@ -325,6 +327,22 @@ fun DictateRecordingScreen() = FlorisScreen {
     val prefs by FlorisPreferenceStore
 
     content {
+        val context = LocalContext.current
+        if (BuildConfig.BUILD_TYPE == "experiment") {
+            Preference(
+                icon = Icons.Default.Mic,
+                title = "Test the Android audio-source handoff",
+                summary = "Open the two-tap speech-recognition diagnostic",
+                onClick = {
+                    context.startActivity(
+                        Intent().setClassName(
+                            context.packageName,
+                            "dev.patrickgold.florisboard.dictate.recognition.AudioSourceProbeActivity",
+                        ),
+                    )
+                },
+            )
+        }
         SwitchPreference(
             prefs.dictate.pushToTalk,
             icon = Icons.Default.TouchApp,

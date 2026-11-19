@@ -16,6 +16,7 @@
 
 package dev.patrickgold.florisboard.app.settings
 
+import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -59,6 +60,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import dev.patrickgold.florisboard.R
+import dev.patrickgold.florisboard.BuildConfig
 import dev.patrickgold.florisboard.app.LocalNavController
 import dev.patrickgold.florisboard.app.PreferenceRecovery
 import dev.patrickgold.florisboard.app.Routes
@@ -261,6 +263,24 @@ fun HomeScreen() = FlorisScreen {
                 }
             },
         )
+        // The IPC test belongs *inside* the configured app, never as a second launcher icon.
+        // Only the experiment build contains the target Activity. This keeps a stable way back
+        // to the test after first-run setup, backup restore, or a launcher database refresh.
+        if (BuildConfig.BUILD_TYPE == "experiment") {
+            Preference(
+                icon = Icons.Outlined.Build,
+                title = "brrSpeak audio-source test",
+                summary = "Two-tap microphone → PCM pipe → recognition result",
+                onClick = {
+                    context.startActivity(
+                        Intent().setClassName(
+                            context.packageName,
+                            "dev.patrickgold.florisboard.dictate.recognition.AudioSourceProbeActivity",
+                        ),
+                    )
+                },
+            )
+        }
         Preference(
             icon = Icons.Default.Language,
             title = stringRes(R.string.settings__localization__title),
