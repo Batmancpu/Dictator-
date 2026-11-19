@@ -1,6 +1,23 @@
 > [!IMPORTANT]
 > **brrSpeak is an experimental, independently built fork of [Dictate Keyboard](https://github.com/DevEmperor/DictateKeyboard). Its purpose is to investigate and test an Android 15 speech-recognition integration problem documented in [upstream issue #489](https://github.com/DevEmperor/DictateKeyboard/issues/489): allowing another keyboard to supply microphone audio for transcription without switching apps. Experimental `RecognizerIntent.EXTRA_AUDIO_SOURCE` input support is implemented here but is NOT yet verified on a real device or included upstream. This is not an official release, and no personal or device-identifying information is included here.**
 
+## brrBoard record-first receiver (experimental)
+
+brrSpeak now exposes a UI-free **explicit bound service** for the separately installed
+`com.mangoloads.board` keyboard. The keyboard records **16 kHz mono PCM16** privately,
+then passes only a read-only file descriptor (maximum 120 seconds) over Binder.
+brrSpeak verifies the Binder sender's package UID, reuses its saved provider/model/language
+and normal transcription/post-processing pipeline, and returns only final text over a
+session-scoped Messenger reply. It opens no microphone and reads no editor or clipboard data.
+The existing system RecognitionService and built-in audio-source probe are unchanged.
+
+**Hardware acceptance is pending** on Android 15/ColorOS; CI is not a real-device test.
+The experimental release workflow currently falls back to an ephemeral Android debug signer
+when persistent signing secrets are absent. A fresh build may require a brrSpeak-only
+uninstall/reinstall after exporting any settings you need. Never uninstall the purchased
+`net.devemperor.dictate` app. Install brrSpeak first, then the signed brrBoard update.
+See [record-first protocol](docs/BRRBOARD_RECORD_FIRST_HANDOFF_2026_11_19.md).
+
 <div align="center">
 
 <img src="img/Icon_512x512_2_round.png" alt="Upstream Dictate Keyboard artwork" width="120">
