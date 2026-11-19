@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!-- Only the debug-signed experiment APK exposes this second launcher entry. Keeping
+             its microphone in another process tests that the RecognitionService consumes
+             caller-owned PCM, rather than accidentally recording from its own process. -->
+        <activity
+            android:name="dev.patrickgold.florisboard.dictate.recognition.AudioSourceProbeActivity"
+            android:process=":audio_source_probe"
+            android:label="brrSpeak audio-source test"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

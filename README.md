@@ -37,7 +37,7 @@ verified brrSpeak release.
 - **Baseline:** refreshed from upstream `main`, including the fixes in commit `84adfa9`.
 - **Android application ID:** `com.mangoloads.speak`, separate from the original Dictate installation.
 - **Current experiment:** receive 16 kHz mono PCM16 through `RecognizerIntent.EXTRA_AUDIO_SOURCE` and feed the existing WAV/transcription path without opening brrSpeak's microphone. Real-device verification is pending.
-- **Test APK:** the GitHub Actions `brrSpeak audio-source experiment APK` workflow builds an installable, debug-signed `com.mangoloads.speak` APK. Its native on-device translation engine is deliberately omitted; microphone-source testing uses normal transcription providers.
+- **Test APK:** the GitHub Actions `brrSpeak audio-source experiment APK` workflow builds an installable, debug-signed `com.mangoloads.speak` APK. It includes an experiment-only **brrSpeak audio-source test** launcher screen that records microphone audio in a separate process, streams it through `EXTRA_AUDIO_SOURCE`, and displays the recognition result. Its native on-device translation engine is deliberately omitted; microphone-source testing uses normal transcription providers.
 - **Privacy:** this README intentionally contains no personal data, phone model, or device-specific identifiers.
 
 ### Audio-source caller contract (Android 13+)
@@ -50,6 +50,20 @@ and `EXTRA_AUDIO_SOURCE_SAMPLING_RATE=16000`. Close the write side at the user's
 No extra activity or keyboard switch is required. A caller that does not attach this extra will still use
 the upstream microphone path and may still receive Android 15 error 9. Integration with brrBoard is a
 **separate, not-yet-verified sender change**; installing brrSpeak by itself does not change brrBoard's mic.
+
+### One-APK test before brrBoard integration
+
+1. Install the `brrSpeak-experiment.apk` from the experiment's GitHub Actions prerelease and open
+   the regular **brrSpeak** launcher to configure a working transcription provider.
+2. Open the separate **brrSpeak audio-source test** launcher icon (included **only** in experiment builds).
+   Grant microphone permission when asked.
+3. Tap **Start audio test**, wait until it says it is recording, and speak a short sentence.
+4. Tap **Stop & transcribe**. The test screen closes the audio pipe (without switching keyboards)
+   and should display recognized text or Android's precise `SpeechRecognizer` error code.
+
+This separate-process probe tests the core audio-descriptor handoff and transcription engine,
+**not** a completed integration into brrBoard. On Android 15, this is a meaningful first
+check because brrSpeak's recognition process never attempts to capture microphone audio.
 
 ## Installation of brrSpeak
 

@@ -27,7 +27,8 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - uses: android-actions/setup-android@v3
+      # ubuntu-latest already supplies an Android SDK. The setup-android action's
+      # legacy `sdkmanager tools` install fails because that package was retired.
       - uses: gradle/actions/setup-gradle@v4
       - name: Fetch verified upstream speech model native libraries
         run: bash tools/fetch-sherpa-onnx.sh
