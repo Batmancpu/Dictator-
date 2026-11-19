@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Dictate</string>
+    <string name="app_name">brrSpeak</string>
     <string name="key__phone_pause" comment="Label for the Pause key in the telephone keyboard layout">一時停止</string>
     <string name="key__phone_wait" comment="Label for the Wait key in the telephone keyboard layout">待機</string>
     <string name="key_popup__threedots_alt" comment="Content description for the three-dots icon in a key popup">3点リーダーアイコン。表示されている場合、長押しで他の文字が利用できることを示します。</string>
@@ -1185,9 +1185,9 @@
     <string name="unit__percent__symbol">{v}%</string>
     <string name="unit__display_pixel__symbol">{v} dp</string>
     <string name="unit__display_pixel_per_seconds__symbol">{v} dp/秒</string>
-    <string name="dictate__accessibility_service_label">Dictate のフローティングボタン</string>
+    <string name="dictate__accessibility_service_label">brrSpeak のフローティングボタン</string>
     <string name="dictate__accessibility_service_summary">任意のテキスト欄に音声入力するためのフローティングボタンを表示します。</string>
-    <string name="dictate__accessibility_service_description">Dictate はフローティング音声入力ボタンにこのサービスを使用します。有効にすると、任意のアプリでテキスト欄がフォーカスされたことを検出し（ボタンを表示できるように）、文字起こしした音声をその欄に挿入します。Dictate はカーソル位置にテキストを配置するためにフォーカス中の欄のみを読み取り、その他の画面の内容を収集・保存・共有することはありません。</string>
+    <string name="dictate__accessibility_service_description">Dictate はフローティング音声入力ボタンにこのサービスを使用します。有効にすると、任意のアプリでテキスト欄がフォーカスされたことを検出し（ボタンを表示できるように）、文字起こしした音声をその欄に挿入します。brrSpeak はカーソル位置にテキストを配置するためにフォーカス中の欄のみを読み取り、その他の画面の内容を収集・保存・共有することはありません。</string>
     <string name="dictate__overlay_notification_channel">フローティング音声入力ボタン</string>
     <string name="dictate__overlay_notification_recording">録音中 — フローティングボタンをタップして文字起こし</string>
     <string name="dictate__overlay_notification_working">文字起こし中…</string>
@@ -1199,7 +1199,7 @@
     <string name="dictate__floating_button_service_enabled">有効 · タップしてシステム設定を開く</string>
     <string name="dictate__floating_button_service_disabled">まだ有効ではありません · タップして設定</string>
     <string name="dictate__floating_button_disclosure_title">フローティングボタンを有効にする</string>
-    <string name="dictate__floating_button_disclosure_message">フローティングボタンを表示するには、Dictate にユーザー補助サービスが必要です。任意のアプリでテキスト欄がフォーカスされたことを検出し（ボタンを表示できるように）、文字起こしした音声をその欄に挿入します。Dictate はテキストを配置するためにフォーカス中の欄のみを読み取り、その他の画面の内容を収集・保存・共有することはありません。\n\n次の画面で「Dictate のフローティングボタン」を見つけてオンにしてください。</string>
+    <string name="dictate__floating_button_disclosure_message">フローティングボタンを表示するには、Dictate にユーザー補助サービスが必要です。任意のアプリでテキスト欄がフォーカスされたことを検出し（ボタンを表示できるように）、文字起こしした音声をその欄に挿入します。Dictate はテキストを配置するためにフォーカス中の欄のみを読み取り、その他の画面の内容を収集・保存・共有することはありません。\n\n次の画面で「brrSpeak のフローティングボタン」を見つけてオンにしてください。</string>
     <string name="dictate__floating_button_disclosure_continue">設定を開く</string>
     <string name="dictate__floating_button_mic_title">マイクへのアクセス</string>
     <string name="dictate__floating_button_mic_summary">音声の録音に必要です · タップして許可</string>
@@ -1287,8 +1287,8 @@
     <string name="dictate__voice_input_transcribing">文字起こし中…</string>
     <string name="dictate__voice_input_stop">完了</string>
     <string name="dictate__voice_input_hint">タップで送信</string>
-    <string name="dictate__voice_ime_label">Dictate 音声入力</string>
-    <string name="dictate__error_no_api_key">APIキーが設定されていません – Dictate設定で構成してください。</string>
+    <string name="dictate__voice_ime_label">brrSpeak 音声入力</string>
+    <string name="dictate__error_no_api_key">APIキーが設定されていません – brrSpeak設定で構成してください。</string>
     <string name="dictate__error_transcription_failed">文字起こしに失敗しました。</string>
     <string name="dictate__error_unknown">文字起こし中に不明なエラーが発生しました。</string>
     <string name="dictate__error_rewording_failed">言い換えに失敗しました。</string>
@@ -1327,7 +1327,7 @@
     <string name="dictate__promo_donate_action">寄付する</string>
     <string name="dictate__promo_changelog_message">Dictateが更新されました</string>
     <string name="dictate__promo_changelog_action">詳細</string>
-    <string name="dictate__title">Dictate</string>
+    <string name="dictate__title">brrSpeak</string>
     <string name="dictate__provider_title">文字起こしプロバイダー</string>
     <string name="dictate__provider__openai">OpenAI</string>
     <string name="dictate__provider__groq">Groq</string>
@@ -1737,7 +1737,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">各口述はクリップボードにもコピーされ、挿入が失敗しても手動で貼り付けられます。一部の端末ではクリップボードの通知が表示される場合があります。</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">口述は挿入されるだけで、クリップボードにはコピーされません。</string>
     <string name="dictate__floating_button_menu_group">長押しメニュー</string>
-    <string name="dictate__floating_button_menu_settings_title">Dictate の設定</string>
+    <string name="dictate__floating_button_menu_settings_title">brrSpeak の設定</string>
     <string name="dictate__floating_button_side_buttons_title">追加のボタン</string>
     <string name="dictate__mappings_add">マッピングを追加</string>
     <string name="dictate__mappings_editor_title">マッピング</string>

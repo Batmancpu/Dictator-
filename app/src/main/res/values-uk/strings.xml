@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Dictate</string>
+    <string name="app_name">brrSpeak</string>
     <string name="key__phone_pause" comment="Label for the Pause key in the telephone keyboard layout">Пауза</string>
     <string name="key__phone_wait" comment="Label for the Wait key in the telephone keyboard layout">Зачекайте</string>
     <string name="key_popup__threedots_alt" comment="Content description for the three-dots icon in a key popup">Значок трикрапки. Якщо видно, означає, що при довшому натисканні можна використати більше літер.</string>
@@ -1095,9 +1095,9 @@
     <string name="unit__percent__symbol">{v} %</string>
     <string name="unit__display_pixel__symbol">{v} dp</string>
     <string name="unit__display_pixel_per_seconds__symbol">{v} dp/с</string>
-    <string name="dictate__accessibility_service_label">Плаваюча кнопка Dictate</string>
+    <string name="dictate__accessibility_service_label">Плаваюча кнопка brrSpeak</string>
     <string name="dictate__accessibility_service_summary">Показувати плаваючу кнопку для диктування в будь-яке текстове поле.</string>
-    <string name="dictate__accessibility_service_description">Dictate використовує цю службу для плаваючої кнопки диктування. Коли її ввімкнено, вона визначає, що текстове поле отримало фокус у будь-якому застосунку — щоб кнопка могла з’явитися — і вставляє ваше розпізнане мовлення в це поле. Dictate читає лише поле у фокусі, щоб розмістити ваш текст біля курсора; вона не збирає, не зберігає та не передає інший вміст екрана.</string>
+    <string name="dictate__accessibility_service_description">Dictate використовує цю службу для плаваючої кнопки диктування. Коли її ввімкнено, вона визначає, що текстове поле отримало фокус у будь-якому застосунку — щоб кнопка могла з’явитися — і вставляє ваше розпізнане мовлення в це поле. brrSpeak читає лише поле у фокусі, щоб розмістити ваш текст біля курсора; вона не збирає, не зберігає та не передає інший вміст екрана.</string>
     <string name="dictate__overlay_notification_channel">Плаваюча кнопка диктування</string>
     <string name="dictate__overlay_notification_recording">Запис — торкніться плаваючої кнопки, щоб транскрибувати</string>
     <string name="dictate__overlay_notification_working">Транскрибування…</string>
@@ -1109,7 +1109,7 @@
     <string name="dictate__floating_button_service_enabled">Увімкнено · торкніться, щоб відкрити системні налаштування</string>
     <string name="dictate__floating_button_service_disabled">Ще не ввімкнено · торкніться, щоб налаштувати</string>
     <string name="dictate__floating_button_disclosure_title">Увімкнути плаваючу кнопку</string>
-    <string name="dictate__floating_button_disclosure_message">Щоб показати плаваючу кнопку, Dictate потрібна служба доступності. Вона визначає, що текстове поле отримало фокус у будь-якому застосунку — щоб кнопка могла з’явитися — і вставляє ваше розпізнане мовлення в це поле. Dictate читає лише поле у фокусі, щоб розмістити ваш текст; вона не збирає, не зберігає та не передає інший вміст екрана.\n\nНа наступному екрані знайдіть «Плаваюча кнопка Dictate» та ввімкніть її.</string>
+    <string name="dictate__floating_button_disclosure_message">Щоб показати плаваючу кнопку, Dictate потрібна служба доступності. Вона визначає, що текстове поле отримало фокус у будь-якому застосунку — щоб кнопка могла з’явитися — і вставляє ваше розпізнане мовлення в це поле. Dictate читає лише поле у фокусі, щоб розмістити ваш текст; вона не збирає, не зберігає та не передає інший вміст екрана.\n\nНа наступному екрані знайдіть «Плаваюча кнопка brrSpeak» та ввімкніть її.</string>
     <string name="dictate__floating_button_disclosure_continue">Відкрити налаштування</string>
     <string name="dictate__floating_button_mic_title">Доступ до мікрофона</string>
     <string name="dictate__floating_button_mic_summary">Потрібен для запису вашого голосу · торкніться, щоб надати</string>
@@ -1197,8 +1197,8 @@
     <string name="dictate__voice_input_transcribing">Транскрибування…</string>
     <string name="dictate__voice_input_stop">Готово</string>
     <string name="dictate__voice_input_hint">Торкніться, щоб надіслати</string>
-    <string name="dictate__voice_ime_label">Голосовий ввід Dictate</string>
-    <string name="dictate__error_no_api_key">Ключ API не задано — налаштуйте його в налаштуваннях Dictate.</string>
+    <string name="dictate__voice_ime_label">Голосовий ввід brrSpeak</string>
+    <string name="dictate__error_no_api_key">Ключ API не задано — налаштуйте його в налаштуваннях brrSpeak.</string>
     <string name="dictate__error_transcription_failed">Не вдалося виконати транскрибування.</string>
     <string name="dictate__error_unknown">Невідома помилка під час транскрибування.</string>
     <string name="dictate__error_rewording_failed">Не вдалося переформулювати.</string>
@@ -1237,7 +1237,7 @@
     <string name="dictate__promo_donate_action">Підтримати</string>
     <string name="dictate__promo_changelog_message">Dictate оновлено</string>
     <string name="dictate__promo_changelog_action">Докладніше</string>
-    <string name="dictate__title">Dictate</string>
+    <string name="dictate__title">brrSpeak</string>
     <string name="dictate__provider_title">Постачальник транскрибування</string>
     <string name="dictate__provider__openai">OpenAI</string>
     <string name="dictate__provider__groq">Groq</string>
@@ -1659,7 +1659,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Кожна диктовка також копіюється в буфер обміну, щоб ви могли вставити її вручну, якщо вставлення не вдалося. На деяких телефонах може показуватися сповіщення буфера обміну.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Диктовки лише вставляються, а не копіюються в буфер обміну.</string>
     <string name="dictate__floating_button_menu_group">Меню при утриманні</string>
-    <string name="dictate__floating_button_menu_settings_title">Налаштування Dictate</string>
+    <string name="dictate__floating_button_menu_settings_title">Налаштування brrSpeak</string>
     <string name="dictate__floating_button_side_buttons_title">Додаткові кнопки</string>
     <string name="dictate__mappings_add">Додати правило</string>
     <string name="dictate__mappings_editor_title">Правило заміни</string>

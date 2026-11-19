@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Dictate</string>
+    <string name="app_name">brrSpeak</string>
     <string name="key__phone_pause" comment="Label for the Pause key in the telephone keyboard layout">Pausa</string>
     <string name="key__phone_wait" comment="Label for the Wait key in the telephone keyboard layout">Espera</string>
     <string name="key_popup__threedots_alt" comment="Content description for the three-dots icon in a key popup">Icona de tres punts. Si és visible, indica que es poden utilitzar més lletres si es prem més temps.</string>
@@ -1120,9 +1120,9 @@
     <string name="unit__percent__symbol">{v} %</string>
     <string name="unit__display_pixel__symbol">{v} dp</string>
     <string name="unit__display_pixel_per_seconds__symbol">{v} dp/s</string>
-    <string name="dictate__accessibility_service_label">Botó flotant de Dictate</string>
+    <string name="dictate__accessibility_service_label">Botó flotant de brrSpeak</string>
     <string name="dictate__accessibility_service_summary">Mostra un botó flotant per dictar a qualsevol camp de text.</string>
-    <string name="dictate__accessibility_service_description">Dictate utilitza aquest servei per al botó de dictat flotant. Quan està activat, detecta quan un camp de text té el focus en qualsevol aplicació — perquè el botó pugui aparèixer — i insereix la teva parla transcrita en aquest camp. Dictate només llegeix el camp enfocat per col·locar el text al cursor; no recopila, emmagatzema ni comparteix cap altre contingut de la pantalla.</string>
+    <string name="dictate__accessibility_service_description">Dictate utilitza aquest servei per al botó de dictat flotant. Quan està activat, detecta quan un camp de text té el focus en qualsevol aplicació — perquè el botó pugui aparèixer — i insereix la teva parla transcrita en aquest camp. brrSpeak només llegeix el camp enfocat per col·locar el text al cursor; no recopila, emmagatzema ni comparteix cap altre contingut de la pantalla.</string>
     <string name="dictate__overlay_notification_channel">Botó de dictat flotant</string>
     <string name="dictate__overlay_notification_recording">Gravant — toca el botó flotant per transcriure</string>
     <string name="dictate__overlay_notification_working">Transcrivint…</string>
@@ -1134,7 +1134,7 @@
     <string name="dictate__floating_button_service_enabled">Activat · toca per obrir la configuració del sistema</string>
     <string name="dictate__floating_button_service_disabled">Encara no activat · toca per configurar</string>
     <string name="dictate__floating_button_disclosure_title">Activa el botó flotant</string>
-    <string name="dictate__floating_button_disclosure_message">Per mostrar el botó flotant, Dictate necessita el servei d’accessibilitat. Detecta quan un camp de text té el focus en qualsevol aplicació — perquè el botó pugui aparèixer — i insereix la teva parla transcrita en aquest camp. Dictate només llegeix el camp enfocat per col·locar el teu text; no recopila, emmagatzema ni comparteix cap altre contingut de la pantalla.\n\nA la pantalla següent, busca «Botó flotant de Dictate» i activa’l.</string>
+    <string name="dictate__floating_button_disclosure_message">Per mostrar el botó flotant, Dictate necessita el servei d’accessibilitat. Detecta quan un camp de text té el focus en qualsevol aplicació — perquè el botó pugui aparèixer — i insereix la teva parla transcrita en aquest camp. Dictate només llegeix el camp enfocat per col·locar el teu text; no recopila, emmagatzema ni comparteix cap altre contingut de la pantalla.\n\nA la pantalla següent, busca «Botó flotant de brrSpeak» i activa’l.</string>
     <string name="dictate__floating_button_disclosure_continue">Obre la configuració</string>
     <string name="dictate__floating_button_mic_title">Accés al micròfon</string>
     <string name="dictate__floating_button_mic_summary">Necessari per gravar la teva veu · toca per concedir</string>
@@ -1222,8 +1222,8 @@
     <string name="dictate__voice_input_transcribing">Transcrivint…</string>
     <string name="dictate__voice_input_stop">Fet</string>
     <string name="dictate__voice_input_hint">Toca per enviar</string>
-    <string name="dictate__voice_ime_label">Entrada de veu de Dictate</string>
-    <string name="dictate__error_no_api_key">No hi ha cap clau d\'API – configura-la a la configuració del Dictate.</string>
+    <string name="dictate__voice_ime_label">Entrada de veu de brrSpeak</string>
+    <string name="dictate__error_no_api_key">No hi ha cap clau d\'API – configura-la a la configuració del brrSpeak.</string>
     <string name="dictate__error_transcription_failed">Ha fallat la transcripció.</string>
     <string name="dictate__error_unknown">Error desconegut durant la transcripció.</string>
     <string name="dictate__error_rewording_failed">Ha fallat la reformulació.</string>
@@ -1262,7 +1262,7 @@
     <string name="dictate__promo_donate_action">Fes un donatiu</string>
     <string name="dictate__promo_changelog_message">El Dictate s\'ha actualitzat</string>
     <string name="dictate__promo_changelog_action">Detalls</string>
-    <string name="dictate__title">Dictate</string>
+    <string name="dictate__title">brrSpeak</string>
     <string name="dictate__provider_title">Proveïdor de transcripció</string>
     <string name="dictate__provider__openai">OpenAI</string>
     <string name="dictate__provider__groq">Groq</string>
@@ -1676,7 +1676,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Cada dictat també es copia al porta-retalls, perquè el puguis enganxar manualment si la inserció falla. Pot mostrar un avís del porta-retalls en alguns telèfons.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Els dictats només s\'insereixen, no es copien al porta-retalls.</string>
     <string name="dictate__floating_button_menu_group">Menú en mantenir premut</string>
-    <string name="dictate__floating_button_menu_settings_title">Configuració de Dictate</string>
+    <string name="dictate__floating_button_menu_settings_title">Configuració de brrSpeak</string>
     <string name="dictate__floating_button_side_buttons_title">Botons addicionals</string>
     <string name="dictate__mappings_add">Afegeix una assignació</string>
     <string name="dictate__mappings_editor_title">Assignació</string>

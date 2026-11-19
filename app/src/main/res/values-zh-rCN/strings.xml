@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Dictate</string>
+    <string name="app_name">brrSpeak</string>
     <string name="key__phone_pause" comment="Label for the Pause key in the telephone keyboard layout">暂停</string>
     <string name="key__phone_wait" comment="Label for the Wait key in the telephone keyboard layout">等待</string>
     <string name="key_popup__threedots_alt" comment="Content description for the three-dots icon in a key popup">三点图标。如果可见，表明长按后可使用更多字符。</string>
@@ -1245,9 +1245,9 @@
     <string name="unit__percent__symbol">{v}%</string>
     <string name="unit__display_pixel__symbol">{v} dp</string>
     <string name="unit__display_pixel_per_seconds__symbol">{v} dp/秒</string>
-    <string name="dictate__accessibility_service_label">Dictate 悬浮按钮</string>
+    <string name="dictate__accessibility_service_label">brrSpeak 悬浮按钮</string>
     <string name="dictate__accessibility_service_summary">显示一个悬浮按钮，可向任意文本框听写。</string>
-    <string name="dictate__accessibility_service_description">Dictate 使用此服务来提供悬浮听写按钮。启用后，它会检测任意应用中文本框何时获得焦点（以便按钮可以出现），并将转写的语音插入该文本框。Dictate 仅读取获得焦点的文本框，以便将文本放置在光标处；它不会收集、存储或分享任何其他屏幕内容。</string>
+    <string name="dictate__accessibility_service_description">Dictate 使用此服务来提供悬浮听写按钮。启用后，它会检测任意应用中文本框何时获得焦点（以便按钮可以出现），并将转写的语音插入该文本框。brrSpeak 仅读取获得焦点的文本框，以便将文本放置在光标处；它不会收集、存储或分享任何其他屏幕内容。</string>
     <string name="dictate__overlay_notification_channel">悬浮听写按钮</string>
     <string name="dictate__overlay_notification_recording">正在录音 — 点按悬浮按钮进行转写</string>
     <string name="dictate__overlay_notification_working">正在转写…</string>
@@ -1259,7 +1259,7 @@
     <string name="dictate__floating_button_service_enabled">已启用 · 点按以打开系统设置</string>
     <string name="dictate__floating_button_service_disabled">尚未启用 · 点按以设置</string>
     <string name="dictate__floating_button_disclosure_title">启用悬浮按钮</string>
-    <string name="dictate__floating_button_disclosure_message">若要显示悬浮按钮，Dictate 需要无障碍服务。它会检测任意应用中文本框何时获得焦点（以便按钮可以出现），并将转写的语音插入该文本框。Dictate 仅读取获得焦点的文本框，以便放置您的文本；它不会收集、存储或分享任何其他屏幕内容。\n\n在下一个屏幕中，找到“Dictate 悬浮按钮”并将其开启。</string>
+    <string name="dictate__floating_button_disclosure_message">若要显示悬浮按钮，Dictate 需要无障碍服务。它会检测任意应用中文本框何时获得焦点（以便按钮可以出现），并将转写的语音插入该文本框。Dictate 仅读取获得焦点的文本框，以便放置您的文本；它不会收集、存储或分享任何其他屏幕内容。\n\n在下一个屏幕中，找到“brrSpeak 悬浮按钮”并将其开启。</string>
     <string name="dictate__floating_button_disclosure_continue">打开设置</string>
     <string name="dictate__floating_button_mic_title">麦克风权限</string>
     <string name="dictate__floating_button_mic_summary">录制语音所必需 · 点按以授予</string>
@@ -1347,8 +1347,8 @@
     <string name="dictate__voice_input_transcribing">正在转写…</string>
     <string name="dictate__voice_input_stop">完成</string>
     <string name="dictate__voice_input_hint">点按发送</string>
-    <string name="dictate__voice_ime_label">Dictate 语音输入</string>
-    <string name="dictate__error_no_api_key">未设置 API 密钥——请在 Dictate 设置中配置。</string>
+    <string name="dictate__voice_ime_label">brrSpeak 语音输入</string>
+    <string name="dictate__error_no_api_key">未设置 API 密钥——请在 brrSpeak 设置中配置。</string>
     <string name="dictate__error_transcription_failed">转录失败。</string>
     <string name="dictate__error_unknown">转录时发生未知错误。</string>
     <string name="dictate__error_rewording_failed">改写失败。</string>
@@ -1387,7 +1387,7 @@
     <string name="dictate__promo_donate_action">捐赠</string>
     <string name="dictate__promo_changelog_message">Dictate 已更新</string>
     <string name="dictate__promo_changelog_action">详情</string>
-    <string name="dictate__title">Dictate</string>
+    <string name="dictate__title">brrSpeak</string>
     <string name="dictate__provider_title">转录服务商</string>
     <string name="dictate__provider__openai">OpenAI</string>
     <string name="dictate__provider__groq">Groq</string>
@@ -1797,7 +1797,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">每次听写也会复制到剪贴板，这样即使插入失败也能手动粘贴。在某些手机上可能会显示剪贴板提示。</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">听写仅插入，不复制到剪贴板。</string>
     <string name="dictate__floating_button_menu_group">长按菜单</string>
-    <string name="dictate__floating_button_menu_settings_title">Dictate 设置</string>
+    <string name="dictate__floating_button_menu_settings_title">brrSpeak 设置</string>
     <string name="dictate__floating_button_side_buttons_title">额外按钮</string>
     <string name="dictate__mappings_add">添加映射</string>
     <string name="dictate__mappings_editor_title">映射</string>

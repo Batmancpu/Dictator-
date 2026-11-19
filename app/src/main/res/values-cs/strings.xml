@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Dictate</string>
+    <string name="app_name">brrSpeak</string>
     <string name="key__phone_pause" comment="Label for the Pause key in the telephone keyboard layout">Pauza</string>
     <string name="key__phone_wait" comment="Label for the Wait key in the telephone keyboard layout">Počkat</string>
     <string name="key_popup__threedots_alt" comment="Content description for the three-dots icon in a key popup">Tří-tečková ikona. Pokud je viditelná, tak se po delším podržení nabídne více písmen.</string>
@@ -1266,9 +1266,9 @@
     <string name="unit__percent__symbol">{v} %</string>
     <string name="unit__display_pixel__symbol">{v} dp</string>
     <string name="unit__display_pixel_per_seconds__symbol">{v} dp/s</string>
-    <string name="dictate__accessibility_service_label">Plovoucí tlačítko Dictate</string>
+    <string name="dictate__accessibility_service_label">Plovoucí tlačítko brrSpeak</string>
     <string name="dictate__accessibility_service_summary">Zobrazit plovoucí tlačítko pro diktování do libovolného textového pole.</string>
-    <string name="dictate__accessibility_service_description">Dictate používá tuto službu pro plovoucí tlačítko diktování. Když je zapnutá, rozpozná, že je textové pole zaměřené v jakékoli aplikaci — aby se tlačítko mohlo zobrazit — a vloží přepsanou řeč do tohoto pole. Dictate čte pouze zaměřené pole, aby umístil text na pozici kurzoru; nesbírá, neukládá ani nesdílí žádný jiný obsah obrazovky.</string>
+    <string name="dictate__accessibility_service_description">Dictate používá tuto službu pro plovoucí tlačítko diktování. Když je zapnutá, rozpozná, že je textové pole zaměřené v jakékoli aplikaci — aby se tlačítko mohlo zobrazit — a vloží přepsanou řeč do tohoto pole. brrSpeak čte pouze zaměřené pole, aby umístil text na pozici kurzoru; nesbírá, neukládá ani nesdílí žádný jiný obsah obrazovky.</string>
     <string name="dictate__overlay_notification_channel">Plovoucí tlačítko diktování</string>
     <string name="dictate__overlay_notification_recording">Nahrávání — klepnutím na plovoucí tlačítko přepíšete</string>
     <string name="dictate__overlay_notification_working">Přepis…</string>
@@ -1280,7 +1280,7 @@
     <string name="dictate__floating_button_service_enabled">Zapnuto · klepnutím otevřete nastavení systému</string>
     <string name="dictate__floating_button_service_disabled">Zatím nezapnuto · klepnutím nastavíte</string>
     <string name="dictate__floating_button_disclosure_title">Zapnout plovoucí tlačítko</string>
-    <string name="dictate__floating_button_disclosure_message">Aby se plovoucí tlačítko zobrazilo, Dictate potřebuje službu přístupnosti. Rozpozná, že je textové pole zaměřené v jakékoli aplikaci — aby se tlačítko mohlo zobrazit — a vloží přepsanou řeč do tohoto pole. Dictate čte pouze zaměřené pole, aby umístil váš text; nesbírá, neukládá ani nesdílí žádný jiný obsah obrazovky.\n\nNa další obrazovce najděte „Plovoucí tlačítko Dictate” a zapněte ho.</string>
+    <string name="dictate__floating_button_disclosure_message">Aby se plovoucí tlačítko zobrazilo, Dictate potřebuje službu přístupnosti. Rozpozná, že je textové pole zaměřené v jakékoli aplikaci — aby se tlačítko mohlo zobrazit — a vloží přepsanou řeč do tohoto pole. Dictate čte pouze zaměřené pole, aby umístil váš text; nesbírá, neukládá ani nesdílí žádný jiný obsah obrazovky.\n\nNa další obrazovce najděte „Plovoucí tlačítko brrSpeak” a zapněte ho.</string>
     <string name="dictate__floating_button_disclosure_continue">Otevřít nastavení</string>
     <string name="dictate__floating_button_mic_title">Přístup k mikrofonu</string>
     <string name="dictate__floating_button_mic_summary">Vyžadováno k nahrávání hlasu · klepnutím povolíte</string>
@@ -1368,8 +1368,8 @@
     <string name="dictate__voice_input_transcribing">Přepis…</string>
     <string name="dictate__voice_input_stop">Hotovo</string>
     <string name="dictate__voice_input_hint">Klepnutím odešlete</string>
-    <string name="dictate__voice_ime_label">Hlasový vstup Dictate</string>
-    <string name="dictate__error_no_api_key">Není nastaven klíč API – nastavte jej v nastavení Dictate.</string>
+    <string name="dictate__voice_ime_label">Hlasový vstup brrSpeak</string>
+    <string name="dictate__error_no_api_key">Není nastaven klíč API – nastavte jej v nastavení brrSpeak.</string>
     <string name="dictate__error_transcription_failed">Přepis selhal.</string>
     <string name="dictate__error_unknown">Neznámá chyba při přepisu.</string>
     <string name="dictate__error_rewording_failed">Přeformulování selhalo.</string>
@@ -1408,7 +1408,7 @@
     <string name="dictate__promo_donate_action">Přispět</string>
     <string name="dictate__promo_changelog_message">Dictate byl aktualizován</string>
     <string name="dictate__promo_changelog_action">Podrobnosti</string>
-    <string name="dictate__title">Dictate</string>
+    <string name="dictate__title">brrSpeak</string>
     <string name="dictate__provider_title">Poskytovatel přepisu</string>
     <string name="dictate__provider__openai">OpenAI</string>
     <string name="dictate__provider__groq">Groq</string>
@@ -1830,7 +1830,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Každé diktování se také zkopíruje do schránky, takže je můžeš vložit ručně, pokud vložení selže. Na některých telefonech může zobrazit upozornění schránky.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Diktování se pouze vkládají, nekopírují se do schránky.</string>
     <string name="dictate__floating_button_menu_group">Nabídka při podržení</string>
-    <string name="dictate__floating_button_menu_settings_title">Nastavení Dictate</string>
+    <string name="dictate__floating_button_menu_settings_title">Nastavení brrSpeak</string>
     <string name="dictate__floating_button_side_buttons_title">Další tlačítka</string>
     <string name="dictate__mappings_add">Přidat pravidlo</string>
     <string name="dictate__mappings_editor_title">Pravidlo</string>

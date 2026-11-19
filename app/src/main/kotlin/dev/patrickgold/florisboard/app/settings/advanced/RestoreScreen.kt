@@ -105,10 +105,9 @@ import dev.patrickgold.florisboard.lib.FlorisLocale
 
 object Restore {
     const val MIN_VERSION_CODE = 64
-    // Dictate's own application id (base, without the .debug/.beta variant suffixes) — a backup whose
-    // metadata package starts with this is a genuine Dictate backup, not a "third-party" one. Was still
-    // the upstream FlorisBoard id after the fork, which made every Dictate backup falsely warn.
-    const val PACKAGE_NAME = "net.devemperor.dictate"
+    // brrSpeak's own application ID (without .debug/.beta suffixes). Original Dictate backups are
+    // treated as imports from a different app so we do not mistake them for brrSpeak backups.
+    const val PACKAGE_NAME = "com.mangoloads.speak"
     const val BACKUP_ARCHIVE_FILE_NAME = "backup.zip"
     // The plain archive inside a password-protected one (issue #470), deleted again once it is unpacked.
     const val DECRYPTED_ARCHIVE_FILE_NAME = "decrypted_backup.zip"

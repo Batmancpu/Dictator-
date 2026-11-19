@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Dictate</string>
+    <string name="app_name">brrSpeak</string>
     <string name="key__phone_pause" comment="Label for the Pause key in the telephone keyboard layout">إيقاف مؤقت</string>
     <string name="key__phone_wait" comment="Label for the Wait key in the telephone keyboard layout">انتظر</string>
     <string name="key_popup__threedots_alt" comment="Content description for the three-dots icon in a key popup">أيقونة ثلاث نقاط. إذا كانت ظاهرة ، تشير إلى أنه يمكن استخدام المزيد من الأحرف إذا تم الضغط عليها لفترة أطول.</string>
@@ -1109,9 +1109,9 @@
     <string name="unit__percent__symbol">{v}٪</string>
     <string name="unit__display_pixel__symbol">{v} dp</string>
     <string name="unit__display_pixel_per_seconds__symbol">{v} dp/ث</string>
-    <string name="dictate__accessibility_service_label">زر Dictate العائم</string>
+    <string name="dictate__accessibility_service_label">زر brrSpeak العائم</string>
     <string name="dictate__accessibility_service_summary">إظهار زر عائم للإملاء في أي حقل نصي.</string>
-    <string name="dictate__accessibility_service_description">يستخدم Dictate هذه الخدمة لتشغيل زر الإملاء العائم. عند تفعيلها، تكتشف متى يصبح حقل نصي في وضع التركيز في أي تطبيق — حتى يظهر الزر — وتُدرج كلامك المنسوخ في ذلك الحقل. لا يقرأ Dictate سوى الحقل المركَّز عليه لوضع نصك عند المؤشر؛ ولا يجمع أو يخزن أو يشارك أي محتوى آخر من الشاشة.</string>
+    <string name="dictate__accessibility_service_description">يستخدم Dictate هذه الخدمة لتشغيل زر الإملاء العائم. عند تفعيلها، تكتشف متى يصبح حقل نصي في وضع التركيز في أي تطبيق — حتى يظهر الزر — وتُدرج كلامك المنسوخ في ذلك الحقل. لا يقرأ brrSpeak سوى الحقل المركَّز عليه لوضع نصك عند المؤشر؛ ولا يجمع أو يخزن أو يشارك أي محتوى آخر من الشاشة.</string>
     <string name="dictate__overlay_notification_channel">زر الإملاء العائم</string>
     <string name="dictate__overlay_notification_recording">جارٍ التسجيل — اضغط على الزر العائم للنسخ</string>
     <string name="dictate__overlay_notification_working">جارٍ النسخ…</string>
@@ -1123,7 +1123,7 @@
     <string name="dictate__floating_button_service_enabled">مُفعَّلة · اضغط لفتح إعدادات النظام</string>
     <string name="dictate__floating_button_service_disabled">غير مُفعَّلة بعد · اضغط للإعداد</string>
     <string name="dictate__floating_button_disclosure_title">تفعيل الزر العائم</string>
-    <string name="dictate__floating_button_disclosure_message">لإظهار الزر العائم، يحتاج Dictate إلى خدمة إمكانية الوصول. تكتشف متى يصبح حقل نصي في وضع التركيز في أي تطبيق — حتى يظهر الزر — وتُدرج كلامك المنسوخ في ذلك الحقل. لا يقرأ Dictate سوى الحقل المركَّز عليه لوضع نصك؛ ولا يجمع أو يخزن أو يشارك أي محتوى آخر من الشاشة.\n\nفي الشاشة التالية، ابحث عن «زر Dictate العائم» وقم بتفعيله.</string>
+    <string name="dictate__floating_button_disclosure_message">لإظهار الزر العائم، يحتاج Dictate إلى خدمة إمكانية الوصول. تكتشف متى يصبح حقل نصي في وضع التركيز في أي تطبيق — حتى يظهر الزر — وتُدرج كلامك المنسوخ في ذلك الحقل. لا يقرأ Dictate سوى الحقل المركَّز عليه لوضع نصك؛ ولا يجمع أو يخزن أو يشارك أي محتوى آخر من الشاشة.\n\nفي الشاشة التالية، ابحث عن «زر brrSpeak العائم» وقم بتفعيله.</string>
     <string name="dictate__floating_button_disclosure_continue">فتح الإعدادات</string>
     <string name="dictate__floating_button_mic_title">الوصول إلى الميكروفون</string>
     <string name="dictate__floating_button_mic_summary">مطلوب لتسجيل صوتك · اضغط للمنح</string>
@@ -1211,8 +1211,8 @@
     <string name="dictate__voice_input_transcribing">جارٍ التفريغ…</string>
     <string name="dictate__voice_input_stop">تم</string>
     <string name="dictate__voice_input_hint">انقر للإرسال</string>
-    <string name="dictate__voice_ime_label">إدخال Dictate الصوتي</string>
-    <string name="dictate__error_no_api_key">لم يُضبط مفتاح API – اضبطه في إعدادات Dictate.</string>
+    <string name="dictate__voice_ime_label">إدخال brrSpeak الصوتي</string>
+    <string name="dictate__error_no_api_key">لم يُضبط مفتاح API – اضبطه في إعدادات brrSpeak.</string>
     <string name="dictate__error_transcription_failed">فشل التفريغ النصي.</string>
     <string name="dictate__error_unknown">خطأ غير معروف أثناء التفريغ النصي.</string>
     <string name="dictate__error_rewording_failed">فشلت إعادة الصياغة.</string>
@@ -1251,7 +1251,7 @@
     <string name="dictate__promo_donate_action">تبرّع</string>
     <string name="dictate__promo_changelog_message">تم تحديث Dictate</string>
     <string name="dictate__promo_changelog_action">التفاصيل</string>
-    <string name="dictate__title">Dictate</string>
+    <string name="dictate__title">brrSpeak</string>
     <string name="dictate__provider_title">مزوّد التفريغ النصي</string>
     <string name="dictate__provider__openai">OpenAI</string>
     <string name="dictate__provider__groq">Groq</string>
@@ -1681,7 +1681,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">يُنسخ كل إملاء أيضًا إلى الحافظة، حتى تتمكن من لصقه يدويًا إذا فشل الإدراج. قد يُظهر إشعار الحافظة على بعض الهواتف.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">يتم إدراج الإملاءات فقط، دون نسخها إلى الحافظة.</string>
     <string name="dictate__floating_button_menu_group">قائمة الضغط المطوّل</string>
-    <string name="dictate__floating_button_menu_settings_title">إعدادات Dictate</string>
+    <string name="dictate__floating_button_menu_settings_title">إعدادات brrSpeak</string>
     <string name="dictate__floating_button_side_buttons_title">أزرار إضافية</string>
     <string name="dictate__mappings_add">إضافة تعيين</string>
     <string name="dictate__mappings_editor_title">التعيين</string>

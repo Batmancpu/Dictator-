@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Dictate</string>
+    <string name="app_name">brrSpeak</string>
     <string name="key__phone_pause" comment="Label for the Pause key in the telephone keyboard layout">Pauze</string>
     <string name="key__phone_wait" comment="Label for the Wait key in the telephone keyboard layout">Wacht</string>
     <string name="key_popup__threedots_alt" comment="Content description for the three-dots icon in a key popup">Pictogram met drie puntjes. Indien zichtbaar, geeft dit aan dat er meer letters gebruikt kunnen worden als u de toets langer ingedrukt houdt.</string>
@@ -1152,9 +1152,9 @@
     <string name="unit__percent__symbol">{v} %</string>
     <string name="unit__display_pixel__symbol">{v} dp</string>
     <string name="unit__display_pixel_per_seconds__symbol">{v} dp/s</string>
-    <string name="dictate__accessibility_service_label">Zwevende knop van Dictate</string>
+    <string name="dictate__accessibility_service_label">Zwevende knop van brrSpeak</string>
     <string name="dictate__accessibility_service_summary">Toon een zwevende knop om in elk tekstveld te dicteren.</string>
-    <string name="dictate__accessibility_service_description">Dictate gebruikt deze service voor de zwevende dicteerknop. Wanneer ingeschakeld detecteert deze wanneer een tekstveld de focus heeft in een willekeurige app — zodat de knop kan verschijnen — en voegt je getranscribeerde spraak in dat veld in. Dictate leest alleen het gefocuste veld om je tekst op de cursor te plaatsen; het verzamelt, bewaart of deelt geen andere scherminhoud.</string>
+    <string name="dictate__accessibility_service_description">Dictate gebruikt deze service voor de zwevende dicteerknop. Wanneer ingeschakeld detecteert deze wanneer een tekstveld de focus heeft in een willekeurige app — zodat de knop kan verschijnen — en voegt je getranscribeerde spraak in dat veld in. brrSpeak leest alleen het gefocuste veld om je tekst op de cursor te plaatsen; het verzamelt, bewaart of deelt geen andere scherminhoud.</string>
     <string name="dictate__overlay_notification_channel">Zwevende dicteerknop</string>
     <string name="dictate__overlay_notification_recording">Bezig met opnemen — tik op de zwevende knop om te transcriberen</string>
     <string name="dictate__overlay_notification_working">Bezig met transcriberen…</string>
@@ -1166,7 +1166,7 @@
     <string name="dictate__floating_button_service_enabled">Ingeschakeld · tik om systeeminstellingen te openen</string>
     <string name="dictate__floating_button_service_disabled">Nog niet ingeschakeld · tik om in te stellen</string>
     <string name="dictate__floating_button_disclosure_title">De zwevende knop inschakelen</string>
-    <string name="dictate__floating_button_disclosure_message">Om de zwevende knop te tonen heeft Dictate de toegankelijkheidsservice nodig. Deze detecteert wanneer een tekstveld de focus heeft in een willekeurige app — zodat de knop kan verschijnen — en voegt je getranscribeerde spraak in dat veld in. Dictate leest alleen het gefocuste veld om je tekst te plaatsen; het verzamelt, bewaart of deelt geen andere scherminhoud.\n\nZoek op het volgende scherm “Zwevende knop van Dictate” en schakel deze in.</string>
+    <string name="dictate__floating_button_disclosure_message">Om de zwevende knop te tonen heeft Dictate de toegankelijkheidsservice nodig. Deze detecteert wanneer een tekstveld de focus heeft in een willekeurige app — zodat de knop kan verschijnen — en voegt je getranscribeerde spraak in dat veld in. Dictate leest alleen het gefocuste veld om je tekst te plaatsen; het verzamelt, bewaart of deelt geen andere scherminhoud.\n\nZoek op het volgende scherm “Zwevende knop van brrSpeak” en schakel deze in.</string>
     <string name="dictate__floating_button_disclosure_continue">Instellingen openen</string>
     <string name="dictate__floating_button_mic_title">Microfoontoegang</string>
     <string name="dictate__floating_button_mic_summary">Vereist om je stem op te nemen · tik om toe te staan</string>
@@ -1254,8 +1254,8 @@
     <string name="dictate__voice_input_transcribing">Transcriberen…</string>
     <string name="dictate__voice_input_stop">Klaar</string>
     <string name="dictate__voice_input_hint">Tik om te verzenden</string>
-    <string name="dictate__voice_ime_label">Dictate spraakinvoer</string>
-    <string name="dictate__error_no_api_key">Geen API-sleutel ingesteld – stel deze in via de Dictate-instellingen.</string>
+    <string name="dictate__voice_ime_label">brrSpeak spraakinvoer</string>
+    <string name="dictate__error_no_api_key">Geen API-sleutel ingesteld – stel deze in via de brrSpeak-instellingen.</string>
     <string name="dictate__error_transcription_failed">Transcriptie mislukt.</string>
     <string name="dictate__error_unknown">Onbekende fout tijdens de transcriptie.</string>
     <string name="dictate__error_rewording_failed">Herformulering mislukt.</string>
@@ -1294,7 +1294,7 @@
     <string name="dictate__promo_donate_action">Doneren</string>
     <string name="dictate__promo_changelog_message">Dictate is bijgewerkt</string>
     <string name="dictate__promo_changelog_action">Details</string>
-    <string name="dictate__title">Dictate</string>
+    <string name="dictate__title">brrSpeak</string>
     <string name="dictate__provider_title">Transcriptie-aanbieder</string>
     <string name="dictate__provider__openai">OpenAI</string>
     <string name="dictate__provider__groq">Groq</string>
@@ -1708,7 +1708,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Elk dictaat wordt ook naar het klembord gekopieerd, zodat je het handmatig kunt plakken als invoegen mislukt. Kan op sommige telefoons een klembordmelding tonen.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Dictaten worden alleen ingevoegd, niet naar het klembord gekopieerd.</string>
     <string name="dictate__floating_button_menu_group">Menu bij ingedrukt houden</string>
-    <string name="dictate__floating_button_menu_settings_title">Dictate-instellingen</string>
+    <string name="dictate__floating_button_menu_settings_title">brrSpeak-instellingen</string>
     <string name="dictate__floating_button_side_buttons_title">Extra knoppen</string>
     <string name="dictate__mappings_add">Toewijzing toevoegen</string>
     <string name="dictate__mappings_editor_title">Toewijzing</string>

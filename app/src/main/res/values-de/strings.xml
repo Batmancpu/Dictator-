@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Dictate</string>
+    <string name="app_name">brrSpeak</string>
     <string name="key__phone_pause" comment="Label for the Pause key in the telephone keyboard layout">Pause</string>
     <string name="key__phone_wait" comment="Label for the Wait key in the telephone keyboard layout">Warten</string>
     <string name="key_popup__threedots_alt" comment="Content description for the three-dots icon in a key popup">Drei-Punkte-Symbol. Zeigt an, dass durch langes Drücken mehr Zeichen verwendet werden können.</string>
@@ -1188,9 +1188,9 @@
     <string name="unit__display_pixel__symbol">{v} dp</string>
     <string name="unit__display_pixel_per_seconds__symbol">{v} dp/s</string>
     <!-- Dictate floating button / accessibility service (issue #88) -->
-    <string name="dictate__accessibility_service_label">Dictate Floating-Button</string>
+    <string name="dictate__accessibility_service_label">brrSpeak Floating-Button</string>
     <string name="dictate__accessibility_service_summary">Zeigt einen schwebenden Button, um in jedes Textfeld zu diktieren.</string>
-    <string name="dictate__accessibility_service_description">Dictate nutzt diesen Dienst für den schwebenden Diktier-Button. Wenn er aktiviert ist, erkennt er, wann in einer beliebigen App ein Textfeld fokussiert wird – damit der Button erscheinen kann – und fügt deine transkribierte Sprache in dieses Feld ein. Dictate liest nur das fokussierte Feld, um deinen Text an der Cursorposition einzufügen; es sammelt, speichert oder teilt keine anderen Bildschirminhalte.</string>
+    <string name="dictate__accessibility_service_description">Dictate nutzt diesen Dienst für den schwebenden Diktier-Button. Wenn er aktiviert ist, erkennt er, wann in einer beliebigen App ein Textfeld fokussiert wird – damit der Button erscheinen kann – und fügt deine transkribierte Sprache in dieses Feld ein. brrSpeak liest nur das fokussierte Feld, um deinen Text an der Cursorposition einzufügen; es sammelt, speichert oder teilt keine anderen Bildschirminhalte.</string>
     <string name="dictate__overlay_notification_channel">Schwebender Diktier-Button</string>
     <string name="dictate__overlay_notification_recording">Aufnahme – tippe auf den schwebenden Button, um zu transkribieren</string>
     <string name="dictate__overlay_notification_working">Transkribiere…</string>
@@ -1202,7 +1202,7 @@
     <string name="dictate__floating_button_service_enabled">Aktiviert · tippen, um die Systemeinstellungen zu öffnen</string>
     <string name="dictate__floating_button_service_disabled">Noch nicht aktiviert · tippen, um einzurichten</string>
     <string name="dictate__floating_button_disclosure_title">Floating-Button aktivieren</string>
-    <string name="dictate__floating_button_disclosure_message">Um den schwebenden Button anzuzeigen, benötigt Dictate den Bedienungshilfe-Dienst. Er erkennt, wann in einer beliebigen App ein Textfeld fokussiert wird – damit der Button erscheinen kann – und fügt deine transkribierte Sprache in dieses Feld ein. Dictate liest nur das fokussierte Feld, um deinen Text einzufügen; es sammelt, speichert oder teilt keine anderen Bildschirminhalte.\n\nSuche auf dem nächsten Bildschirm „Dictate Floating-Button\" und schalte ihn ein.</string>
+    <string name="dictate__floating_button_disclosure_message">Um den schwebenden Button anzuzeigen, benötigt Dictate den Bedienungshilfe-Dienst. Er erkennt, wann in einer beliebigen App ein Textfeld fokussiert wird – damit der Button erscheinen kann – und fügt deine transkribierte Sprache in dieses Feld ein. Dictate liest nur das fokussierte Feld, um deinen Text einzufügen; es sammelt, speichert oder teilt keine anderen Bildschirminhalte.\n\nSuche auf dem nächsten Bildschirm „brrSpeak Floating-Button\" und schalte ihn ein.</string>
     <string name="dictate__floating_button_disclosure_continue">Einstellungen öffnen</string>
     <string name="dictate__floating_button_mic_title">Mikrofon-Zugriff</string>
     <string name="dictate__floating_button_mic_summary">Nötig, um deine Stimme aufzunehmen · tippen, um zu erlauben</string>
@@ -1273,8 +1273,8 @@
     <string name="dictate__voice_input_transcribing">Transkribiere …</string>
     <string name="dictate__voice_input_stop">Fertig</string>
     <string name="dictate__voice_input_hint">Zum Senden tippen</string>
-    <string name="dictate__voice_ime_label">Dictate Spracheingabe</string>
-    <string name="dictate__error_no_api_key">Kein API-Schlüssel gesetzt – richte ihn in den Dictate-Einstellungen ein.</string>
+    <string name="dictate__voice_ime_label">brrSpeak Spracheingabe</string>
+    <string name="dictate__error_no_api_key">Kein API-Schlüssel gesetzt – richte ihn in den brrSpeak-Einstellungen ein.</string>
     <string name="dictate__error_transcription_failed">Transkription fehlgeschlagen.</string>
     <string name="dictate__error_unknown">Unbekannter Fehler bei der Transkription.</string>
     <string name="dictate__error_rewording_failed">Umformulierung fehlgeschlagen.</string>
@@ -1322,7 +1322,7 @@
     <string name="dictate__promo_donate_action">Spenden</string>
     <string name="dictate__promo_changelog_message">Dictate wurde aktualisiert</string>
     <string name="dictate__promo_changelog_action">Details</string>
-    <string name="dictate__title">Dictate</string>
+    <string name="dictate__title">brrSpeak</string>
     <string name="dictate__provider_title">Transkriptionsanbieter</string>
     <string name="dictate__provider__openai">OpenAI</string>
     <string name="dictate__provider__groq">Groq</string>
@@ -1778,7 +1778,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Jedes Diktat wird zusätzlich in die Zwischenablage kopiert, sodass du es manuell einfügen kannst, falls das Einfügen fehlschlägt. Zeigt auf manchen Geräten einen Zwischenablage-Hinweis.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Diktate werden nur eingefügt, nicht in die Zwischenablage kopiert.</string>
     <string name="dictate__floating_button_menu_group">Menü beim Halten</string>
-    <string name="dictate__floating_button_menu_settings_title">Dictate-Einstellungen</string>
+    <string name="dictate__floating_button_menu_settings_title">brrSpeak-Einstellungen</string>
     <string name="dictate__floating_button_side_buttons_title">Zusätzliche Schaltflächen</string>
     <string name="dictate__mappings_add">Zuordnung hinzufügen</string>
     <string name="dictate__mappings_editor_title">Zuordnung</string>

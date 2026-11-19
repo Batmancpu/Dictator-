@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Dictate</string>
+    <string name="app_name">brrSpeak</string>
     <string name="key__phone_pause" comment="Label for the Pause key in the telephone keyboard layout">Duraklat</string>
     <string name="key__phone_wait" comment="Label for the Wait key in the telephone keyboard layout">Bekle</string>
     <string name="key_popup__threedots_alt" comment="Content description for the three-dots icon in a key popup">Üç nokta simgesi. Görünürse, daha uzun basıldığında daha fazla harfin kullanılabileceğini gösterir.</string>
@@ -1232,9 +1232,9 @@
     <string name="unit__percent__symbol">%{v}</string>
     <string name="unit__display_pixel__symbol">{v} dp</string>
     <string name="unit__display_pixel_per_seconds__symbol">{v} dp/sn</string>
-    <string name="dictate__accessibility_service_label">Dictate kayan düğmesi</string>
+    <string name="dictate__accessibility_service_label">brrSpeak kayan düğmesi</string>
     <string name="dictate__accessibility_service_summary">Herhangi bir metin alanına dikte etmek için kayan bir düğme göster.</string>
-    <string name="dictate__accessibility_service_description">Dictate, kayan dikte düğmesi için bu hizmeti kullanır. Etkinleştirildiğinde, herhangi bir uygulamada bir metin alanının odaklandığını algılar — böylece düğme görünebilir — ve yazıya dökülen konuşmanızı o alana ekler. Dictate metninizi imlece yerleştirmek için yalnızca odaklanılan alanı okur; başka hiçbir ekran içeriğini toplamaz, saklamaz veya paylaşmaz.</string>
+    <string name="dictate__accessibility_service_description">Dictate, kayan dikte düğmesi için bu hizmeti kullanır. Etkinleştirildiğinde, herhangi bir uygulamada bir metin alanının odaklandığını algılar — böylece düğme görünebilir — ve yazıya dökülen konuşmanızı o alana ekler. brrSpeak metninizi imlece yerleştirmek için yalnızca odaklanılan alanı okur; başka hiçbir ekran içeriğini toplamaz, saklamaz veya paylaşmaz.</string>
     <string name="dictate__overlay_notification_channel">Kayan dikte düğmesi</string>
     <string name="dictate__overlay_notification_recording">Kaydediliyor — yazıya dökmek için kayan düğmeye dokunun</string>
     <string name="dictate__overlay_notification_working">Yazıya dökülüyor…</string>
@@ -1246,7 +1246,7 @@
     <string name="dictate__floating_button_service_enabled">Etkin · sistem ayarlarını açmak için dokunun</string>
     <string name="dictate__floating_button_service_disabled">Henüz etkin değil · kurmak için dokunun</string>
     <string name="dictate__floating_button_disclosure_title">Kayan düğmeyi etkinleştir</string>
-    <string name="dictate__floating_button_disclosure_message">Kayan düğmeyi göstermek için Dictate’in erişilebilirlik hizmetine ihtiyacı var. Herhangi bir uygulamada bir metin alanının odaklandığını algılar — böylece düğme görünebilir — ve yazıya dökülen konuşmanızı o alana ekler. Dictate metninizi yerleştirmek için yalnızca odaklanılan alanı okur; başka hiçbir ekran içeriğini toplamaz, saklamaz veya paylaşmaz.\n\nSonraki ekranda “Dictate kayan düğmesi” öğesini bulun ve açın.</string>
+    <string name="dictate__floating_button_disclosure_message">Kayan düğmeyi göstermek için Dictate’in erişilebilirlik hizmetine ihtiyacı var. Herhangi bir uygulamada bir metin alanının odaklandığını algılar — böylece düğme görünebilir — ve yazıya dökülen konuşmanızı o alana ekler. Dictate metninizi yerleştirmek için yalnızca odaklanılan alanı okur; başka hiçbir ekran içeriğini toplamaz, saklamaz veya paylaşmaz.\n\nSonraki ekranda “brrSpeak kayan düğmesi” öğesini bulun ve açın.</string>
     <string name="dictate__floating_button_disclosure_continue">Ayarları aç</string>
     <string name="dictate__floating_button_mic_title">Mikrofon erişimi</string>
     <string name="dictate__floating_button_mic_summary">Sesinizi kaydetmek için gerekli · izin vermek için dokunun</string>
@@ -1334,8 +1334,8 @@
     <string name="dictate__voice_input_transcribing">Yazıya dökülüyor…</string>
     <string name="dictate__voice_input_stop">Bitti</string>
     <string name="dictate__voice_input_hint">Göndermek için dokun</string>
-    <string name="dictate__voice_ime_label">Dictate sesli giriş</string>
-    <string name="dictate__error_no_api_key">API anahtarı ayarlanmadı – Dictate ayarlarından yapılandırın.</string>
+    <string name="dictate__voice_ime_label">brrSpeak sesli giriş</string>
+    <string name="dictate__error_no_api_key">API anahtarı ayarlanmadı – brrSpeak ayarlarından yapılandırın.</string>
     <string name="dictate__error_transcription_failed">Yazıya dökme başarısız oldu.</string>
     <string name="dictate__error_unknown">Yazıya dökme sırasında bilinmeyen hata.</string>
     <string name="dictate__error_rewording_failed">Yeniden ifade etme başarısız oldu.</string>
@@ -1374,7 +1374,7 @@
     <string name="dictate__promo_donate_action">Bağış yap</string>
     <string name="dictate__promo_changelog_message">Dictate güncellendi</string>
     <string name="dictate__promo_changelog_action">Ayrıntılar</string>
-    <string name="dictate__title">Dictate</string>
+    <string name="dictate__title">brrSpeak</string>
     <string name="dictate__provider_title">Yazıya dökme sağlayıcısı</string>
     <string name="dictate__provider__openai">OpenAI</string>
     <string name="dictate__provider__groq">Groq</string>
@@ -1788,7 +1788,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Her dikte panoya da kopyalanır; böylece ekleme başarısız olursa metni elle yapıştırabilirsin. Bazı telefonlarda pano bildirimi gösterebilir.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Dikteler yalnızca eklenir, panoya kopyalanmaz.</string>
     <string name="dictate__floating_button_menu_group">Basılı tutma menüsü</string>
-    <string name="dictate__floating_button_menu_settings_title">Dictate ayarları</string>
+    <string name="dictate__floating_button_menu_settings_title">brrSpeak ayarları</string>
     <string name="dictate__floating_button_side_buttons_title">Ek düğmeler</string>
     <string name="dictate__mappings_add">Eşleme ekle</string>
     <string name="dictate__mappings_editor_title">Eşleme</string>

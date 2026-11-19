@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Dictate</string>
+    <string name="app_name">brrSpeak</string>
     <string name="key__phone_pause" comment="Label for the Pause key in the telephone keyboard layout">مکث</string>
     <string name="key__phone_wait" comment="Label for the Wait key in the telephone keyboard layout">صبر‌کنید</string>
     <string name="key_popup__threedots_alt" comment="Content description for the three-dots icon in a key popup">نماد سه نقطه. در صورت مشاهده ، نشان می دهد که در صورت فشار بیشتر می توان از حروف بیشتری استفاده کرد.</string>

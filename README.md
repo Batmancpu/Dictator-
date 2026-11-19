@@ -1,20 +1,24 @@
+> [!IMPORTANT]
+> **brrSpeak is an experimental, independently built fork of [Dictate Keyboard](https://github.com/DevEmperor/DictateKeyboard). Its purpose is to investigate and test an Android 15 speech-recognition integration problem documented in [upstream issue #489](https://github.com/DevEmperor/DictateKeyboard/issues/489): allowing another keyboard to supply microphone audio for transcription without switching apps. The proposed `RecognizerIntent.EXTRA_AUDIO_SOURCE` integration is NOT implemented or verified yet. This is not an official release, and no personal or device-identifying information is included here.**
+
 <div align="center">
 
-<img src="img/Icon_512x512_2_round.png" alt="Dictate Keyboard logo" width="120">
+<img src="img/Icon_512x512_2_round.png" alt="Upstream Dictate Keyboard artwork" width="120">
 
-# Dictate Keyboard
+# brrSpeak
 
-### Speak instead of type — in any app.
+### Experimental speech-recognition companion for Android
 
-A powerful AI keyboard for dictation, real-time transcription and typing — with Whisper and many
-more speech engines, in the cloud or on your phone.
+Based on Dictate Keyboard, retaining its speech engines and transcription features while we
+test interoperability with another Android keyboard. The original project's documentation
+continues below for reference; upstream links and screenshots describe Dictate, not a
+verified brrSpeak release.
 
 <p>
-  <a href="https://dictatekeyboard.com"><img alt="Website" src="https://img.shields.io/badge/website-dictatekeyboard.com-30B7E6?labelColor=1b1e2b&logo=googlechrome&logoColor=white"></a>
-  <a href="https://github.com/DevEmperor/DictateKeyboard/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/DevEmperor/DictateKeyboard?color=30B7E6&labelColor=1b1e2b&label=release"></a>
+  <a href="https://github.com/DevEmperor/DictateKeyboard"><img alt="Upstream source" src="https://img.shields.io/badge/source-Dictate%20Keyboard-30B7E6?labelColor=1b1e2b"></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/DevEmperor/DictateKeyboard?color=30B7E6&labelColor=1b1e2b"></a>
   <img alt="Platform" src="https://img.shields.io/badge/platform-Android%206%2B-30B7E6?labelColor=1b1e2b">
-  <a href="https://github.com/DevEmperor/DictateKeyboard/commits/main"><img alt="Last commit" src="https://img.shields.io/github/last-commit/DevEmperor/DictateKeyboard?color=30B7E6&labelColor=1b1e2b"></a>
+  <a href="https://github.com/DevEmperor/DictateKeyboard/issues/489"><img alt="Integration issue" src="https://img.shields.io/badge/issue-%23489-30B7E6?labelColor=1b1e2b"></a>
   <a href="https://github.com/sponsors/DevEmperor"><img alt="Sponsors" src="https://img.shields.io/github/sponsors/DevEmperor?color=30B7E6&labelColor=1b1e2b&label=sponsors"></a>
   <a href="https://github.com/DevEmperor/DictateKeyboard/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/DevEmperor/DictateKeyboard?style=social"></a>
 </p>
@@ -24,14 +28,22 @@ more speech engines, in the cloud or on your phone.
   <img alt="Jetpack Compose" src="https://img.shields.io/badge/Jetpack%20Compose-4285F4?logo=jetpackcompose&logoColor=white">
 </p>
 
-<table align="center">
-  <tr>
-    <td valign="middle"><a href="https://play.google.com/store/apps/details?id=net.devemperor.dictate&referrer=utm_source%3Dgithub%26utm_medium%3Dbadge%26utm_campaign%3Dreadme"><img alt="Get it on Google Play" width="300" src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"/></a></td>
-    <td valign="middle"><a href="https://paypal.me/DevEmperor"><img alt="Donate with PayPal" width="200" src="https://www.paypalobjects.com/webstatic/en_US/i/buttons/PP_logo_h_150x38.png"/></a></td>
-  </tr>
-</table>
-
 </div>
+
+---
+
+## Experiment status
+
+- **Baseline:** refreshed from upstream `main`, including the fixes in commit `84adfa9`.
+- **Android application ID:** `com.mangoloads.speak`, separate from the original Dictate installation.
+- **Planned investigation:** microphone audio captured by the calling keyboard and delivered via `RecognizerIntent.EXTRA_AUDIO_SOURCE`, pending implementation and testing.
+- **Privacy:** this README intentionally contains no personal data, phone model, or device-specific identifiers.
+
+## Installation of brrSpeak
+
+This experimental fork is **not** the app distributed on Google Play. Build and install its
+APK from this repository's source when a test build is available. The original Dictate app
+and documentation are available from the [upstream project](https://github.com/DevEmperor/DictateKeyboard).
 
 ---
 
@@ -72,9 +84,9 @@ more speech engines, in the cloud or on your phone.
 
 <br>
 
-## 📲 Installation
+## 📲 Upstream installation (original Dictate only)
 
-**The app is available on [Google Play](https://play.google.com/store/apps/details?id=net.devemperor.dictate&referrer=utm_source%3Dgithub%26utm_medium%3Dintro%26utm_campaign%3Dreadme)**
+**The original Dictate app, not brrSpeak, is available on [Google Play](https://play.google.com/store/apps/details?id=net.devemperor.dictate&referrer=utm_source%3Dgithub%26utm_medium%3Dintro%26utm_campaign%3Dreadme)**
 (for a small fee that supports continued development), giving you easy installation and free
 lifetime updates. Just tap the badge above or [this link](https://play.google.com/store/apps/details?id=net.devemperor.dictate&referrer=utm_source%3Dgithub%26utm_medium%3Dintro_link%26utm_campaign%3Dreadme).
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Dictate</string>
+    <string name="app_name">brrSpeak</string>
     <string name="key__phone_pause" comment="Label for the Pause key in the telephone keyboard layout">Szünet</string>
     <string name="key__phone_wait" comment="Label for the Wait key in the telephone keyboard layout">Várakozás</string>
     <string name="key_popup__threedots_alt" comment="Content description for the three-dots icon in a key popup">Hárompontos ikon. Ha látható, azt jelzi, hogy több betű használható, ha hosszabb ideig megnyomja.</string>
@@ -1248,9 +1248,9 @@
     <string name="unit__percent__symbol">{v}%</string>
     <string name="unit__display_pixel__symbol">{v} dp</string>
     <string name="unit__display_pixel_per_seconds__symbol">{v} dp/mp</string>
-    <string name="dictate__accessibility_service_label">Dictate lebegő gomb</string>
+    <string name="dictate__accessibility_service_label">brrSpeak lebegő gomb</string>
     <string name="dictate__accessibility_service_summary">Lebegő gomb megjelenítése, hogy bármely szövegmezőbe diktálhass.</string>
-    <string name="dictate__accessibility_service_description">A Dictate ezt a szolgáltatást használja a lebegő diktálógombhoz. Ha be van kapcsolva, érzékeli, amikor egy szövegmező fókuszba kerül bármely alkalmazásban — hogy a gomb megjelenhessen —, és beszúrja a leírt beszédet abba a mezőbe. A Dictate csak a fókuszban lévő mezőt olvassa, hogy a szöveget a kurzorhoz helyezze; nem gyűjt, nem tárol és nem oszt meg más képernyőtartalmat.</string>
+    <string name="dictate__accessibility_service_description">A Dictate ezt a szolgáltatást használja a lebegő diktálógombhoz. Ha be van kapcsolva, érzékeli, amikor egy szövegmező fókuszba kerül bármely alkalmazásban — hogy a gomb megjelenhessen —, és beszúrja a leírt beszédet abba a mezőbe. A brrSpeak csak a fókuszban lévő mezőt olvassa, hogy a szöveget a kurzorhoz helyezze; nem gyűjt, nem tárol és nem oszt meg más képernyőtartalmat.</string>
     <string name="dictate__overlay_notification_channel">Lebegő diktálógomb</string>
     <string name="dictate__overlay_notification_recording">Felvétel — koppints a lebegő gombra az átíráshoz</string>
     <string name="dictate__overlay_notification_working">Átírás…</string>
@@ -1262,7 +1262,7 @@
     <string name="dictate__floating_button_service_enabled">Bekapcsolva · koppints a rendszerbeállítások megnyitásához</string>
     <string name="dictate__floating_button_service_disabled">Még nincs bekapcsolva · koppints a beállításhoz</string>
     <string name="dictate__floating_button_disclosure_title">A lebegő gomb bekapcsolása</string>
-    <string name="dictate__floating_button_disclosure_message">A lebegő gomb megjelenítéséhez a Dictate-nek szüksége van a kisegítő szolgáltatásra. Érzékeli, amikor egy szövegmező fókuszba kerül bármely alkalmazásban — hogy a gomb megjelenhessen —, és beszúrja a leírt beszédet abba a mezőbe. A Dictate csak a fókuszban lévő mezőt olvassa, hogy elhelyezze a szöveget; nem gyűjt, nem tárol és nem oszt meg más képernyőtartalmat.\n\nA következő képernyőn keresd meg a „Dictate lebegő gomb” elemet, és kapcsold be.</string>
+    <string name="dictate__floating_button_disclosure_message">A lebegő gomb megjelenítéséhez a Dictate-nek szüksége van a kisegítő szolgáltatásra. Érzékeli, amikor egy szövegmező fókuszba kerül bármely alkalmazásban — hogy a gomb megjelenhessen —, és beszúrja a leírt beszédet abba a mezőbe. A Dictate csak a fókuszban lévő mezőt olvassa, hogy elhelyezze a szöveget; nem gyűjt, nem tárol és nem oszt meg más képernyőtartalmat.\n\nA következő képernyőn keresd meg a „brrSpeak lebegő gomb” elemet, és kapcsold be.</string>
     <string name="dictate__floating_button_disclosure_continue">Beállítások megnyitása</string>
     <string name="dictate__floating_button_mic_title">Mikrofon-hozzáférés</string>
     <string name="dictate__floating_button_mic_summary">A hangod rögzítéséhez szükséges · koppints az engedélyezéshez</string>
@@ -1350,8 +1350,8 @@
     <string name="dictate__voice_input_transcribing">Átírás…</string>
     <string name="dictate__voice_input_stop">Kész</string>
     <string name="dictate__voice_input_hint">Koppints a küldéshez</string>
-    <string name="dictate__voice_ime_label">Dictate hangbevitel</string>
-    <string name="dictate__error_no_api_key">Nincs beállítva API-kulcs – állítsa be a Dictate beállításaiban.</string>
+    <string name="dictate__voice_ime_label">brrSpeak hangbevitel</string>
+    <string name="dictate__error_no_api_key">Nincs beállítva API-kulcs – állítsa be a brrSpeak beállításaiban.</string>
     <string name="dictate__error_transcription_failed">Az átírás sikertelen.</string>
     <string name="dictate__error_unknown">Ismeretlen hiba az átírás során.</string>
     <string name="dictate__error_rewording_failed">Az átfogalmazás sikertelen.</string>
@@ -1390,7 +1390,7 @@
     <string name="dictate__promo_donate_action">Adományozás</string>
     <string name="dictate__promo_changelog_message">A Dictate frissült</string>
     <string name="dictate__promo_changelog_action">Részletek</string>
-    <string name="dictate__title">Dictate</string>
+    <string name="dictate__title">brrSpeak</string>
     <string name="dictate__provider_title">Átírási szolgáltató</string>
     <string name="dictate__provider__openai">OpenAI</string>
     <string name="dictate__provider__groq">Groq</string>
@@ -1804,7 +1804,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Minden diktálás a vágólapra is másolódik, így kézzel beillesztheted, ha a beszúrás sikertelen. Egyes telefonokon vágólap-értesítést jeleníthet meg.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">A diktálások csak beszúrásra kerülnek, a vágólapra nem másolódnak.</string>
     <string name="dictate__floating_button_menu_group">Nyomva tartás menü</string>
-    <string name="dictate__floating_button_menu_settings_title">Dictate beállításai</string>
+    <string name="dictate__floating_button_menu_settings_title">brrSpeak beállításai</string>
     <string name="dictate__floating_button_side_buttons_title">További gombok</string>
     <string name="dictate__mappings_add">Hozzárendelés hozzáadása</string>
     <string name="dictate__mappings_editor_title">Hozzárendelés</string>

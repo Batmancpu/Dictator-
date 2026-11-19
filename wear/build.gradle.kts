@@ -54,10 +54,10 @@ configure<ApplicationExtension> {
     }
 
     defaultConfig {
-        // Same applicationId as the phone app so Play delivers this as the "Wear OS" APK of the
-        // same listing. Play still requires a unique versionCode per APK across the form factors;
+        // Keep the same applicationId as the brrSpeak phone app for companion compatibility.
+        // Play still requires a unique versionCode per APK across the form factors;
         // we keep the Wear codes in a separate high band (see versionCode below).
-        applicationId = "net.devemperor.dictate"
+        applicationId = "com.mangoloads.speak"
         minSdk = wearMinSdk
         targetSdk = projectTargetSdk.toInt()
         // Offset the Wear versionCode into its own band so it never collides with the phone APK

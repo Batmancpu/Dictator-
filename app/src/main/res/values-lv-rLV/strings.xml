@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Dictate</string>
+    <string name="app_name">brrSpeak</string>
     <string name="key__phone_pause" comment="Label for the Pause key in the telephone keyboard layout">Apturēt</string>
     <string name="key__phone_wait" comment="Label for the Wait key in the telephone keyboard layout">Uzgaidīt</string>
     <string name="key_popup__threedots_alt" comment="Content description for the three-dots icon in a key popup">Trīspunkte. Ja redzama, norāda, ka vairāk rakstzīmju var tikt izmantotas, ja nospiež ilgāk.</string>
@@ -1195,9 +1195,9 @@
     <string name="unit__percent__symbol">{v}%</string>
     <string name="unit__display_pixel__symbol">{v} dp</string>
     <string name="unit__display_pixel_per_seconds__symbol">{v} dp/s</string>
-    <string name="dictate__accessibility_service_label">Dictate peldošā poga</string>
+    <string name="dictate__accessibility_service_label">brrSpeak peldošā poga</string>
     <string name="dictate__accessibility_service_summary">Rādīt peldošu pogu, lai diktētu jebkurā teksta laukā.</string>
-    <string name="dictate__accessibility_service_description">Dictate izmanto šo pakalpojumu peldošajai diktēšanas pogai. Kad tas ir iespējots, tas nosaka, kad teksta lauks ir fokusēts jebkurā lietotnē — lai poga varētu parādīties — un ievieto jūsu transkribēto runu šajā laukā. Dictate nolasa tikai fokusēto lauku, lai novietotu tekstu pie kursora; tas nevāc, neuzglabā un nekopīgo citu ekrāna saturu.</string>
+    <string name="dictate__accessibility_service_description">Dictate izmanto šo pakalpojumu peldošajai diktēšanas pogai. Kad tas ir iespējots, tas nosaka, kad teksta lauks ir fokusēts jebkurā lietotnē — lai poga varētu parādīties — un ievieto jūsu transkribēto runu šajā laukā. brrSpeak nolasa tikai fokusēto lauku, lai novietotu tekstu pie kursora; tas nevāc, neuzglabā un nekopīgo citu ekrāna saturu.</string>
     <string name="dictate__overlay_notification_channel">Peldošā diktēšanas poga</string>
     <string name="dictate__overlay_notification_recording">Notiek ierakstīšana — pieskarieties peldošajai pogai, lai transkribētu</string>
     <string name="dictate__overlay_notification_working">Notiek transkribēšana…</string>
@@ -1209,7 +1209,7 @@
     <string name="dictate__floating_button_service_enabled">Iespējots · pieskarieties, lai atvērtu sistēmas iestatījumus</string>
     <string name="dictate__floating_button_service_disabled">Vēl nav iespējots · pieskarieties, lai iestatītu</string>
     <string name="dictate__floating_button_disclosure_title">Iespējot peldošo pogu</string>
-    <string name="dictate__floating_button_disclosure_message">Lai parādītu peldošo pogu, Dictate ir nepieciešams pieejamības pakalpojums. Tas nosaka, kad teksta lauks ir fokusēts jebkurā lietotnē — lai poga varētu parādīties — un ievieto jūsu transkribēto runu šajā laukā. Dictate nolasa tikai fokusēto lauku, lai novietotu jūsu tekstu; tas nevāc, neuzglabā un nekopīgo citu ekrāna saturu.\n\nNākamajā ekrānā atrodiet «Dictate peldošā poga» un ieslēdziet to.</string>
+    <string name="dictate__floating_button_disclosure_message">Lai parādītu peldošo pogu, Dictate ir nepieciešams pieejamības pakalpojums. Tas nosaka, kad teksta lauks ir fokusēts jebkurā lietotnē — lai poga varētu parādīties — un ievieto jūsu transkribēto runu šajā laukā. Dictate nolasa tikai fokusēto lauku, lai novietotu jūsu tekstu; tas nevāc, neuzglabā un nekopīgo citu ekrāna saturu.\n\nNākamajā ekrānā atrodiet «brrSpeak peldošā poga» un ieslēdziet to.</string>
     <string name="dictate__floating_button_disclosure_continue">Atvērt iestatījumus</string>
     <string name="dictate__floating_button_mic_title">Mikrofona piekļuve</string>
     <string name="dictate__floating_button_mic_summary">Nepieciešama jūsu balss ierakstīšanai · pieskarieties, lai piešķirtu</string>
@@ -1297,8 +1297,8 @@
     <string name="dictate__voice_input_transcribing">Transkribē…</string>
     <string name="dictate__voice_input_stop">Gatavs</string>
     <string name="dictate__voice_input_hint">Pieskaries, lai sūtītu</string>
-    <string name="dictate__voice_ime_label">Dictate balss ievade</string>
-    <string name="dictate__error_no_api_key">API atslēga nav iestatīta – konfigurējiet to Dictate iestatījumos.</string>
+    <string name="dictate__voice_ime_label">brrSpeak balss ievade</string>
+    <string name="dictate__error_no_api_key">API atslēga nav iestatīta – konfigurējiet to brrSpeak iestatījumos.</string>
     <string name="dictate__error_transcription_failed">Transkribēšana neizdevās.</string>
     <string name="dictate__error_unknown">Nezināma kļūda transkribēšanas laikā.</string>
     <string name="dictate__error_rewording_failed">Pārformulēšana neizdevās.</string>
@@ -1337,7 +1337,7 @@
     <string name="dictate__promo_donate_action">Ziedot</string>
     <string name="dictate__promo_changelog_message">Dictate tika atjaunināts</string>
     <string name="dictate__promo_changelog_action">Detaļas</string>
-    <string name="dictate__title">Dictate</string>
+    <string name="dictate__title">brrSpeak</string>
     <string name="dictate__provider_title">Transkribēšanas pakalpojuma sniedzējs</string>
     <string name="dictate__provider__openai">OpenAI</string>
     <string name="dictate__provider__groq">Groq</string>
@@ -1755,7 +1755,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Katrs diktāts tiek arī kopēts starpliktuvē, lai to varētu ielīmēt manuāli, ja ievietošana neizdodas. Dažos tālruņos var parādīt starpliktuves paziņojumu.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Diktāti tiek tikai ievietoti, nevis kopēti starpliktuvē.</string>
     <string name="dictate__floating_button_menu_group">Turēšanas izvēlne</string>
-    <string name="dictate__floating_button_menu_settings_title">Dictate iestatījumi</string>
+    <string name="dictate__floating_button_menu_settings_title">brrSpeak iestatījumi</string>
     <string name="dictate__floating_button_side_buttons_title">Papildu pogas</string>
     <string name="dictate__mappings_add">Pievienot kārtulu</string>
     <string name="dictate__mappings_editor_title">Kārtula</string>

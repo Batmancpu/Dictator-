@@ -35,6 +35,6 @@ class ExampleInstrumentedTest {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         // The fork's applicationId, not the upstream namespace — the stock assertion has been failing
         // since this became Dictate. Debug builds carry the ".debug" suffix.
-        assertEquals("net.devemperor.dictate", appContext.packageName.removeSuffix(".debug"))
+        assertEquals("com.mangoloads.speak", appContext.packageName.removeSuffix(".debug"))
     }
 }

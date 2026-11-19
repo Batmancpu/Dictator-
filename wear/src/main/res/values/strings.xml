@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="wear_app_name">Dictate</string>
-    <string name="wear_ime_label">Dictate (Wear)</string>
+    <string name="wear_app_name">brrSpeak</string>
+    <string name="wear_ime_label">brrSpeak (Wear)</string>
 
     <!-- Pager tabs (content descriptions) -->
     <string name="wear_tab_numbers">123</string>
@@ -35,7 +35,7 @@
     <string name="wear_cd_close">Close</string>
 
     <!-- Errors -->
-    <string name="wear_err_mic_grant">Grant mic in Dictate app</string>
+    <string name="wear_err_mic_grant">Grant mic in brrSpeak app</string>
     <string name="wear_err_mic_unavailable">Microphone unavailable</string>
     <string name="wear_err_transcribe_failed">Transcription failed</string>
     <string name="wear_err_tap_to_retry">%1$s · Tap to retry</string>

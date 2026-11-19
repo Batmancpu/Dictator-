@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Dictate</string>
+    <string name="app_name">brrSpeak</string>
 
     <string name="key__phone_pause" comment="Label for the Pause key in the telephone keyboard layout">Pause</string>
     <string name="key__phone_wait" comment="Label for the Wait key in the telephone keyboard layout">Wait</string>
@@ -300,9 +300,9 @@
     <string name="settings__search__placeholder" comment="Placeholder in the settings search field">Search settings…</string>
     <string name="settings__search__recent" comment="Header above recently used search terms">Recent searches</string>
     <string name="settings__search__clear_recent" comment="Button to clear the recent searches">Clear recent searches</string>
-    <string name="dictate__settings_unreadable_card" comment="Red card on the settings home screen, shown after the app could not read its settings file at start and started with the defaults. Tapping it offers to restore the old file.">Your settings could not be read, so Dictate started with its defaults. Tap here to bring them back.</string>
+    <string name="dictate__settings_unreadable_card" comment="Red card on the settings home screen, shown after the app could not read its settings file at start and started with the defaults. Tapping it offers to restore the old file.">Your settings could not be read, so brrSpeak started with its defaults. Tap here to bring them back.</string>
     <string name="dictate__settings_unreadable_title" comment="Title of the dialog offering to restore the settings that could not be read. One line of about 18 characters at most; it is cut off beyond that.">Restore settings?</string>
-    <string name="dictate__settings_unreadable_message" comment="Body of that dialog. The buttons are Restore, Delete and Cancel; use the same words as those buttons.">When Dictate started, it could not read its settings file. It kept the file untouched and started with the defaults. Restore brings back your providers, keys, prompts and settings as they were. Delete removes the old file.</string>
+    <string name="dictate__settings_unreadable_message" comment="Body of that dialog. The buttons are Restore, Delete and Cancel; use the same words as those buttons.">When brrSpeak started, it could not read its settings file. It kept the file untouched and started with the defaults. Restore brings back your providers, keys, prompts and settings as they were. Delete removes the old file.</string>
     <string name="dictate__settings_restore_failed" comment="Toast when restoring the settings file failed because it still cannot be read">The old settings still cannot be read.</string>
     <string name="settings__search__popular" comment="Header above a small list of popular settings shortcuts">Popular</string>
     <string name="settings__search__no_results" comment="Shown when a settings search returns nothing">No settings found</string>
@@ -1249,7 +1249,7 @@
     <string name="setup__select_ime__switch_keyboard_btn">Switch Keyboard</string>
 
     <string name="setup__grant_notification_permission__title">Allow notifications</string>
-    <string name="setup__grant_notification_permission__description">As of Android 13, apps must ask before they show notifications. Dictate Keyboard shows one while the floating button records, while a speech model downloads and while your watch dictates through the phone, and it opens a crash report if the app crashes. You can change this at any time in the system settings.</string>
+    <string name="setup__grant_notification_permission__description">As of Android 13, apps must ask before they show notifications. brrSpeak shows one while the floating button records, while a speech model downloads and while your watch dictates through the phone, and it opens a crash report if the app crashes. You can change this at any time in the system settings.</string>
     <string name="setup__grant_notification_permission__btn">Grant Permission</string>
 
     <!-- Setup: connect an AI provider (Dictate onboarding for non-technical users) -->
@@ -1297,7 +1297,7 @@
     <string name="setup__finish_up__description_p1">{app_name} is ready. Switch to it with the keyboard switcher, tap the microphone, and start speaking.</string>
     <string name="setup__finish_up__description_p2">You can change languages, the AI provider and everything else anytime in the settings. If you ever run into a problem or have an idea, reach out from the about screen!</string>
     <string name="setup__finish_up__add_key_hint">Tip: you haven\'t added an AI key yet. Add one anytime in Settings → Dictate → AI providers to start dictating.</string>
-    <string name="setup__finish_up__finish_btn">Start using Dictate</string>
+    <string name="setup__finish_up__finish_btn">Start using brrSpeak</string>
     <string name="setup__floating_button__btn" comment="Onboarding button that opens the floating-button settings">Set up the floating button</string>
     <string name="setup__floating_button__title" comment="Title of the optional floating-button onboarding step">Dictate anywhere (optional)</string>
     <string name="setup__floating_button__intro" comment="Explanation on the optional floating-button onboarding step">The floating button puts a small dictation bubble over any app, so you can speak into any text field without switching keyboards.</string>
@@ -1364,8 +1364,8 @@
     <string name="backup_and_restore__restore__failure">Failed to restore data: {error_message}</string>
 
     <!-- Crash Dialog strings -->
-    <string name="crash_dialog__title" comment="Title of crash dialog">Dictate error report</string>
-    <string name="crash_dialog__description" comment="Description of crash dialog">Sorry for the inconvenience, but Dictate has crashed due to an unexpected error.</string>
+    <string name="crash_dialog__title" comment="Title of crash dialog">brrSpeak error report</string>
+    <string name="crash_dialog__description" comment="Description of crash dialog">Sorry for the inconvenience, but brrSpeak has crashed due to an unexpected error.</string>
     <string name="crash_dialog__report_instructions" comment="Issue tracker report instructions for the crash dialog. The %s placeholder is the name of the crash report template and always in English/LTR.">If you wish to report this error, first check out the issue tracker on GitHub if your crash has not already been reported.\nIf it hasn\'t, copy the generated crash log and open a new issue. Use the \"%s\" template and fill out the description, the steps to reproduce, and paste the generated crash log at the end. This helps in making Dictate better and more stable for everyone. Thank you!</string>
     <string name="crash_dialog__bug_report_template" comment="Name of the template to use in the GitHub issue tracker (is always in English)" translatable="false">Crash report</string>
     <string name="crash_dialog__copy_to_clipboard" comment="Label of Copy to clipboard button in crash dialog">Copy to system clipboard</string>
@@ -1373,10 +1373,10 @@
     <string name="crash_dialog__copy_to_clipboard_failure" comment="Label of Copy to clipboard failure message in crash dialog">Cannot copy to system clipboard: Clipboard manager instance not found</string>
     <string name="crash_dialog__open_issue_tracker" comment="Label of Open issue tracker button in crash dialog">Open issue tracker (github.com)</string>
     <string name="crash_dialog__close" comment="Label of Close button in crash dialog">Close</string>
-    <string name="crash_notification_channel__title" comment="Title of crash notification channel">Dictate error reports</string>
-    <string name="crash_once_notification__title" comment="Title of the notification for a single crash">Dictate has stopped working…</string>
+    <string name="crash_notification_channel__title" comment="Title of crash notification channel">brrSpeak error reports</string>
+    <string name="crash_once_notification__title" comment="Title of the notification for a single crash">brrSpeak has stopped working…</string>
     <string name="crash_once_notification__body" comment="Body of the notification for a single crash">Tap to view error details</string>
-    <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">Dictate seems to stop working repeatedly…</string>
+    <string name="crash_multiple_notification__title" comment="Title of the notification for consecutive crashes">brrSpeak seems to stop working repeatedly…</string>
     <string name="crash_multiple_notification__body" comment="Body of the notification for consecutive crashes">Falling back to previous keyboard to stop infinite crash loop. Tap to view error details</string>
 
 
@@ -1882,9 +1882,9 @@
     <!-- Strings for the Dictate AI voice features (panel, settings, onboarding). -->
 
     <!-- Dictate floating button / accessibility service (issue #88) -->
-    <string name="dictate__accessibility_service_label" comment="Name of the Dictate accessibility service, shown in the system accessibility settings list">Dictate floating button</string>
+    <string name="dictate__accessibility_service_label" comment="Name of the accessibility service shown in the system accessibility settings list">brrSpeak floating button</string>
     <string name="dictate__accessibility_service_summary" comment="Short one-line summary of the accessibility service in the system settings">Show a floating button to dictate into any text field.</string>
-    <string name="dictate__accessibility_service_description" comment="Full disclosure shown in the system accessibility settings explaining what the service does and why">Dictate uses this service to power the floating dictation button. When enabled, it detects when a text field is focused in any app — so the button can appear — and inserts your transcribed speech into that field. Dictate only reads the focused field to place your text at the cursor; it does not collect, store or share other screen content.</string>
+    <string name="dictate__accessibility_service_description" comment="Full disclosure shown in the system accessibility settings explaining what the service does and why">brrSpeak uses this service to power the floating dictation button. When enabled, it detects when a text field is focused in any app — so the button can appear — and inserts your transcribed speech into that field. brrSpeak only reads the focused field to place your text at the cursor; it does not collect, store or share other screen content.</string>
     <string name="dictate__overlay_notification_channel" comment="Name of the notification channel for the floating-button recording notification">Floating dictation button</string>
     <string name="dictate__overlay_notification_recording" comment="Text of the ongoing notification shown while the floating button is recording">Recording — tap the floating button to transcribe</string>
     <string name="dictate__overlay_notification_working" comment="Text shown in the notification while the floating-button dictation is being transcribed">Transcribing…</string>
@@ -1896,14 +1896,14 @@
     <string name="dictate__floating_button_service_enabled" comment="Status when the accessibility service is on">Enabled · tap to open system settings</string>
     <string name="dictate__floating_button_service_disabled" comment="Status when the accessibility service is off">Not enabled yet · tap to set up</string>
     <string name="dictate__floating_button_disclosure_title" comment="Title of the prominent-disclosure dialog before enabling the accessibility service">Enable the floating button</string>
-    <string name="dictate__floating_button_disclosure_message" comment="Prominent disclosure shown before sending the user to the accessibility settings">To show the floating button, Dictate needs the accessibility service. It detects when a text field is focused in any app — so the button can appear — and inserts your transcribed speech into that field. Dictate only reads the focused field to place your text; it does not collect, store or share other screen content.\n\nOn the next screen, find “Dictate floating button” and turn it on.</string>
+    <string name="dictate__floating_button_disclosure_message" comment="Prominent disclosure shown before sending the user to the accessibility settings">To show the floating button, brrSpeak needs the accessibility service. It detects when a text field is focused in any app — so the button can appear — and inserts your transcribed speech into that field. brrSpeak only reads the focused field to place your text; it does not collect, store or share other screen content.\n\nOn the next screen, find “brrSpeak floating button” and turn it on.</string>
     <string name="dictate__floating_button_disclosure_continue" comment="Confirm button that opens the system accessibility settings">Open settings</string>
     <string name="dictate__floating_button_mic_title" comment="Row to grant the microphone permission for the floating button">Microphone access</string>
     <string name="dictate__floating_button_mic_summary" comment="Summary of the microphone row when the permission is missing">Required to record your voice · tap to grant</string>
     <string name="dictate__floating_button_show_when_title" comment="Setting title: in which situation the floating dictation button appears; opens a list of three choices">When to show</string>
     <string name="dictate__floating_button_show_when_field" comment="Choice: the floating button appears as soon as a text field is focused, even before any keyboard opens">As soon as a text field is selected</string>
     <string name="dictate__floating_button_show_when_keyboard" comment="Choice: the floating button appears only while an on-screen keyboard (any keyboard) is open">Only while a keyboard is open</string>
-    <string name="dictate__floating_button_show_when_dictate_keyboard" comment="Choice: like “as soon as a text field is selected”, and also while the Dictate keyboard itself is open (normally hidden then, as it has its own mic key)">Also with the Dictate keyboard</string>    <string name="dictate__floating_button_apps_title" comment="Row that opens the per-app visibility screen for the floating button">App visibility</string>
+    <string name="dictate__floating_button_show_when_dictate_keyboard" comment="Choice: like “as soon as a text field is selected”, and also while brrSpeak is open (normally hidden then, as it has its own mic key)">Also with the brrSpeak keyboard</string>    <string name="dictate__floating_button_apps_title" comment="Row that opens the per-app visibility screen for the floating button">App visibility</string>
     <string name="dictate__floating_button_apps_summary_all" comment="Summary of the app-visibility row when no filter is set">In every app</string>
     <string name="dictate__floating_button_apps_summary_only" comment="Summary of the app-visibility row in allow-list mode; {n} is the number of chosen apps">Only in {n} apps</string>
     <string name="dictate__floating_button_apps_summary_except" comment="Summary of the app-visibility row in block-list mode; {n} is the number of chosen apps">Everywhere except {n} apps</string>
@@ -1947,7 +1947,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_on" comment="Summary when copy-every-dictation is enabled">Each dictation is also copied to the clipboard, so you can paste it manually if inserting ever fails. May show a clipboard notice on some phones.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off" comment="Summary when copy-every-dictation is disabled">Dictations are only inserted, not copied to the clipboard.</string>
     <string name="dictate__floating_button_menu_group" comment="Header above the switches that add entries to the menu opened by holding the floating button">Hold menu</string>
-    <string name="dictate__floating_button_menu_settings_title" comment="Menu entry and switch that opens the Dictate settings from the floating button">Dictate settings</string>
+    <string name="dictate__floating_button_menu_settings_title" comment="Menu entry and switch that opens the speech settings from the floating button">brrSpeak settings</string>
     <string name="dictate__floating_button_no_prompts" comment="Toast when long-pressing the floating button but no rewording prompts exist">No rewording prompts yet — add some in Dictate settings.</string>
     <string name="dictate__floating_button_retry_hint" comment="Toast after a failed floating-button dictation whose recording was kept; %1$s is the error message. Tapping the button re-sends the recording.">%1$s — tap to retry</string>
     <string name="dictate__floating_button_badge_new" comment="Small 'New' badge on the floating-button settings entry. Keep very short.">New</string>
@@ -2019,8 +2019,8 @@
     <string name="dictate__voice_input_transcribing" comment="Status in the system voice-input popup while transcribing (issue #67)">Transcribing…</string>
     <string name="dictate__voice_input_stop" comment="Button in the system voice-input popup to stop recording and transcribe now (issue #67)">Done</string>
     <string name="dictate__voice_input_hint" comment="Subtle hint under the orb in the voice-input UI (issue #67)">Tap to send</string>
-    <string name="dictate__voice_ime_label" comment="Name of the Dictate voice input method shown in system keyboard settings (issue #67)">Dictate voice input</string>
-    <string name="dictate__error_no_api_key" comment="Error when no API key is configured">No API key set – configure it in the Dictate settings.</string>
+    <string name="dictate__voice_ime_label" comment="Name of the voice input method shown in system keyboard settings (issue #67)">brrSpeak voice input</string>
+    <string name="dictate__error_no_api_key" comment="Error when no API key is configured">No API key set – configure it in the brrSpeak settings.</string>
     <string name="dictate__error_no_rewording_model" comment="Error when a rewording is asked for but the rewording provider has no model chosen and no default of its own. %1$s is the provider's name, e.g. Mistral AI or Ollama.">Choose a rewording model for %1$s</string>
     <string name="dictate__error_transcription_failed" comment="Generic transcription failure">Transcription failed.</string>
     <string name="dictate__error_unknown" comment="Unknown transcription error">Unknown error during transcription.</string>
@@ -2106,7 +2106,7 @@
     <string name="about__more_apps__sayova_requirements" comment="Small print under the SayOVA features on the More apps page">Needs a watch with Wear OS 3 or newer and a microphone, plus an API key from Google Gemini or OpenAI. Your provider bills the usage.</string>
 
     <!-- Dictate settings screen -->
-    <string name="dictate__title" comment="Title of the Dictate settings screen and home tile">Dictate</string>
+    <string name="dictate__title" comment="Title of the speech settings screen and home tile">brrSpeak</string>
     <string name="dictate__provider_title" comment="Label for the transcription provider selector">Transcription provider</string>
     <string name="dictate__provider__openai" translatable="false">OpenAI</string>
     <string name="dictate__provider__groq" translatable="false">Groq</string>
@@ -2617,7 +2617,7 @@
     <string name="dictate__stats_reset_confirm_title" comment="Reset-statistics confirmation dialog title">Reset statistics?</string>
     <string name="dictate__stats_reset_confirm_msg" comment="Reset-statistics confirmation dialog message">This permanently clears all your dictation statistics and can\'t be undone.</string>
     <string name="dictate__stats_share" comment="Button to share your statistics">Share</string>
-    <string name="dictate__stats_share_text" comment="Shared text; %1$s time saved, %2$s dictations, %3$s words">I’ve saved %1$s with Dictate — %2$s dictations, %3$s words. 🎤</string>
+    <string name="dictate__stats_share_text" comment="Shared text; %1$s time saved, %2$s dictations, %3$s words">I’ve saved %1$s with brrSpeak — %2$s dictations, %3$s words. 🎤</string>
     <string name="dictate__stats_view" comment="Button that opens the statistics screen">View statistics</string>
     <string name="dictate__stats_milestones_title" comment="Toggle title for one-time milestone celebrations">Milestone celebrations</string>
     <string name="dictate__stats_milestones_summary" comment="Toggle summary for milestone celebrations">Celebrate once when you reach a saved-time or dictation milestone</string>
@@ -2775,9 +2775,9 @@
 
     <!-- Dictate onboarding step -->
     <string name="dictate__setup_description" comment="Onboarding text inviting the user to set up Dictate">Set up your AI provider and API key so you can start dictating with the mic.</string>
-    <string name="dictate__setup_configure_btn" comment="Onboarding button opening the Dictate settings">Configure Dictate</string>
+    <string name="dictate__setup_configure_btn" comment="Onboarding button opening the speech settings">Configure brrSpeak</string>
     <string name="setup__grant_mic_permission__title" comment="Title of the microphone permission onboarding step">Microphone access</string>
-    <string name="setup__grant_mic_permission__description" comment="Onboarding: ask for microphone permission for dictation">Dictate needs microphone access to record your voice for transcription.</string>
+    <string name="setup__grant_mic_permission__description" comment="Onboarding: ask for microphone permission for dictation">brrSpeak needs microphone access to record your voice for transcription.</string>
     <string name="setup__grant_mic_permission__btn" comment="Onboarding button to grant the microphone permission">Grant microphone permission</string>
 
     <!-- ============================== Changelog ============================== -->

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Dictate</string>
+    <string name="app_name">brrSpeak</string>
     <string name="key__phone_pause" comment="Label for the Pause key in the telephone keyboard layout">Pausa</string>
     <string name="key__phone_wait" comment="Label for the Wait key in the telephone keyboard layout">Aguarde</string>
     <string name="key_popup__threedots_alt" comment="Content description for the three-dots icon in a key popup">Ícone de 3 pontos. Se mostrado, indica que pode utilizar mais letras com um toque longo.</string>
@@ -1230,9 +1230,9 @@
     <string name="unit__percent__symbol">{v} %</string>
     <string name="unit__display_pixel__symbol">{v} dp</string>
     <string name="unit__display_pixel_per_seconds__symbol">{v} dp/s</string>
-    <string name="dictate__accessibility_service_label">Botão flutuante do Dictate</string>
+    <string name="dictate__accessibility_service_label">Botão flutuante do brrSpeak</string>
     <string name="dictate__accessibility_service_summary">Mostra um botão flutuante para ditar em qualquer campo de texto.</string>
-    <string name="dictate__accessibility_service_description">O Dictate usa este serviço para o botão de ditado flutuante. Quando ativado, deteta quando um campo de texto tem o foco em qualquer app — para que o botão possa aparecer — e insere a sua fala transcrita nesse campo. O Dictate só lê o campo focado para colocar o seu texto no cursor; não recolhe, armazena nem partilha qualquer outro conteúdo do ecrã.</string>
+    <string name="dictate__accessibility_service_description">O Dictate usa este serviço para o botão de ditado flutuante. Quando ativado, deteta quando um campo de texto tem o foco em qualquer app — para que o botão possa aparecer — e insere a sua fala transcrita nesse campo. O brrSpeak só lê o campo focado para colocar o seu texto no cursor; não recolhe, armazena nem partilha qualquer outro conteúdo do ecrã.</string>
     <string name="dictate__overlay_notification_channel">Botão de ditado flutuante</string>
     <string name="dictate__overlay_notification_recording">A gravar — toque no botão flutuante para transcrever</string>
     <string name="dictate__overlay_notification_working">A transcrever…</string>
@@ -1244,7 +1244,7 @@
     <string name="dictate__floating_button_service_enabled">Ativado · toque para abrir as definições do sistema</string>
     <string name="dictate__floating_button_service_disabled">Ainda não ativado · toque para configurar</string>
     <string name="dictate__floating_button_disclosure_title">Ativar o botão flutuante</string>
-    <string name="dictate__floating_button_disclosure_message">Para mostrar o botão flutuante, o Dictate precisa do serviço de acessibilidade. Deteta quando um campo de texto tem o foco em qualquer app — para que o botão possa aparecer — e insere a sua fala transcrita nesse campo. O Dictate só lê o campo focado para colocar o seu texto; não recolhe, armazena nem partilha qualquer outro conteúdo do ecrã.\n\nNo ecrã seguinte, encontre “Botão flutuante do Dictate” e ative-o.</string>
+    <string name="dictate__floating_button_disclosure_message">Para mostrar o botão flutuante, o Dictate precisa do serviço de acessibilidade. Deteta quando um campo de texto tem o foco em qualquer app — para que o botão possa aparecer — e insere a sua fala transcrita nesse campo. O Dictate só lê o campo focado para colocar o seu texto; não recolhe, armazena nem partilha qualquer outro conteúdo do ecrã.\n\nNo ecrã seguinte, encontre “Botão flutuante do brrSpeak” e ative-o.</string>
     <string name="dictate__floating_button_disclosure_continue">Abrir definições</string>
     <string name="dictate__floating_button_mic_title">Acesso ao microfone</string>
     <string name="dictate__floating_button_mic_summary">Necessário para gravar a sua voz · toque para conceder</string>
@@ -1332,8 +1332,8 @@
     <string name="dictate__voice_input_transcribing">A transcrever…</string>
     <string name="dictate__voice_input_stop">Concluído</string>
     <string name="dictate__voice_input_hint">Toca para enviar</string>
-    <string name="dictate__voice_ime_label">Entrada de voz do Dictate</string>
-    <string name="dictate__error_no_api_key">Sem chave de API – configure-a nas definições do Dictate.</string>
+    <string name="dictate__voice_ime_label">Entrada de voz do brrSpeak</string>
+    <string name="dictate__error_no_api_key">Sem chave de API – configure-a nas definições do brrSpeak.</string>
     <string name="dictate__error_transcription_failed">Falha na transcrição.</string>
     <string name="dictate__error_unknown">Erro desconhecido durante a transcrição.</string>
     <string name="dictate__error_rewording_failed">Falha na reformulação.</string>
@@ -1372,7 +1372,7 @@
     <string name="dictate__promo_donate_action">Doar</string>
     <string name="dictate__promo_changelog_message">O Dictate foi atualizado</string>
     <string name="dictate__promo_changelog_action">Detalhes</string>
-    <string name="dictate__title">Dictate</string>
+    <string name="dictate__title">brrSpeak</string>
     <string name="dictate__provider_title">Fornecedor de transcrição</string>
     <string name="dictate__provider__openai">OpenAI</string>
     <string name="dictate__provider__groq">Groq</string>
@@ -1786,7 +1786,7 @@
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Cada ditado também é copiado para a área de transferência, para que possa colá-lo manualmente se a inserção falhar. Pode mostrar um aviso da área de transferência em alguns telemóveis.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Os ditados são apenas inseridos, não copiados para a área de transferência.</string>
     <string name="dictate__floating_button_menu_group">Menu ao manter premido</string>
-    <string name="dictate__floating_button_menu_settings_title">Definições do Dictate</string>
+    <string name="dictate__floating_button_menu_settings_title">Definições do brrSpeak</string>
     <string name="dictate__floating_button_side_buttons_title">Botões adicionais</string>
     <string name="dictate__mappings_add">Adicionar substituição</string>
     <string name="dictate__mappings_editor_title">Substituição</string>

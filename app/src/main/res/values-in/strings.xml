@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-    <string name="app_name">Dictate</string>
+    <string name="app_name">brrSpeak</string>
     <string name="key__phone_pause" comment="Label for the Pause key in the telephone keyboard layout">Jeda</string>
     <string name="key__phone_wait" comment="Label for the Wait key in the telephone keyboard layout">Tunggu</string>
     <string name="key_popup__threedots_alt" comment="Content description for the three-dots icon in a key popup">Ikon titik tiga. Jika terlihat, menandakan bahwa lebih banyak huruf dapat digunakan jika ditekan lama.</string>
@@ -1205,9 +1205,9 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="unit__percent__symbol">{v}%</string>
     <string name="unit__display_pixel__symbol">{v} dp</string>
     <string name="unit__display_pixel_per_seconds__symbol">{v} dp/dtk</string>
-    <string name="dictate__accessibility_service_label">Tombol mengambang Dictate</string>
+    <string name="dictate__accessibility_service_label">Tombol mengambang brrSpeak</string>
     <string name="dictate__accessibility_service_summary">Tampilkan tombol mengambang untuk mendikte ke kolom teks mana pun.</string>
-    <string name="dictate__accessibility_service_description">Dictate menggunakan layanan ini untuk tombol dikte mengambang. Saat diaktifkan, layanan ini mendeteksi ketika kolom teks mendapat fokus di aplikasi mana pun — agar tombol dapat muncul — dan menyisipkan ucapan Anda yang ditranskripsikan ke kolom tersebut. Dictate hanya membaca kolom yang difokuskan untuk menempatkan teks pada kursor; layanan ini tidak mengumpulkan, menyimpan, atau membagikan konten layar lainnya.</string>
+    <string name="dictate__accessibility_service_description">Dictate menggunakan layanan ini untuk tombol dikte mengambang. Saat diaktifkan, layanan ini mendeteksi ketika kolom teks mendapat fokus di aplikasi mana pun — agar tombol dapat muncul — dan menyisipkan ucapan Anda yang ditranskripsikan ke kolom tersebut. brrSpeak hanya membaca kolom yang difokuskan untuk menempatkan teks pada kursor; layanan ini tidak mengumpulkan, menyimpan, atau membagikan konten layar lainnya.</string>
     <string name="dictate__overlay_notification_channel">Tombol dikte mengambang</string>
     <string name="dictate__overlay_notification_recording">Merekam — ketuk tombol mengambang untuk mentranskripsi</string>
     <string name="dictate__overlay_notification_working">Mentranskripsi…</string>
@@ -1219,7 +1219,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__floating_button_service_enabled">Aktif · ketuk untuk membuka pengaturan sistem</string>
     <string name="dictate__floating_button_service_disabled">Belum aktif · ketuk untuk menyiapkan</string>
     <string name="dictate__floating_button_disclosure_title">Aktifkan tombol mengambang</string>
-    <string name="dictate__floating_button_disclosure_message">Untuk menampilkan tombol mengambang, Dictate memerlukan layanan aksesibilitas. Layanan ini mendeteksi ketika kolom teks mendapat fokus di aplikasi mana pun — agar tombol dapat muncul — dan menyisipkan ucapan Anda yang ditranskripsikan ke kolom tersebut. Dictate hanya membaca kolom yang difokuskan untuk menempatkan teks Anda; layanan ini tidak mengumpulkan, menyimpan, atau membagikan konten layar lainnya.\n\nDi layar berikutnya, temukan “Tombol mengambang Dictate” dan aktifkan.</string>
+    <string name="dictate__floating_button_disclosure_message">Untuk menampilkan tombol mengambang, Dictate memerlukan layanan aksesibilitas. Layanan ini mendeteksi ketika kolom teks mendapat fokus di aplikasi mana pun — agar tombol dapat muncul — dan menyisipkan ucapan Anda yang ditranskripsikan ke kolom tersebut. Dictate hanya membaca kolom yang difokuskan untuk menempatkan teks Anda; layanan ini tidak mengumpulkan, menyimpan, atau membagikan konten layar lainnya.\n\nDi layar berikutnya, temukan “Tombol mengambang brrSpeak” dan aktifkan.</string>
     <string name="dictate__floating_button_disclosure_continue">Buka pengaturan</string>
     <string name="dictate__floating_button_mic_title">Akses mikrofon</string>
     <string name="dictate__floating_button_mic_summary">Diperlukan untuk merekam suara Anda · ketuk untuk memberikan</string>
@@ -1307,8 +1307,8 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__voice_input_transcribing">Mentranskripsi…</string>
     <string name="dictate__voice_input_stop">Selesai</string>
     <string name="dictate__voice_input_hint">Ketuk untuk kirim</string>
-    <string name="dictate__voice_ime_label">Input suara Dictate</string>
-    <string name="dictate__error_no_api_key">Kunci API belum diatur – konfigurasikan di pengaturan Dictate.</string>
+    <string name="dictate__voice_ime_label">Input suara brrSpeak</string>
+    <string name="dictate__error_no_api_key">Kunci API belum diatur – konfigurasikan di pengaturan brrSpeak.</string>
     <string name="dictate__error_transcription_failed">Transkripsi gagal.</string>
     <string name="dictate__error_unknown">Kesalahan tidak diketahui saat transkripsi.</string>
     <string name="dictate__error_rewording_failed">Penyusunan ulang gagal.</string>
@@ -1347,7 +1347,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__promo_donate_action">Donasi</string>
     <string name="dictate__promo_changelog_message">Dictate telah diperbarui</string>
     <string name="dictate__promo_changelog_action">Detail</string>
-    <string name="dictate__title">Dictate</string>
+    <string name="dictate__title">brrSpeak</string>
     <string name="dictate__provider_title">Penyedia transkripsi</string>
     <string name="dictate__provider__openai">OpenAI</string>
     <string name="dictate__provider__groq">Groq</string>
@@ -1757,7 +1757,7 @@ Klik di sini untuk menyelesaikan masalah ini.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_on">Setiap dikte juga disalin ke papan klip, sehingga kamu bisa menempelkannya secara manual jika penyisipan gagal. Dapat menampilkan pemberitahuan papan klip di beberapa ponsel.</string>
     <string name="dictate__floating_button_copy_to_clipboard_summary_off">Dikte hanya disisipkan, tidak disalin ke papan klip.</string>
     <string name="dictate__floating_button_menu_group">Menu saat ditahan</string>
-    <string name="dictate__floating_button_menu_settings_title">Pengaturan Dictate</string>
+    <string name="dictate__floating_button_menu_settings_title">Pengaturan brrSpeak</string>
     <string name="dictate__floating_button_side_buttons_title">Tombol tambahan</string>
     <string name="dictate__mappings_add">Tambah pemetaan</string>
     <string name="dictate__mappings_editor_title">Pemetaan</string>
