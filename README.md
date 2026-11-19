@@ -37,7 +37,7 @@ verified brrSpeak release.
 - **Baseline:** refreshed from upstream `main`, including the fixes in commit `84adfa9`.
 - **Android application ID:** `com.mangoloads.speak`, separate from the original Dictate installation.
 - **Current experiment:** receive 16 kHz mono PCM16 through `RecognizerIntent.EXTRA_AUDIO_SOURCE` and feed the existing WAV/transcription path without opening brrSpeak's microphone. Real-device verification is pending.
-- **Test APK:** the GitHub Actions `brrSpeak audio-source experiment APK` workflow builds an installable, debug-signed `com.mangoloads.speak` APK. It includes an experiment-only **brrSpeak audio-source test** launcher screen that records microphone audio in a separate process, streams it through `EXTRA_AUDIO_SOURCE`, and displays the recognition result. Its native on-device translation engine is deliberately omitted; microphone-source testing uses normal transcription providers.
+- **Test APK:** the GitHub Actions `brrSpeak audio-source experiment APK` workflow builds an installable, debug-signed `com.mangoloads.speak` APK. It publishes `brrSpeak.apk` to the **latest stable-channel GitHub Release** so Obtainium will not silently select the old `net.devemperor.dictate.debug` APK. The app itself is experimental and has an experiment-only **brrSpeak audio-source test** launcher screen that records microphone audio in a separate process, streams it through `EXTRA_AUDIO_SOURCE`, and displays the recognition result. Its native on-device translation engine is deliberately omitted; microphone-source testing uses normal transcription providers.
 - **Privacy:** this README intentionally contains no personal data, phone model, or device-specific identifiers.
 
 ### Audio-source caller contract (Android 13+)
@@ -53,7 +53,7 @@ the upstream microphone path and may still receive Android 15 error 9. Integrati
 
 ### One-APK test before brrBoard integration
 
-1. Install the `brrSpeak-experiment.apk` from the experiment's GitHub Actions prerelease and open
+1. Install `brrSpeak.apk` from the [latest GitHub Release](https://github.com/Batmancpu/Dictator-/releases/latest) and open
    the regular **brrSpeak** launcher to configure a working transcription provider.
 2. Open the separate **brrSpeak audio-source test** launcher icon (included **only** in experiment builds).
    Grant microphone permission when asked.
@@ -64,6 +64,18 @@ the upstream microphone path and may still receive Android 15 error 9. Integrati
 This separate-process probe tests the core audio-descriptor handoff and transcription engine,
 **not** a completed integration into brrBoard. On Android 15, this is a meaningful first
 check because brrSpeak's recognition process never attempts to capture microphone audio.
+
+### Obtainium
+
+Use `https://github.com/Batmancpu/Dictator-` as the source and, if prompted for an APK filter,
+use `^brrSpeak[.]apk$`. Confirm the detected package ID is **`com.mangoloads.speak`** before
+installing. If an existing Obtainium entry still identifies `net.devemperor.dictate.debug`, it
+is tracking an older fork release; recreate the tracking entry for this new APK.
+
+These experimental APKs use GitHub Actions' debug signing key, which is **not yet guaranteed to
+stay constant between builds**. Later test APKs might need an uninstall/reinstall; stable in-place
+updates require a dedicated persistent signing key. The separately installed paid Dictate app
+is not affected.
 
 ## Installation of brrSpeak
 

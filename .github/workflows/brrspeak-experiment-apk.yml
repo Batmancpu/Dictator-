@@ -36,25 +36,27 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace :app:assembleExperiment -PbrrSpeakExperiment=true
+      - name: Name APK for Obtainium
+        run: cp app/build/outputs/apk/experiment/app-experiment.apk brrSpeak.apk
       - name: Validate APK and installation identity
         run: |
-          test -s app/build/outputs/apk/experiment/app-experiment.apk
+          test -s brrSpeak.apk
           aapt_bin="$(find "$ANDROID_HOME/build-tools" -name aapt -type f | sort -V | tail -1)"
-          "$aapt_bin" dump badging app/build/outputs/apk/experiment/app-experiment.apk | grep -F "package: name='com.mangoloads.speak'"
-          sha256sum app/build/outputs/apk/experiment/app-experiment.apk
+          "$aapt_bin" dump badging brrSpeak.apk | grep -F "package: name='com.mangoloads.speak'"
+          sha256sum brrSpeak.apk
       - name: Upload APK build artifact
         uses: actions/upload-artifact@v4
         with:
           name: brrSpeak-audio-source-experiment
-          path: app/build/outputs/apk/experiment/app-experiment.apk
+          path: brrSpeak.apk
           if-no-files-found: error
-      - name: Publish test-only prerelease
+      - name: Publish latest Obtainium-compatible test release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag="brrspeak-audio-source-test-${GITHUB_RUN_NUMBER}"
           gh release create "$tag" \
-            'app/build/outputs/apk/experiment/app-experiment.apk#brrSpeak-experiment.apk' \
+            brrSpeak.apk \
             --title "brrSpeak audio-source experiment ${GITHUB_RUN_NUMBER}" \
-            --notes "Test-only Android 15 PCM16 EXTRA_AUDIO_SOURCE receiver. Package: com.mangoloads.speak. Requires a caller app that sends the PCM file descriptor. Debug-signed for testing; a future build may require uninstalling this APK before installing a differently signed version. Not an upstream Dictate release." \
-            --prerelease --latest=false --target "$GITHUB_SHA"
+            --notes "EXPERIMENTAL TEST BUILD, published as the latest non-prerelease solely for Obtainium compatibility. Package: com.mangoloads.speak (NOT net.devemperor.dictate.debug). Includes a standalone launcher test that supplies 16 kHz PCM16 audio to the RecognitionService through EXTRA_AUDIO_SOURCE. Configure the transcription provider in brrSpeak first. GitHub Actions debug signing may change between runs; future test builds may require reinstalling. Not an upstream Dictate release." \
+            --latest --target "$GITHUB_SHA"
