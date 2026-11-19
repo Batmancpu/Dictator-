@@ -11,7 +11,7 @@ and normal transcription/post-processing pipeline, and returns only final text o
 session-scoped Messenger reply. It opens no microphone and reads no editor or clipboard data.
 The existing system RecognitionService and built-in audio-source probe are unchanged.
 
-**Hardware acceptance is pending** on Android 15/ColorOS; CI is not a real-device test.
+**Partial Oppo/ColorOS acceptance:** record-first dictation successfully returned final text while brrSpeak was open, but the service was unavailable after the app process was cold. The new `BoardAudioWakeProvider` uses an authenticated, no-data `ContentResolver.call` to cold-start the process only when needed; it does not keep brrSpeak running in the background. Re-test this OEM behavior on the device. CI is not a real-device test.
 The experimental release workflow currently falls back to an ephemeral Android debug signer
 when persistent signing secrets are absent. A fresh build may require a brrSpeak-only
 uninstall/reinstall after exporting any settings you need. Never uninstall the purchased

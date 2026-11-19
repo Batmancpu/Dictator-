@@ -71,6 +71,7 @@ jobs:
           "$aapt_bin" dump badging brrSpeak.apk | grep -F "package: name='com.mangoloads.speak'"
           "$aapt_bin" dump xmltree brrSpeak.apk AndroidManifest.xml | grep -F 'AudioSourceProbeActivity'
           "$aapt_bin" dump xmltree brrSpeak.apk AndroidManifest.xml | grep -F 'BoardRecordedAudioService'
+          "$aapt_bin" dump xmltree brrSpeak.apk AndroidManifest.xml | grep -F 'BoardAudioWakeProvider'
           sha256sum brrSpeak.apk
       - name: Upload APK build artifact
         uses: actions/upload-artifact@v4
@@ -86,5 +87,5 @@ jobs:
           gh release create "$tag" \
             brrSpeak.apk \
             --title "brrSpeak audio-source experiment ${GITHUB_RUN_NUMBER}" \
-            --notes "EXPERIMENTAL TEST BUILD, published as the latest non-prerelease solely for Obtainium compatibility. Package: com.mangoloads.speak (NOT net.devemperor.dictate.debug). Open brrSpeak Settings > Home > brrSpeak audio-source test. Includes brrBoard-only explicit bound-service receiver for completed 16 kHz PCM16 recordings via a read-only descriptor, with final-text-only callback. The old same-app audio-source probe remains available. Configure a transcription provider first. In-place updates require the optional persistent BRRSPEAK signing secrets; otherwise a later test build may require reinstalling. Not an upstream Dictate release." \
+            --notes "EXPERIMENTAL TEST BUILD, published as the latest non-prerelease solely for Obtainium compatibility. Package: com.mangoloads.speak (NOT net.devemperor.dictate.debug). Open brrSpeak Settings > Home > brrSpeak audio-source test. Includes brrBoard-only UID-verified no-data cold-start ContentProvider handshake followed by the explicit bound-service receiver for complete 16 kHz PCM16 read-only audio; final-text-only callback. brrSpeak need not remain open in the background. The old same-app audio-source probe remains available. Configure a transcription provider first. In-place updates require the optional persistent BRRSPEAK signing secrets; otherwise a later test build may require reinstalling. Not an upstream Dictate release." \
             --latest --target "$GITHUB_SHA"

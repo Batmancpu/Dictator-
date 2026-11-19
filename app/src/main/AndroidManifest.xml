@@ -152,6 +152,13 @@
             android:process=":translate"
             android:exported="false"/>
 
+        <!-- Only a UID-verified, no-data ContentResolver.call() to cold-start this process. -->
+        <provider
+            android:name="dev.patrickgold.florisboard.dictate.recognition.BoardAudioWakeProvider"
+            android:authorities="com.mangoloads.speak.boardaudio"
+            android:exported="true"
+            android:grantUriPermissions="false" />
+
         <!-- Explicit brrBoard-only recorded PCM Binder receiver: no activity or microphone. -->
         <service
             android:name="dev.patrickgold.florisboard.dictate.recognition.BoardRecordedAudioService"
