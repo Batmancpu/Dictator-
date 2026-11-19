@@ -28,6 +28,11 @@ through brrSpeak; sensitive text must never be retained by the external voice-in
 - Local `./gradlew --offline :app:testExperimentUnitTest`: **not run** because the Gradle
   9.4.1 distribution is absent and outbound download is blocked in this workspace.
 - CI compile/unit/publication: **pending a GitHub Actions run after commit**.
+- First pushed commit `ae4d7ce` compiled the experiment APK successfully but its new
+  `:app:testExperimentUnitTest` step failed task selection: this AGP configuration has
+  no such test task. Corrective batch uses `:app:testDebugUnitTest` on the same
+  `src/main` implementation and switches its tests to the existing Kotlin test/JUnit 5
+  convention. Re-run CI; no APK was published by that failed workflow.
 - Real cross-UID PCM from brrBoard on Android 15/ColorOS: **not proven**.
 - Native cached WAV data is still used temporarily during network transcription; the
   separate private brrBoard offline path must never use this brrSpeak code.
