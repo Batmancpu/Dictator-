@@ -99,6 +99,7 @@ import dev.patrickgold.florisboard.dictate.provider.rewordingBlocker
 import dev.patrickgold.florisboard.dictate.provider.rewordingKeyFor
 import dev.patrickgold.florisboard.dictate.provider.singleCallApplies
 import dev.patrickgold.florisboard.dictate.recognition.RecognitionSink
+import dev.patrickgold.florisboard.dictate.recognition.ExternalAudioPrivacy
 import dev.patrickgold.florisboard.dictate.snippet.SnippetTriggers
 import dev.patrickgold.florisboard.ime.text.key.KeyVariation
 import dev.patrickgold.florisboard.keyboardManager
@@ -1713,7 +1714,9 @@ object DictateController {
                 // Highlight the live-prompt chip for the duration of a live-prompt recording.
                 _livePromptActive.value = livePromptArmed
                 if (segmented) initSegmented(appContext)
-                registerScreenOffReceiver(appContext)
+                // The caller owns a system-recognition PCM pipe. Screen-off must cancel via
+                // the recognition lifecycle, never stash a private cross-app recording.
+                if (externalAudio == null) registerScreenOffReceiver(appContext)
                 if (externalAudio == null) registerInputDeviceWatch(appContext)
                 // Push-to-talk (#235): the finger came back up while this job was still acquiring audio
                 // focus / Bluetooth SCO. Now that a recorder exists, honour that release.
@@ -3859,6 +3862,12 @@ object DictateController {
         // saved (issue #144); otherwise retention is gated on the resend-button preference.
         force: Boolean = false,
     ): Boolean {
+        // A system RecognitionService request does not tell us which editor receives the result.
+        // Never retain a keyboard-supplied private recording for retry, even after an API failure,
+        // regardless of the general resend preference or the force-export error path.
+        if (!ExternalAudioPrivacy.mayRetainForRetry(
+                outputTarget == OutputTarget.RECOGNITION_SERVICE, recognitionFieldSensitive,
+            )) return false
         if (!force && !prefs.dictate.resendButton.get()) return false
         if (!audioFile.exists() || audioFile.length() == 0L) return false
         if (retained?.file != audioFile) discardRetainedAudio()

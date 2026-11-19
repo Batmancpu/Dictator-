@@ -58,6 +58,8 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace :app:assembleExperiment -PbrrSpeakExperiment=true
+      - name: Run experiment unit tests before publication
+        run: ./gradlew --no-daemon --stacktrace :app:testExperimentUnitTest -PbrrSpeakExperiment=true
       - name: Name APK for Obtainium
         run: cp app/build/outputs/apk/experiment/app-experiment.apk brrSpeak.apk
       - name: Validate APK and installation identity

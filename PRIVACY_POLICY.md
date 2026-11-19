@@ -1,4 +1,25 @@
-# Privacy Policy for Dictate Keyboard
+# Privacy and origin notes for the brrSpeak experiment fork
+
+This repository also builds **brrSpeak** (`com.mangoloads.speak`), a separately installed fork
+of Dictate Keyboard. The upstream policy below describes `net.devemperor.dictate` and its
+original developer; it is **not** a statement that the upstream developer operates the fork.
+
+In the brrBoard-to-brrSpeak `EXTRA_AUDIO_SOURCE` path, brrBoard supplies microphone PCM and
+brrSpeak returns a transcript through Android's speech-recognition interface. brrSpeak may
+temporarily write WAV audio into its private cache to transcribe it. As of this fork's external
+audio privacy guard, these requests are treated as sensitive even without editor metadata:
+their transcripts do not enter Dictate history, and failed recordings are not retained for
+the retry/export feature. Temporary cache files should be removed on completion or cancellation;
+any failure to enforce that cleanup is a bug, not a retention feature.
+
+If a network provider is selected, audio goes to **that configured provider**, so this is not
+an offline-only mode. The user should select a provider they trust and avoid the optional
+Dictate Cloud service if they do not want upstream-mediated processing. The planned blue
+offline-only mode belongs entirely inside brrBoard and does not invoke brrSpeak.
+
+---
+
+# Upstream Privacy Policy for Dictate Keyboard
 
 **Effective date:** 31 August 2026
 **Last updated:** 6 October 2026

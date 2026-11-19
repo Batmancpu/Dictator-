@@ -41,7 +41,10 @@ import kotlinx.coroutines.launch
 class RecognitionSession(
     private val appContext: Context,
     private val host: Host,
-    /** The caller's field is a password or incognito field: keep the dictation out of the history (#383). */
+    /**
+     * The caller's field is private. A framework RecognitionService caller cannot pass reliable field
+     * sensitivity; keyboard-supplied external PCM is therefore always handled as private as well.
+     */
     private val sensitiveField: Boolean = false,
     /** Caller-owned PCM pipe, when Android 15 cannot give this background process microphone access. */
     private val externalAudio: ParcelFileDescriptor? = null,
@@ -69,7 +72,7 @@ class RecognitionSession(
     fun start() {
         RecognitionBridge.register(this)
         DictateController.startRecognition(
-            appContext, sensitiveField, externalAudio,
+            appContext, ExternalAudioPrivacy.suppressHistory(sensitiveField, externalAudio != null), externalAudio,
             onExternalAudioFinished = { failed ->
                 if (failed) failAndCancel(SpeechRecognizer.ERROR_AUDIO) else stop()
             },
