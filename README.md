@@ -1,5 +1,5 @@
 > [!IMPORTANT]
-> **brrSpeak is an experimental, independently built fork of [Dictate Keyboard](https://github.com/DevEmperor/DictateKeyboard). Its purpose is to investigate and test an Android 15 speech-recognition integration problem documented in [upstream issue #489](https://github.com/DevEmperor/DictateKeyboard/issues/489): allowing another keyboard to supply microphone audio for transcription without switching apps. The proposed `RecognizerIntent.EXTRA_AUDIO_SOURCE` integration is NOT implemented or verified yet. This is not an official release, and no personal or device-identifying information is included here.**
+> **brrSpeak is an experimental, independently built fork of [Dictate Keyboard](https://github.com/DevEmperor/DictateKeyboard). Its purpose is to investigate and test an Android 15 speech-recognition integration problem documented in [upstream issue #489](https://github.com/DevEmperor/DictateKeyboard/issues/489): allowing another keyboard to supply microphone audio for transcription without switching apps. Experimental `RecognizerIntent.EXTRA_AUDIO_SOURCE` input support is implemented here but is NOT yet verified on a real device or included upstream. This is not an official release, and no personal or device-identifying information is included here.**
 
 <div align="center">
 
@@ -36,8 +36,20 @@ verified brrSpeak release.
 
 - **Baseline:** refreshed from upstream `main`, including the fixes in commit `84adfa9`.
 - **Android application ID:** `com.mangoloads.speak`, separate from the original Dictate installation.
-- **Planned investigation:** microphone audio captured by the calling keyboard and delivered via `RecognizerIntent.EXTRA_AUDIO_SOURCE`, pending implementation and testing.
+- **Current experiment:** receive 16 kHz mono PCM16 through `RecognizerIntent.EXTRA_AUDIO_SOURCE` and feed the existing WAV/transcription path without opening brrSpeak's microphone. Real-device verification is pending.
+- **Test APK:** the GitHub Actions `brrSpeak audio-source experiment APK` workflow builds an installable, debug-signed `com.mangoloads.speak` APK. Its native on-device translation engine is deliberately omitted; microphone-source testing uses normal transcription providers.
 - **Privacy:** this README intentionally contains no personal data, phone model, or device-specific identifiers.
+
+### Audio-source caller contract (Android 13+)
+
+An external keyboard must open its own microphone, stream **raw 16 kHz mono signed PCM16 little-endian**
+to the write side of a `ParcelFileDescriptor.createPipe()`, and put the read descriptor in the
+`SpeechRecognizer.startListening()` intent under `RecognizerIntent.EXTRA_AUDIO_SOURCE`.
+Also set `EXTRA_AUDIO_SOURCE_CHANNEL_COUNT=1`, `EXTRA_AUDIO_SOURCE_ENCODING=AudioFormat.ENCODING_PCM_16BIT`,
+and `EXTRA_AUDIO_SOURCE_SAMPLING_RATE=16000`. Close the write side at the user's second mic tap.
+No extra activity or keyboard switch is required. A caller that does not attach this extra will still use
+the upstream microphone path and may still receive Android 15 error 9. Integration with brrBoard is a
+**separate, not-yet-verified sender change**; installing brrSpeak by itself does not change brrBoard's mic.
 
 ## Installation of brrSpeak
 

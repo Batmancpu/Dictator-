@@ -11,8 +11,12 @@
 package dev.patrickgold.florisboard.dictate.recognition
 
 import android.content.Intent
+import android.media.AudioFormat
+import android.os.Build
 import android.os.Bundle
+import android.os.ParcelFileDescriptor
 import android.speech.RecognitionService
+import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 
 /**
@@ -46,7 +50,30 @@ class DictateRecognitionService : RecognitionService() {
      */
     override fun onStartListening(recognizerIntent: Intent, listener: Callback) {
         session?.cancel()
-        session = RecognitionSession(applicationContext, hostFor(listener)).also { it.start() }
+        val externalAudio: ParcelFileDescriptor? = if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            recognizerIntent.hasExtra(RecognizerIntent.EXTRA_AUDIO_SOURCE)
+        ) {
+            val source = recognizerIntent.getParcelableExtra(
+                RecognizerIntent.EXTRA_AUDIO_SOURCE, ParcelFileDescriptor::class.java,
+            )
+            val channels = recognizerIntent.getIntExtra(RecognizerIntent.EXTRA_AUDIO_SOURCE_CHANNEL_COUNT, 1)
+            val encoding = recognizerIntent.getIntExtra(
+                RecognizerIntent.EXTRA_AUDIO_SOURCE_ENCODING, AudioFormat.ENCODING_PCM_16BIT,
+            )
+            val rate = recognizerIntent.getIntExtra(RecognizerIntent.EXTRA_AUDIO_SOURCE_SAMPLING_RATE, 16_000)
+            // Explicitly reject unsupported PCM formats. Silently interpreting another rate as 16 kHz
+            // produces pitched/garbled speech that looks like a broken transcription provider.
+            if (source == null || channels != 1 || encoding != AudioFormat.ENCODING_PCM_16BIT || rate != 16_000) {
+                runCatching { source?.close() }
+                session = null
+                runCatching { listener.error(SpeechRecognizer.ERROR_AUDIO) }
+                return
+            }
+            source
+        } else null
+        session = RecognitionSession(applicationContext, hostFor(listener), externalAudio = externalAudio)
+            .also { it.start() }
     }
 
     override fun onStopListening(listener: Callback) {

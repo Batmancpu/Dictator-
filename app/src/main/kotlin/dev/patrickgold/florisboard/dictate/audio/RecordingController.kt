@@ -15,7 +15,11 @@ import android.content.Context
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import android.os.ParcelFileDescriptor
 import android.os.SystemClock
+import android.system.ErrnoException
+import android.system.Os
+import android.system.OsConstants
 import android.util.Log
 import kotlinx.coroutines.delay
 import java.io.File
@@ -71,6 +75,89 @@ class RecordingController(private val context: Context) {
 
     val isRecording: Boolean
         get() = recording
+
+    /**
+     * Captures PCM16/16 kHz/mono supplied by a calling app through
+     * [android.speech.RecognizerIntent.EXTRA_AUDIO_SOURCE]. There is deliberately **no AudioRecord**:
+     * Android 15 does not give a background third-party RecognitionService microphone capabilities.
+     *
+     * The reader is non-blocking, so [stop] can join it without waiting for an external writer that
+     * forgot to close its pipe. The reader owns and closes [source]; EOF tells the recognition session
+     * that the caller ended the stream. This path uses the same WAV writer and [stop] finalizer as the
+     * ordinary microphone path, keeping every transcription engine unchanged.
+     */
+    fun startExternal(source: ParcelFileDescriptor, onSourceFinished: () -> Unit) {
+        if (recording) {
+            runCatching { source.close() }
+            error("Recording already active")
+        }
+        val file = File(context.cacheDir, AUDIO_FILE_NAME)
+        val out = try {
+            RandomAccessFile(file, "rw").apply {
+                setLength(0)
+                write(ByteArray(WAV_HEADER_SIZE))
+            }
+        } catch (t: Throwable) {
+            runCatching { source.close() }
+            throw t
+        }
+        raf = out
+        outputFile = file
+        pcmBytes = 0L
+        capturedSamples = 0L
+        peak = 0
+        paused = false
+        longestSilentMs = 0L
+        captureLost = null
+        recording = true
+        thread = Thread({
+            var inputFinished = false
+            val buf = ByteArray(4096)
+            var spareByte = -1
+            try {
+                val fd = source.fileDescriptor
+                val flags = Os.fcntlInt(fd, OsConstants.F_GETFL, 0)
+                Os.fcntlInt(fd, OsConstants.F_SETFL, flags or OsConstants.O_NONBLOCK)
+                while (recording) {
+                    val offset = if (spareByte >= 0) 1 else 0
+                    if (offset == 1) buf[0] = spareByte.toByte()
+                    val n = try {
+                        Os.read(fd, buf, offset, buf.size - offset)
+                    } catch (e: ErrnoException) {
+                        if (e.errno == OsConstants.EAGAIN || e.errno == OsConstants.EINTR) {
+                            Thread.sleep(20)
+                            continue
+                        }
+                        throw e
+                    }
+                    if (n == 0) {
+                        inputFinished = true
+                        break
+                    }
+                    val available = offset + n
+                    val evenBytes = available - (available % 2)
+                    spareByte = if (evenBytes < available) buf[evenBytes].toInt() and 0xff else -1
+                    if (evenBytes > 0 && !paused) {
+                        synchronized(fileLock) {
+                            if (recording) {
+                                raf?.write(buf, 0, evenBytes)
+                                pcmBytes += evenBytes
+                                capturedSamples += evenBytes / 2
+                            }
+                        }
+                        val framePeak = framePeak(buf, evenBytes)
+                        if (framePeak > peak) peak = framePeak
+                    }
+                }
+            } catch (t: Throwable) {
+                if (recording) Log.w("DictateAudioSource", "External PCM source failed", t)
+                inputFinished = true // end the request; never silently switch to this process's mic
+            } finally {
+                runCatching { source.close() }
+                if (inputFinished && recording) onSourceFinished()
+            }
+        }, "brrSpeak-external-pcm").also { it.start() }
+    }
 
     /**
      * Starts a new recording. A microphone that is momentarily busy is waited out (see [acquire]); this

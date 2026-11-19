@@ -11,6 +11,7 @@
 package dev.patrickgold.florisboard.dictate.recognition
 
 import android.content.Context
+import android.os.ParcelFileDescriptor
 import android.speech.SpeechRecognizer
 import dev.patrickgold.florisboard.dictate.DictateController
 import kotlinx.coroutines.CoroutineScope
@@ -42,6 +43,8 @@ class RecognitionSession(
     private val host: Host,
     /** The caller's field is a password or incognito field: keep the dictation out of the history (#383). */
     private val sensitiveField: Boolean = false,
+    /** Caller-owned PCM pipe, when Android 15 cannot give this background process microphone access. */
+    private val externalAudio: ParcelFileDescriptor? = null,
 ) {
     /** Receives lifecycle + result callbacks; the service maps these to its `RecognitionService.Callback`,
      *  the activity updates its UI and returns an activity result. Only [onResults]/[onError] are required. */
@@ -65,7 +68,10 @@ class RecognitionSession(
 
     fun start() {
         RecognitionBridge.register(this)
-        DictateController.startRecognition(appContext, sensitiveField)
+        DictateController.startRecognition(
+            appContext, sensitiveField, externalAudio,
+            onExternalAudioFinished = { stop() },
+        )
         watchdog = scope.launch {
             val startedMs = System.currentTimeMillis()
             var speechStarted = false
@@ -93,8 +99,12 @@ class RecognitionSession(
                 }
                 val elapsed = now - startedMs
                 when {
-                    speechStarted && now - lastLoudMs >= END_SILENCE_MS -> { stop(); return@launch }
-                    !speechStarted && elapsed >= NO_SPEECH_TIMEOUT_MS -> {
+                    // The calling keyboard owns the external microphone and chooses when the second
+                    // mic tap closes the pipe. Do not override that with Dictate's silence endpointing.
+                    externalAudio == null && speechStarted && now - lastLoudMs >= END_SILENCE_MS -> {
+                        stop(); return@launch
+                    }
+                    externalAudio == null && !speechStarted && elapsed >= NO_SPEECH_TIMEOUT_MS -> {
                         failAndCancel(SpeechRecognizer.ERROR_SPEECH_TIMEOUT)
                         return@launch
                     }

@@ -31,6 +31,7 @@ import android.media.AudioManager
 import android.media.MediaRecorder
 import android.os.Handler
 import android.os.Looper
+import android.os.ParcelFileDescriptor
 import android.os.SystemClock
 import dev.patrickgold.florisboard.BuildConfig
 import dev.patrickgold.florisboard.R
@@ -1327,16 +1328,26 @@ object DictateController {
      * [sensitiveField] keeps the dictation out of the history (#383). Only the voice IME can say so, because
      * it is the one entry point that sees the caller's field.
      */
-    fun startRecognition(context: Context, sensitiveField: Boolean = false) {
+    fun startRecognition(
+        context: Context,
+        sensitiveField: Boolean = false,
+        externalAudio: ParcelFileDescriptor? = null,
+        onExternalAudioFinished: (() -> Unit)? = null,
+    ) {
         // Busy with another dictation → ignore; the service will time out and report an error.
         if (_state.value is UiState.Recording ||
             _state.value is UiState.Transcribing ||
             _state.value is UiState.Rewording
-        ) return
+        || startJob?.isCompleted == false
+        ) {
+            runCatching { externalAudio?.close() }
+            dev.patrickgold.florisboard.dictate.recognition.RecognitionBridge.completeOutcome("recordingFailed")
+            return
+        }
         outputTarget = OutputTarget.RECOGNITION_SERVICE
         recognitionFieldSensitive = sensitiveField
         pttStopPending = false
-        startRecording(context)
+        startRecording(context, externalAudio = externalAudio, onExternalAudioFinished = onExternalAudioFinished)
     }
 
     /**
@@ -1593,7 +1604,12 @@ object DictateController {
      * already-captured audio when continuing an interrupted recording, so the bar shows the running
      * total; it is 0 for a normal recording.
      */
-    private fun startRecording(context: Context, seedAccumulatedMs: Long = 0L) {
+    private fun startRecording(
+        context: Context,
+        seedAccumulatedMs: Long = 0L,
+        externalAudio: ParcelFileDescriptor? = null,
+        onExternalAudioFinished: (() -> Unit)? = null,
+    ) {
         if (_state.value is UiState.Recording) return
         // The state only turns to Recording at the very end of [startJob], after audio focus, Bluetooth SCO
         // and the realtime socket. A second start inside that window (a second tap on a mic that has not
@@ -1607,7 +1623,11 @@ object DictateController {
         // Before the credential check, not after: a missing key on the very first dictation is an error
         // a screen reader has to speak (#159), and the observer only hears what happens once it runs.
         ensureHapticObserver(appContext)
-        if (refuseIfNoCredential(context)) return
+        if (refuseIfNoCredential(context)) {
+            runCatching { externalAudio?.close() }
+            if (externalAudio != null) endRecognitionWithout("apiError")
+            return
+        }
         // Measured from here to the recorder running and to its first frame (#447): whatever is said
         // before that frame is not in the recording at all.
         val startRequestedAt = SystemClock.elapsedRealtime()
@@ -1630,8 +1650,12 @@ object DictateController {
                 // Correct any stale active language (e.g. leftover "detect" after auto-detect was
                 // disabled) before the realtime session / request reads it.
                 reconcileActiveLanguage()
-                requestAudioFocusIfEnabled(appContext)
-                val audioSource = setupBluetoothIfEnabled(appContext)
+                // Android 15 permits this background RecognitionService to *consume* audio supplied
+                // by the caller, not to open its own mic. The external path must skip audio focus,
+                // Bluetooth routing and AudioRecord entirely (issue #489).
+                if (externalAudio == null) requestAudioFocusIfEnabled(appContext)
+                val audioSource = if (externalAudio == null) setupBluetoothIfEnabled(appContext)
+                    else MediaRecorder.AudioSource.MIC // unused; the external recorder never opens a mic
                 // Long-form segmented dictation (#170): transcribe cut segments in the background while
                 // recording continues. Off for realtime / live-prompt / system voice input / multimodal (see the gate).
                 val segmented = isSegmentedMode(appContext)
@@ -1652,6 +1676,7 @@ object DictateController {
                     // Off the main thread: opening the stream builds an HTTP client and a WebSocket, and
                     // doing that inline stalled the UI thread long enough for Android to cancel the
                     // in-flight touch — which killed push-to-talk ~90 ms into a hold (#235).
+                    externalAudio != null -> null // external recognition is plain batch transcription
                     !segmented -> withContext(Dispatchers.IO) { openRealtimeSession(appContext) }
                     segmentVad != null -> { val v = segmentVad!!; { pcm, len -> v.feed(pcm, len) } }
                     else -> null
@@ -1664,9 +1689,15 @@ object DictateController {
                     stale.cancel()
                 }
                 recorder = RecordingController(appContext).also {
-                    it.start(audioSource, pcmSink, onCaptureLost = { reason ->
-                        onCaptureRouteLost(appContext, reason)
-                    }, startRequestedAt = startRequestedAt)
+                    if (externalAudio != null) {
+                        it.startExternal(externalAudio) {
+                            scope.launch { onExternalAudioFinished?.invoke() }
+                        }
+                    } else {
+                        it.start(audioSource, pcmSink, onCaptureLost = { reason ->
+                            onCaptureRouteLost(appContext, reason)
+                        }, startRequestedAt = startRequestedAt)
+                    }
                 }
                 Log.i(
                     LATENCY_LOG_TAG,
@@ -1683,7 +1714,7 @@ object DictateController {
                 _livePromptActive.value = livePromptArmed
                 if (segmented) initSegmented(appContext)
                 registerScreenOffReceiver(appContext)
-                registerInputDeviceWatch(appContext)
+                if (externalAudio == null) registerInputDeviceWatch(appContext)
                 // Push-to-talk (#235): the finger came back up while this job was still acquiring audio
                 // focus / Bluetooth SCO. Now that a recorder exists, honour that release.
                 if (pttStopPending) {
@@ -1691,6 +1722,7 @@ object DictateController {
                     if (pttStopSends) stopAndTranscribe(appContext) else cancelRecording()
                 }
             } catch (t: Throwable) {
+                runCatching { externalAudio?.close() }
                 // Whatever this start had already opened goes with it. Only nulling [recorder] left the
                 // microphone running whenever something after `start` threw, and a realtime socket opened
                 // ahead of a busy microphone stayed connected with nothing to send (#147).

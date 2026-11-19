@@ -143,6 +143,16 @@ configure<ApplicationExtension> {
             isJniDebuggable = false
         }
 
+        // Installable experiment APK with the exact app ID used by external recognizer callers.
+        // It is debuggable and signed with the CI debug key; do not distribute as a production APK.
+        create("experiment") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ""
+            versionNameSuffix = "-audio-source-experiment"
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("debug")
+        }
+
         create("beta") {
             applicationIdSuffix = ".beta"
             versionNameSuffix = projectVersionNameSuffix
@@ -346,8 +356,13 @@ tasks.named("preBuild").configure { dependsOn(verifySherpaOnnxLibs) }
 // otherwise it ships a feature that cannot run on any phone at all.
 val verifyBergamotLib by tasks.registering {
     val library = layout.projectDirectory.file("src/main/jniLibs/arm64-v8a/libdictate_bergamot.so").asFile
+    // The speech-input experiment does not test on-device translation. A clean fork cannot build
+    // Bergamot without its lengthy separate native toolchain, so allow this one test-only variant
+    // to ship without it; the native loader already reports "unsupported" if absent.
+    val allowMissingForExperiment = providers.gradleProperty("brrSpeakExperiment")
+        .map { it == "true" }.getOrElse(false)
     doLast {
-        if (!library.exists()) {
+        if (!library.exists() && !allowMissingForExperiment) {
             throw GradleException("Missing libdictate_bergamot.so for arm64-v8a.\n\nRun:  tools/bergamot/build-android.sh")
         }
     }
