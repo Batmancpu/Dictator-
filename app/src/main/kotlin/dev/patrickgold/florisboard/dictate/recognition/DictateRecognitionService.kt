@@ -18,6 +18,16 @@ import android.os.ParcelFileDescriptor
 import android.speech.RecognitionService
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import dev.patrickgold.florisboard.FlorisApplication
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * Makes Dictate a system-wide speech recognizer via the standard Android [RecognitionService] API
@@ -35,6 +45,10 @@ import android.speech.SpeechRecognizer
 class DictateRecognitionService : RecognitionService() {
 
     private var session: RecognitionSession? = null
+    // Dispatch, do not run inline: pendingStart must be assigned before the coroutine completes.
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private var pendingStart: Job? = null
+    private var pendingAudio: ParcelFileDescriptor? = null
 
     /**
      * Android 15 binds a third-party recognition service with nothing but BIND_AUTO_CREATE (AOSP "Restrict
@@ -49,6 +63,7 @@ class DictateRecognitionService : RecognitionService() {
      * and "no speech" instead of an honest permission error (measured on the same emulator).
      */
     override fun onStartListening(recognizerIntent: Intent, listener: Callback) {
+        cancelPendingStart()
         session?.cancel()
         val externalAudio: ParcelFileDescriptor? = if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
@@ -72,23 +87,71 @@ class DictateRecognitionService : RecognitionService() {
             }
             source
         } else null
-        session = RecognitionSession(applicationContext, hostFor(listener), externalAudio = externalAudio)
-            .also { it.start() }
+        // An Android 15 keyboard can bind this service while the brrSpeak process is cold.
+        // FlorisApplication initializes preferences asynchronously: starting transcription before
+        // that completes can fail before the PCM receiver ever becomes ready. Keep the descriptor
+        // alive while we wait, then start the existing recognition path as normal.
+        val app = application as FlorisApplication
+        if (externalAudio != null && !app.preferenceStoreLoaded.value) {
+            pendingAudio = externalAudio
+            pendingStart = scope.launch {
+                val ready = withTimeoutOrNull(PREFS_START_TIMEOUT_MS) {
+                    app.preferenceStoreLoaded.first { it }
+                } != null
+                if (!isActive) return@launch
+                pendingStart = null
+                pendingAudio = null
+                if (ready) {
+                    startSession(listener, externalAudio)
+                } else {
+                    runCatching { externalAudio.close() }
+                    runCatching { listener.error(SpeechRecognizer.ERROR_CLIENT) }
+                }
+            }
+        } else {
+            startSession(listener, externalAudio)
+        }
     }
 
     override fun onStopListening(listener: Callback) {
-        session?.stop()
+        if (pendingStart != null) {
+            cancelPendingStart()
+            runCatching { listener.error(SpeechRecognizer.ERROR_NO_MATCH) }
+        } else {
+            session?.stop()
+        }
     }
 
     override fun onCancel(listener: Callback) {
+        cancelPendingStart()
         session?.cancel()
         session = null
     }
 
     override fun onDestroy() {
+        cancelPendingStart()
         session?.cancel()
         session = null
+        scope.cancel()
         super.onDestroy()
+    }
+
+    private fun cancelPendingStart() {
+        pendingStart?.cancel()
+        pendingStart = null
+        runCatching { pendingAudio?.close() }
+        pendingAudio = null
+    }
+
+    private fun startSession(listener: Callback, source: ParcelFileDescriptor?) {
+        try {
+            session = RecognitionSession(applicationContext, hostFor(listener), externalAudio = source)
+                .also { it.start() }
+        } catch (t: Throwable) {
+            runCatching { source?.close() }
+            session = null
+            runCatching { listener.error(SpeechRecognizer.ERROR_CLIENT) }
+        }
     }
 
     private fun hostFor(listener: Callback) = object : RecognitionSession.Host {
@@ -124,6 +187,8 @@ class DictateRecognitionService : RecognitionService() {
     }
 
     private companion object {
+        private const val PREFS_START_TIMEOUT_MS = 15_000L
+
         private fun resultsBundle(text: String): Bundle = Bundle().apply {
             putStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION, arrayListOf(text))
         }

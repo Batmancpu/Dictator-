@@ -1332,13 +1332,13 @@ object DictateController {
         context: Context,
         sensitiveField: Boolean = false,
         externalAudio: ParcelFileDescriptor? = null,
-        onExternalAudioFinished: (() -> Unit)? = null,
+        onExternalAudioFinished: ((failed: Boolean) -> Unit)? = null,
     ) {
         // Busy with another dictation → ignore; the service will time out and report an error.
         if (_state.value is UiState.Recording ||
             _state.value is UiState.Transcribing ||
-            _state.value is UiState.Rewording
-        || startJob?.isCompleted == false
+            _state.value is UiState.Rewording ||
+            startJob?.isCompleted == false
         ) {
             runCatching { externalAudio?.close() }
             dev.patrickgold.florisboard.dictate.recognition.RecognitionBridge.completeOutcome("recordingFailed")
@@ -1608,7 +1608,7 @@ object DictateController {
         context: Context,
         seedAccumulatedMs: Long = 0L,
         externalAudio: ParcelFileDescriptor? = null,
-        onExternalAudioFinished: (() -> Unit)? = null,
+        onExternalAudioFinished: ((failed: Boolean) -> Unit)? = null,
     ) {
         if (_state.value is UiState.Recording) return
         // The state only turns to Recording at the very end of [startJob], after audio focus, Bluetooth SCO
@@ -1690,8 +1690,8 @@ object DictateController {
                 }
                 recorder = RecordingController(appContext).also {
                     if (externalAudio != null) {
-                        it.startExternal(externalAudio) {
-                            scope.launch { onExternalAudioFinished?.invoke() }
+                        it.startExternal(externalAudio) { failed ->
+                            scope.launch { onExternalAudioFinished?.invoke(failed) }
                         }
                     } else {
                         it.start(audioSource, pcmSink, onCaptureLost = { reason ->

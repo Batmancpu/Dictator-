@@ -86,7 +86,7 @@ class RecordingController(private val context: Context) {
      * that the caller ended the stream. This path uses the same WAV writer and [stop] finalizer as the
      * ordinary microphone path, keeping every transcription engine unchanged.
      */
-    fun startExternal(source: ParcelFileDescriptor, onSourceFinished: () -> Unit) {
+    fun startExternal(source: ParcelFileDescriptor, onSourceFinished: (failed: Boolean) -> Unit) {
         if (recording) {
             runCatching { source.close() }
             error("Recording already active")
@@ -112,6 +112,7 @@ class RecordingController(private val context: Context) {
         recording = true
         thread = Thread({
             var inputFinished = false
+            var readFailed = false
             val buf = ByteArray(4096)
             var spareByte = -1
             try {
@@ -151,10 +152,12 @@ class RecordingController(private val context: Context) {
                 }
             } catch (t: Throwable) {
                 if (recording) Log.w("DictateAudioSource", "External PCM source failed", t)
-                inputFinished = true // end the request; never silently switch to this process's mic
+                // Do not turn a broken pipe, FD error, or disk write failure into a plausible but
+                // incomplete transcript. Give the caller ERROR_AUDIO instead of treating it as EOF.
+                readFailed = true
             } finally {
                 runCatching { source.close() }
-                if (inputFinished && recording) onSourceFinished()
+                if ((inputFinished || readFailed) && recording) onSourceFinished(readFailed)
             }
         }, "brrSpeak-external-pcm").also { it.start() }
     }

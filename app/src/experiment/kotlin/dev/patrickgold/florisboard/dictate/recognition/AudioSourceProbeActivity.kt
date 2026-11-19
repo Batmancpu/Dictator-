@@ -20,6 +20,8 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.ParcelFileDescriptor
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
@@ -30,10 +32,11 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * A test-only, separate-process microphone source for EXTRA_AUDIO_SOURCE.
- * This is intentionally not the final keyboard UI. The two taps here prove whether a
+ * This is intentionally not the final keyboard UI. The two taps here test whether a
  * foreground caller can send its PCM audio to the background Dictate RecognitionService
  * without that service ever opening its own microphone (Android 15 issue #489).
  */
@@ -49,6 +52,11 @@ class AudioSourceProbeActivity : Activity() {
     private var pipeWrite: ParcelFileDescriptor? = null
     @Volatile private var recorder: AudioRecord? = null
     private val captureWanted = AtomicBoolean(false)
+    private val bytesSent = AtomicLong(0)
+    private val nonZeroFrames = AtomicLong(0)
+    private val handler = Handler(Looper.getMainLooper())
+    private var timeoutRunnable: Runnable? = null
+    @Volatile private var sessionToken = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +83,7 @@ class AudioSourceProbeActivity : Activity() {
                 when (phase) {
                     Phase.IDLE -> requestMicAndStart()
                     Phase.RECORDING -> stopSending()
-                    else -> Unit
+                    Phase.CONNECTING, Phase.TRANSCRIBING -> finish("Audio-source test cancelled.")
                 }
             }
         }
@@ -112,9 +120,15 @@ class AudioSourceProbeActivity : Activity() {
 
     private fun startListeningWithPipe() {
         releaseSession()
+        val token = sessionToken
+        bytesSent.set(0)
+        nonZeroFrames.set(0)
         phase = Phase.CONNECTING
-        button.isEnabled = false
+        button.text = "Cancel test"
+        button.isEnabled = true
         status.text = "Binding to brrSpeak recognition service; waiting for ready…"
+        scheduleTimeout(Phase.CONNECTING, READY_TIMEOUT_MS,
+            "Recognition service did not become ready within 25 seconds.")
         try {
             val pipe = ParcelFileDescriptor.createPipe()
             pipeRead = pipe[0]
@@ -124,18 +138,25 @@ class AudioSourceProbeActivity : Activity() {
             val engine = SpeechRecognizer.createSpeechRecognizer(this, target)
             recognizer = engine
             engine.setRecognitionListener(object : RecognitionListener {
-                override fun onReadyForSpeech(params: Bundle?) = startMicSender()
+                override fun onReadyForSpeech(params: Bundle?) {
+                    if (sessionToken == token) startMicSender(token)
+                }
                 override fun onBeginningOfSpeech() = Unit
                 override fun onRmsChanged(rmsdB: Float) = Unit
                 override fun onBufferReceived(buffer: ByteArray?) = Unit
                 override fun onEndOfSpeech() {
-                    if (phase == Phase.TRANSCRIBING) status.text = "Audio sent. Transcribing…"
+                    if (sessionToken == token && phase == Phase.TRANSCRIBING) {
+                        status.text = "Audio sent. Transcribing…"
+                    }
                 }
                 override fun onError(error: Int) {
-                    finish("Recognition failed: Android SpeechRecognizer error $error. " +
-                        "(9 = insufficient permissions; 3 = audio; 5 = client; 7 = no match.)")
+                    if (sessionToken == token) {
+                        finish("Recognition failed: Android SpeechRecognizer error $error. " +
+                            "(9 = insufficient permissions; 3 = audio; 5 = client; 7 = no match.)")
+                    }
                 }
                 override fun onResults(results: Bundle?) {
+                    if (sessionToken != token) return
                     val text = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                         ?.firstOrNull().orEmpty()
                     finish(if (text.isBlank()) "No text returned." else "Recognized text:\n$text")
@@ -156,13 +177,14 @@ class AudioSourceProbeActivity : Activity() {
         }
     }
 
-    private fun startMicSender() {
-        if (phase != Phase.CONNECTING) return
+    private fun startMicSender(token: Int) {
+        if (sessionToken != token || phase != Phase.CONNECTING) return
         val writer = pipeWrite ?: return finish("Audio pipe was closed before recognition became ready.")
         captureWanted.set(true)
         Thread({
             var mic: AudioRecord? = null
             try {
+                if (sessionToken != token || !captureWanted.get()) return@Thread
                 val minBuffer = AudioRecord.getMinBufferSize(
                     SAMPLE_RATE, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT,
                 )
@@ -174,12 +196,14 @@ class AudioSourceProbeActivity : Activity() {
                 )
                 if (mic.state != AudioRecord.STATE_INITIALIZED) throw IOException("Microphone not initialized")
                 recorder = mic
+                if (sessionToken != token || !captureWanted.get()) return@Thread
                 mic.startRecording()
                 if (mic.recordingState != AudioRecord.RECORDSTATE_RECORDING) {
                     throw IOException("Microphone did not start recording")
                 }
                 runOnUiThread {
-                    if (phase == Phase.CONNECTING) {
+                    if (sessionToken == token && phase == Phase.CONNECTING) {
+                        clearTimeout()
                         phase = Phase.RECORDING
                         button.text = "Stop & transcribe"
                         button.isEnabled = true
@@ -190,17 +214,27 @@ class AudioSourceProbeActivity : Activity() {
 
                 ParcelFileDescriptor.AutoCloseOutputStream(writer).use { output ->
                     val buffer = ByteArray(size)
-                    while (captureWanted.get()) {
+                    while (sessionToken == token && captureWanted.get()) {
                         val read = mic.read(buffer, 0, buffer.size, AudioRecord.READ_BLOCKING)
-                        if (!captureWanted.get()) break
-                        if (read < 0) throw IOException("AudioRecord.read failed: $read")
-                        if (read > 0) output.write(buffer, 0, read)
+                        if (sessionToken != token) break
+                        if (read < 0) {
+                            if (!captureWanted.get()) break // stop() interrupted the blocking read.
+                            throw IOException("AudioRecord.read failed: $read")
+                        }
+                        if (read > 0) {
+                            // Keep the last completed frame even if the user tapped Stop during read.
+                            output.write(buffer, 0, read)
+                            bytesSent.addAndGet(read.toLong())
+                            if ((0 until read).any { buffer[it] != 0.toByte() }) {
+                                nonZeroFrames.incrementAndGet()
+                            }
+                        }
                     }
                 }
             } catch (t: Throwable) {
-                if (captureWanted.getAndSet(false)) {
+                if (sessionToken == token && captureWanted.getAndSet(false)) {
                     runOnUiThread {
-                        if (phase == Phase.CONNECTING || phase == Phase.RECORDING) {
+                        if (sessionToken == token && (phase == Phase.CONNECTING || phase == Phase.RECORDING)) {
                             finish("Audio capture/pipe failed: ${t.javaClass.simpleName}: ${t.message}")
                         }
                     }
@@ -209,7 +243,7 @@ class AudioSourceProbeActivity : Activity() {
                 runCatching { writer.close() } // EOF triggers recognition/transcription on the service side.
                 runCatching { mic?.stop() }
                 runCatching { mic?.release() }
-                recorder = null
+                if (recorder === mic) recorder = null
             }
         }, "brrSpeak-probe-microphone").apply { isDaemon = true }.start()
     }
@@ -217,22 +251,34 @@ class AudioSourceProbeActivity : Activity() {
     private fun stopSending() {
         if (phase != Phase.RECORDING) return
         phase = Phase.TRANSCRIBING
-        button.isEnabled = false
+        button.text = "Cancel test"
+        button.isEnabled = true
         status.text = "Stopping local microphone, closing the PCM pipe, then transcribing…"
+        scheduleTimeout(Phase.TRANSCRIBING, RESULT_TIMEOUT_MS,
+            "No recognition result arrived within two minutes.")
         captureWanted.set(false)
         runCatching { recorder?.stop() } // Wake the blocking read so the writer closes promptly.
         // Do not call stopListening here: the receiver must first consume every queued PCM byte.
     }
 
     private fun finish(message: String) {
-        releaseSession()
+        if (phase == Phase.IDLE) return
         phase = Phase.IDLE
+        releaseSession()
         button.text = "Start audio test"
         button.isEnabled = true
-        status.text = message
+        val durationMs = bytesSent.get() * 1_000L / (SAMPLE_RATE * 2)
+        val diagnostic = when {
+            bytesSent.get() == 0L -> " No microphone PCM reached the pipe."
+            nonZeroFrames.get() == 0L -> " All transmitted PCM samples were zero (muted source)."
+            else -> " Nonzero audio was captured."
+        }
+        status.text = "$message\n\nPCM bytes sent: ${bytesSent.get()} (~${durationMs} ms).$diagnostic"
     }
 
     private fun releaseSession() {
+        sessionToken++ // Ignore late SpeechRecognizer and worker callbacks from a previous run.
+        clearTimeout()
         captureWanted.set(false)
         runCatching { recorder?.stop() }
         runCatching { pipeWrite?.close() }
@@ -243,7 +289,23 @@ class AudioSourceProbeActivity : Activity() {
         recognizer = null
     }
 
+    private fun scheduleTimeout(phaseToWatch: Phase, timeoutMs: Long, message: String) {
+        clearTimeout()
+        val token = sessionToken
+        val task = Runnable {
+            if (sessionToken == token && phase == phaseToWatch) finish(message)
+        }
+        timeoutRunnable = task
+        handler.postDelayed(task, timeoutMs)
+    }
+
+    private fun clearTimeout() {
+        timeoutRunnable?.let { handler.removeCallbacks(it) }
+        timeoutRunnable = null
+    }
+
     override fun onDestroy() {
+        phase = Phase.IDLE
         releaseSession()
         super.onDestroy()
     }
@@ -251,5 +313,7 @@ class AudioSourceProbeActivity : Activity() {
     private companion object {
         const val MIC_REQUEST = 7001
         const val SAMPLE_RATE = 16_000
+        const val READY_TIMEOUT_MS = 25_000L
+        const val RESULT_TIMEOUT_MS = 120_000L
     }
 }

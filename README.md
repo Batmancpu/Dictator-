@@ -58,7 +58,10 @@ the upstream microphone path and may still receive Android 15 error 9. Integrati
 2. From the regular app's **Home → brrSpeak audio-source test** row (or **Dictate → Recording & Audio → Test the Android audio-source handoff**), open the test screen. There is only **one launcher icon**, and the test remains accessible after settings restore. Grant microphone permission when asked.
 3. Tap **Start audio test**, wait until it says it is recording, and speak a short sentence.
 4. Tap **Stop & transcribe**. The test screen closes the audio pipe (without switching keyboards)
-   and should display recognized text or Android's precise `SpeechRecognizer` error code.
+   and should display recognized text or Android's precise `SpeechRecognizer` error code. It
+   also reports transmitted PCM bytes, approximate audio duration, and whether the source was
+   entirely zero-valued (helpful when an Android microphone is silently muted). **Cancel test**
+   remains available during a stuck startup or transcription; both phases have timeouts.
 
 This separate-process probe tests the core audio-descriptor handoff and transcription engine,
 **not** a completed integration into brrBoard. On Android 15, this is a meaningful first
@@ -71,10 +74,13 @@ use `^brrSpeak[.]apk$`. Confirm the detected package ID is **`com.mangoloads.spe
 installing. If an existing Obtainium entry still identifies `net.devemperor.dictate.debug`, it
 is tracking an older fork release; recreate the tracking entry for this new APK.
 
-These experimental APKs use GitHub Actions' debug signing key, which is **not yet guaranteed to
-stay constant between builds**. Later test APKs might need an uninstall/reinstall; stable in-place
-updates require a dedicated persistent signing key. The separately installed paid Dictate app
-is not affected.
+By default these experimental APKs use GitHub Actions' ephemeral debug signing key. **For reliable
+Obtainium in-place updates**, configure four repository *Actions secrets*: `BRRSPEAK_KEYSTORE_BASE64`
+(base64 of a dedicated signing keystore, not the paid upstream app's key), `BRRSPEAK_STORE_PASSWORD`,
+`BRRSPEAK_KEY_ALIAS`, and `BRRSPEAK_KEY_PASSWORD`. The test workflow will use the same private
+keystore on every build once provided. No key or password is committed. Without all four secrets,
+future APKs may require uninstall/reinstall; setting up the persistent key cannot retroactively
+make existing debug-signed installations compatible. The paid Dictate app is not affected.
 
 ## Installation of brrSpeak
 

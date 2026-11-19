@@ -30,9 +30,31 @@ jobs:
       # ubuntu-latest already supplies an Android SDK. The setup-android action's
       # legacy `sdkmanager tools` install fails because that package was retired.
       - uses: gradle/actions/setup-gradle@v4
+      - name: Restore optional persistent brrSpeak test signing key
+        env:
+          BRRSPEAK_KEYSTORE_BASE64: ${{ secrets.BRRSPEAK_KEYSTORE_BASE64 }}
+          BRRSPEAK_STORE_PASSWORD: ${{ secrets.BRRSPEAK_STORE_PASSWORD }}
+          BRRSPEAK_KEY_ALIAS: ${{ secrets.BRRSPEAK_KEY_ALIAS }}
+          BRRSPEAK_KEY_PASSWORD: ${{ secrets.BRRSPEAK_KEY_PASSWORD }}
+        run: |
+          if [[ -z "$BRRSPEAK_KEYSTORE_BASE64" ]]; then
+            echo '::warning::No persistent signing key configured. This test APK may need reinstalling after a future build.'
+            exit 0
+          fi
+          if [[ -z "$BRRSPEAK_STORE_PASSWORD" || -z "$BRRSPEAK_KEY_ALIAS" || -z "$BRRSPEAK_KEY_PASSWORD" ]]; then
+            echo '::error::Incomplete brrSpeak signing secrets. Configure all four secrets or none.'
+            exit 1
+          fi
+          umask 077
+          printf '%s' "$BRRSPEAK_KEYSTORE_BASE64" | base64 --decode > brrspeak-signing.jks
+          test -s brrspeak-signing.jks
       - name: Fetch verified upstream speech model native libraries
         run: bash tools/fetch-sherpa-onnx.sh
       - name: Build separately installable brrSpeak APK
+        env:
+          BRRSPEAK_STORE_PASSWORD: ${{ secrets.BRRSPEAK_STORE_PASSWORD }}
+          BRRSPEAK_KEY_ALIAS: ${{ secrets.BRRSPEAK_KEY_ALIAS }}
+          BRRSPEAK_KEY_PASSWORD: ${{ secrets.BRRSPEAK_KEY_PASSWORD }}
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace :app:assembleExperiment -PbrrSpeakExperiment=true
@@ -59,5 +81,5 @@ jobs:
           gh release create "$tag" \
             brrSpeak.apk \
             --title "brrSpeak audio-source experiment ${GITHUB_RUN_NUMBER}" \
-            --notes "EXPERIMENTAL TEST BUILD, published as the latest non-prerelease solely for Obtainium compatibility. Package: com.mangoloads.speak (NOT net.devemperor.dictate.debug). Includes a standalone launcher test that supplies 16 kHz PCM16 audio to the RecognitionService through EXTRA_AUDIO_SOURCE. Configure the transcription provider in brrSpeak first. GitHub Actions debug signing may change between runs; future test builds may require reinstalling. Not an upstream Dictate release." \
+            --notes "EXPERIMENTAL TEST BUILD, published as the latest non-prerelease solely for Obtainium compatibility. Package: com.mangoloads.speak (NOT net.devemperor.dictate.debug). Open brrSpeak Settings > Home > brrSpeak audio-source test. The separate-process sender supplies 16 kHz PCM16 audio through EXTRA_AUDIO_SOURCE. Configure a transcription provider first. In-place updates require the optional persistent BRRSPEAK signing secrets; otherwise a later test build may require reinstalling. Not an upstream Dictate release." \
             --latest --target "$GITHUB_SHA"

@@ -70,7 +70,9 @@ class RecognitionSession(
         RecognitionBridge.register(this)
         DictateController.startRecognition(
             appContext, sensitiveField, externalAudio,
-            onExternalAudioFinished = { stop() },
+            onExternalAudioFinished = { failed ->
+                if (failed) failAndCancel(SpeechRecognizer.ERROR_AUDIO) else stop()
+            },
         )
         watchdog = scope.launch {
             val startedMs = System.currentTimeMillis()

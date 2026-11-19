@@ -131,6 +131,9 @@ configure<ApplicationExtension> {
     } else {
         null
     }
+    // Separate from the paid upstream app's release key. A persistent *private* signing key can
+    // be restored by CI from this fork's repository secrets; no keystore is committed to Git.
+    val experimentKeystore = rootProject.file("brrspeak-signing.jks")
     signingConfigs {
         keystoreProps?.let { props ->
             create("release") {
@@ -138,6 +141,14 @@ configure<ApplicationExtension> {
                 storePassword = props.getProperty("storePassword")
                 keyAlias = props.getProperty("keyAlias")
                 keyPassword = props.getProperty("keyPassword")
+            }
+        }
+        if (experimentKeystore.exists()) {
+            create("brrSpeakExperiment") {
+                storeFile = experimentKeystore
+                storePassword = checkNotNull(System.getenv("BRRSPEAK_STORE_PASSWORD"))
+                keyAlias = checkNotNull(System.getenv("BRRSPEAK_KEY_ALIAS"))
+                keyPassword = checkNotNull(System.getenv("BRRSPEAK_KEY_PASSWORD"))
             }
         }
     }
@@ -152,12 +163,15 @@ configure<ApplicationExtension> {
         }
 
         // Installable experiment APK with the exact app ID used by external recognizer callers.
-        // It is debuggable and signed with the CI debug key; do not distribute as a production APK.
+        // It is debuggable; prefer the repository's persistent test key when configured, falling
+        // back to an ephemeral debug key otherwise. Never use the original paid app's release key.
         create("experiment") {
             initWith(getByName("debug"))
             applicationIdSuffix = ""
             versionNameSuffix = "-audio-source-experiment.$brrSpeakExperimentRunNumber"
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName(
+                if (experimentKeystore.exists()) "brrSpeakExperiment" else "debug",
+            )
             matchingFallbacks += listOf("debug")
         }
 
